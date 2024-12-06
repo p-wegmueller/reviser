@@ -2,7 +2,7 @@
 % Please edit documentation in R/tests.R
 \name{MincerZarnowitz}
 \alias{MincerZarnowitz}
-\title{Title}
+\title{Mincer-Zarnowitz regression}
 \usage{
 MincerZarnowitz(df_full, df_final, significance)
 }
@@ -13,6 +13,9 @@ MincerZarnowitz(df_full, df_final, significance)
 
 \item{significance}{}
 }
+\value{
+Statistics from MZ-regression
+}
 \description{
-Title
+Mincer-Zarnowitz regression
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/tests.R
 \name{get_revision}
 \alias{get_revision}
-\title{Title}
+\title{get revisions}
 \usage{
 get_revision(df, col_rel_date, col_val_date, i)
 }
@@ -15,6 +15,9 @@ get_revision(df, col_rel_date, col_val_date, i)
 
 \item{i}{}
 }
+\value{
+obtain revisions from data frame
+}
 \description{
-Title
+get revisions
 }

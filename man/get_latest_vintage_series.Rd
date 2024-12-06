@@ -2,7 +2,7 @@
 % Please edit documentation in R/tests.R
 \name{get_latest_vintage_series}
 \alias{get_latest_vintage_series}
-\title{Title}
+\title{get latest vintage}
 \usage{
 get_latest_vintage_series(df, col_rel_date, col_val_date)
 }
@@ -13,6 +13,9 @@ get_latest_vintage_series(df, col_rel_date, col_val_date)
 
 \item{col_val_date}{}
 }
+\value{
+filtered df only with latest data vintage
+}
 \description{
-Title
+get latest vintage
 }

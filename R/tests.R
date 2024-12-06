@@ -1,3 +1,8 @@
+#' @import tidyverse
+#' @import tsbox
+#' @import dlm
+NULL
+
 #' get first release series ("realtime")
 #'
 #' @param df dataframe with revisions, longformat
@@ -7,7 +12,6 @@
 #' @return filtered df with every first release for obs col_val_date
 #' @export
 #'
-#' @examples
 get_realtime_series <- function(df, col_rel_date, col_val_date) {
   df_adj <- df %>%
     group_by({{ col_val_date }}) %>%
@@ -16,17 +20,16 @@ get_realtime_series <- function(df, col_rel_date, col_val_date) {
   return(df_adj)
 }
 
-#' Title
+#' get revisions
 #'
 #' @param df 
 #' @param col_rel_date 
 #' @param col_val_date 
 #' @param i 
 #'
-#' @return
-#' @export
+#' @return obtain revisions from data frame
+#' @export 
 #'
-#' @examples
 get_revision <- function(df, col_rel_date, col_val_date, i) {
   df_adj <- df %>%
     group_by({{ col_val_date }}) %>%
@@ -46,7 +49,6 @@ get_revision <- function(df, col_rel_date, col_val_date, i) {
 #' @return filtered df only with first release + p_month
 #' @export
 #'
-#' @examples
 get_final_revision_series <- function(df, col_rel_date, col_val_date) {
   df_adj <- df %>%
     group_by({{ col_val_date }}) %>%
@@ -65,16 +67,15 @@ get_final_revision_series <- function(df, col_rel_date, col_val_date) {
   return(df_adj)
 } 
 
-#' Title
+#' get latest vintage
 #'
 #' @param df 
 #' @param col_rel_date 
 #' @param col_val_date 
 #'
-#' @return
+#' @return filtered df only with latest data vintage
 #' @export
 #'
-#' @examples
 get_latest_vintage_series <- function(df, col_rel_date, col_val_date) {
   df_adj <- df %>%
     group_by({{ col_val_date }}) %>%
@@ -92,7 +93,6 @@ get_latest_vintage_series <- function(df, col_rel_date, col_val_date) {
 #' @return dataframe with 1 row and summary stats
 #' @export
 #'
-#' @examples
 create_summary_stats <- function(df_i) {
   noise <- (sd(df_i[["revision"]])**2)/(sd(df_i[["initial"]])**2)
   print("noise")
@@ -115,16 +115,15 @@ create_summary_stats <- function(df_i) {
 }
 
 
-#' Title
+#' Mincer-Zarnowitz regression
 #'
 #' @param df_full 
 #' @param df_final 
 #' @param significance 
 #'
-#' @return
+#' @return Statistics from MZ-regression
 #' @export
 #'
-#' @examples
 MincerZarnowitz <- function(df_full, df_final, significance) {
   df_final <- df_final %>%
     rename(value="final") %>% 
@@ -162,4 +161,37 @@ MincerZarnowitz <- function(df_full, df_final, significance) {
   }
   df_output <- list('e' = e-1, 'coef' = model$coefficients, 'p_value' = p_value, 'releases' = df_all)
   return(df_output)
+}
+
+
+#' Univariate simple Kalman filter
+#'
+#' @param df_full 
+#' @param df_final 
+#' @param significance 
+#'
+#' @return MLE of state space model - Kalman filter
+#' @export
+#'
+# 
+KalmanNowcastPrecision <- function(x, y, m0, C0, initial_params) {
+  # TODO: mention imprecision in paper (how mo and c0 were estimtaed)
+  fn <- function(param) {
+    dlm(FF = 1, V = exp(param[1]), GG = param[2], W= exp(param[3]), m0 = m0, C0 = C0)
+  }
+  # Initial parameter values (what are reasonable values?)
+  err <- numeric(length(y))
+  for (i in 1:length(y)) {
+    y_i <- y[1:i]
+    fit <- dlmMLE(y_i, initial_params, build = fn)
+    # Check convergence and log-likelihood
+    print(paste("Convergence: ", fit$convergence))
+    print(paste("Log-likelihood: ", fit$value))
+    # Update state estimates
+    x_hat <- dlmFilter(y_i, fn(fit$par))$m
+    x_i_hat <- x_hat[length(x_hat)]
+    # Update error calculation
+    err[i] <- (x[i] - x_i_hat)^2
+  }
+  return(err)
 }
