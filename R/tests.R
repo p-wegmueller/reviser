@@ -1,7 +1,18 @@
 #' @import tidyverse
 #' @import tsbox
 #' @import dlm
+#' @import sandwich
+#' @import car
 NULL
+
+.onAttach <- function(libname, pkgname) {
+  packageStartupMessage("ReviseR is loading, along with the packages: tidyverse, tsbox, dlm, car, sandwhich.")
+  suppressPackageStartupMessages(library(tidyverse))
+  suppressPackageStartupMessages(library(tsbox))
+  suppressPackageStartupMessages(library(dlm))
+  suppressPackageStartupMessages(library(sandwich))
+  suppressPackageStartupMessages(library(car))
+}
 
 #' get first release series ("realtime")
 #'
