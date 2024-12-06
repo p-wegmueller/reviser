@@ -1,12 +1,11 @@
-Package: test
+Package: ReviseR
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Tools for Studying Revision Properties in Real-Time Time Series Vintages
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Author: Philipp Wegmueller (SECO)
+Maintainer: philipp.wegmueller@seco.admin.ch
+Description: Provides tools to analyze revision properties in real-time time series data.
+License: SECO IP
 Encoding: UTF-8
 LazyData: true
 Depends: 
