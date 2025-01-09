@@ -1,4 +1,11 @@
 library(ReviseR)
+library(lubridate)
+library(tsbox)
+library(sandwich)
+library(dplyr)
+library(car)
+library(dlm)
+
 
 data("sample_data")
 
@@ -25,4 +32,8 @@ MZ_gdp <- MincerZarnowitz(dta, gdp_growth, 0.05)
 y1 <- gdp_growth$initial
 x1 <- gdp_growth$final
 err_pubcon <- KalmanNowcastPrecision(x1, y1, 0, 10, c(-2, 1, -2))
+
+err_pubcon1 <- KalmanNowcastPrecision( y1, 0, 10, c(-2, 1, -2))
+err_pubcon2 <- kalman_nowcast(y1)$nowcast
+
 prec_score <- sqrt(mean(err_pubcon^2))/sqrt(mean((x1-y1)^2))

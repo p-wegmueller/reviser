@@ -1,19 +1,39 @@
-Package: ReviseR
+Package: reviser
 Type: Package
 Title: Tools for Studying Revision Properties in Real-Time Time Series Vintages
-Version: 0.1.0
-Author: person(given = "Philipp", family = "Wegmueller", 
-        email = "philipp.wemueller@seco.admin.ch", role = c("aut", "cre"))
+Version: 0.1.0.9000
+Authors@R: c(
+    person("Marc", "Burri", ,"marc.burri91@gmail.com", role = c("aut", "cre", "cph"),
+           comment = c(ORCID = "0000-0001-8974-9090")),
+    person(given = "Philipp", family = "Wegmueller", 
+        email = "philipp.wemueller@seco.admin.ch", role = c("aut", "cph"))
+  )
 Description: Provides tools to analyze revision properties in real-time time series data.
-License: SECO IP
+Maintainers:  c(
+    person("Marc", "Burri", ,"marc.burri91@gmail.com",
+           comment = c(ORCID = "0000-0001-8974-9090")),
+    person(given = "Philipp", family = "Wegmueller", 
+        email = "philipp.wemueller@seco.admin.ch")
+  )
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Depends: 
     R (>= 2.10)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.1
 Imports:
-    tidyverse,
-    tsbox,
+    magrittr,
+    dplyr,
+    tidyr,
+    ggplot2,
     dlm, 
     car,
-    sandwich
+    sandwich,
+    systemfit,
+    calculus,
+    rlang,
+    scales,
+    tibble
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3

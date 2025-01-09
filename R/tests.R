@@ -1,19 +1,3 @@
-#' @import tidyverse
-#' @import tsbox
-#' @import dlm
-#' @import sandwich
-#' @import car
-NULL
-
-.onAttach <- function(libname, pkgname) {
-  packageStartupMessage("ReviseR is loading, along with the packages: tidyverse, tsbox, dlm, car, sandwhich.")
-  suppressPackageStartupMessages(library(tidyverse))
-  suppressPackageStartupMessages(library(tsbox))
-  suppressPackageStartupMessages(library(dlm))
-  suppressPackageStartupMessages(library(sandwich))
-  suppressPackageStartupMessages(library(car))
-}
-
 #' get first release series ("realtime")
 #'
 #' @param df dataframe with revisions, longformat
@@ -21,8 +5,7 @@ NULL
 #' @param col_val_date name of column with observation dates (date format)
 #'
 #' @return filtered df with every first release for obs col_val_date
-#' @export
-#'
+#' @noRd
 get_realtime_series <- function(df, col_rel_date, col_val_date) {
   df_adj <- df %>%
     group_by({{ col_val_date }}) %>%
@@ -39,8 +22,7 @@ get_realtime_series <- function(df, col_rel_date, col_val_date) {
 #' @param i 
 #'
 #' @return obtain revisions from data frame
-#' @export 
-#'
+#' @noRd
 get_revision <- function(df, col_rel_date, col_val_date, i) {
   df_adj <- df %>%
     group_by({{ col_val_date }}) %>%
@@ -58,8 +40,7 @@ get_revision <- function(df, col_rel_date, col_val_date, i) {
 #' @param p_month number of months to be added to release until "final" revision 
 #' 
 #' @return filtered df only with first release + p_month
-#' @export
-#'
+#' @noRd
 get_final_revision_series <- function(df, col_rel_date, col_val_date) {
   df_adj <- df %>%
     group_by({{ col_val_date }}) %>%
@@ -85,8 +66,7 @@ get_final_revision_series <- function(df, col_rel_date, col_val_date) {
 #' @param col_val_date 
 #'
 #' @return filtered df only with latest data vintage
-#' @export
-#'
+#' @noRd
 get_latest_vintage_series <- function(df, col_rel_date, col_val_date) {
   df_adj <- df %>%
     group_by({{ col_val_date }}) %>%
@@ -102,8 +82,7 @@ get_latest_vintage_series <- function(df, col_rel_date, col_val_date) {
 #' @param df_i 
 #'
 #' @return dataframe with 1 row and summary stats
-#' @export
-#'
+#' @noRd
 create_summary_stats <- function(df_i) {
   noise <- (sd(df_i[["revision"]])**2)/(sd(df_i[["initial"]])**2)
   print("noise")
@@ -133,8 +112,7 @@ create_summary_stats <- function(df_i) {
 #' @param significance 
 #'
 #' @return Statistics from MZ-regression
-#' @export
-#'
+#' @noRd
 MincerZarnowitz <- function(df_full, df_final, significance) {
   df_final <- df_final %>%
     rename(value="final") %>% 
@@ -182,7 +160,7 @@ MincerZarnowitz <- function(df_full, df_final, significance) {
 #' @param significance 
 #'
 #' @return MLE of state space model - Kalman filter
-#' @export
+#' @noRd
 #'
 # 
 KalmanNowcastPrecision <- function(x, y, m0, C0, initial_params) {

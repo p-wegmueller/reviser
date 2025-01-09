@@ -1,0 +1,171 @@
+#' Functions to plot vintages data
+#' 
+#' @export
+plot_vintages <- function(df, type="line", dim_col = "pub_date", title="", subtitle="", ylab = "") {
+  
+  # Check type input
+  if (!type %in% c("line", "point")) {
+    rlang::abort("The 'type' argument must be either 'line' or 'point'.")
+  }
+  
+  # Check 'dim_col' is column name of 'df'
+  if (!dim_col %in% colnames(df)) {
+    rlang::abort(
+      paste0(
+        "The column ", dim_col, " is not found in 'df'."
+      )
+    )
+  }
+  
+  # Check title and subtitle are character strings
+  if (!is.character(title) || !is.character(subtitle)|| !is.character(ylab)) {
+    rlang::abort("The 'title', 'subtitle', and 'ylab' arguments must be character strings.")
+  }
+  
+  
+  dim_col <- as.name(dim_col)
+  
+  check <- vintages_check(df)
+  if (check=="wide") {
+    df <- vintages_long(df, keep_na = FALSE)
+  }
+  
+  if (ncol(df) <= 1L) {
+    rlang::abort("'df' must have at least two columns.")
+  }
+  
+  n <- length(unique(df[[dim_col]]))
+  
+  if (n == 1L || max(table(df$time)) == 1L) {
+    p <- ggplot2::ggplot(
+      df,
+      ggplot2::aes(x = time, y = value)
+    )
+  } else if (n > 1) {
+    
+    if (class(df[[dim_col]]) %in% c("Date","integer", "numeric")) {
+      df[[dim_col]] <- as.character(df[[dim_col]])
+    }
+    
+    if (n > 30) {
+      rlang::warn(
+        paste0(n,
+        " time series supplied. Showing recent 30."
+      ))
+      df <- df %>%
+        dplyr::filter(!!dim_col %in% tail(unique(!!dim_col), 30))
+    }
+    
+    p <- ggplot2::ggplot(
+      df,
+      ggplot2::aes(x = time, y = value, color = !!dim_col)
+    )
+  }
+  if (type == "line") {
+    p <- p + ggplot2::geom_line()
+  } else if (type == "point") {
+    p <- p + ggplot2::geom_point()
+  } else {
+    rlang::abort("Invalid 'type' argument. Must be either 'line' or 'point'.")
+  }
+
+  # labels and title
+  p <- p + ggplot2::ylab(ylab)
+  if (!missing("title")) {
+    if (missing("subtitle")) subtitle <- NULL
+    p <- p + ggplot2::ggtitle(label = title, subtitle = subtitle)
+  }
+  
+  p <- p + scale_color_reviser()
+  
+  if (n > 5) {
+    p <- p + theme_reviser(legend.position ="right", legend.direction = "vertical")
+  } else {
+    p <- p + theme_reviser(legend.position ="bottom", legend.direction = "horizontal")
+  }
+  p
+}
+
+
+
+#' @export
+#' @name plot_vintages
+theme_reviser <- function(base_size = 12, legend.position = "bottom", legend.direction = "horizontal") {
+  half_line <- base_size / 2
+  ggplot2::theme_minimal(base_size = base_size) +
+    ggplot2::theme(
+      axis.title.x = ggplot2::element_blank(),
+      axis.title.y = ggplot2::element_text(
+        size = ggplot2::rel(0.9), color = "grey10",
+        margin = ggplot2::margin(t = 0, r = 7, b = 0, l = 0)
+      ),
+      plot.title = ggplot2::element_text(
+        color = "grey10",
+        face = "bold",
+        margin = ggplot2::margin(t = half_line * 2, b = half_line * 0.7),
+        hjust = 0, size = ggplot2::rel(1.2)
+      ),
+      plot.subtitle = ggplot2::element_text(
+        color = "grey10",
+        margin = ggplot2::margin(t = 0, b = half_line * 1.2),
+        size = ggplot2::rel(0.9),
+        hjust = 0
+      ),
+      plot.caption = ggplot2::element_text(
+        color = "grey50",
+        margin = ggplot2::margin(t = 0, b = half_line * 1.2),
+        size = ggplot2::rel(0.8)
+      ),
+      panel.grid = ggplot2::element_line(linewidth = 0.2),
+      axis.text = ggplot2::element_text(
+        color = "grey10",
+        size = ggplot2::rel(0.7)
+      ),
+      legend.title = ggplot2::element_blank(),
+      legend.text = ggplot2::element_text(
+        color = "grey10",
+        size = ggplot2::rel(0.9)
+      ),
+      legend.position = legend.position,
+      legend.direction = legend.direction
+    )
+}
+
+
+
+#' @export
+#' @name plot_vintages
+colors_reviser <- function() {
+  c(
+    # A soft black
+    "#4D4D4D",
+    # colorblindr
+    "#0072B2", "#D55E00", "#009E73", "#E69F00", "#56B4E9", "#CC79A7", 
+    "#F0E442", "#999999",
+    # Additional Colors
+    "#8D0808", "#461E78", "#4AFFF0", "#34BDCC", "#4F61A1", "#440A4F", "#C3FBC4",
+    "#85F9D6", "#79C7AD", "#A6CC7A", "#DFFF7B",
+    "#8D7B88", "#4E414F", "#BAADB5", "#2D2538", "#837A80", "#FFF68F",
+    "#800080", "#F8B1CC", "#C29BFF", "#FFD700", "#FF6347"
+  )
+}
+
+#' @export
+#' @name plot_vintages
+scale_color_reviser <- function(...) {
+  ggplot2::discrete_scale(
+    aesthetics = "colour",
+    palette = scales::manual_pal(colors_reviser()),
+    ...
+  )
+}
+
+#' @export
+#' @name plot_vintages
+scale_fill_reviser <- function(...) {
+  ggplot2::discrete_scale(
+    aesthetics = "fill",
+    palette = scales::manual_pal(colors_reviser()),
+    ...
+  )
+}
