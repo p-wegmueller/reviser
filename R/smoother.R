@@ -6,7 +6,8 @@
 #'
 #' @return MLE of state space model - Kalman filter and smoother
 #' @export
-#'
+#' TODO: Allow for more lags, add constant and trend, or choose wit IC
+#' TODO: function for start_values grid search
 kk_nowcast <- function(
     df, 
     e, 
@@ -247,22 +248,22 @@ kk_nowcast <- function(
   colnames(Y) <- observable_names
   Ymat <- as.matrix(Y)
   
-  filtered <- dlm::dlmFilter(Ymat, dlmMod)
+  filtered <- dlm::dlmFilter(Ymat, dlm_mod)
   smoothed <- dlm::dlmSmooth(filtered)
   
   # Filtered states
-  filtered_states <- tibble::as_tibble(filtered$m[2:nrow(filtered$m),1:2]) %>%
-    dplyr::mutate(time = df$time[2:(nrow(df))]) %>%
+  filtered_states <- tibble::as_tibble(filtered$m[2:nrow(filtered$m),1:(e+1)]) %>%
+    dplyr::mutate(time = df$time[2:(nrow(df)-1)]) %>%
     dplyr::select(time, !!!setNames(seq_along(state_names), state_names) )
 
   # Smoothed states
-  smoothed_states <- tibble::as_tibble(smoothed$s[2:nrow(smoothed$s),1:2]) %>%
-    dplyr::mutate(time = df$time[2:(nrow(df))]) %>%
+  smoothed_states <- tibble::as_tibble(smoothed$s[2:nrow(smoothed$s),1:(e+1)]) %>%
+    dplyr::mutate(time = df$time[2:(nrow(df)-1)]) %>%
     dplyr::select(time, !!!setNames(seq_along(state_names), state_names) )
   
   # Observations
   observations <- Y  %>%
-    dplyr::mutate(time = df$time[2:(nrow(df))]) %>%
+    dplyr::mutate(time = df$time[2:(nrow(df)-1)]) %>%
     # select time and up to release_e
     dplyr::select(time, dplyr::everything()) 
   
@@ -455,30 +456,45 @@ kk_to_ss <- function(II, FF, GG, R, H, epsilon = 1e-6) {
   e <- nrow(FF) - 1
   
   # Observation matrix Z
-  Z <- cbind(GG, (II - GG) %*% FF)
+  # Z <- cbind(GG, (II - GG) %*% FF)
+  Z <- cbind(II, II)
   
   # State transition matrix T
-  Tmat <- rbind(
-    cbind(FF, matrix(0, e+1, e+1)),
-    Z
+  # Tmat <- rbind(
+  #   cbind(FF, matrix(0, e+1, e+1)),
+  #   Z
+  # )
+  Tmat <- rbind(cbind(
+    FF, array(0, c(e+1, e+1))), 
+    array(0, c(e+1, e+1)), (II - GG) %*% FF
   )
   
   # Covariance matrices
+  # V <- array(0,c(e+1, e+1))
+  # 
+  # # State noise covariance (x_t and y_t-1)
+  # W <- array(0,c(2*(e+1), 2*(e+1)))
+  # 
+  # for (jj in 2:(e+1)) {
+  #   V[jj,jj] <- H[jj,jj]  # e param for V0
+  #   W[jj+e+1,jj+e+1] <- H[jj,jj]  # same e param for W0
+  # }
+  # 
+  # V[1,1] <- epsilon
+  # 
+  # W[1:e,1:e] <- diag(e)*epsilon
+  # W[e+1,e+1] <- R[e+1,e+1]  # 1 param for W0
+  # W[e+2,e+2] <- epsilon
+  
   V <- array(0,c(e+1, e+1))
-  
-  # State noise covariance (x_t and y_t-1)
   W <- array(0,c(2*(e+1), 2*(e+1)))
+  v_t_2 <- R[1:(e+1),1:(e+1)]
+  W[1:(e+1), 1:(e+1)] <- v_t_2
+  W[(1:(e+1)), ((e+2):(2*(e+1)))] <- -v_t_2*t((II-GG))
+  W[((e+2):(2*(e+1))), 1:(e+1)] <- -(II-GG)*v_t_2
+  W[((e+2):(2*(e+1))), ((e+2):(2*(e+1)))] <- H[1:(e+1),1:(e+1)]
   
-  for (jj in 2:(e+1)) {
-    V[jj,jj] <- H[jj,jj]  # e param for V0
-    W[jj+e+1,jj+e+1] <- H[jj,jj]  # same e param for W0
-  }
   
-  V[1,1] <- epsilon
-  
-  W[1:e,1:e] <- diag(e)*epsilon
-  W[e+1,e+1] <- R[e+1,e+1]  # 1 param for W0
-  W[e+2,e+2] <- epsilon
   
   return(list(Z = Z, Tmat = Tmat, V = V, W = W))
 }
