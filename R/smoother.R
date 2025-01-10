@@ -253,17 +253,17 @@ kk_nowcast <- function(
   
   # Filtered states
   filtered_states <- tibble::as_tibble(filtered$m[2:nrow(filtered$m),1:(e+1)]) %>%
-    dplyr::mutate(time = df$time[2:(nrow(df)-1)]) %>%
+    dplyr::mutate(time = df$time[(e+1):(nrow(df))]) %>%
     dplyr::select(time, !!!setNames(seq_along(state_names), state_names) )
 
   # Smoothed states
   smoothed_states <- tibble::as_tibble(smoothed$s[2:nrow(smoothed$s),1:(e+1)]) %>%
-    dplyr::mutate(time = df$time[2:(nrow(df)-1)]) %>%
+    dplyr::mutate(time = df$time[(e+1):(nrow(df))]) %>%
     dplyr::select(time, !!!setNames(seq_along(state_names), state_names) )
   
   # Observations
   observations <- Y  %>%
-    dplyr::mutate(time = df$time[2:(nrow(df)-1)]) %>%
+    dplyr::mutate(time = df$time[(e+1):(nrow(df))]) %>%
     # select time and up to release_e
     dplyr::select(time, dplyr::everything()) 
   
@@ -464,9 +464,9 @@ kk_to_ss <- function(II, FF, GG, R, H, epsilon = 1e-6) {
   #   cbind(FF, matrix(0, e+1, e+1)),
   #   Z
   # )
-  Tmat <- rbind(cbind(
-    FF, array(0, c(e+1, e+1))), 
-    array(0, c(e+1, e+1)), (II - GG) %*% FF
+  Tmat <- rbind(
+    cbind(FF, array(0, c(e+1, e+1))), 
+    cbind(array(0, c(e+1, e+1)), (II - GG) %*% FF)
   )
   
   # Covariance matrices
@@ -492,7 +492,12 @@ kk_to_ss <- function(II, FF, GG, R, H, epsilon = 1e-6) {
   W[1:(e+1), 1:(e+1)] <- v_t_2
   W[(1:(e+1)), ((e+2):(2*(e+1)))] <- -v_t_2*t((II-GG))
   W[((e+2):(2*(e+1))), 1:(e+1)] <- -(II-GG)*v_t_2
-  W[((e+2):(2*(e+1))), ((e+2):(2*(e+1)))] <- H[1:(e+1),1:(e+1)]
+  W[((e+2):(2*(e+1))), ((e+2):(2*(e+1)))] <- H[1:(e+1),1:(e+1)] + (II-GG)*v_t_2*(II-GG)
+  
+  for (jj in c(1:e,e+2)) {
+    W[jj,jj] <- epsilon
+  }
+
   
   
   
