@@ -4,6 +4,8 @@
 # reviser <img src="man/figures/logo.png" align="right" height="139" />
 
 <!-- badges: start -->
+
+[![R-CMD-check](https://github.com/p-wegmueller/ReviseR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/p-wegmueller/ReviseR/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 **reviser** is an R package designed for working with time-series

@@ -9,7 +9,7 @@ Authors@R: c(
         email = "philipp.wemueller@seco.admin.ch", role = c("aut", "cph"))
   )
 Description: Provides tools to analyze revision properties in real-time time series data.
-Maintainers:  c(
+Maintainers: c(
     person("Marc", "Burri", ,"marc.burri91@gmail.com",
            comment = c(ORCID = "0000-0001-8974-9090")),
     person(given = "Philipp", family = "Wegmueller", 
@@ -36,5 +36,8 @@ Imports:
     glue
 Suggests: 
     tsbox,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown
 Config/testthat/edition: 3
+VignetteBuilder: knitr
