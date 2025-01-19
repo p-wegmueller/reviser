@@ -60,6 +60,7 @@ final_release <- get_nth_release(gdp_long, n = 16)
 df <- get_nth_release(gdp_long, n = 0:6)
 
 summary <- get_revision_analysis(df, final_release)
+print(summary)
 
 efficient_release <- get_first_efficient_release(df, final_release)
 summary(efficient_release)

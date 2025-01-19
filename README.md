@@ -53,6 +53,27 @@ final_release <- get_nth_release(gdp_long, n = 16)
 df <- get_nth_release(gdp_long, n = 0:6)
 
 summary <- get_revision_analysis(df, final_release)
+print(summary)
+#> # A tibble: 7 × 29
+#>   release      N Frequency `Bias (mean)` `Bias (p-value)` Bias (robust p-value…¹
+#>   <chr>    <dbl>     <dbl>         <dbl>            <dbl>                  <dbl>
+#> 1 release…   163         4       0.00983            0.762                  0.753
+#> 2 release…   163         4      -0.0204             0.477                  0.478
+#> 3 release…   163         4      -0.0223             0.427                  0.433
+#> 4 release…   163         4      -0.0158             0.532                  0.527
+#> 5 release…   163         4      -0.0121             0.617                  0.607
+#> 6 release…   163         4      -0.0115             0.600                  0.609
+#> 7 release…   163         4      -0.0216             0.279                  0.312
+#> # ℹ abbreviated name: ¹​`Bias (robust p-value)`
+#> # ℹ 23 more variables: `Bias (intercept)` <dbl>,
+#> #   `Bias (intercept p-value)` <dbl>, `Bias (slope)` <dbl>,
+#> #   `Bias (slope p-value)` <dbl>, `Efficiency (intercept)` <dbl>,
+#> #   `Efficiency (intercept p-value)` <dbl>, `Efficiency (slope)` <dbl>,
+#> #   `Efficiency (slope p-value)` <dbl>, Minimum <dbl>, Maximum <dbl>,
+#> #   `Std. Dev.` <dbl>, `Noise/Signal` <dbl>, Correlation <dbl>, …
+```
+
+``` r
 
 efficient_release <- get_first_efficient_release(df, final_release)
 summary(efficient_release)
