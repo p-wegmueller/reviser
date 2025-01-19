@@ -1,21 +1,32 @@
+---
+output: github_document
+---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
 
 # reviser <img src="man/figures/logo.png" align="right" height="139" />
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-**reviser** is an R package designed for working with time-series
-vintages data. The package provides tools to clean, visualize, and
-analyze time-series revisions.
+**reviser** is an R package designed for working with time-series vintages data. The package provides tools to clean, visualize, and analyze time-series revisions.
+
 
 ## Installation
 
-You can install the development version of reviser from
-[GitHub](https://github.com/) with:
+You can install the development version of reviser from [GitHub](https://github.com/) with:
 
-``` r
+
+```r
 # Install devtools if not already installed
 # install.packages("devtools")
 
@@ -23,11 +34,11 @@ You can install the development version of reviser from
 devtools::install_github("p-wegmueller/ReviseR")
 ```
 
-## Usage
 
 ## Usage
+## Usage
 
-``` r
+```r
 library(reviser)
 library(dplyr)
 
