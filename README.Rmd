@@ -26,7 +26,7 @@ knitr::opts_chunk$set(
 You can install the development version of reviser from [GitHub](https://github.com/) with:
 
 
-```r
+```{r}
 # Install devtools if not already installed
 # install.packages("devtools")
 
@@ -36,13 +36,12 @@ devtools::install_github("p-wegmueller/ReviseR")
 
 
 ## Usage
-## Usage
 
-```r
+```{r, eval = TRUE}
 library(reviser)
 library(dplyr)
 
-gdp <- data(gdp) %>% tsbox::ts_pc()
+gdp <- gdp %>% tsbox::ts_pc() %>% tsbox::ts_span(start = "1980-01-01") 
 
 gdp_wide <- vintages_wide(gdp)
 
@@ -56,9 +55,9 @@ plot_vintages(
     ),
   type = "line")
   
-final_release <- get_nth_release(gdp_long_pc, n = 16)
+final_release <- get_nth_release(gdp_long, n = 16)
 
-df <- get_nth_release(gdp_long_pc, n = 0:6)
+df <- get_nth_release(gdp_long, n = 0:6)
 
 summary <- get_revision_analysis(df, final_release)
 
