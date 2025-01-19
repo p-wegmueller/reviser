@@ -38,10 +38,12 @@ gdp_long <- vintages_long(gdp_wide, keep_na = FALSE)
 plot_vintages(
   gdp_long %>% 
   filter(
-    pub_date > as.Date("2009-01-01") & pub_date < as.Date("2009-10-01"),
+    pub_date >= as.Date("2009-01-01") & pub_date < as.Date("2010-01-01"),
     time < as.Date("2010-01-01") & time > as.Date("2008-01-01")
     ),
-  type = "line")
+  type = "line",
+  title = "Revisions of GDP during the financial crisis",
+  subtitle = "qoq growth rates")
 ```
 
 <img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
