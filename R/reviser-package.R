@@ -3,10 +3,9 @@
 #' `browseVignettes(package = "reviser")`
 #' @keywords internal
 "_PACKAGE"
-#utils::globalVariables(c(
- # ".", "id", "ind_freq", "month", "week", "quarter", "time", "year",
-# "n", "values", "frquency", "period", "observations", "targ_freq"
-#  ))
+utils::globalVariables(c(
+ ".", "final_value", "pub_date", "release", "time", "value", "value_ref"
+  ))
 
 #' @importFrom magrittr %>%
 #' @importFrom calculus %mx% %diff% %sum% %prod%

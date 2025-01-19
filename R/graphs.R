@@ -1,11 +1,88 @@
-#' Functions to plot vintages data
+#' Plot Vintages Data
+#'
+#' A flexible function to visualize vintage data using various plot types such as line plots, point plots, bar plots, or boxplots. 
+#' The function ensures that input data is validated and appropriately transformed before plotting.
+#'
+#' @param df A data frame containing the vintage data to be plotted. Must include at least two columns: 
+#' one for time (`time`) and one for value (`value`).
+#' @param type A character string specifying the type of plot to create. Options are:
+#' \itemize{
+#'   \item{ "line": Line plot (default).}
+#'   \item{ "point": Scatter plot.}
+#'   \item{ "bar": Bar plot.}
+#'   \item{ "boxplot": Boxplot.}
+#'   }
+#' @param dim_col A character string specifying the column name in `df` that represents publication dates or other grouping dimensions (e.g. `"release"`). Defaults to `"pub_date"`.
+#' @param title A character string specifying the title of the plot. Defaults to an empty string.
+#' @param subtitle A character string specifying the subtitle of the plot. Defaults to an empty string.
+#' @param ylab A character string specifying the label for the y-axis. Defaults to an empty string.
+#'
+#' @return A ggplot2 plot object representing the specified vintage data visualization.
+#'
+#' @details
+#' The `plot_vintages` function is designed to handle data frames in both wide and long formats. It ensures 
+#' that the provided data frame includes the necessary columns for plotting. If the `dim_col` column contains 
+#' more than 30 unique values, only the most recent 30 are plotted. Additionally, the function supports 
+#' custom themes and color scales using `scale_color_reviser`, `scale_fill_reviser`, and `theme_reviser`.
+#'
+#' The function raises an error if:
+#' \itemize{
+#'  \item{The `type` argument is not one of `"line"`, `"point"`, `"bar"`, or `"boxplot"`.}
+#'  \item{The specified `dim_col` is not a column in `df`.}
+#'  \item{`title`, `subtitle`, or `ylab` are not character strings.}
+#' }
 #' 
+#' @seealso [theme_reviser()], [scale_color_reviser()], [scale_fill_reviser()]
+#' @examples
+#' # Example data
+#' df <- data.frame(
+#'   time = rep(seq.Date(from = as.Date("2022-01-01"), by = "month", length.out = 12), 3),
+#'   value = runif(36, 50, 100),
+#'   pub_date = rep(c("2022-01-05", "2022-02-07", "2022-03-03"), each = 12)
+#' )
+#'
+#' # Line plot
+#' plot_vintages(
+#'   df, 
+#'   type = "line", 
+#'   dim_col = "pub_date", 
+#'   title = "Line plot", 
+#'   subtitle = "Randomly generated data"
+#'   )
+#'
+#' # Point plot
+#' plot_vintages(
+#'   df, 
+#'   type = "point", 
+#'   dim_col = "pub_date", 
+#'   title = "Scatter plot", 
+#'   subtitle = "Randomly generated data"
+#'   )
+#'
+#' # Bar plot
+#' plot_vintages(
+#'   df, 
+#'   type = "bar", 
+#'   dim_col = "pub_date", 
+#'   title = "Bar plot", 
+#'   subtitle = "Randomly generated data"
+#'   )
+#'
+#' # Boxplot
+#' plot_vintages(
+#'   df, 
+#'   type = "boxplot", 
+#'   dim_col = "pub_date", 
+#'   title = "Boxplot", 
+#'   subtitle = "Randomly generated data"
+#'   )
+#'
 #' @export
 plot_vintages <- function(df, type="line", dim_col = "pub_date", title="", subtitle="", ylab = "") {
   
   # Check type input
-  if (!type %in% c("line", "point")) {
-    rlang::abort("The 'type' argument must be either 'line' or 'point'.")
+  if (!type %in% c("line", "point", "bar", "boxplot")) {
+    rlang::abort("The 'type' argument must be either 'line', 'point', 'bar' or 'boxplot'.")
   }
   
   # Check 'dim_col' is column name of 'df'
@@ -36,6 +113,11 @@ plot_vintages <- function(df, type="line", dim_col = "pub_date", title="", subti
   
   n <- length(unique(df[[dim_col]]))
   
+  df <- df %>%
+    dplyr::group_by(time) %>%
+    dplyr::arrange(dplyr::desc(abs(value)), .by_group = TRUE) %>%
+    dplyr::ungroup()
+  
   if (n == 1L || max(table(df$time)) == 1L) {
     p <- ggplot2::ggplot(
       df,
@@ -53,18 +135,26 @@ plot_vintages <- function(df, type="line", dim_col = "pub_date", title="", subti
         " time series supplied. Showing recent 30."
       ))
       df <- df %>%
-        dplyr::filter(!!dim_col %in% tail(unique(!!dim_col), 30))
+        dplyr::filter(!!dim_col %in% utils::tail(unique(!!dim_col), 30))
     }
     
     p <- ggplot2::ggplot(
       df,
-      ggplot2::aes(x = time, y = value, color = !!dim_col)
+      ggplot2::aes(x = time, y = value)
     )
   }
   if (type == "line") {
-    p <- p + ggplot2::geom_line()
+    p <- p + ggplot2::geom_line(ggplot2::aes(color = !!dim_col)) + 
+      scale_color_reviser()
   } else if (type == "point") {
-    p <- p + ggplot2::geom_point()
+    p <- p + ggplot2::geom_point(ggplot2::aes(color = !!dim_col)) + 
+      scale_color_reviser()
+  } else if(type == "bar") {
+    p <- p + ggplot2::geom_bar(ggplot2::aes(color = !!dim_col, fill = !!dim_col), position = "identity", stat = "identity") + 
+      scale_color_reviser() + scale_fill_reviser()
+  } else if(type == "boxplot") {
+    p <- p + ggplot2::geom_boxplot(ggplot2::aes(fill = factor(time))) + 
+      scale_fill_reviser() + theme_reviser(legend.position ="none")
   } else {
     rlang::abort("Invalid 'type' argument. Must be either 'line' or 'point'.")
   }
@@ -76,20 +166,44 @@ plot_vintages <- function(df, type="line", dim_col = "pub_date", title="", subti
     p <- p + ggplot2::ggtitle(label = title, subtitle = subtitle)
   }
   
-  p <- p + scale_color_reviser()
-  
+  if (!type == "boxplot") {
   if (n > 5) {
     p <- p + theme_reviser(legend.position ="right", legend.direction = "vertical")
   } else {
     p <- p + theme_reviser(legend.position ="bottom", legend.direction = "horizontal")
   }
+  }
   p
 }
 
 
-
+#' Custom Visualization Theme and Color Scales for Reviser
+#'
+#' These functions provide a custom visualization theme and color scales for use with ggplot2, inspired by the `tsbox` package. 
+#'
+#' @param base_size Numeric. The base font size for the theme. Default is 12.
+#' @param legend.position Character. Position of the legend. Default is "bottom".
+#' @param legend.direction Character. Direction of the legend. Default is "horizontal".
+#' @param ... Additional arguments passed to the ggplot2 scale functions.
+#'
+#' @return A customized ggplot2 theme, color palette, or scale.
+#'
+#' @details
+#' \itemize{
+#' \item{`theme_reviser`: Defines a minimal theme with custom adjustments for axis titles, plot titles, subtitles, captions, and legend positioning.}
+#' \item{`colors_reviser`: Provides a predefined set of colors, including a soft black, a palette suitable for colorblind readers, and additional colors for extended use.}
+#' \item{`scale_color_reviser`: A ggplot2 color scale that uses the custom `colors_reviser` palette.}
+#' \item{`scale_fill_reviser`: A ggplot2 fill scale that uses the custom `colors_reviser` palette.}
+#'}
+#'
+#' @examples
+#' library(ggplot2)
+#' ggplot(mtcars, aes(x = wt, y = mpg, color = factor(cyl))) +
+#'   geom_point(size = 3) +
+#'   theme_reviser() +
+#'   scale_color_reviser()
+#'
 #' @export
-#' @name plot_vintages
 theme_reviser <- function(base_size = 12, legend.position = "bottom", legend.direction = "horizontal") {
   half_line <- base_size / 2
   ggplot2::theme_minimal(base_size = base_size) +
@@ -134,7 +248,7 @@ theme_reviser <- function(base_size = 12, legend.position = "bottom", legend.dir
 
 
 #' @export
-#' @name plot_vintages
+#' @name theme_reviser
 colors_reviser <- function() {
   c(
     # A soft black
@@ -151,7 +265,7 @@ colors_reviser <- function() {
 }
 
 #' @export
-#' @name plot_vintages
+#' @name theme_reviser
 scale_color_reviser <- function(...) {
   ggplot2::discrete_scale(
     aesthetics = "colour",
@@ -161,7 +275,7 @@ scale_color_reviser <- function(...) {
 }
 
 #' @export
-#' @name plot_vintages
+#' @name theme_reviser
 scale_fill_reviser <- function(...) {
   ggplot2::discrete_scale(
     aesthetics = "fill",

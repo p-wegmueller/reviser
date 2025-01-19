@@ -2,10 +2,33 @@
 % Please edit documentation in R/revisions.R
 \name{get_days_to_release}
 \alias{get_days_to_release}
-\title{get the number of days between first release and period end:}
+\title{Calculate the Number of Days Between Period End and First Release}
 \usage{
 get_days_to_release(df)
 }
+\arguments{
+\item{df}{A data frame containing data vintages. The data frame must include the columns 
+`pub_date` (publication date of the release) and `time` (the corresponding time period for the data).}
+}
+\value{
+A data frame with an additional column `days_to_release` representing the number of days between 
+        the publication date (`pub_date`) and the time period (`time`) for each release.
+}
 \description{
-get the number of days between first release and period end:
+Computes the number of days between the publication date (`pub_date`) of a release and the time period 
+(`time`) end date for each record in the dataset.
+}
+\details{
+The function calculates the difference between `pub_date` and `time` for each row in the dataset. 
+The result is expressed as the number of days between the release publication date and the corresponding 
+time period end. If the dataset is in wide format, it will first be transformed into long format using 
+`vintages_long`.
+}
+\examples{
+# Example data
+df <- reviser::gdp
+
+# Calculate days to release
+df_with_days <- get_days_to_release(df)
+
 }

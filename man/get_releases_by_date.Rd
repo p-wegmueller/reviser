@@ -2,10 +2,35 @@
 % Please edit documentation in R/revisions.R
 \name{get_releases_by_date}
 \alias{get_releases_by_date}
-\title{get all releases of a single observation date:}
+\title{Get Data Releases for a Specific Date}
 \usage{
 get_releases_by_date(df, date)
 }
+\arguments{
+\item{df}{A data frame containing data vintages. The data frame must include the columns 
+`pub_date` (publication date of the release) and `time` (the corresponding time period for the data).}
+
+\item{date}{A Date object specifying the time period (date) for which releases should be retrieved.}
+}
+\value{
+A data frame containing the releases for the specified date. The returned data frame will include 
+        the same structure as the input, filtered to only include rows matching the `date` in the `time` column.
+}
 \description{
-get all releases of a single observation date:
+Filters the input dataset to return the releases corresponding to a specific time period (date).
+}
+\details{
+This function filters the input data based on the specified `date` in the `time` column. The input dataset 
+must have the `pub_date` and `time` columns, with `time` being the period to match against the given `date`. 
+If the dataset is in wide format, it will first be transformed into long format using the helper function 
+`vintages_long`.
+}
+\examples{
+# Example data
+df <- reviser::gdp
+
+# Get releases for a specific date
+date <- as.Date("2020-04-01")
+releases_on_date <- get_releases_by_date(df, date)
+
 }

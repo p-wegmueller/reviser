@@ -2,16 +2,46 @@
 % Please edit documentation in R/revisions.R
 \name{get_nth_release}
 \alias{get_nth_release}
-\title{get nth vintage}
+\title{Extract the Nth Data Release (Vintage)}
 \usage{
-get_nth_release(df, n = 1)
+get_nth_release(df, n = 0)
 }
 \arguments{
-\item{df}{}
+\item{df}{A data frame containing data vintages. The data frame must include the columns 
+`pub_date` (publication date of the release) and `time` (the corresponding time period for the data).}
+
+\item{n}{The release number to extract. Accepts:
+- A non-negative integer or vector (e.g., 0 for the first release, 1 for the second, etc.).
+- `"first"` to extract the first release.
+- `"latest"` to extract the most recent release.
+Default is 0 (the first release).}
 }
 \value{
-filtered df only with first data vintage
+A filtered data frame containing only the specified release(s). The resulting data frame is 
+        assigned the class `tbl_nth_rel` to indicate its structure.
 }
 \description{
-get nth vintage
+Filters the input dataset to return the Nth release (or vintage) of data for each time period. 
+The function supports selecting the first, latest, or a specific numbered release (starting from 0).
+}
+\details{
+The behavior depends on the value of `n`:
+- **Non-negative integer**: The function retrieves the Nth release for each time period. Note that the release 
+  indexing starts at 0 (e.g., 0 = first release, 1 = second release, etc.).
+- **"first"**: Retrieves the first release for each time period (via `get_first_release`).
+- **"latest"**: Retrieves the most recent release for each time period (via `get_latest_release`).
+}
+\examples{
+# Example data
+df <- reviser::gdp
+
+# Get the first release (n = 0)
+first_release <- get_nth_release(df, n = 0)
+
+# Get the latest release
+latest_release <- get_nth_release(df, n = "latest")
+
+# Get the second release (n = 1)
+second_release <- get_nth_release(df, n = 1)
+
 }

@@ -2,13 +2,44 @@
 % Please edit documentation in R/revisions.R
 \name{summary.list_eff_rel}
 \alias{summary.list_eff_rel}
-\title{summary of efficient release models}
+\title{Summary of Efficient Release Models}
 \usage{
 \method{summary}{list_eff_rel}(object, ...)
 }
 \arguments{
-\item{output}{from get_first_efficient_release}
+\item{object}{An output object from the `get_first_efficient_release` function. 
+The object must be of class `list_eff_rel`.}
+
+\item{...}{Additional arguments (not used).}
+}
+\value{
+This function does not return a value. It prints the summary to the console.
 }
 \description{
-summary of efficient release models
+Provides a detailed summary of the regression model and hypothesis test for the first efficient release 
+identified by the `get_first_efficient_release` function.
+}
+\details{
+This function prints the following information:
+- The index of the first efficient release.
+- A summary of the regression model fitted for the efficient release, which includes coefficients, 
+  R-squared values, and other relevant statistics.
+- The hypothesis test results for the efficient release, showing the test statistic and p-value 
+  for the null hypothesis of unbiasedness and efficiency.
+
+The function assumes the object includes:
+- `e`: The index of the first efficient release (0-based).
+- `models`: A list of linear regression models for each release.
+- `tests`: A list of hypothesis test results corresponding to each release.
+}
+\examples{
+# Example usage
+df <- get_nth_release(reviser::gdp, n = 0:3)
+
+final_release <- get_nth_release(reviser::gdp, n = "latest")
+
+# Identify the first efficient release
+result <- get_first_efficient_release(df, final_release)
+summary(result)
+
 }

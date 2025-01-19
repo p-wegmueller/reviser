@@ -2,27 +2,65 @@
 % Please edit documentation in R/utils.R
 \name{vintages_rename}
 \alias{vintages_rename}
-\title{Function to rename columns in accordance with the package}
+\title{Rename Columns to Align with Package Standards}
 \usage{
 vintages_rename(
   df,
   col_time = NULL,
   col_pub_date = NULL,
   col_value = NULL,
+  col_release = NULL,
   col_id = NULL
 )
 }
 \arguments{
-\item{df}{data.frame or tibble}
+\item{df}{A data frame or tibble containing the data to be renamed.}
 
-\item{col_time}{name of column with observation dates (date format)}
+\item{col_time}{Optional. The name of the column to be renamed as `time`. 
+The `time` column represents observation dates and will be converted to `Date` format.}
 
-\item{col_pub_date}{name of column with release dates (date format)}
+\item{col_pub_date}{Optional. The name of the column to be renamed as `pub_date`. 
+The `pub_date` column represents release dates and will be converted to `Date` format.}
 
-\item{col_value}{name of column with values}
+\item{col_value}{Optional. The name of the column to be renamed as `value`. 
+The `value` column represents the observed values and will be converted to numeric.}
 
-\item{col_id}{name of column with id}
+\item{col_release}{Optional. The name of the column to be renamed as `release`.
+The `id` column is used as an identifier and will be converted to character format.}
+
+\item{col_id}{Optional. The name of the column to be renamed as `id`.}
+}
+\value{
+A data frame or tibble with the renamed columns and their respective data types converted 
+        (if specified). The original class of the input object is preserved.
 }
 \description{
-Function to rename columns in accordance with the package
+Renames columns in a data frame or tibble to align with the conventions used in this package. 
+Converts the renamed columns to the appropriate data types.
+}
+\details{
+The function checks the validity of the input data frame and ensures that at least one column 
+is specified for renaming. If a column is renamed, it is also converted to the expected data type:
+- `time` and `pub_date` are converted to `Date`.
+- `value` is converted to numeric.
+- `release` and `id` are converted to character.
+}
+\examples{
+# Example data
+data <- tibble::tibble(
+  observation_date = seq.Date(as.Date("2020-01-01"), as.Date("2020-06-01"), by = "month"),
+  release_date = seq.Date(as.Date("2020-01-15"), as.Date("2020-06-15"), by = "month"),
+  observed_value = rnorm(6),
+  identifier = rep("A", 6)
+)
+
+# Rename columns
+renamed_data <- vintages_rename(
+  data,
+  col_time = observation_date,
+  col_pub_date = release_date,
+  col_value = observed_value,
+  col_id = identifier
+)
+
 }

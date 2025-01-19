@@ -1,4 +1,46 @@
-#' get revisions
+#' Calculate Revisions in Vintage Data
+#'
+#' Computes revisions in vintage data based on specified reference points: a fixed reference date, 
+#' the nth release, or a specified interval. This function allows users to analyze differences between 
+#' data vintages across time.
+#'
+#' @param df A data frame containing vintage data. The data frame must include at least the following columns:
+#'   - `pub_date`: The publication date of each vintage.
+#'   - `time`: The reference period (e.g., quarter or month).
+#'   - `value`: The observed value for the given vintage and reference period.
+#' @param interval A positive integer specifying the lag (in periods) between vintages to compute revisions. 
+#'   Defaults to `1` if no other parameter is specified.
+#' @param nth_release A positive integer or `"latest"`, specifying the release to use as a reference for revisions.
+#'   If `"latest"`, the most recent vintage is used.
+#' @param ref_date A date specifying the fixed reference publication date to compare all vintages against.
+#'
+#' @return A data frame (tibble) of class `tbl_rev`, with the following columns:
+#'   - `pub_date`: The publication date of the vintage.
+#'   - `time`: The reference period (e.g., quarter or month).
+#'   - `value`: The calculated revision, i.e., the difference between the observed value and the reference value.
+#'
+#' @details
+#' The function supports three mutually exclusive methods for calculating revisions:
+#' - **Reference date (`ref_date`)**: Computes revisions relative to a fixed publication date.
+#' - **Interval (`interval`)**: Computes revisions relative to vintages published `interval` periods earlier.
+#' - **Nth release (`nth_release`)**: Computes revisions relative to the nth vintage release for each reference period.
+#'
+#' If no method is explicitly specified, `interval = 1` is used by default.
+#'
+#' Input validation ensures that only one of `ref_date`, `nth_release`, or `interval` is specified. 
+#'
+#' @examples
+#' # Example data
+#' df <- reviser::gdp
+#'
+#' # Calculate revisions using an interval of 1
+#' revisions_interval <- get_revisions(df, interval = 1)
+#' 
+#' # Calculate revisions using a fixed reference date
+#' revisions_date <- get_revisions(df, ref_date = as.Date("2023-02-01"))
+#'
+#' # Calculate revisions relative to the nth release (2nd release)
+#' revisions_nth <- get_revisions(df, nth_release = 2)
 #'
 #' @export
 get_revisions <- function(df, interval = NULL, nth_release = NULL, ref_date = NULL) {
@@ -15,8 +57,8 @@ get_revisions <- function(df, interval = NULL, nth_release = NULL, ref_date = NU
   }
   
   if (!is.null(ref_date)) {
-    ref_date <- as.Date(ref_date)
-    if (!is.Date(ref_date)) {
+    ref_date <- tryCatch(as.Date(ref_date), error = function(e) e)
+    if (!c("Date") %in% class(ref_date)) {
       rlang::abort("The input 'ref_date' must be a date object.")
     }
   } else if (!is.null(interval)) {
@@ -42,9 +84,9 @@ get_revisions <- function(df, interval = NULL, nth_release = NULL, ref_date = NU
   
   if (!is.null(ref_date)) {
     # Calculate revisions against the specified reference date
-    revisions <- data %>%
+    revisions <- df %>%
       dplyr::inner_join(
-        data %>%
+        df %>%
           dplyr::filter(pub_date == ref_date) %>%
           dplyr::select(time, value_ref = value),
         by = "time"
@@ -70,7 +112,7 @@ get_revisions <- function(df, interval = NULL, nth_release = NULL, ref_date = NU
         get_nth_release(df, n = nth_release) %>%
           dplyr::select(time, value_ref = value),
         by = "time"
-      )
+      ) %>%
       dplyr::mutate(value = value - value_ref) %>%
       dplyr::filter(!is.na(value)) %>%
       dplyr::select(pub_date, time, value)
@@ -79,14 +121,57 @@ get_revisions <- function(df, interval = NULL, nth_release = NULL, ref_date = NU
   return(revisions)
 }
 
-#' get first efficient release using Mincer Zarnowitz regression
+#' Identify the First Efficient Release in Vintage Data
 #'
-#' @param df 
+#' Identifies the first release in a sequence of vintages that is "efficient" relative to the final release. 
+#' A release is deemed efficient if it satisfies specific conditions of unbiasedness and efficiency, 
+#' tested using a Mincer-Zarnowitz type linear regression and hypothesis testing.
 #'
-#' @return filtered df only with first data vintage
+#' @param df A data frame of class `tbl_nth_rel` containing the vintage data. 
+#'   It must include the columns:
+#'   - `time`: The reference period (e.g., quarter or month).
+#'   - `value`: The observed value for the given release.
+#'   - `release`: The release number or identifier.
+#' @param final_release A data frame containing the final release data. 
+#'   This must include the columns:
+#'   - `time`: The reference period.
+#'   - `value`: The observed final value for the given period.
+#' @param significance A numeric value specifying the significance level for the hypothesis test (default is `0.05`).
+#' @param test_all A logical value indicating whether to test all releases, even after finding the first efficient release (default is `FALSE`).
+#'
+#' @return A list of class `list_eff_rel` with the following elements:
+#'   - `e`: The index of the first efficient release (0-based index).
+#'   - `data`: A long-format data frame containing the vintage data with the final release appended.
+#'   - `models`: A list of linear regression models fitted for each release.
+#'   - `tests`: A list of hypothesis test results for each release.
+#'
+#' @details
+#' The function performs the following steps:
+#' 1. Validates inputs and ensures both `df` and `final_release` are in the correct format.
+#' 2. Iteratively tests each release for efficiency using a linear regression model of the form:
+#'    \deqn{final = \beta_0 + \beta_1 \cdot release_i + \epsilon}
+#'    The null hypothesis for efficiency is:
+#'    - \eqn{\beta_0 = 0} (no bias)
+#'    - \eqn{\beta_1 = 1} (efficiency)
+#'    Uses heteroskedasticity and autocorrelation consistent (HAC) standard errors for robust hypothesis testing.
+#' 3. Stops testing when the first efficient release is found (unless `test_all = TRUE`).
+#'
+#' If no efficient release is found, a warning is issued.
+#'
+#' @examples
+#' # Example data
+#' df <- get_nth_release(reviser::gdp, n = 0:3)
+#' 
+#' final_release <- get_nth_release(reviser::gdp, n = "latest")
+#'
+#' # Identify the first efficient release
+#' result <- get_first_efficient_release(df, final_release, significance = 0.05)
+#'
+#' # Access the index of the first efficient release
+#' result$e
+#'
 #' @export
-#'
-get_first_efficient_release <- function(df, final_release, significance=0.05) {
+get_first_efficient_release <- function(df, final_release, significance=0.05, test_all = FALSE) {
   
   
   if(!"tbl_nth_rel" %in% class(df)) {
@@ -112,14 +197,13 @@ get_first_efficient_release <- function(df, final_release, significance=0.05) {
     dplyr::mutate(release = "final")
   
   df <- df %>%
-    dplyr::select(time, value, release) %>%
-    dplyr::mutate(release = paste0("release_", release))
+    dplyr::select(time, value, release) 
   
   # Ensure data is sorted by pub_date and time
   df <- df %>%
-    bind_rows(final_release) %>%
+    dplyr::bind_rows(final_release) %>%
     dplyr::arrange(time) %>%
-    na.omit()
+    stats::na.omit()
   
   es <- unique(df$release)
   es <- es[es != "final"]
@@ -128,9 +212,9 @@ get_first_efficient_release <- function(df, final_release, significance=0.05) {
   
   models <- list()
   tests <- list()
+  e_found <- FALSE
   for (i in 1:length(es)) {
-    formula <- as.formula(paste0("final ~ ", es[i]))
-    
+    formula <- stats::as.formula(paste0("final ~ ", es[i]))
     
     model <- stats::lm(formula, data = df_wide)
     hac_se <- sandwich::vcovHAC(model)
@@ -142,48 +226,150 @@ get_first_efficient_release <- function(df, final_release, significance=0.05) {
     models[[i]] <- model
     tests[[i]] <- test
     
-    if (p_value < significance) {
-      break
+    if (!test_all) {
+      if (p_value < significance) {
+        efficient_release <- i-1
+        break
+      }
+    } else if (test_all & !e_found & p_value < significance) {
+      efficient_release <- i-1
+      e_found <- TRUE
     }
     
   }
   
-  if (i == length(es) && p_value > significance) {
+  if (i == length(es) & p_value > significance) {
     rlang::warn("No efficient release found. Please provide further releases!")
+    efficient_release <- NA_real_
   }
   
   data <- vintages_long(df_wide, names_to = "release")
   
-  df_output <- list('e' = (i), 'data' = data, 'models' = models, 'tests' = tests)
+  df_output <- list('e' = efficient_release, 'data' = data, 'models' = models, 'tests' = tests)
   class(df_output) <- c("list_eff_rel", class(df_output))
   return(df_output)
 }
 
-#' summary of efficient release models
+#' Summary of Efficient Release Models
 #'
-#' @param output from get_first_efficient_release 
+#' Provides a detailed summary of the regression model and hypothesis test for the first efficient release 
+#' identified by the `get_first_efficient_release` function.
+#'
+#' @param object An output object from the `get_first_efficient_release` function. 
+#'   The object must be of class `list_eff_rel`.
+#' @param ... Additional arguments (not used).
+#'
+#' @details
+#' This function prints the following information:
+#' - The index of the first efficient release.
+#' - A summary of the regression model fitted for the efficient release, which includes coefficients, 
+#'   R-squared values, and other relevant statistics.
+#' - The hypothesis test results for the efficient release, showing the test statistic and p-value 
+#'   for the null hypothesis of unbiasedness and efficiency.
+#'
+#' The function assumes the object includes:
+#' - `e`: The index of the first efficient release (0-based).
+#' - `models`: A list of linear regression models for each release.
+#' - `tests`: A list of hypothesis test results corresponding to each release.
+#'
+#' @return This function does not return a value. It prints the summary to the console.
+#'
+#' @examples
+#' # Example usage
+#' df <- get_nth_release(reviser::gdp, n = 0:3)
+#' 
+#' final_release <- get_nth_release(reviser::gdp, n = "latest")
+#'
+#' # Identify the first efficient release
+#' result <- get_first_efficient_release(df, final_release)
+#' summary(result)
 #'
 #' @export
-#'
-summary.list_eff_rel <- function(object) {
+summary.list_eff_rel <- function(object, ...) {
   cat("Efficient release: ", object$e, "\n\n")
   cat("Model summary: \n")
-  print(summary(object$models[[object$e]]))
+  print(summary(object$models[[object$e+1]]))
   cat("\nTest summary: \n")
-  print(object$tests[[object$e]])
+  print(object$tests[[object$e+1]])
 }
 
 
-#' calculate summary statistics
-#' 
-#' requires input to have initial and revision col
-#' 
-#' @param df
+#' Revision Analysis Summary Statistics
 #'
-#' @return dataframe with 1 row and summary stats
+#' Calculates a comprehensive set of summary statistics and hypothesis tests 
+#' for revisions between initial and final data releases.
+#'
+#' @param df A data frame containing the initial data releases. Must include columns:
+#'   - `time`: The time variable.
+#'   - `value`: The observed values in the initial release.
+#'   - Optionally, `release` (release identifier) and `id` (grouping variable).
+#' @param final_release A data frame containing the final release data. Must include columns:
+#'   - `time`: The time variable (matching the initial release data).
+#'   - `value`: The observed values in the final release.
+#'
+#' @details
+#' This function performs a variety of statistical analyses to understand the nature of revisions between 
+#' the initial and final data releases. The function:
+#' - Checks the input data for consistency and transforms it as necessary.
+#' - Merges the initial and final release datasets by their time variable and optional grouping variables (`id` or `release`).
+#' - Computes summary statistics such as the mean, standard deviation, and range of the revisions.
+#' - Performs hypothesis tests for bias, efficiency, and correlation using robust methods (e.g., Newey-West standard errors).
+#' - Includes tests for seasonality, noise, and news effects.
+#'
+#' Key tests include:
+#' - **Bias Tests**: Tests for the presence of mean bias and regression bias.
+#' - **Efficiency Tests**: Tests whether revisions are orthogonal to initial values.
+#' - **Autocorrelation and Seasonality**: Tests for serial correlation and seasonal patterns in revisions.
+#' - **Theil's U Statistics**: Measures predictive accuracy of the initial releases relative to the final values.
+#' - **Noise vs. News**: Differentiates between unpredictable errors (noise) and systematic adjustments (news).
+#'
+#' The function supports grouped calculations based on the presence of `id` or `release` columns in the input.
+#'
+#' The following statistics and tests are calculated:
+#' 
+#' - **N**: The number of observations in the group.
+#' - **Frequency**: The inferred data frequency (e.g., 12 for monthly or 4 for quarterly data).
+#' - **Bias (mean)**: The mean revision, testing whether revisions are systematically biased.
+#' - **Bias (p-value)**: p-value from a t-test evaluating the significance of the mean revision.
+#' - **Bias (robust p-value)**: Newey-West HAC robust p-value for the mean revision test.
+#' - **Bias (intercept)**: Intercept of a regression of final values on initial values, testing for systematic bias.
+#' - **Bias (intercept p-value)**: p-value for the intercept test.
+#' - **Bias (slope)**: Slope of the regression of final values on initial values, testing the alignment between them.
+#' - **Bias (slope p-value)**: p-value for the slope test, with the null hypothesis of slope = 1.
+#' - **Efficiency (intercept)**: Intercept of the regression of revisions on initial values, testing forecast efficiency.
+#' - **Efficiency (intercept p-value)**: p-value for the efficiency intercept test.
+#' - **Efficiency (slope)**: Slope of the regression of revisions on initial values, testing forecast efficiency.
+#' - **Efficiency (slope p-value)**: p-value for the efficiency slope test, with the null hypothesis of slope = 0.
+#' - **Minimum**: The minimum revision in the group.
+#' - **Maximum**: The maximum revision in the group.
+#' - **Std. Dev.**: The standard deviation of revisions, indicating their variability.
+#' - **Noise/Signal**: The ratio of the standard deviation of revisions to the standard deviation of final values.
+#' - **Correlation**: The Pearson correlation between revisions and initial values, testing the relationship.
+#' - **Correlation (p-value)**: p-value for the significance of the correlation.
+#' - **Autocorrelation (1st)**: The first-order autocorrelation of revisions, measuring persistence.
+#' - **Autocorrelation (1st p-value)**: p-value for the first-order autocorrelation test.
+#' - **Autocorrelation up to 4th (Ljung-Box p-value)**: p-value for the Ljung-Box test for higher-order autocorrelation.
+#' - **Theil's U1**: A normalized measure of forecast accuracy, comparing the root mean squared error (RMSE) of revisions to the RMSE of final and initial values.
+#' - **Theil's U2**: A measure comparing forecast changes to actual changes.
+#' - **Seasonality (Ljung-Box p-value)**: Tests for seasonality in revisions using the Ljung-Box test for lags matching the data frequency.
+#' - **Seasonality (Friedman p-value)**: Tests for seasonality in revisions using the Friedman test.
+#' - **News test (p-value)**: Tests whether revisions are explained by information in final values.
+#' - **Noise test (p-value)**: Tests whether revisions are uncorrelated with initial values.
+#'
+#' @return A data frame with one row per grouping (if applicable) and columns for summary statistics and test results. 
+#' The resulting data frame is of class `revision_summary`.
+#'
+#' @examples
+#' # Example usage:
+#' df <- get_nth_release(reviser::gdp, n = 0:3)
+#' 
+#' final_release <- get_nth_release(reviser::gdp, n = "latest")
+#' 
+#' results <- get_revision_analysis(df, final_release)
+#' print(results)
+#'
 #' @export
-get_revision_summary <- function(df, final_release) {
-  
+get_revision_analysis <- function(df, final_release) {
   if(!"tbl_nth_rel" %in% class(df)) {
     rlang::abort("The input 'df' must be a 'tbl_nth_rel' object.")
   }
@@ -203,60 +389,284 @@ get_revision_summary <- function(df, final_release) {
     rlang::abort("The 'time' column in 'final_release' must have no duplicates.")
   }
   
-  final_release <- dplyr::select(final_release, time, value) %>%
-    dplyr::mutate(release = "final")
+  # check that both datasets have the same time column names
+  if (!all(identical(colnames(df), colnames(final_release)))) {
+    rlang::abort("The columns in 'df' and 'final_release' must have the same names.")
+  }
   
-  df <- df %>%
-    dplyr::select(time, value, release) %>%
-    dplyr::mutate(release = paste0("release_", release))
-  
-  # Ensure data is sorted by pub_date and time
-  df <- df %>%
-    bind_rows(final_release) %>%
-    dplyr::arrange(time) %>%
-    na.omit()
-  
-  es <- unique(df$release)
-  es <- es[es != "final"]
-  
-  df_wide <- vintages_wide(df, names_from = "release")
-  df_wide_rev <- get_revisions(df_wide, )
+  final_release <- final_release %>%
+    dplyr::rename(final_value = value)
   
   
-  noise <- (sd(df_i[["revision"]])**2)/(sd(df_i[["initial"]])**2)
-  print("noise")
-  print(sd(df_i[["revision"]])**2)
-  print("signal")
-  print(sd(df_i[["initial"]])**2)
-  print("-----")
+  # Check if df has id column:
+  if ("id" %in% colnames(df) & "id" %in% colnames(final_release)) {
+    final_release <- dplyr::select(final_release, time, final_value, id)
+    
+    df <- df %>%
+      dplyr::select(time, value, release, id) 
+    
+    df <- df %>%
+      dplyr::left_join(final_release, by = c("time" = "time", "id" = "id")) %>%
+      dplyr::arrange(id, time) %>%
+      stats::na.omit()
+  } else {
+    final_release <- dplyr::select(final_release, time, final_value) 
+    
+    df <- df %>%
+      dplyr::select(time, value, release) 
+    
+    df <- df %>%
+      dplyr::left_join(final_release, by = c("time" = "time")) %>%
+      dplyr::arrange(time) %>%
+      stats::na.omit()
+  }
   
-  corr <- cor(df_i[["initial"]], df_i[["revision"]])
-  summary_df <- data.frame(
-    NoObs = length(df_i[["revision"]]),
-    Mean = mean(df_i[["revision"]]),
-    Min = min(df_i[["revision"]]),
-    Max = max(df_i[["revision"]]),
-    SD = sd(df_i[["revision"]]),
-    Noise = noise,
-    Correlation = corr
-  )
-  return(summary_df)
+  revisions <- df %>% 
+    dplyr::mutate(
+      revision = final_value - value,
+      )
+  
+     
+  # Function to compute statistics and tests for each group
+  compute_stats <- function(data) {
+    N <- nrow(data)
+    freq <- round(1/((mean(((as.numeric(diff(unique(data$time)))/360)), na.rm = TRUE))))
+    mean_revision <- mean(data$revision)
+    min_revision <- min(data$revision)
+    max_revision <- max(data$revision)
+    std_dev_revision <- stats::sd(data$revision)
+    noise_to_signal <- std_dev_revision / stats::sd(data$final_value)
+    correlation <- stats::cor(data$revision, data$value, use = "complete.obs")
+    autocorrelation <- stats::cor(data$revision[-1], data$revision[-length(data$revision)], use = "complete.obs")
+    
+    # Significance test for the Bias (mean) (Newey-West HAC standard errors)
+    mean_test_model <- stats::lm(revision ~ 1, data = data)
+    # Conventional t test:
+    mean_t_stat <- summary(mean_test_model)$coefficients[1, 3]  
+    mean_p_value <- summary(mean_test_model)$coefficients[1, 4]
+    
+    # Newey-West HAC standard errors t test:
+    mean_test_se <- sqrt(sandwich::NeweyWest(mean_test_model))
+    mean_nw_t_stat <- stats::coef(mean_test_model)[1] / mean_test_se
+    mean_nw_p_value <- 2 * (1 - stats::pt(abs(mean_nw_t_stat), df = N - 1))  # Two-sided p-value
+    
+    # Significance test for the Bias (intercept and slope)
+    bias_test_model <- stats::lm(final_value ~ value, data = data)
+    coef_test_intercept <- summary(bias_test_model)$coefficients[1, 1]
+    coef_test_slope <- summary(bias_test_model)$coefficients[2, 1]
+    coef_p_value_intercept <- summary(bias_test_model)$coefficients[1, 4]
+    test <- car::linearHypothesis(bias_test_model, c("value = 1"))
+    coef_p_value_slope <- test[2, 'Pr(>F)']
+
+    # Efficiency test
+    efficiency_test_model <- stats::lm(revision ~ value, data = data)
+    coef_efficiency_intercept <- summary(efficiency_test_model)$coefficients[1, 1]
+    coef_efficiency_slope <- summary(efficiency_test_model)$coefficients[2, 1]
+    coef_efficiency_p_value_intercept <- summary(efficiency_test_model)$coefficients[1, 4]
+    coef_efficiency_p_value_slope <- summary(efficiency_test_model)$coefficients[2, 4]
+    
+    # Significance test for correlation
+    cor_t_stat <- correlation * sqrt((N - 2) / (1 - correlation^2))
+    cor_p_value <- 2 * (1 - stats::pt(abs(cor_t_stat), df = N - 2))  # Two-sided p-value
+    
+    # Significance test for autocorrelation
+    auto_t_stat <- autocorrelation * sqrt((N - 2) / (1 - autocorrelation^2))
+    auto_p_value <- 2 * (1 - stats::pt(abs(auto_t_stat), df = N - 2))  # Two-sided p-value
+    
+    # Ljung Box:
+    ljung_box <- stats::Box.test(data$revision, lag = 4, type = "Ljung-Box", fitdf = 1)$p.value
+    
+    # U_1=\frac{\sqrt{\frac{1}{n}\sum^n_{t=1}(L_t-P_t)^2}}{\sqrt{\frac{1}{n}\sum^n_{t=1}L_t^2}+\sqrt{\frac{1}{n}\sum^n_{t=1}P_t^2}}
+    # U_2=\frac{\sqrt{\sum^n_{t=1}\left(\frac{P_{t + 1}-L_{t + 1}}{L_t}\right)^2}}{\sqrt{\sum^n_{t=1}\left(\frac{L_{t + 1}-L_t}{L_t}\right)^2}}
+
+    theils_u1 <- sqrt(mean((data$final_value - data$value)^2)) / (sqrt(mean(data$final_value^2)) + sqrt(mean(data$value^2)))
+    theils_u2 <- sqrt(sum((data$value[-1] - data$final_value[-1]) / data$final_value[-length(data$final_value)])^2) / sqrt(sum((data$final_value[-1] - data$final_value[-length(data$final_value)]) / data$final_value[-length(data$final_value)])^2)
+    
+    # Seasonality test
+    if (freq == 12) {
+      friedman_p_value <- friedman_test(data$revision, frequency = freq)$`p_value`
+      ljung_box_seasonality_p_value <- qs_test(data$revision, lags = c(12,24))$`p_value`
+    } else if (freq == 4) {
+      friedman_p_value <- friedman_test(data$revision, frequency = freq)$`p_value`
+      ljung_box_seasonality_p_value <- qs_test(data$revision, lags = c(4,8))$`p_value`
+    } else {
+      friedman_p_value <- NA
+      ljung_box_seasonality_p_value <- NA
+    }
+    
+    # Noise test
+    noise_test <- stats::lm(revision ~ value, data = data)
+    hac_se <- sandwich::vcovHAC(noise_test)
+    test <- car::linearHypothesis(noise_test, c("(Intercept) = 0", "value = 0"), vcov = hac_se)
+    noise_p_value <- test[2, 'Pr(>F)']
+    
+    # News test
+    news_test <- stats::lm(revision ~ final_value, data = data)
+    hac_se <- sandwich::vcovHAC(news_test)
+    test <- car::linearHypothesis(news_test, c("(Intercept) = 0", "final_value = 0"), vcov = hac_se)
+    news_p_value <- test[2, 'Pr(>F)']
+
+    tibble::tibble(
+      Statistic = c(
+        "N", "Frequency",
+        "Bias (mean)", "Bias (p-value)", "Bias (robust p-value)",
+        "Bias (intercept)", "Bias (intercept p-value)", "Bias (slope)", "Bias (slope p-value)",
+        "Efficiency (intercept)", "Efficiency (intercept p-value)", "Efficiency (slope)", "Efficiency (slope p-value)",
+        "Minimum", "Maximum", "Std. Dev.", "Noise/Signal",
+        "Correlation", "Correlation (p-value)",
+        "Autocorrelation (1st)", "Autocorrelation (1st p-value)", "Autocorrelation up to 4th (Ljung-Box p-value)",
+        "Theil's U1", "Theil's U2",
+        "Seasonality (Ljung-Box p-value)", "Seasonality (Friedman p-value)",
+        "News test (p-value)", "Noise test (p-value)"
+      ),
+      Value = c(
+        N, freq,
+        mean_revision, mean_p_value, mean_nw_p_value,
+        coef_test_intercept, coef_p_value_intercept, coef_test_slope, coef_p_value_slope,
+        coef_efficiency_intercept, coef_efficiency_p_value_intercept, coef_efficiency_slope, coef_efficiency_p_value_slope,
+        min_revision, max_revision, std_dev_revision, noise_to_signal,
+        correlation, cor_p_value,
+        autocorrelation, auto_p_value, ljung_box,
+        theils_u1, theils_u2,
+        ljung_box_seasonality_p_value, friedman_p_value,
+        news_p_value, noise_p_value
+      )
+    )
+  }
+  
+  # if no id or release column present, create a dummy id column
+  if (!any(c("id", "release") %in% colnames(revisions))) {
+    revisions <- revisions %>% 
+      dplyr::mutate(id = "release_0")
+  }
+  
+  # Defing grouping vars
+  if (all(c("release", "id") %in% colnames(revisions))) {
+    grouping_vars <- c("id", "release")
+  } else if ("id" %in% colnames(revisions)) {
+    grouping_vars <- c("id")
+  } else if ("release" %in% colnames(revisions)) {
+    grouping_vars <- c("release")
+  } 
+  
+  # Apply the computation to each group and combine the results
+  results <- revisions %>%
+    dplyr::group_by(dplyr::across(dplyr::all_of(grouping_vars))) %>%
+    dplyr::group_modify(~ compute_stats(.x)) %>%
+    dplyr::ungroup()
+  
+  results <- results %>%
+    tidyr::pivot_wider(
+      names_from = "Statistic",
+      values_from = "Value"
+    )
+  
+  class(results) <- c("revision_summary", class(results))
+  
+  return(results)
 }
 
 
-#' get nth vintage
+#' Function for Friedman Test used in `get_revision_analysis`
+#' @param series vector
+#' @param frequency integer
+#' @noRd
+friedman_test <- function(series, frequency = 12) {
+  # First-difference the series
+  diff_series <- diff(series)
+  
+  # Reshape the series into blocks (years) and treatments (months or quarters)
+  n <- length(diff_series)
+  n_blocks <- n %/% frequency  # Number of years (or periods of 'frequency' data)
+  
+  # Reshape the series into a matrix of ranks
+  diff_matrix <- matrix(diff_series[1:(n_blocks * frequency)], nrow = n_blocks, ncol = frequency)
+  ranked_matrix <- apply(diff_matrix, 2, rank)
+  
+  # Compute the test statistic
+  row_means <- apply(ranked_matrix, 1, mean)
+  total_mean <- mean(row_means)
+  
+  Q <- sum((row_means - total_mean)^2) / sum((ranked_matrix - total_mean)^2)
+  
+  # Degrees of freedom for the chi-squared distribution
+  df <- frequency - 1
+  p_value <- 1 - stats::pchisq(Q, df)
+  
+  return(list(p_value = p_value))
+}
+
+
+#' Function for the QS test used in `get_revision_analysis`
+#' @param series vector
+#' @param lags vector of seasonal lags
+#' @noRd
+qs_test <- function(series, lags = c(12, 24)) {
+  # First-difference the series
+  diff_series <- diff(series)
+  
+  # Compute autocorrelations for seasonal lags
+  acf_vals <- stats::acf(diff_series, lag.max = max(lags), plot = FALSE)$acf
+  
+  # Compute QS statistic
+  n <- length(diff_series)
+  QS <- sum((pmax(0, acf_vals[lags])^2) * (n * (n + 2) / (n - lags)))
+  
+  # Chi-squared distribution with 'k' degrees of freedom
+  k <- length(lags)
+
+  
+  # Compare QS statistic to chi-squared critical value
+  p_value <- 1 - stats::pchisq(QS, df = k)
+  
+  return(list(p_value = p_value))
+}
+
+
+
+#' Extract the Nth Data Release (Vintage)
 #'
-#' @param df 
+#' Filters the input dataset to return the Nth release (or vintage) of data for each time period. 
+#' The function supports selecting the first, latest, or a specific numbered release (starting from 0).
 #'
-#' @return filtered df only with first data vintage
+#' @param df A data frame containing data vintages. The data frame must include the columns 
+#'           `pub_date` (publication date of the release) and `time` (the corresponding time period for the data).
+#' @param n The release number to extract. Accepts:
+#'          - A non-negative integer or vector (e.g., 0 for the first release, 1 for the second, etc.).
+#'          - `"first"` to extract the first release.
+#'          - `"latest"` to extract the most recent release.
+#'          Default is 0 (the first release).
+#'
+#' @return A filtered data frame containing only the specified release(s). The resulting data frame is 
+#'         assigned the class `tbl_nth_rel` to indicate its structure.
+#'
+#' @details 
+#' The behavior depends on the value of `n`:
+#' - **Non-negative integer**: The function retrieves the Nth release for each time period. Note that the release 
+#'   indexing starts at 0 (e.g., 0 = first release, 1 = second release, etc.).
+#' - **"first"**: Retrieves the first release for each time period (via `get_first_release`).
+#' - **"latest"**: Retrieves the most recent release for each time period (via `get_latest_release`).
+#'
+#' @examples
+#' # Example data
+#' df <- reviser::gdp
+#'
+#' # Get the first release (n = 0)
+#' first_release <- get_nth_release(df, n = 0)
+#' 
+#' # Get the latest release
+#' latest_release <- get_nth_release(df, n = "latest")
+#' 
+#' # Get the second release (n = 1)
+#' second_release <- get_nth_release(df, n = 1)
+#'
 #' @export
-#'
-get_nth_release <- function(df, n = 1) {
+get_nth_release <- function(df, n = 0) {
   # Validate inputs
-  if (is.numeric(n) && any(n < 1)) {
-    rlang::abort("The input 'n' must be set to a positive integer, 'first', or 'latest'.")
+  if (is.numeric(n) && any(n < 0)) {
+    rlang::abort("The input 'n' must be >= 0, 'first', or 'latest'.")
   } else if (is.character(n) && !tolower(n) %in% c("first", "latest")) {
-    rlang::abort("The input 'n' must be set to a positive integer, 'first', or 'latest'.")
+    rlang::abort("The input 'n' must be  >= 0, 'first', or 'latest'.")
   }
   
   check <- vintages_check(df)
@@ -269,11 +679,12 @@ get_nth_release <- function(df, n = 1) {
     dplyr::arrange(pub_date, time)
   
   if (is.numeric(n)) {
+    n <- n + 1
   # Get the nth release(s)
   nth_release <- df %>%
     dplyr::group_by(time) %>%
+    dplyr::mutate(release = paste0("release_",(1:dplyr::n()-1))) %>%
     dplyr::slice(n) %>%
-    dplyr::mutate(release = as.character((1:dplyr::n())-1)) %>%
     dplyr::ungroup()
   } else if (tolower(n) == "latest") {
     # Get the latest release
@@ -290,13 +701,28 @@ get_nth_release <- function(df, n = 1) {
   return(nth_release)
 }
 
-#' get first vintage
+#' Extract the First Data Release (Vintage)
 #'
-#' @param df 
+#' Filters the input dataset to return the earliest release (or vintage) for each time period.
 #'
-#' @return filtered df only with first data vintage
+#' @param df A data frame containing data vintages. The data frame must include the columns 
+#'           `pub_date` (publication date of the release) and `time` (the corresponding time period for the data).
+#'
+#' @return A filtered data frame containing only the first release(s). The resulting data frame is 
+#'         assigned the class `tbl_nth_rel` to indicate its structure.
+#'
+#' @details
+#' For each time period, the function identifies the release with the earliest publication date (`pub_date`). 
+#' A new column `release` is added and labels all rows in the resulting data frame as `release_0`.
+#'
+#' @examples
+#' # Example data
+#' df <- reviser::gdp
+#'
+#' # Get the first release for each time period
+#' first_release <- get_first_release(df)
+#'
 #' @export
-#'
 get_first_release <- function(df) {
   
   check <- vintages_check(df)
@@ -310,6 +736,7 @@ get_first_release <- function(df) {
   
   df <- df %>%
     dplyr::group_by(time) %>%
+    dplyr::mutate("release" = "release_0") %>%
     dplyr::filter(pub_date == min(pub_date)) %>%
     dplyr::ungroup()
   
@@ -320,15 +747,28 @@ get_first_release <- function(df) {
   return(df)
 }
 
-#' get latest vintage
+#' Extract the Latest Data Release (Vintage)
 #'
-#' @param df 
-#' @param col_rel_date 
-#' @param col_val_date 
+#' Filters the input dataset to return the most recent release (or vintage) for each time period.
 #'
-#' @return filtered df only with latest data vintage
+#' @param df A data frame containing data vintages. The data frame must include the columns 
+#'           `pub_date` (publication date of the release) and `time` (the corresponding time period for the data).
+#'
+#' @return A filtered data frame containing only the most recent release(s). The resulting data frame is 
+#'         assigned the class `tbl_nth_rel` to indicate its structure.
+#'
+#' @details 
+#' For each time period, the function identifies the release with the latest publication date (`pub_date`) 
+#' and adds a column `release` that labels the release as `release_N`, where `N` is the release index.
+#'
+#' @examples
+#' # Example data
+#' df <- reviser::gdp
+#'
+#' # Get the latest release for each time period
+#' latest_release <- get_latest_release(df)
+#'
 #' @export
-#'
 get_latest_release <- function(df) {
   
   check <- vintages_check(df)
@@ -341,6 +781,7 @@ get_latest_release <- function(df) {
     dplyr::arrange(pub_date, time)
   df <- df %>%
     dplyr::group_by(time) %>%
+    dplyr::mutate("release" = paste0("release_",dplyr::n())) %>%
     dplyr::filter(pub_date == max(pub_date)) %>%
     dplyr::ungroup()
   
@@ -351,10 +792,38 @@ get_latest_release <- function(df) {
   return(df)
 }
 
-#' get all releases of a single observation date:
+#' Get Data Releases for a Specific Date
+#'
+#' Filters the input dataset to return the releases corresponding to a specific time period (date).
+#'
+#' @param df A data frame containing data vintages. The data frame must include the columns 
+#'           `pub_date` (publication date of the release) and `time` (the corresponding time period for the data).
+#' @param date A Date object specifying the time period (date) for which releases should be retrieved.
+#'
+#' @return A data frame containing the releases for the specified date. The returned data frame will include 
+#'         the same structure as the input, filtered to only include rows matching the `date` in the `time` column.
+#'
+#' @details
+#' This function filters the input data based on the specified `date` in the `time` column. The input dataset 
+#' must have the `pub_date` and `time` columns, with `time` being the period to match against the given `date`. 
+#' If the dataset is in wide format, it will first be transformed into long format using the helper function 
+#' `vintages_long`.
+#'
+#' @examples
+#' # Example data
+#' df <- reviser::gdp
+#'
+#' # Get releases for a specific date
+#' date <- as.Date("2020-04-01")
+#' releases_on_date <- get_releases_by_date(df, date)
+#'
+#' @export
 get_releases_by_date <- function(df, date) {
+  
+  date <- tryCatch(as.Date(date), error = function(e) e)
+  
   # Validate inputs
-  if (!is.Date(date)) {
+  if (!c("Date") %in% class(date)) {
     rlang::abort("The input 'date' must be a Date object.")
   }
   
@@ -375,7 +844,31 @@ get_releases_by_date <- function(df, date) {
 }
 
 
-#' get the number of days between first release and period end:
+#' Calculate the Number of Days Between Period End and First Release
+#'
+#' Computes the number of days between the publication date (`pub_date`) of a release and the time period 
+#' (`time`) end date for each record in the dataset.
+#'
+#' @param df A data frame containing data vintages. The data frame must include the columns 
+#'           `pub_date` (publication date of the release) and `time` (the corresponding time period for the data).
+#'
+#' @return A data frame with an additional column `days_to_release` representing the number of days between 
+#'         the publication date (`pub_date`) and the time period (`time`) for each release.
+#'
+#' @details
+#' The function calculates the difference between `pub_date` and `time` for each row in the dataset. 
+#' The result is expressed as the number of days between the release publication date and the corresponding 
+#' time period end. If the dataset is in wide format, it will first be transformed into long format using 
+#' `vintages_long`.
+#'
+#' @examples
+#' # Example data
+#' df <- reviser::gdp
+#'
+#' # Calculate days to release
+#' df_with_days <- get_days_to_release(df)
+#'
+#' @export
 get_days_to_release <- function(df) {
 
   check <- vintages_check(df)

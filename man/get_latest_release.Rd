@@ -2,20 +2,30 @@
 % Please edit documentation in R/revisions.R
 \name{get_latest_release}
 \alias{get_latest_release}
-\title{get latest vintage}
+\title{Extract the Latest Data Release (Vintage)}
 \usage{
 get_latest_release(df)
 }
 \arguments{
-\item{df}{}
-
-\item{col_rel_date}{}
-
-\item{col_val_date}{}
+\item{df}{A data frame containing data vintages. The data frame must include the columns 
+`pub_date` (publication date of the release) and `time` (the corresponding time period for the data).}
 }
 \value{
-filtered df only with latest data vintage
+A filtered data frame containing only the most recent release(s). The resulting data frame is 
+        assigned the class `tbl_nth_rel` to indicate its structure.
 }
 \description{
-get latest vintage
+Filters the input dataset to return the most recent release (or vintage) for each time period.
+}
+\details{
+For each time period, the function identifies the release with the latest publication date (`pub_date`) 
+and adds a column `release` that labels the release as `release_N`, where `N` is the release index.
+}
+\examples{
+# Example data
+df <- reviser::gdp
+
+# Get the latest release for each time period
+latest_release <- get_latest_release(df)
+
 }

@@ -2,31 +2,62 @@
 % Please edit documentation in R/smoother.R
 \name{kk_nowcast}
 \alias{kk_nowcast}
-\title{Generalized Kishor-Koenig model nowcasting}
+\title{Generalized Kishor-Koenig Model for Nowcasting}
 \usage{
-kk_nowcast(
-  df,
-  e,
-  h = 1,
-  model = "Kishor-Koenig",
-  estim = "MLE",
-  start_mat = 0.4,
-  start_cov = 0.4,
-  m0 = 0,
-  C0 = 1e-06,
-  trace = 0
-)
+kk_nowcast(df, e, h = 0, model = "Kishor-Koenig", trace = 0)
 }
 \arguments{
-\item{df_full}{}
+\item{df}{A data frame containing the time series data in either "long" or "wide" format. 
+It must include columns for the time index and the different release vintages.}
 
-\item{df_final}{}
+\item{e}{An integer indicating the number of data vintages to include in the model.
+Must be greater than 0.}
 
-\item{significance}{}
+\item{h}{An integer specifying the forecast horizon. Default is 0, which implies no forecasts.
+Must be greater than or equal to 0.}
+
+\item{model}{A string specifying the type of model to use. Options are:
+- "Kishor-Koenig" or "KK" (default): Full Kishor-Koenig model.
+- "Howrey": Howrey's simplified framework.
+- "Classical": Classical model without vintage effects.}
+
+\item{trace}{An integer controlling the level of output for the optimization procedure.
+Default is 0 (minimal output).}
 }
 \value{
-MLE of state space model - Kalman filter and smoother
+A list with the following components:
+\describe{
+  \item{forecast_states}{A tibble of forecasted state variables, including the forecast dates. Returned only if \code{h > 0}.}
+  \item{filtered_states}{A tibble of filtered state variables based on the Kalman filter.}
+  \item{observations}{A tibble of the observed variables used in the model.}
+  \item{forecast_observation}{A tibble of forecasted observations. Returned only if \code{h > 0}.}
+  \item{smoothed_states}{A tibble of smoothed state variables based on the Kalman smoother.}
+  \item{kk_model_mat}{A list of KK model matrices (e.g., transition and observation matrices).}
+  \item{ss_model_mat}{A list of state-space model matrices derived from the KK model.}
+  \item{params}{Estimated model parameters, including covariance terms.}
+  \item{fit}{The fitted model object from the SUR estimation procedure.}
+}
 }
 \description{
-Generalized Kishor-Koenig model nowcasting
+Implements a generalized Kishor-Koenig (KK) model for nowcasting and forecasting 
+with state-space models, allowing for multiple vintages of data, efficient estimation, 
+and Kalman filtering and smoothing.
+}
+\details{
+The function supports multiple models, including the full Kishor-Koenig framework, Howrey's model, 
+and a classical approach. It handles data preprocessing, estimation of system equations using 
+Seemingly Unrelated Regressions (SUR), and application of the Kalman filter and smoother.
+
+The function requires well-structured input data with multiple vintages. The time series must 
+be regular, and the function automatically checks and transforms the data if needed.
+}
+\examples{
+# Example usage:
+df <- get_nth_release(tsbox::ts_span(tsbox::ts_pc(reviser::gdp), start = "1980-01-01"), n = 0:1)
+e <- 1  # Number of efficient release
+h <- 2  # Forecast horizon
+model_result <- kk_nowcast(df, e, h = h, model = "Kishor-Koenig")
+
+model_result$params
+
 }

@@ -2,10 +2,40 @@
 % Please edit documentation in R/utils.R
 \name{vintages_wide}
 \alias{vintages_wide}
-\title{Function to put the vintages data to wide format}
+\title{Convert Vintages Data to Wide Format}
 \usage{
 vintages_wide(df, names_from = "pub_date")
 }
+\arguments{
+\item{df}{A data frame or tibble containing vintages data in long format.}
+
+\item{names_from}{The name of the column whose unique values will be used as column names in the wide format. 
+Defaults to `"pub_date"`.}
+}
+\value{
+If an `id` column is present, the function returns a named list of wide-format data frames, 
+        one for each unique `id`. Otherwise, it returns a single wide-format data frame.
+}
 \description{
-Function to put the vintages data to wide format
+Converts a vintages dataset from long format to wide format, optionally grouping by `id` if present. 
+The wide format uses one column per unique value of the `names_from` parameter, with observation dates 
+(`time`) as rows and values (`value`) as cell contents.
+}
+\examples{
+# Example wide-format data
+long_data <- reviser::gdp
+
+# Convert to wide format
+wide_data <- vintages_wide(long_data)
+
+# Example list of wide-format data frames
+wide_list <- list(
+  A = wide_data,
+  B = wide_data
+)
+
+# Convert list to long format
+long_data1 <- vintages_long(wide_data, names_to = "pub_date")
+long_data2 <- vintages_long(wide_list, names_to = "pub_date")
+
 }

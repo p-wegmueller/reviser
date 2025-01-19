@@ -2,11 +2,7 @@
 % Please edit documentation in R/graphs.R
 \name{plot_vintages}
 \alias{plot_vintages}
-\alias{theme_reviser}
-\alias{colors_reviser}
-\alias{scale_color_reviser}
-\alias{scale_fill_reviser}
-\title{Functions to plot vintages data}
+\title{Plot Vintages Data}
 \usage{
 plot_vintages(
   df,
@@ -16,19 +12,92 @@ plot_vintages(
   subtitle = "",
   ylab = ""
 )
+}
+\arguments{
+\item{df}{A data frame containing the vintage data to be plotted. Must include at least two columns: 
+one for time (`time`) and one for value (`value`).}
 
-theme_reviser(
-  base_size = 12,
-  legend.position = "bottom",
-  legend.direction = "horizontal"
-)
+\item{type}{A character string specifying the type of plot to create. Options are:
+\itemize{
+  \item{ "line": Line plot (default).}
+  \item{ "point": Scatter plot.}
+  \item{ "bar": Bar plot.}
+  \item{ "boxplot": Boxplot.}
+  }}
 
-colors_reviser()
+\item{dim_col}{A character string specifying the column name in `df` that represents publication dates or other grouping dimensions (e.g. `"release"`). Defaults to `"pub_date"`.}
 
-scale_color_reviser(...)
+\item{title}{A character string specifying the title of the plot. Defaults to an empty string.}
 
-scale_fill_reviser(...)
+\item{subtitle}{A character string specifying the subtitle of the plot. Defaults to an empty string.}
+
+\item{ylab}{A character string specifying the label for the y-axis. Defaults to an empty string.}
+}
+\value{
+A ggplot2 plot object representing the specified vintage data visualization.
 }
 \description{
-Functions to plot vintages data
+A flexible function to visualize vintage data using various plot types such as line plots, point plots, bar plots, or boxplots. 
+The function ensures that input data is validated and appropriately transformed before plotting.
+}
+\details{
+The `plot_vintages` function is designed to handle data frames in both wide and long formats. It ensures 
+that the provided data frame includes the necessary columns for plotting. If the `dim_col` column contains 
+more than 30 unique values, only the most recent 30 are plotted. Additionally, the function supports 
+custom themes and color scales using `scale_color_reviser`, `scale_fill_reviser`, and `theme_reviser`.
+
+The function raises an error if:
+\itemize{
+ \item{The `type` argument is not one of `"line"`, `"point"`, `"bar"`, or `"boxplot"`.}
+ \item{The specified `dim_col` is not a column in `df`.}
+ \item{`title`, `subtitle`, or `ylab` are not character strings.}
+}
+}
+\examples{
+# Example data
+df <- data.frame(
+  time = rep(seq.Date(from = as.Date("2022-01-01"), by = "month", length.out = 12), 3),
+  value = runif(36, 50, 100),
+  pub_date = rep(c("2022-01-05", "2022-02-07", "2022-03-03"), each = 12)
+)
+
+# Line plot
+plot_vintages(
+  df, 
+  type = "line", 
+  dim_col = "pub_date", 
+  title = "Line plot", 
+  subtitle = "Randomly generated data"
+  )
+
+# Point plot
+plot_vintages(
+  df, 
+  type = "point", 
+  dim_col = "pub_date", 
+  title = "Scatter plot", 
+  subtitle = "Randomly generated data"
+  )
+
+# Bar plot
+plot_vintages(
+  df, 
+  type = "bar", 
+  dim_col = "pub_date", 
+  title = "Bar plot", 
+  subtitle = "Randomly generated data"
+  )
+
+# Boxplot
+plot_vintages(
+  df, 
+  type = "boxplot", 
+  dim_col = "pub_date", 
+  title = "Boxplot", 
+  subtitle = "Randomly generated data"
+  )
+
+}
+\seealso{
+[theme_reviser()], [scale_color_reviser()], [scale_fill_reviser()]
 }
