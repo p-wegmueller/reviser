@@ -26,7 +26,7 @@ knitr::opts_chunk$set(
 You can install the development version of reviser from [GitHub](https://github.com/) with:
 
 
-```{r}
+```{r, eval = FALSE}
 # Install devtools if not already installed
 # install.packages("devtools")
 
@@ -39,7 +39,7 @@ devtools::install_github("p-wegmueller/ReviseR")
 
 ```{r, eval = TRUE}
 library(reviser)
-library(dplyr)
+suppressMessages(library(dplyr))
 
 gdp <- gdp %>% tsbox::ts_pc() %>% tsbox::ts_span(start = "1980-01-01") 
 
