@@ -9,6 +9,13 @@
 To learn more about reviser, start with the vignettes:
 `browseVignettes(package = "reviser")`
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://p-wegmueller.github.io/reviser/}
+}
+
+}
 \author{
 \strong{Maintainer}: Marc Burri \email{marc.burri91@gmail.com} (\href{https://orcid.org/0000-0001-8974-9090}{ORCID}) [copyright holder]
 
