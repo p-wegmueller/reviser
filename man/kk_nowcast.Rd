@@ -7,7 +7,7 @@
 kk_nowcast(df, e, h = 0, model = "Kishor-Koenig", trace = 0)
 }
 \arguments{
-\item{df}{A data frame containing the time series data in either "long" or "wide" format. 
+\item{df}{A data frame containing the time series data in either "long" or "wide" format.
 It must include columns for the time index and the different release vintages.}
 
 \item{e}{An integer indicating the number of data vintages to include in the model.
@@ -27,28 +27,28 @@ Default is 0 (minimal output).}
 \value{
 A list with the following components:
 \describe{
-  \item{forecast_states}{A tibble of forecasted state variables, including the forecast dates. Returned only if \code{h > 0}.}
-  \item{filtered_states}{A tibble of filtered state variables based on the Kalman filter.}
-  \item{observations}{A tibble of the observed variables used in the model.}
-  \item{forecast_observation}{A tibble of forecasted observations. Returned only if \code{h > 0}.}
-  \item{smoothed_states}{A tibble of smoothed state variables based on the Kalman smoother.}
-  \item{kk_model_mat}{A list of KK model matrices (e.g., transition and observation matrices).}
-  \item{ss_model_mat}{A list of state-space model matrices derived from the KK model.}
-  \item{params}{Estimated model parameters, including covariance terms.}
-  \item{fit}{The fitted model object from the SUR estimation procedure.}
+\item{forecast_states}{A tibble of forecasted state variables, including the forecast dates. Returned only if \code{h > 0}.}
+\item{filtered_states}{A tibble of filtered state variables based on the Kalman filter.}
+\item{observations}{A tibble of the observed variables used in the model.}
+\item{forecast_observation}{A tibble of forecasted observations. Returned only if \code{h > 0}.}
+\item{smoothed_states}{A tibble of smoothed state variables based on the Kalman smoother.}
+\item{kk_model_mat}{A list of KK model matrices (e.g., transition and observation matrices).}
+\item{ss_model_mat}{A list of state-space model matrices derived from the KK model.}
+\item{params}{Estimated model parameters, including covariance terms.}
+\item{fit}{The fitted model object from the SUR estimation procedure.}
 }
 }
 \description{
-Implements a generalized Kishor-Koenig (KK) model for nowcasting and forecasting 
-with state-space models, allowing for multiple vintages of data, efficient estimation, 
+Implements a generalized Kishor-Koenig (KK) model for nowcasting and forecasting
+with state-space models, allowing for multiple vintages of data, efficient estimation,
 and Kalman filtering and smoothing.
 }
 \details{
-The function supports multiple models, including the full Kishor-Koenig framework, Howrey's model, 
-and a classical approach. It handles data preprocessing, estimation of system equations using 
+The function supports multiple models, including the full Kishor-Koenig framework, Howrey's model,
+and a classical approach. It handles data preprocessing, estimation of system equations using
 Seemingly Unrelated Regressions (SUR), and application of the Kalman filter and smoother.
 
-The function requires well-structured input data with multiple vintages. The time series must 
+The function requires well-structured input data with multiple vintages. The time series must
 be regular, and the function automatically checks and transforms the data if needed.
 }
 \examples{

@@ -5,7 +5,7 @@
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/p-wegmueller/ReviseR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/p-wegmueller/ReviseR/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/p-wegmueller/reviser/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/p-wegmueller/reviser/actions/workflows/R-CMD-check.yaml)
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
@@ -24,7 +24,7 @@ You can install the development version of reviser from
 # install.packages("devtools")
 
 # Install the reviser package
-devtools::install_github("p-wegmueller/ReviseR")
+devtools::install_github("p-wegmueller/reviser")
 ```
 
 ## Usage

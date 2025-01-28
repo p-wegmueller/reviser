@@ -32,14 +32,14 @@ scale_fill_reviser(...)
 A customized ggplot2 theme, color palette, or scale.
 }
 \description{
-These functions provide a custom visualization theme and color scales for use with ggplot2, inspired by the `tsbox` package.
+These functions provide a custom visualization theme and color scales for use with ggplot2, inspired by the \code{tsbox} package.
 }
 \details{
 \itemize{
-\item{`theme_reviser`: Defines a minimal theme with custom adjustments for axis titles, plot titles, subtitles, captions, and legend positioning.}
-\item{`colors_reviser`: Provides a predefined set of colors, including a soft black, a palette suitable for colorblind readers, and additional colors for extended use.}
-\item{`scale_color_reviser`: A ggplot2 color scale that uses the custom `colors_reviser` palette.}
-\item{`scale_fill_reviser`: A ggplot2 fill scale that uses the custom `colors_reviser` palette.}
+\item{\code{theme_reviser}: Defines a minimal theme with custom adjustments for axis titles, plot titles, subtitles, captions, and legend positioning.}
+\item{\code{colors_reviser}: Provides a predefined set of colors, including a soft black, a palette suitable for colorblind readers, and additional colors for extended use.}
+\item{\code{scale_color_reviser}: A ggplot2 color scale that uses the custom \code{colors_reviser} palette.}
+\item{\code{scale_fill_reviser}: A ggplot2 fill scale that uses the custom \code{colors_reviser} palette.}
 }
 }
 \examples{

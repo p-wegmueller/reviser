@@ -9,19 +9,19 @@ vintages_long(df, names_to = "pub_date", keep_na = FALSE)
 \arguments{
 \item{df}{A data frame, tibble, or list of data frames containing vintages data in wide format.}
 
-\item{names_to}{The name of the column to create from the wide-format column names. Must be either 
-`"pub_date"` (default) or `"release"`.}
+\item{names_to}{The name of the column to create from the wide-format column names. Must be either
+\code{"pub_date"} (default) or \code{"release"}.}
 
-\item{keep_na}{Logical. If `TRUE`, retains rows with `NA` values in the `value` column. Default is `FALSE`.}
+\item{keep_na}{Logical. If \code{TRUE}, retains rows with \code{NA} values in the \code{value} column. Default is \code{FALSE}.}
 }
 \value{
-A long-format data frame or tibble. If the input is a list of wide-format data frames, the output 
-        will be a single combined long-format data frame.
+A long-format data frame or tibble. If the input is a list of wide-format data frames, the output
+will be a single combined long-format data frame.
 }
 \description{
-Converts a vintages dataset from wide format to long format, optionally grouping by `id` if the input 
-is a list of data frames. The long format contains one row per combination of `time` and `names_to` 
-(e.g., `pub_date` or `release`), with values stored in a single `value` column.
+Converts a vintages dataset from wide format to long format, optionally grouping by \code{id} if the input
+is a list of data frames. The long format contains one row per combination of \code{time} and \code{names_to}
+(e.g., \code{pub_date} or \code{release}), with values stored in a single \code{value} column.
 }
 \examples{
 # Example wide-format data

@@ -10,22 +10,23 @@ plot_vintages(
   dim_col = "pub_date",
   title = "",
   subtitle = "",
-  ylab = ""
+  ylab = "",
+  p = NULL
 )
 }
 \arguments{
-\item{df}{A data frame containing the vintage data to be plotted. Must include at least two columns: 
-one for time (`time`) and one for value (`value`).}
+\item{df}{A data frame containing the vintage data to be plotted. Must include at least two columns:
+one for time (\code{time}) and one for value (\code{value}).}
 
 \item{type}{A character string specifying the type of plot to create. Options are:
 \itemize{
-  \item{ "line": Line plot (default).}
-  \item{ "point": Scatter plot.}
-  \item{ "bar": Bar plot.}
-  \item{ "boxplot": Boxplot.}
-  }}
+\item{ "line": Line plot (default).}
+\item{ "point": Scatter plot.}
+\item{ "bar": Bar plot.}
+\item{ "boxplot": Boxplot.}
+}}
 
-\item{dim_col}{A character string specifying the column name in `df` that represents publication dates or other grouping dimensions (e.g. `"release"`). Defaults to `"pub_date"`.}
+\item{dim_col}{A character string specifying the column name in \code{df} that represents publication dates or other grouping dimensions (e.g. \code{"release"}). Defaults to \code{"pub_date"}.}
 
 \item{title}{A character string specifying the title of the plot. Defaults to an empty string.}
 
@@ -37,20 +38,20 @@ one for time (`time`) and one for value (`value`).}
 A ggplot2 plot object representing the specified vintage data visualization.
 }
 \description{
-A flexible function to visualize vintage data using various plot types such as line plots, point plots, bar plots, or boxplots. 
+A flexible function to visualize vintage data using various plot types such as line plots, point plots, bar plots, or boxplots.
 The function ensures that input data is validated and appropriately transformed before plotting.
 }
 \details{
-The `plot_vintages` function is designed to handle data frames in both wide and long formats. It ensures 
-that the provided data frame includes the necessary columns for plotting. If the `dim_col` column contains 
-more than 30 unique values, only the most recent 30 are plotted. Additionally, the function supports 
-custom themes and color scales using `scale_color_reviser`, `scale_fill_reviser`, and `theme_reviser`.
+The \code{plot_vintages} function is designed to handle data frames in both wide and long formats. It ensures
+that the provided data frame includes the necessary columns for plotting. If the \code{dim_col} column contains
+more than 30 unique values, only the most recent 30 are plotted. Additionally, the function supports
+custom themes and color scales using \code{scale_color_reviser}, \code{scale_fill_reviser}, and \code{theme_reviser}.
 
 The function raises an error if:
 \itemize{
- \item{The `type` argument is not one of `"line"`, `"point"`, `"bar"`, or `"boxplot"`.}
- \item{The specified `dim_col` is not a column in `df`.}
- \item{`title`, `subtitle`, or `ylab` are not character strings.}
+\item{The \code{type} argument is not one of \code{"line"}, \code{"point"}, \code{"bar"}, or \code{"boxplot"}.}
+\item{The specified \code{dim_col} is not a column in \code{df}.}
+\item{\code{title}, \code{subtitle}, or \code{ylab} are not character strings.}
 }
 }
 \examples{
@@ -99,5 +100,5 @@ plot_vintages(
 
 }
 \seealso{
-[theme_reviser()], [scale_color_reviser()], [scale_fill_reviser()]
+\code{\link[=theme_reviser]{theme_reviser()}}, \code{\link[=scale_color_reviser]{scale_color_reviser()}}, \code{\link[=scale_fill_reviser]{scale_fill_reviser()}}
 }

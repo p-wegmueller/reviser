@@ -7,8 +7,8 @@
 \method{summary}{list_eff_rel}(object, ...)
 }
 \arguments{
-\item{object}{An output object from the `get_first_efficient_release` function. 
-The object must be of class `list_eff_rel`.}
+\item{object}{An output object from the \code{get_first_efficient_release} function.
+The object must be of class \code{list_eff_rel}.}
 
 \item{...}{Additional arguments (not used).}
 }
@@ -16,21 +16,25 @@ The object must be of class `list_eff_rel`.}
 This function does not return a value. It prints the summary to the console.
 }
 \description{
-Provides a detailed summary of the regression model and hypothesis test for the first efficient release 
-identified by the `get_first_efficient_release` function.
+Provides a detailed summary of the regression model and hypothesis test for the first efficient release
+identified by the \code{get_first_efficient_release} function.
 }
 \details{
 This function prints the following information:
-- The index of the first efficient release.
-- A summary of the regression model fitted for the efficient release, which includes coefficients, 
-  R-squared values, and other relevant statistics.
-- The hypothesis test results for the efficient release, showing the test statistic and p-value 
-  for the null hypothesis of unbiasedness and efficiency.
+\itemize{
+\item The index of the first efficient release.
+\item A summary of the regression model fitted for the efficient release, which includes coefficients,
+R-squared values, and other relevant statistics.
+\item The hypothesis test results for the efficient release, showing the test statistic and p-value
+for the null hypothesis of unbiasedness and efficiency.
+}
 
 The function assumes the object includes:
-- `e`: The index of the first efficient release (0-based).
-- `models`: A list of linear regression models for each release.
-- `tests`: A list of hypothesis test results corresponding to each release.
+\itemize{
+\item \code{e}: The index of the first efficient release (0-based).
+\item \code{models}: A list of linear regression models for each release.
+\item \code{tests}: A list of hypothesis test results corresponding to each release.
+}
 }
 \examples{
 # Example usage

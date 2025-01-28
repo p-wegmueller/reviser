@@ -7,19 +7,19 @@
 get_first_release(df)
 }
 \arguments{
-\item{df}{A data frame containing data vintages. The data frame must include the columns 
-`pub_date` (publication date of the release) and `time` (the corresponding time period for the data).}
+\item{df}{A data frame containing data vintages. The data frame must include the columns
+\code{pub_date} (publication date of the release) and \code{time} (the corresponding time period for the data).}
 }
 \value{
-A filtered data frame containing only the first release(s). The resulting data frame is 
-        assigned the class `tbl_nth_rel` to indicate its structure.
+A filtered data frame containing only the first release(s). The resulting data frame is
+assigned the class \code{tbl_nth_rel} to indicate its structure.
 }
 \description{
 Filters the input dataset to return the earliest release (or vintage) for each time period.
 }
 \details{
-For each time period, the function identifies the release with the earliest publication date (`pub_date`). 
-A new column `release` is added and labels all rows in the resulting data frame as `release_0`.
+For each time period, the function identifies the release with the earliest publication date (\code{pub_date}).
+A new column \code{release} is added and labels all rows in the resulting data frame as \code{release_0}.
 }
 \examples{
 # Example data

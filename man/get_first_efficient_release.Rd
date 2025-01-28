@@ -12,43 +12,53 @@ get_first_efficient_release(
 )
 }
 \arguments{
-\item{df}{A data frame of class `tbl_nth_rel` containing the vintage data. 
+\item{df}{A data frame of class \code{tbl_nth_rel} containing the vintage data.
 It must include the columns:
-- `time`: The reference period (e.g., quarter or month).
-- `value`: The observed value for the given release.
-- `release`: The release number or identifier.}
+\itemize{
+\item \code{time}: The reference period (e.g., quarter or month).
+\item \code{value}: The observed value for the given release.
+\item \code{release}: The release number or identifier.
+}}
 
-\item{final_release}{A data frame containing the final release data. 
+\item{final_release}{A data frame containing the final release data.
 This must include the columns:
-- `time`: The reference period.
-- `value`: The observed final value for the given period.}
+\itemize{
+\item \code{time}: The reference period.
+\item \code{value}: The observed final value for the given period.
+}}
 
-\item{significance}{A numeric value specifying the significance level for the hypothesis test (default is `0.05`).}
+\item{significance}{A numeric value specifying the significance level for the hypothesis test (default is \code{0.05}).}
 
-\item{test_all}{A logical value indicating whether to test all releases, even after finding the first efficient release (default is `FALSE`).}
+\item{test_all}{A logical value indicating whether to test all releases, even after finding the first efficient release (default is \code{FALSE}).}
 }
 \value{
-A list of class `list_eff_rel` with the following elements:
-  - `e`: The index of the first efficient release (0-based index).
-  - `data`: A long-format data frame containing the vintage data with the final release appended.
-  - `models`: A list of linear regression models fitted for each release.
-  - `tests`: A list of hypothesis test results for each release.
+A list of class \code{list_eff_rel} with the following elements:
+\itemize{
+\item \code{e}: The index of the first efficient release (0-based index).
+\item \code{data}: A long-format data frame containing the vintage data with the final release appended.
+\item \code{models}: A list of linear regression models fitted for each release.
+\item \code{tests}: A list of hypothesis test results for each release.
+}
 }
 \description{
-Identifies the first release in a sequence of vintages that is "efficient" relative to the final release. 
-A release is deemed efficient if it satisfies specific conditions of unbiasedness and efficiency, 
+Identifies the first release in a sequence of vintages that is "efficient" relative to the final release.
+A release is deemed efficient if it satisfies specific conditions of unbiasedness and efficiency,
 tested using a Mincer-Zarnowitz type linear regression and hypothesis testing.
 }
 \details{
 The function performs the following steps:
-1. Validates inputs and ensures both `df` and `final_release` are in the correct format.
-2. Iteratively tests each release for efficiency using a linear regression model of the form:
-   \deqn{final = \beta_0 + \beta_1 \cdot release_i + \epsilon}
-   The null hypothesis for efficiency is:
-   - \eqn{\beta_0 = 0} (no bias)
-   - \eqn{\beta_1 = 1} (efficiency)
-   Uses heteroskedasticity and autocorrelation consistent (HAC) standard errors for robust hypothesis testing.
-3. Stops testing when the first efficient release is found (unless `test_all = TRUE`).
+\enumerate{
+\item Validates inputs and ensures both \code{df} and \code{final_release} are in the correct format.
+\item Iteratively tests each release for efficiency using a linear regression model of the form:
+\deqn{final = \beta_0 + \beta_1 \cdot release_i + \epsilon}
+The null hypothesis for efficiency is:
+\itemize{
+\item \eqn{\beta_0 = 0} (no bias)
+\item \eqn{\beta_1 = 1} (efficiency)
+Uses heteroskedasticity and autocorrelation consistent (HAC) standard errors for robust hypothesis testing.
+}
+\item Stops testing when the first efficient release is found (unless \code{test_all = TRUE}).
+}
 
 If no efficient release is found, a warning is issued.
 }

@@ -16,34 +16,36 @@ vintages_rename(
 \arguments{
 \item{df}{A data frame or tibble containing the data to be renamed.}
 
-\item{col_time}{Optional. The name of the column to be renamed as `time`. 
-The `time` column represents observation dates and will be converted to `Date` format.}
+\item{col_time}{Optional. The name of the column to be renamed as \code{time}.
+The \code{time} column represents observation dates and will be converted to \code{Date} format.}
 
-\item{col_pub_date}{Optional. The name of the column to be renamed as `pub_date`. 
-The `pub_date` column represents release dates and will be converted to `Date` format.}
+\item{col_pub_date}{Optional. The name of the column to be renamed as \code{pub_date}.
+The \code{pub_date} column represents release dates and will be converted to \code{Date} format.}
 
-\item{col_value}{Optional. The name of the column to be renamed as `value`. 
-The `value` column represents the observed values and will be converted to numeric.}
+\item{col_value}{Optional. The name of the column to be renamed as \code{value}.
+The \code{value} column represents the observed values and will be converted to numeric.}
 
-\item{col_release}{Optional. The name of the column to be renamed as `release`.
-The `id` column is used as an identifier and will be converted to character format.}
+\item{col_release}{Optional. The name of the column to be renamed as \code{release}.
+The \code{id} column is used as an identifier and will be converted to character format.}
 
-\item{col_id}{Optional. The name of the column to be renamed as `id`.}
+\item{col_id}{Optional. The name of the column to be renamed as \code{id}.}
 }
 \value{
-A data frame or tibble with the renamed columns and their respective data types converted 
-        (if specified). The original class of the input object is preserved.
+A data frame or tibble with the renamed columns and their respective data types converted
+(if specified). The original class of the input object is preserved.
 }
 \description{
-Renames columns in a data frame or tibble to align with the conventions used in this package. 
+Renames columns in a data frame or tibble to align with the conventions used in this package.
 Converts the renamed columns to the appropriate data types.
 }
 \details{
-The function checks the validity of the input data frame and ensures that at least one column 
+The function checks the validity of the input data frame and ensures that at least one column
 is specified for renaming. If a column is renamed, it is also converted to the expected data type:
-- `time` and `pub_date` are converted to `Date`.
-- `value` is converted to numeric.
-- `release` and `id` are converted to character.
+\itemize{
+\item \code{time} and \code{pub_date} are converted to \code{Date}.
+\item \code{value} is converted to numeric.
+\item \code{release} and \code{id} are converted to character.
+}
 }
 \examples{
 # Example data

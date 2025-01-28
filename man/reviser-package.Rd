@@ -7,7 +7,7 @@
 \title{reviser: Tools for Studying Revision Properties in Real-Time Time Series Vintages}
 \description{
 To learn more about reviser, start with the vignettes:
-`browseVignettes(package = "reviser")`
+\code{browseVignettes(package = "reviser")}
 }
 \seealso{
 Useful links:
