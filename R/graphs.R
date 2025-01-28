@@ -78,7 +78,13 @@
 #'   )
 #'
 #' @export
-plot_vintages <- function(df, type="line", dim_col = "pub_date", title="", subtitle="", ylab = "") {
+plot_vintages <- function(df, type="line", dim_col = "pub_date", title="", subtitle="", ylab = "", p = NULL) {
+  
+  if (!missing(p)) {
+    if (!"ggplot" %in% class(p)) {
+      rlang::abort("If argument 'p' is provided it must be a valid ggplot object.")
+    }
+  }
   
   # Check type input
   if (!type %in% c("line", "point", "bar", "boxplot")) {
@@ -118,12 +124,7 @@ plot_vintages <- function(df, type="line", dim_col = "pub_date", title="", subti
     dplyr::arrange(dplyr::desc(abs(value)), .by_group = TRUE) %>%
     dplyr::ungroup()
   
-  if (n == 1L || max(table(df$time)) == 1L) {
-    p <- ggplot2::ggplot(
-      df,
-      ggplot2::aes(x = time, y = value)
-    )
-  } else if (n > 1) {
+ if (n > 1) {
     
     if (class(df[[dim_col]]) %in% c("Date","integer", "numeric")) {
       df[[dim_col]] <- as.character(df[[dim_col]])
@@ -137,26 +138,41 @@ plot_vintages <- function(df, type="line", dim_col = "pub_date", title="", subti
       df <- df %>%
         dplyr::filter(!!dim_col %in% utils::tail(unique(!!dim_col), 30))
     }
-    
-    p <- ggplot2::ggplot(
-      df,
-      ggplot2::aes(x = time, y = value)
-    )
+ }
+  if (missing(p)) {
+    p <- ggplot2::ggplot()
   }
-  if (type == "line") {
-    p <- p + ggplot2::geom_line(ggplot2::aes(color = !!dim_col)) + 
-      scale_color_reviser()
-  } else if (type == "point") {
-    p <- p + ggplot2::geom_point(ggplot2::aes(color = !!dim_col)) + 
-      scale_color_reviser()
-  } else if(type == "bar") {
-    p <- p + ggplot2::geom_bar(ggplot2::aes(color = !!dim_col, fill = !!dim_col), position = "identity", stat = "identity") + 
-      scale_color_reviser() + scale_fill_reviser()
-  } else if(type == "boxplot") {
-    p <- p + ggplot2::geom_boxplot(ggplot2::aes(fill = factor(time))) + 
-      scale_fill_reviser() + theme_reviser(legend.position ="none")
+  if (n == 1L) {
+    if (type == "line") {
+      p <- p + ggplot2::geom_line(aes(x = time, y = value), data = df) + 
+        scale_color_reviser()
+    } else if (type == "point") {
+      p <- p + ggplot2::geom_point(aes(x = time, y = value), data = df) + 
+        scale_color_reviser()
+    } else if(type == "bar") {
+      p <- p + ggplot2::geom_bar(aes(x = time, y = value), data = df, position = "identity", stat = "identity") + 
+        scale_color_reviser() + scale_fill_reviser()
+    } else if(type == "boxplot") {
+      rlang::abort("'type' boxplot not supported if 'dim_col' contains only one unique value.")
+    } else {
+      rlang::abort("Invalid 'type' argument. Must be either 'line' or 'point'.")
+    }
   } else {
-    rlang::abort("Invalid 'type' argument. Must be either 'line' or 'point'.")
+    if (type == "line") {
+      p <- p + ggplot2::geom_line(ggplot2::aes(x = time, y = value, color = !!dim_col), data = df) + 
+        scale_color_reviser()
+    } else if (type == "point") {
+      p <- p + ggplot2::geom_point(ggplot2::aes(x = time, y = value, color = !!dim_col), data = df) + 
+        scale_color_reviser()
+    } else if(type == "bar") {
+      p <- p + ggplot2::geom_bar(ggplot2::aes(x = time, y = value, color = !!dim_col, fill = !!dim_col), position = "identity", stat = "identity", data = df) + 
+        scale_color_reviser() + scale_fill_reviser()
+    } else if(type == "boxplot") {
+      p <- p + ggplot2::geom_boxplot(ggplot2::aes(x = time, y = value, fill = factor(time)), data = df) + 
+        scale_fill_reviser() + theme_reviser(legend.position ="none")
+    } else {
+      rlang::abort("Invalid 'type' argument. Must be either 'line' or 'point'.")
+    }
   }
 
   # labels and title
