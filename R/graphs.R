@@ -16,6 +16,7 @@
 #' @param title A character string specifying the title of the plot. Defaults to an empty string.
 #' @param subtitle A character string specifying the subtitle of the plot. Defaults to an empty string.
 #' @param ylab A character string specifying the label for the y-axis. Defaults to an empty string.
+#' @param p A ggplot2 plot object to which the vintage data will be added. Defaults to `NULL`.
 #'
 #' @return A ggplot2 plot object representing the specified vintage data visualization.
 #'
@@ -144,13 +145,13 @@ plot_vintages <- function(df, type="line", dim_col = "pub_date", title="", subti
   }
   if (n == 1L) {
     if (type == "line") {
-      p <- p + ggplot2::geom_line(aes(x = time, y = value), data = df) + 
+      p <- p + ggplot2::geom_line(ggplot2::aes(x = time, y = value), data = df) + 
         scale_color_reviser()
     } else if (type == "point") {
-      p <- p + ggplot2::geom_point(aes(x = time, y = value), data = df) + 
+      p <- p + ggplot2::geom_point(ggplot2::aes(x = time, y = value), data = df) + 
         scale_color_reviser()
     } else if(type == "bar") {
-      p <- p + ggplot2::geom_bar(aes(x = time, y = value), data = df, position = "identity", stat = "identity") + 
+      p <- p + ggplot2::geom_bar(ggplot2::aes(x = time, y = value), data = df, position = "identity", stat = "identity") + 
         scale_color_reviser() + scale_fill_reviser()
     } else if(type == "boxplot") {
       rlang::abort("'type' boxplot not supported if 'dim_col' contains only one unique value.")

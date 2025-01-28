@@ -33,6 +33,8 @@ one for time (\code{time}) and one for value (\code{value}).}
 \item{subtitle}{A character string specifying the subtitle of the plot. Defaults to an empty string.}
 
 \item{ylab}{A character string specifying the label for the y-axis. Defaults to an empty string.}
+
+\item{p}{A ggplot2 plot object to which the vintage data will be added. Defaults to \code{NULL}.}
 }
 \value{
 A ggplot2 plot object representing the specified vintage data visualization.
