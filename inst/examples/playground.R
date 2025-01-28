@@ -4,11 +4,15 @@ library(ggplot2)
 library(reviser)
 
 gdp <- reviser::gdp
-
 gdp_wide <- vintages_wide(gdp)
-gdp_wide <- vintages_wide(gdp_wide)
-
 gdp_long_pc <- vintages_long(gdp_wide, keep_na = FALSE) %>% tsbox::ts_pc() %>% tsbox::ts_span(start="1980-01-01")
+
+generate_basic_report(data = gdp_long_pc, 
+                    title = "Revisions to US GDP growth rates",
+                    author = "Marc Burri"
+                    )
+
+
 gdp_long <- vintages_long(gdp_wide)
 
 
