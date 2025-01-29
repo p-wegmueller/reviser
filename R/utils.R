@@ -168,7 +168,7 @@ vintages_wide <- function(df, names_from = "pub_date") {
   if (id_present) {
     n_id <- df$id %>%
       unique() %>%
-      nrow()
+      length()
   } else {
     n_id <- 0
   }
