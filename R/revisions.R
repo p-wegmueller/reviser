@@ -227,18 +227,18 @@ get_first_efficient_release <- function(df, final_release, significance=0.05, te
     tests[[i]] <- test
     
     if (!test_all) {
-      if (p_value < significance) {
+      if (p_value > significance) {
         efficient_release <- i-1
         break
       }
-    } else if (test_all & !e_found & p_value < significance) {
+    } else if (test_all & !e_found & p_value > significance) {
       efficient_release <- i-1
       e_found <- TRUE
     }
     
   }
   
-  if (i == length(es) & p_value > significance) {
+  if (i == length(es) & p_value < significance) {
     rlang::warn("No efficient release found. Please provide further releases!")
     efficient_release <- NA_real_
   }
