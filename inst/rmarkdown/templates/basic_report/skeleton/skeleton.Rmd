@@ -1,7 +1,7 @@
 ---
-title: "`r params$report_title`"
-author: "`r params$report_author`"
-logo: "`r params$logo_path`"
+title: '`r params$report_title`'
+author: '`r params$report_author`' 
+logo: '`r params$logo_path`'
 output: output_format
 params:
   data: NULL
