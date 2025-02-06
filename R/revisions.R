@@ -534,10 +534,6 @@ summary.lst_efficient <- function(object, ...) {
 #'
 #' @export
 get_revision_analysis <- function(df, final_release, degree = 1) {
-  if(!"tbl_release" %in% class(df) | !"tbl_pubdate" %in% class(final_release)) {
-    rlang::abort("The input 'df' must be a 'tbl_release' or 'tbl_pubdate' object.")
-  }
-  
   # Check degree in 1:5
   if (!degree %in% c(1:5)) {
     rlang::abort("The 'degree' must be an integer between 1 and 3.")
@@ -548,6 +544,10 @@ get_revision_analysis <- function(df, final_release, degree = 1) {
     df <- vintages_long(df)
   }
   df <- vintages_assign_class(df)
+  
+  if(!"tbl_release" %in% class(df) | !"tbl_pubdate" %in% class(final_release)) {
+    rlang::abort("The input 'df' must be a 'tbl_release' or 'tbl_pubdate' object.")
+  }
   
   check <- vintages_check(final_release)
   if (check=="wide") {
