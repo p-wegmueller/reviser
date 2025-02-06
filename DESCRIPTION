@@ -34,7 +34,8 @@ Imports:
     rlang,
     scales,
     tibble,
-    glue
+    glue,
+    lubridate
 Suggests: 
     tsbox,
     testthat (>= 3.0.0),

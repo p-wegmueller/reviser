@@ -14,7 +14,7 @@
 #'   If `"latest"`, the most recent vintage is used.
 #' @param ref_date A date specifying the fixed reference publication date to compare all vintages against.
 #'
-#' @return A data frame (tibble) of class `tbl_rev`, with the following columns:
+#' @return A data frame (tibble) of class `tbl_revision`, with the following columns:
 #'   - `pub_date`: The publication date of the vintage.
 #'   - `time`: The reference period (e.g., quarter or month).
 #'   - `value`: The calculated revision, i.e., the difference between the observed value and the reference value.
@@ -40,7 +40,7 @@
 #' revisions_date <- get_revisions(df, ref_date = as.Date("2023-02-01"))
 #'
 #' # Calculate revisions relative to the nth release (2nd release)
-#' revisions_nth <- get_revisions(df, nth_release = 2)
+#' revisions_nth <- get_revisions(df, nth_release = 1)
 #'
 #' @export
 get_revisions <- function(df, interval = NULL, nth_release = NULL, ref_date = NULL) {
@@ -66,58 +66,108 @@ get_revisions <- function(df, interval = NULL, nth_release = NULL, ref_date = NU
       rlang::abort("The input 'interval' must be a positive integer.")
     }
   } else if (!is.null(nth_release)) {
-    if (is.numeric(nth_release) && nth_release < 1) {
-      rlang::abort("The input 'nth_release' must be set to a positive integer or 'latest'.")
+    if (is.numeric(nth_release) && nth_release < 0) {
+      rlang::abort("The input 'nth_release' must be set to a non-negative integer or 'latest'.")
     } else if (is.character(nth_release) && tolower(nth_release) != "latest") {
-      rlang::abort("The input 'nth_release' must be set to a positive integer or 'latest'.")
+      rlang::abort("The input 'nth_release' must be set to a non-negative integer or 'latest'.")
     }
   }
+
   
   check <- vintages_check(df)
   if (check=="wide") {
     df <- vintages_long(df)
   }
+  df <- vintages_assign_class(df)
   
-  # Ensure data is sorted by pub_date and time
-  df <- df %>%
-    dplyr::arrange(pub_date, time)
-  
-  if (!is.null(ref_date)) {
-    # Calculate revisions against the specified reference date
-    revisions <- df %>%
-      dplyr::inner_join(
-        df %>%
-          dplyr::filter(pub_date == ref_date) %>%
-          dplyr::select(time, value_ref = value),
-        by = "time"
-      ) %>%
-      dplyr::mutate(value = value - value_ref) %>%
-      dplyr::select(pub_date, time, value)
+  # Check if id column present
+  if ("id" %in% colnames(df)) {
+    # Ensure data is sorted by pub_date and time
+    df <- df %>%
+      dplyr::arrange(id, pub_date, time)
     
-  } else if (!is.null(interval)) {
-    # Calculate revisions relative to estimates published 'interval' periods ago
-    revisions <- df %>%
-      dplyr::group_by(time) %>%
-      dplyr::mutate(
-        value_ref = dplyr::lag(value, n = interval, order_by = pub_date)
-      ) %>%
-      dplyr::ungroup() %>%
-      dplyr::mutate(value = value - value_ref) %>%
-      dplyr::filter(!is.na(value)) %>%
-      dplyr::select(pub_date, time, value)
-  } else if (!is.null(nth_release)) {
-    # Calculate revisions relative to the nth release
-    revisions <- df %>%
-      dplyr::inner_join(
-        get_nth_release(df, n = nth_release) %>%
-          dplyr::select(time, value_ref = value),
-        by = "time"
-      ) %>%
-      dplyr::mutate(value = value - value_ref) %>%
-      dplyr::filter(!is.na(value)) %>%
-      dplyr::select(pub_date, time, value)
+    if (!is.null(ref_date)) {
+      # Calculate revisions against the specified reference date
+      revisions <- df %>%
+        dplyr::inner_join(
+          df %>%
+            dplyr::filter(pub_date == ref_date) %>%
+            dplyr::select(time, value_ref = value),
+          by = "time"
+        ) %>% 
+        dplyr::group_by(id, time) %>%
+        dplyr::mutate(value = value - value_ref) %>%
+        dplyr::ungroup() %>%
+        dplyr::select(id, pub_date, time, value)
+      
+    } else if (!is.null(interval)) {
+      # Calculate revisions relative to estimates published 'interval' periods ago
+      revisions <- df %>%
+        dplyr::group_by(id, time) %>%
+        dplyr::mutate(
+          value_ref = dplyr::lag(value, n = interval, order_by = pub_date)
+        ) %>%
+        dplyr::mutate(value = value - value_ref) %>%
+        dplyr::ungroup() %>%
+        dplyr::filter(!is.na(value)) %>%
+        dplyr::select(id, pub_date, time, value)
+    } else if (!is.null(nth_release)) {
+      # Calculate revisions relative to the nth release
+      revisions <- df %>%
+        dplyr::inner_join(
+          get_nth_release(df, n = nth_release) %>%
+            dplyr::select(time, value_ref = value),
+          by = "time"
+        ) %>%
+        dplyr::group_by(id, time) %>%
+        dplyr::mutate(value = value - value_ref) %>%
+        dplyr::ungroup() %>%
+        dplyr::filter(!is.na(value)) %>%
+        dplyr::select(id, pub_date, time, value)
+    }
+  } else {
+    # Ensure data is sorted by pub_date and time
+    df <- df %>%
+      dplyr::arrange(pub_date, time)
+    
+    if (!is.null(ref_date)) {
+      # Calculate revisions against the specified reference date
+      revisions <- df %>%
+        dplyr::inner_join(
+          df %>%
+            dplyr::filter(pub_date == ref_date) %>%
+            dplyr::select(time, value_ref = value),
+          by = "time"
+        ) %>%
+        dplyr::mutate(value = value - value_ref) %>%
+        dplyr::select(pub_date, time, value)
+      
+    } else if (!is.null(interval)) {
+      # Calculate revisions relative to estimates published 'interval' periods ago
+      revisions <- df %>%
+        dplyr::group_by(time) %>%
+        dplyr::mutate(
+          value_ref = dplyr::lag(value, n = interval, order_by = pub_date)
+        ) %>%
+        dplyr::ungroup() %>%
+        dplyr::mutate(value = value - value_ref) %>%
+        dplyr::filter(!is.na(value)) %>%
+        dplyr::select(pub_date, time, value)
+    } else if (!is.null(nth_release)) {
+      # Calculate revisions relative to the nth release
+      revisions <- df %>%
+        dplyr::inner_join(
+          get_nth_release(df, n = nth_release) %>%
+            dplyr::select(time, value_ref = value),
+          by = "time"
+        ) %>%
+        dplyr::mutate(value = value - value_ref) %>%
+        dplyr::filter(!is.na(value)) %>%
+        dplyr::select(pub_date, time, value)
+    }
   }
-  class(revisions) <- c("tbl_rev", class(revisions))
+  
+  revisions <- vintages_assign_class(revisions)
   return(revisions)
 }
 
@@ -127,7 +177,7 @@ get_revisions <- function(df, interval = NULL, nth_release = NULL, ref_date = NU
 #' A release is deemed efficient if it satisfies specific conditions of unbiasedness and efficiency, 
 #' tested using a Mincer-Zarnowitz type linear regression and hypothesis testing.
 #'
-#' @param df A data frame of class `tbl_nth_rel` containing the vintage data. 
+#' @param df A data frame of class `tbl_release` containing the vintage data. 
 #'   It must include the columns:
 #'   - `time`: The reference period (e.g., quarter or month).
 #'   - `value`: The observed value for the given release.
@@ -140,7 +190,7 @@ get_revisions <- function(df, interval = NULL, nth_release = NULL, ref_date = NU
 #' @param test_all A logical value indicating whether to test all releases, even after finding the first efficient release (default is `FALSE`).
 #'
 #' @return A list of class `list_eff_rel` with the following elements:
-#'   - `e`: The index of the first efficient release (0-based index).
+#'   - `e`: The index of the first efficient release. (0 indexed)
 #'   - `data`: A long-format data frame containing the vintage data with the final release appended.
 #'   - `models`: A list of linear regression models fitted for each release.
 #'   - `tests`: A list of hypothesis test results for each release.
@@ -160,9 +210,9 @@ get_revisions <- function(df, interval = NULL, nth_release = NULL, ref_date = NU
 #'
 #' @examples
 #' # Example data
-#' df <- get_nth_release(reviser::gdp, n = 0:3)
+#' df <- get_nth_release(tsbox::ts_pc(reviser::gdp), n = 0:3)
 #' 
-#' final_release <- get_nth_release(reviser::gdp, n = "latest")
+#' final_release <- get_nth_release(tsbox::ts_pc(reviser::gdp), n = 10)
 #'
 #' # Identify the first efficient release
 #' result <- get_first_efficient_release(df, final_release, significance = 0.05)
@@ -173,80 +223,156 @@ get_revisions <- function(df, interval = NULL, nth_release = NULL, ref_date = NU
 #' @export
 get_first_efficient_release <- function(df, final_release, significance=0.05, test_all = FALSE) {
   
-  
-  if(!"tbl_nth_rel" %in% class(df)) {
-    rlang::abort("The input 'df' must be a 'tbl_nth_rel' object.")
-  }
-  
   check <- vintages_check(df)
   if (check=="wide") {
     df <- vintages_long(df)
   }
+  df <- vintages_assign_class(df)
   
   check <- vintages_check(final_release)
   if (check=="wide") {
     final_release <- vintages_long(final_release)
   }
+  final_release <- vintages_assign_class(final_release)
   
-  # Check for unique dates in the 'time' column
-  if (any(duplicated(final_release$time))) {
-    rlang::abort("The 'time' column in 'final_release' must have no duplicates.")
+  if(!"tbl_release" %in% class(df)) {
+    rlang::abort("The input 'df' must be a 'tbl_release' object.")
   }
   
-  final_release <- dplyr::select(final_release, time, value) %>%
-    dplyr::mutate(release = "final")
+  if ("id" %in% colnames(df) & "id" %in% colnames(final_release)) {
+    if(!setequal(unique(df$id), unique(final_release$id))) {
+      rlang::abort("The 'id' column in 'df' and 'final_release' must have the same values.")
+    }
+  } else if ("id" %in% colnames(df) | "id" %in% colnames(final_release)) {
+    rlang::abort("Either both or none of 'df' and 'final_release' must contain an 'id' column.")
+  }
   
-  df <- df %>%
-    dplyr::select(time, value, release) 
+  df_output <- NULL
   
-  # Ensure data is sorted by pub_date and time
-  df <- df %>%
-    dplyr::bind_rows(final_release) %>%
-    dplyr::arrange(time) %>%
-    stats::na.omit()
-  
-  es <- unique(df$release)
-  es <- es[es != "final"]
-  
-  df_wide <- vintages_wide(df, names_from = "release")
-  
-  models <- list()
-  tests <- list()
-  e_found <- FALSE
-  for (i in 1:length(es)) {
-    formula <- stats::as.formula(paste0("final ~ ", es[i]))
+  if ("id" %in% colnames(df)) {
+    if (length(unique(df$id)) > 1) {
+      models <- list()
+      tests <- list()
+      for (iidd in unique(df$id)) {
+        final_release_id <- final_release %>% 
+          dplyr::filter(id == iidd) %>%
+          dplyr::select(time, value) %>%
+          dplyr::mutate(release = "final")
+        
+        df_id <- df %>%
+          dplyr::filter(id == iidd) %>%
+          dplyr::select(time, value, release) 
+        
+        # Ensure data is sorted by pub_date and time
+        df_id <- df_id %>%
+          dplyr::bind_rows(final_release_id) %>%
+          dplyr::arrange(time) %>%
+          stats::na.omit()
+        
+        es <- unique(df_id$release)
+        es <- es[es != "final"]
+        
+        df_wide <- vintages_wide(df_id, names_from = "release")
+        
+        e_found <- FALSE
+        for (i in 1:length(es)) {
+          formula <- stats::as.formula(paste0("final ~ ", es[i]))
+          
+          model <- stats::lm(formula, data = df_wide)
+          hac_se <- sandwich::vcovHAC(model)
+          
+          test <- car::linearHypothesis(model, c("(Intercept) = 0", paste0(es[i], " = 1")), vcov = hac_se)
+          
+          p_value <- test[2, 'Pr(>F)']
+          
+          models[[i]] <- model
+          tests[[i]] <- test
+          
+          if (!test_all) {
+            if (p_value > significance) {
+              efficient_release <- i-1
+              break
+            }
+          } else if (test_all & !e_found & p_value > significance) {
+            efficient_release <- i-1
+            e_found <- TRUE
+          }
+          
+        }
+        
+        if (i == length(es) & p_value < significance) {
+          rlang::warn(paste0("No efficient release found for ", iidd, ". Please provide further releases!"))
+          efficient_release <- NA_real_
+        }
+      
+        data <- vintages_long(df_wide, names_to = "release")
+        data <- vintages_assign_class(data)
+        
+        df_output[[iidd]] <- list('e' = efficient_release, 'data' = data, 'models' = models, 'tests' = tests)
+        
+        }
+    }
+  } else {
+    models <- list()
+    tests <- list()
     
-    model <- stats::lm(formula, data = df_wide)
-    hac_se <- sandwich::vcovHAC(model)
-
-    test <- car::linearHypothesis(model, c("(Intercept) = 0", paste0(es[i], " = 1")), vcov = hac_se)
-
-    p_value <- test[2, 'Pr(>F)']
+    final_release <- dplyr::select(final_release, time, value) %>%
+      dplyr::mutate(release = "final")
     
-    models[[i]] <- model
-    tests[[i]] <- test
+    df <- df %>%
+      dplyr::select(time, value, release) 
     
-    if (!test_all) {
-      if (p_value > significance) {
+    # Ensure data is sorted by pub_date and time
+    df <- df %>%
+      dplyr::bind_rows(final_release) %>%
+      dplyr::arrange(time) %>%
+      stats::na.omit()
+    
+    es <- unique(df$release)
+    es <- es[es != "final"]
+    
+    df_wide <- vintages_wide(df, names_from = "release")
+    
+    models <- list()
+    tests <- list()
+    e_found <- FALSE
+    for (i in 1:length(es)) {
+      formula <- stats::as.formula(paste0("final ~ ", es[i]))
+      
+      model <- stats::lm(formula, data = df_wide)
+      hac_se <- sandwich::vcovHAC(model)
+      
+      test <- car::linearHypothesis(model, c("(Intercept) = 0", paste0(es[i], " = 1")), vcov = hac_se)
+      
+      p_value <- test[2, 'Pr(>F)']
+      
+      models[[i]] <- model
+      tests[[i]] <- test
+      
+      if (!test_all) {
+        if (p_value > significance) {
+          efficient_release <- i-1
+          break
+        }
+      } else if (test_all & !e_found & p_value > significance) {
         efficient_release <- i-1
-        break
+        e_found <- TRUE
       }
-    } else if (test_all & !e_found & p_value > significance) {
-      efficient_release <- i-1
-      e_found <- TRUE
+      
     }
     
+    if (i == length(es) & p_value < significance) {
+      rlang::warn("No efficient release found. Please provide further releases!")
+      efficient_release <- NA_real_
+    }
+    
+    data <- vintages_long(df_wide, names_to = "release")
+    data <- vintages_assign_class(data)
+    
+    df_output <- list('e' = efficient_release, 'data' = data, 'models' = models, 'tests' = tests)
   }
   
-  if (i == length(es) & p_value < significance) {
-    rlang::warn("No efficient release found. Please provide further releases!")
-    efficient_release <- NA_real_
-  }
-  
-  data <- vintages_long(df_wide, names_to = "release")
-  
-  df_output <- list('e' = efficient_release, 'data' = data, 'models' = models, 'tests' = tests)
-  class(df_output) <- c("list_eff_rel", class(df_output))
+  class(df_output) <- c("lst_efficient", class(df_output))
   return(df_output)
 }
 
@@ -276,21 +402,53 @@ get_first_efficient_release <- function(df, final_release, significance=0.05, te
 #'
 #' @examples
 #' # Example usage
-#' df <- get_nth_release(reviser::gdp, n = 0:3)
+#' df <- get_nth_release(tsbox::ts_pc(reviser::gdp), n = 1:4)
 #' 
-#' final_release <- get_nth_release(reviser::gdp, n = "latest")
+#' final_release <- get_nth_release(tsbox::ts_pc(reviser::gdp), n = 10)
 #'
 #' # Identify the first efficient release
-#' result <- get_first_efficient_release(df, final_release)
+#' result <- get_first_efficient_release(df, final_release, significance = 0.05)
 #' summary(result)
 #'
 #' @export
-summary.list_eff_rel <- function(object, ...) {
+summary.lst_efficient <- function(object, ...) {
+  is_id_list <- is.null(object$e)
+  df_out <- NULL
+  if (is_id_list) {
+    for (iidd in names(object)) {
+      cat("id: ", iidd, "\n")
+      cat("Efficient release: ", object[[iidd]]$e, "\n\n")
+      cat("Model summary: \n")
+      print(summary(object[[iidd]]$models[[object[[iidd]]$e+1]]))
+      cat("\nTest summary: \n")
+      print(object[[iidd]]$tests[[object[[iidd]]$e+1]])
+      cat("\n\n")
+      df_out <- dplyr::bind_rows(
+        df_out, 
+        tibble::tibble(
+          id = iidd,
+          e = object[[iidd]]$e,
+          alpha = stats::coef(summary(object[[iidd]]$models[[object[[iidd]]$e+1]]))[1,1],
+          beta = stats::coef(summary(object[[iidd]]$models[[object[[iidd]]$e+1]]))[2,1],
+          p_value = object[[iidd]]$tests[[object[[iidd]]$e+1]][2, 'Pr(>F)']
+        )
+        )
+    }
+  } else {
   cat("Efficient release: ", object$e, "\n\n")
   cat("Model summary: \n")
   print(summary(object$models[[object$e+1]]))
   cat("\nTest summary: \n")
   print(object$tests[[object$e+1]])
+  df_out <- tibble::tibble(
+    e = object$e,
+    alpha = stats::coef(summary(object$models[[object$e+1]]))[1,1],
+    beta = stats::coef(summary(object$models[[object$e+1]]))[2,1],
+    p_value = object$tests[[object$e+1]][2, 'Pr(>F)']
+  )
+  }
+  
+  return(invisible(df_out))
 }
 
 
@@ -306,6 +464,12 @@ summary.list_eff_rel <- function(object, ...) {
 #' @param final_release A data frame containing the final release data. Must include columns:
 #'   - `time`: The time variable (matching the initial release data).
 #'   - `value`: The observed values in the final release.
+#' @param degree An integer between 1 and 5 specifying the level of detail for the output:
+#'    1: Default, descriptive statistics (bias, min/max, standard deviation, noise/signal ratio, correlation).
+#'    2: Efficiency tests (bias intercept and slope tests, efficiency tests for intercept and slope).
+#'    3: Orthogonality tests (correlation, autocorrelation, Theil's U statistics, seasonality tests).
+#'    4: News vs. noise tests (p-values for news and noise tests).
+#'    5: Full set of all statistics and tests.
 #'
 #' @details
 #' This function performs a variety of statistical analyses to understand the nature of revisions between 
@@ -369,25 +533,27 @@ summary.list_eff_rel <- function(object, ...) {
 #' print(results)
 #'
 #' @export
-get_revision_analysis <- function(df, final_release) {
-  if(!"tbl_nth_rel" %in% class(df)) {
-    rlang::abort("The input 'df' must be a 'tbl_nth_rel' object.")
+get_revision_analysis <- function(df, final_release, degree = 1) {
+  if(!"tbl_release" %in% class(df) | !"tbl_pubdate" %in% class(final_release)) {
+    rlang::abort("The input 'df' must be a 'tbl_release' or 'tbl_pubdate' object.")
+  }
+  
+  # Check degree in 1:5
+  if (!degree %in% c(1:5)) {
+    rlang::abort("The 'degree' must be an integer between 1 and 3.")
   }
   
   check <- vintages_check(df)
   if (check=="wide") {
     df <- vintages_long(df)
   }
+  df <- vintages_assign_class(df)
   
   check <- vintages_check(final_release)
   if (check=="wide") {
     final_release <- vintages_long(final_release)
   }
-  
-  # Check for unique dates in the 'time' column
-  if (any(duplicated(final_release$time))) {
-    rlang::abort("The 'time' column in 'final_release' must have no duplicates.")
-  }
+  final_release <- vintages_assign_class(final_release)
   
   # check that both datasets have the same time column names
   if (!all(identical(colnames(df), colnames(final_release)))) {
@@ -476,9 +642,6 @@ get_revision_analysis <- function(df, final_release) {
     # Ljung Box:
     ljung_box <- stats::Box.test(data$revision, lag = 4, type = "Ljung-Box", fitdf = 1)$p.value
     
-    # U_1=\frac{\sqrt{\frac{1}{n}\sum^n_{t=1}(L_t-P_t)^2}}{\sqrt{\frac{1}{n}\sum^n_{t=1}L_t^2}+\sqrt{\frac{1}{n}\sum^n_{t=1}P_t^2}}
-    # U_2=\frac{\sqrt{\sum^n_{t=1}\left(\frac{P_{t + 1}-L_{t + 1}}{L_t}\right)^2}}{\sqrt{\sum^n_{t=1}\left(\frac{L_{t + 1}-L_t}{L_t}\right)^2}}
-
     theils_u1 <- sqrt(mean((data$final_value - data$value)^2)) / (sqrt(mean(data$final_value^2)) + sqrt(mean(data$value^2)))
     theils_u2 <- sqrt(sum((data$value[-1] - data$final_value[-1]) / data$final_value[-length(data$final_value)])^2) / sqrt(sum((data$final_value[-1] - data$final_value[-length(data$final_value)]) / data$final_value[-length(data$final_value)])^2)
     
@@ -563,7 +726,38 @@ get_revision_analysis <- function(df, final_release) {
   
   class(results) <- c("revision_summary", class(results))
   
-  return(results)
+  if (degree == 1) {
+    # Descriptives
+    results <- results %>% dplyr::select(dplyr::all_of(
+      grouping_vars), "N", "Bias (mean)", "Bias (p-value)", "Minimum", "Maximum", 
+      "Std. Dev.", "Noise/Signal", "Correlation", "Correlation (p-value)"
+    )
+    return(results)
+  } else if (degree == 2) {
+    # Efficiency
+    results <- results %>% dplyr::select(dplyr::all_of(
+      grouping_vars), "N", "Bias (intercept)", "Bias (intercept p-value)", "Bias (slope)", "Bias (slope p-value)",
+      "Efficiency (intercept)", "Efficiency (intercept p-value)", "Efficiency (slope)", "Efficiency (slope p-value)"
+    )
+    return(results)
+  } else if (degree == 3) {
+    # Orthogonality
+    results <- results %>% dplyr::select(dplyr::all_of(
+      grouping_vars), "N", "Correlation", "Correlation (p-value)",
+      "Autocorrelation (1st)", "Autocorrelation (1st p-value)", "Autocorrelation up to 4th (Ljung-Box p-value)",
+      "Theil's U1", "Theil's U2",
+      "Seasonality (Ljung-Box p-value)", "Seasonality (Friedman p-value)"
+    )
+    return(results)
+  } else if (degree == 4) {
+    # News and noise tests
+    results <- results %>% dplyr::select(dplyr::all_of(
+      grouping_vars), "N", "News test (p-value)", "Noise test (p-value)"
+    )
+    return(results)
+  } else if (degree == 5) {
+    return(results)
+  }
 }
 
 
@@ -627,23 +821,25 @@ qs_test <- function(series, lags = c(12, 24)) {
 #' Extract the Nth Data Release (Vintage)
 #'
 #' Filters the input dataset to return the Nth release (or vintage) of data for each time period. 
-#' The function supports selecting the first, latest, or a specific numbered release (starting from 0).
+#' The function supports selecting the first, latest, or a specific numbered release.
 #'
 #' @param df A data frame containing data vintages. The data frame must include the columns 
 #'           `pub_date` (publication date of the release) and `time` (the corresponding time period for the data).
 #' @param n The release number to extract. Accepts:
-#'          - A non-negative integer or vector (e.g., 0 for the first release, 1 for the second, etc.).
+#'          - A positive integer or vector (e.g., 1 for the first release, 2 for the second, etc.).
 #'          - `"first"` to extract the first release.
 #'          - `"latest"` to extract the most recent release.
-#'          Default is 0 (the first release).
+#'          Default is 1 (the first release).
+#' @param diagonal Logical. If `TRUE`, the function only returns real first releases.
 #'
 #' @return A filtered data frame containing only the specified release(s). The resulting data frame is 
-#'         assigned the class `tbl_nth_rel` to indicate its structure.
+#'         assigned the class `tbl_release` to indicate its structure. If diagonal 
+#'         is set to `TRUE`, the function only returns the real first releases. That is historic values for which no
+#'         vintages exist are not returned.
 #'
 #' @details 
 #' The behavior depends on the value of `n`:
-#' - **Non-negative integer**: The function retrieves the Nth release for each time period. Note that the release 
-#'   indexing starts at 0 (e.g., 0 = first release, 1 = second release, etc.).
+#' - **Non-negative integer**: The function retrieves the Nth release for each time period (e.g., 0 = first release, 1 = second release, etc.).
 #' - **"first"**: Retrieves the first release for each time period (via `get_first_release`).
 #' - **"latest"**: Retrieves the most recent release for each time period (via `get_latest_release`).
 #'
@@ -661,7 +857,7 @@ qs_test <- function(series, lags = c(12, 24)) {
 #' second_release <- get_nth_release(df, n = 1)
 #'
 #' @export
-get_nth_release <- function(df, n = 0) {
+get_nth_release <- function(df, n = 0, diagonal = FALSE) {
   # Validate inputs
   if (is.numeric(n) && any(n < 0)) {
     rlang::abort("The input 'n' must be >= 0, 'first', or 'latest'.")
@@ -673,31 +869,58 @@ get_nth_release <- function(df, n = 0) {
   if (check=="wide") {
     df <- vintages_long(df)
   }
+  df <- vintages_assign_class(df)
   
-  # Ensure data is sorted by pub_date and time
-  df <- df %>%
-    dplyr::arrange(pub_date, time)
+  if ("id" %in% colnames(df)) {
+    # Ensure data is sorted by pub_date and time
+    df <- df %>%
+      dplyr::arrange(id, pub_date, time)
+    
+    if (is.numeric(n)) {
+      n <- n + 1
+      # Get the nth release(s)
+      nth_release <- df %>%
+        dplyr::group_by(time, id) %>%
+        dplyr::mutate(release = paste0("release_",(1:dplyr::n()-1))) %>%
+        dplyr::slice(n) %>%
+        dplyr::ungroup()
+    } else if (tolower(n) == "latest") {
+      # Get the latest release
+      nth_release <- get_latest_release(df)
+    } else if (tolower(n) == "first") {
+      # Get the first release
+      nth_release <- get_first_release(df)
+    }
+  } else {
+    # Ensure data is sorted by pub_date and time
+    df <- df %>%
+      dplyr::arrange(pub_date, time)
+    
+    if (is.numeric(n)) {
+      n <- n + 1
+      # Get the nth release(s)
+      nth_release <- df %>%
+        dplyr::group_by(time) %>%
+        dplyr::mutate(release = paste0("release_",(1:dplyr::n()-1))) %>%
+        dplyr::slice(n) %>%
+        dplyr::ungroup()
+    } else if (tolower(n) == "latest") {
+      # Get the latest release
+      nth_release <- get_latest_release(df)
+    } else if (tolower(n) == "first") {
+      # Get the first release
+      nth_release <- get_first_release(df)
+    }
+  }
   
-  if (is.numeric(n)) {
-    n <- n + 1
-  # Get the nth release(s)
-  nth_release <- df %>%
-    dplyr::group_by(time) %>%
-    dplyr::mutate(release = paste0("release_",(1:dplyr::n()-1))) %>%
-    dplyr::slice(n) %>%
-    dplyr::ungroup()
-  } else if (tolower(n) == "latest") {
-    # Get the latest release
-    nth_release <- get_latest_release(df)
-  } else if (tolower(n) == "first") {
-    # Get the first release
-    nth_release <- get_first_release(df)
+  if (diagonal) {
+    df <- df %>% dplyr::filter(
+      !dplyr::lead(pub_date) == (pub_date)
+    )
   }
     
   # Add the class only if it is not already present
-  if (!"tbl_nth_rel" %in% class(nth_release)) {
-    class(nth_release) <- c("tbl_nth_rel", class(nth_release))
-  }
+  nth_release <- vintages_assign_class(nth_release)
   return(nth_release)
 }
 
@@ -707,13 +930,16 @@ get_nth_release <- function(df, n = 0) {
 #'
 #' @param df A data frame containing data vintages. The data frame must include the columns 
 #'           `pub_date` (publication date of the release) and `time` (the corresponding time period for the data).
+#' @param diagonal Logical. If `TRUE`, the function only returns real first releases.
 #'
 #' @return A filtered data frame containing only the first release(s). The resulting data frame is 
-#'         assigned the class `tbl_nth_rel` to indicate its structure.
+#'         assigned the class `tbl_release` to indicate its structure.
 #'
 #' @details
 #' For each time period, the function identifies the release with the earliest publication date (`pub_date`). 
-#' A new column `release` is added and labels all rows in the resulting data frame as `release_0`.
+#' A new column `release` is added and labels all rows in the resulting data frame as `release_0`. If diagonal 
+#' is set to `TRUE`, the function only returns the real first releases. That is historic values for which no
+#' vintages exist are not returned.
 #'
 #' @examples
 #' # Example data
@@ -723,27 +949,45 @@ get_nth_release <- function(df, n = 0) {
 #' first_release <- get_first_release(df)
 #'
 #' @export
-get_first_release <- function(df) {
+get_first_release <- function(df, diagonal=FALSE) {
   
   check <- vintages_check(df)
   if (check=="wide") {
     df <- vintages_long(df)
   }
+  df <- vintages_assign_class(df)
   
-  # Ensure data is sorted by pub_date and time
-  df <- df %>%
-    dplyr::arrange(pub_date, time)
+  if ("id" %in% colnames(df)) {
+    # Ensure data is sorted by pub_date and time
+    df <- df %>%
+      dplyr::arrange(id, pub_date, time)
+    
+    df <- df %>%
+      dplyr::group_by(id, time) %>%
+      dplyr::mutate("release" = "release_0") %>%
+      dplyr::filter(pub_date == min(pub_date)) %>%
+      dplyr::ungroup()
+  } else {
+    # Ensure data is sorted by pub_date and time
+    df <- df %>%
+      dplyr::arrange(pub_date, time)
+    
+    df <- df %>%
+      dplyr::group_by(time) %>%
+      dplyr::mutate("release" = "release_0") %>%
+      dplyr::filter(pub_date == min(pub_date)) %>%
+      dplyr::ungroup()
+  }
   
-  df <- df %>%
-    dplyr::group_by(time) %>%
-    dplyr::mutate("release" = "release_0") %>%
-    dplyr::filter(pub_date == min(pub_date)) %>%
-    dplyr::ungroup()
+  if (diagonal) {
+    df <- df %>% dplyr::filter(
+      !dplyr::lead(pub_date) == (pub_date)
+    )
+  }
+  
   
   # Add the class only if it is not already present
-  if (!"tbl_nth_rel" %in% class(df)) {
-    class(df) <- c("tbl_nth_rel", class(df))
-  }
+  df <- vintages_assign_class(df)
   return(df)
 }
 
@@ -755,11 +999,11 @@ get_first_release <- function(df) {
 #'           `pub_date` (publication date of the release) and `time` (the corresponding time period for the data).
 #'
 #' @return A filtered data frame containing only the most recent release(s). The resulting data frame is 
-#'         assigned the class `tbl_nth_rel` to indicate its structure.
+#'         assigned the class `tbl_release` to indicate its structure.
 #'
 #' @details 
 #' For each time period, the function identifies the release with the latest publication date (`pub_date`) 
-#' and adds a column `release` that labels the release as `release_N`, where `N` is the release index.
+#' and adds a column `release` that labels the release as `release_N`, where `N` is the release index (zero indexed).
 #'
 #' @examples
 #' # Example data
@@ -775,22 +1019,109 @@ get_latest_release <- function(df) {
   if (check=="wide") {
     df <- vintages_long(df)
   }
+  df <- vintages_assign_class(df)
   
-  # Ensure data is sorted by pub_date and time
-  df <- df %>%
-    dplyr::arrange(pub_date, time)
-  df <- df %>%
-    dplyr::group_by(time) %>%
-    dplyr::mutate("release" = paste0("release_",dplyr::n())) %>%
-    dplyr::filter(pub_date == max(pub_date)) %>%
-    dplyr::ungroup()
+  if ("id" %in% colnames(df)) {
+    # Ensure data is sorted by pub_date and time
+    df <- df %>%
+      dplyr::arrange(id, pub_date, time)
+    df <- df %>%
+      dplyr::group_by(id, time) %>%
+      dplyr::mutate("release" = paste0("release_",dplyr::n())) %>%
+      dplyr::filter(pub_date == max(pub_date)) %>%
+      dplyr::ungroup()
+  } else {
+    # Ensure data is sorted by pub_date and time
+    df <- df %>%
+      dplyr::arrange(pub_date, time)
+    df <- df %>%
+      dplyr::group_by(time) %>%
+      dplyr::mutate("release" = paste0("release_",dplyr::n())) %>%
+      dplyr::filter(pub_date == max(pub_date)) %>%
+      dplyr::ungroup()
+  }
   
   # Add the class only if it is not already present
-  if (!"tbl_nth_rel" %in% class(df)) {
-    class(df) <- c("tbl_nth_rel", class(df))
-  }
+  df <- vintages_assign_class(df)
   return(df)
 }
+
+#' Extract Vintage Values from a Data Frame
+#'
+#' Some statistical agencies make a final revision of their data after a certain
+#' period of time in a give month in the year. This function extracts values 
+#' from a given month or quarter a specified  number of years after the 
+#' initial release.
+#'
+#' @param df A data frame containing columns `pub_date` (publication date) and `time` (observation date).
+#' @param month An optional parameter specifying the target month as a name ("July") or an integer (7). Cannot be used with `quarter`.
+#' @param quarter An optional parameter specifying the target quarter (1-4). Cannot be used with `month`.
+#' @param years The number of years after `pub_date` for which the values should be extracted.
+#' 
+#' @return A filtered data frame containing values matching the specified criteria.
+#' @examples
+#' df <- reviser::gdp
+#' dta <- get_fixed_release(df, month = "July", years = 3)
+#' dta <- get_fixed_release(df, month = 7, years = 3)
+#' dta <- get_fixed_release(df, quarter = 3, years = 3)
+#' 
+#' @export
+get_fixed_release <- function(df, years, month=NULL, quarter = NULL) {
+  # Ensure only one of month or quarter is specified
+  if (!is.null(month) && !is.null(quarter)) {
+    rlang::abort("Specify either a month or a quarter, not both.")
+  }
+  
+  # Ensure years is numeric
+  if (!is.numeric(years)) {
+    rlang::abort("'years' must be a numeric value.")
+  }
+  # Ensure the month is in numeric format if provided
+  if (!is.null(month)) {
+    if (is.character(month)) {
+      month <- match(tolower(month), tolower(month.name))
+      if (is.na(month)) rlang::abort("Invalid 'month' name")
+    }
+  }
+  # Ensure quarter is in numeric format if provided
+  if (!is.null(quarter)) {
+    if (!quarter %in% 1:4) {
+      rlang::abort("Invalid quarter number. Must be between 1 and 4.")
+    }
+  }
+  
+  check <- vintages_check(df)
+  if (check=="wide") {
+    df <- vintages_long(df)
+  }
+  df <- vintages_assign_class(df)
+  
+  # Define quarter months if quarter is specified
+  if (!is.null(quarter)) {
+    quarter_months <- list(
+      `1` = c(1, 2, 3), `2` = c(4, 5, 6), `3` = c(7, 8, 9), `4` = c(10, 11, 12)
+    )
+    target_month <- quarter_months[[as.character(quarter)]][1]
+  } else if(!is.null(month)) {
+    target_month <- month
+  }
+  
+  df <- df %>%
+    dplyr::mutate(
+      target_date = dplyr::if_else(
+        lubridate::month(time) > target_month,
+        lubridate::make_date(lubridate::year(time) + years + 1, target_month, 1),
+        lubridate::make_date(lubridate::year(time) + years, target_month, 1)
+           )) %>%
+    dplyr::filter(
+      lubridate::year(pub_date) == lubridate::year(target_date) &
+        lubridate::month(pub_date) == lubridate::month(target_date)
+    ) %>% dplyr::select(-target_date)
+  
+  # Add the class only if it is not already present
+  df <- vintages_assign_class(df)
+  return(df)
+  }
 
 #' Get Data Releases for a Specific Date
 #'
@@ -839,6 +1170,8 @@ get_releases_by_date <- function(df, date) {
   # Get all releases on the specified date
   releases <- df %>%
     dplyr::filter(time == date)
+  
+  releases <- vintages_assign_class(releases)
     
   return(releases)
 }
@@ -885,6 +1218,8 @@ get_days_to_release <- function(df) {
     dplyr::mutate(
       days_to_release = as.numeric(difftime(pub_date, time, units = "days"))
     )
+  
+  df <- vintages_assign_class(df)
   
   return(df)
 }
