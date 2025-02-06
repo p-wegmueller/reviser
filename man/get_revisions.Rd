@@ -58,6 +58,6 @@ revisions_interval <- get_revisions(df, interval = 1)
 revisions_date <- get_revisions(df, ref_date = as.Date("2023-02-01"))
 
 # Calculate revisions relative to the nth release (2nd release)
-revisions_nth <- get_revisions(df, nth_release = 2)
+revisions_nth <- get_revisions(df, nth_release = 1)
 
 }

@@ -545,21 +545,41 @@ get_revision_analysis <- function(df, final_release, degree = 1) {
   }
   df <- vintages_assign_class(df)
   
-  if(!"tbl_release" %in% class(df) | !"tbl_pubdate" %in% class(final_release)) {
-    rlang::abort("The input 'df' must be a 'tbl_release' or 'tbl_pubdate' object.")
-  }
-  
   check <- vintages_check(final_release)
   if (check=="wide") {
     final_release <- vintages_long(final_release)
   }
   final_release <- vintages_assign_class(final_release)
   
-  # check that both datasets have the same time column names
-  if (!all(identical(colnames(df), colnames(final_release)))) {
-    rlang::abort("The columns in 'df' and 'final_release' must have the same names.")
+  
+  if(!any(c("tbl_release", "tbl_pubdate") %in% class(df))) {
+    rlang::abort("'df' must be a 'tbl_release' or 'tbl_pubdate' object.")
   }
   
+  # Check that id is present in both data.frames or neither
+  if("id" %in% colnames(df) & "id" %in% colnames(final_release)) {
+    if(!identical(unique(df$id), unique(final_release$id))) {
+      rlang::abort("The same 'id' must be present in 'df' and 'final_release'.")
+    } 
+  } else if("id" %in% colnames(df) | "id" %in% colnames(final_release)) {
+    rlang::abort("Both or none of 'df' and 'final_release' must have an 'id' column.")
+  }
+  
+  # If both pub_date and release columns are present in df, use the release column
+  if ("release" %in% colnames(df) & "pub_date" %in% colnames(df)) {
+    rlang::warn("Both 'release' and 'pub_date' columns are present in 'df. The 'release' column will be used.")
+    df <- df %>%
+      dplyr::select(-pub_date)
+  }
+  
+  if(any(grepl("pub_date", colnames(df)))) {
+    df_var <- "pub_date"
+  } else if(any(grepl("release", colnames(df)))) {
+    df_var <- "release"
+  } else {
+    rlang::abort("The 'df' object must have a 'release' or 'pub_date' column.")
+  }
+
   final_release <- final_release %>%
     dplyr::rename(final_value = value)
   
@@ -569,7 +589,7 @@ get_revision_analysis <- function(df, final_release, degree = 1) {
     final_release <- dplyr::select(final_release, time, final_value, id)
     
     df <- df %>%
-      dplyr::select(time, value, release, id) 
+      dplyr::select(time, value, df_var, id) 
     
     df <- df %>%
       dplyr::left_join(final_release, by = c("time" = "time", "id" = "id")) %>%
@@ -579,7 +599,7 @@ get_revision_analysis <- function(df, final_release, degree = 1) {
     final_release <- dplyr::select(final_release, time, final_value) 
     
     df <- df %>%
-      dplyr::select(time, value, release) 
+      dplyr::select(time, value, df_var) 
     
     df <- df %>%
       dplyr::left_join(final_release, by = c("time" = "time")) %>%
@@ -698,18 +718,18 @@ get_revision_analysis <- function(df, final_release, degree = 1) {
   }
   
   # if no id or release column present, create a dummy id column
-  if (!any(c("id", "release") %in% colnames(revisions))) {
+  if (!any(c("id", "release", "pub_date") %in% colnames(revisions))) {
     revisions <- revisions %>% 
       dplyr::mutate(id = "release_0")
   }
   
   # Defing grouping vars
-  if (all(c("release", "id") %in% colnames(revisions))) {
-    grouping_vars <- c("id", "release")
+  if (all(c(df_var, "id") %in% colnames(revisions))) {
+    grouping_vars <- c("id", df_var)
   } else if ("id" %in% colnames(revisions)) {
     grouping_vars <- c("id")
-  } else if ("release" %in% colnames(revisions)) {
-    grouping_vars <- c("release")
+  } else if (df_var %in% colnames(revisions)) {
+    grouping_vars <- c(df_var)
   } 
   
   # Apply the computation to each group and combine the results

@@ -25,7 +25,16 @@ dta7 <- get_revisions(dta, nth_release = "latest")
 dta8 <- get_revisions(dta, nth_release = 1)
 
 
-dta9 <- get_revision_analysis(dta, get_nth_release(dta, n = "latest"))
+dta9 <- get_revision_analysis(
+  dta %>% filter(year(pub_date) %in% c(2022:2023) ) , 
+  get_nth_release(dta, n = "latest")
+  )
+
+dta13 <- get_revision_analysis(
+  get_nth_release(dta, n = 0:4),
+  get_nth_release(dta, n = "latest")
+  )
+
 
 dta10 <- reviser::get_first_efficient_release(
   get_nth_release(dta #%>% 
