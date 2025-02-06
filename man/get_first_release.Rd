@@ -4,22 +4,26 @@
 \alias{get_first_release}
 \title{Extract the First Data Release (Vintage)}
 \usage{
-get_first_release(df)
+get_first_release(df, diagonal = FALSE)
 }
 \arguments{
 \item{df}{A data frame containing data vintages. The data frame must include the columns
 \code{pub_date} (publication date of the release) and \code{time} (the corresponding time period for the data).}
+
+\item{diagonal}{Logical. If \code{TRUE}, the function only returns real first releases.}
 }
 \value{
 A filtered data frame containing only the first release(s). The resulting data frame is
-assigned the class \code{tbl_nth_rel} to indicate its structure.
+assigned the class \code{tbl_release} to indicate its structure.
 }
 \description{
 Filters the input dataset to return the earliest release (or vintage) for each time period.
 }
 \details{
 For each time period, the function identifies the release with the earliest publication date (\code{pub_date}).
-A new column \code{release} is added and labels all rows in the resulting data frame as \code{release_0}.
+A new column \code{release} is added and labels all rows in the resulting data frame as \code{release_0}. If diagonal
+is set to \code{TRUE}, the function only returns the real first releases. That is historic values for which no
+vintages exist are not returned.
 }
 \examples{
 # Example data

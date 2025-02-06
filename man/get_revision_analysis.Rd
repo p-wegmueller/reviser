@@ -4,7 +4,7 @@
 \alias{get_revision_analysis}
 \title{Revision Analysis Summary Statistics}
 \usage{
-get_revision_analysis(df, final_release)
+get_revision_analysis(df, final_release, degree = 1)
 }
 \arguments{
 \item{df}{A data frame containing the initial data releases. Must include columns:
@@ -19,6 +19,13 @@ get_revision_analysis(df, final_release)
 \item \code{time}: The time variable (matching the initial release data).
 \item \code{value}: The observed values in the final release.
 }}
+
+\item{degree}{An integer between 1 and 5 specifying the level of detail for the output:
+1: Default, descriptive statistics (bias, min/max, standard deviation, noise/signal ratio, correlation).
+2: Efficiency tests (bias intercept and slope tests, efficiency tests for intercept and slope).
+3: Orthogonality tests (correlation, autocorrelation, Theil's U statistics, seasonality tests).
+4: News vs. noise tests (p-values for news and noise tests).
+5: Full set of all statistics and tests.}
 }
 \value{
 A data frame with one row per grouping (if applicable) and columns for summary statistics and test results.

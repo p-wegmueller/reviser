@@ -19,7 +19,7 @@ A long-format data frame or tibble. If the input is a list of wide-format data f
 will be a single combined long-format data frame.
 }
 \description{
-Converts a vintages dataset from wide format to long format, optionally grouping by \code{id} if the input
+Converts a vintages dataset from wide format to long format, optionally adding \code{id} if the input
 is a list of data frames. The long format contains one row per combination of \code{time} and \code{names_to}
 (e.g., \code{pub_date} or \code{release}), with values stored in a single \code{value} column.
 }

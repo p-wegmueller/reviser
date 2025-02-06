@@ -12,14 +12,14 @@ get_latest_release(df)
 }
 \value{
 A filtered data frame containing only the most recent release(s). The resulting data frame is
-assigned the class \code{tbl_nth_rel} to indicate its structure.
+assigned the class \code{tbl_release} to indicate its structure.
 }
 \description{
 Filters the input dataset to return the most recent release (or vintage) for each time period.
 }
 \details{
 For each time period, the function identifies the release with the latest publication date (\code{pub_date})
-and adds a column \code{release} that labels the release as \code{release_N}, where \code{N} is the release index.
+and adds a column \code{release} that labels the release as \code{release_N}, where \code{N} is the release index (zero indexed).
 }
 \examples{
 # Example data

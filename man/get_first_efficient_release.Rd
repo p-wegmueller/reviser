@@ -12,7 +12,7 @@ get_first_efficient_release(
 )
 }
 \arguments{
-\item{df}{A data frame of class \code{tbl_nth_rel} containing the vintage data.
+\item{df}{A data frame of class \code{tbl_release} containing the vintage data.
 It must include the columns:
 \itemize{
 \item \code{time}: The reference period (e.g., quarter or month).
@@ -34,7 +34,7 @@ This must include the columns:
 \value{
 A list of class \code{list_eff_rel} with the following elements:
 \itemize{
-\item \code{e}: The index of the first efficient release (0-based index).
+\item \code{e}: The index of the first efficient release. (0 indexed)
 \item \code{data}: A long-format data frame containing the vintage data with the final release appended.
 \item \code{models}: A list of linear regression models fitted for each release.
 \item \code{tests}: A list of hypothesis test results for each release.
@@ -64,9 +64,9 @@ If no efficient release is found, a warning is issued.
 }
 \examples{
 # Example data
-df <- get_nth_release(reviser::gdp, n = 0:3)
+df <- get_nth_release(tsbox::ts_pc(reviser::gdp), n = 0:3)
 
-final_release <- get_nth_release(reviser::gdp, n = "latest")
+final_release <- get_nth_release(tsbox::ts_pc(reviser::gdp), n = 10)
 
 # Identify the first efficient release
 result <- get_first_efficient_release(df, final_release, significance = 0.05)

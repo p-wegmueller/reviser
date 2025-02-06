@@ -23,7 +23,7 @@ If \code{"latest"}, the most recent vintage is used.}
 \item{ref_date}{A date specifying the fixed reference publication date to compare all vintages against.}
 }
 \value{
-A data frame (tibble) of class \code{tbl_rev}, with the following columns:
+A data frame (tibble) of class \code{tbl_revision}, with the following columns:
 \itemize{
 \item \code{pub_date}: The publication date of the vintage.
 \item \code{time}: The reference period (e.g., quarter or month).

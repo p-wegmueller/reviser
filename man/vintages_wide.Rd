@@ -10,7 +10,7 @@ vintages_wide(df, names_from = "pub_date")
 \item{df}{A data frame or tibble containing vintages data in long format.}
 
 \item{names_from}{The name of the column whose unique values will be used as column names in the wide format.
-Defaults to \code{"pub_date"}.}
+Defaults to \code{"pub_date"}. Other: \code{"release"}.}
 }
 \value{
 If an \code{id} column is present, the function returns a named list of wide-format data frames,
