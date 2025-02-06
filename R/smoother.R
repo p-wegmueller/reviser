@@ -54,7 +54,7 @@ kk_nowcast <- function(
     h=0, 
     model = "Kishor-Koenig", 
     trace = 0
-    ) {
+) {
   
   start_mat <- 0.4 
   start_cov <- 0.4
@@ -143,19 +143,19 @@ kk_nowcast <- function(
   
   # Define matrices
   kk_mat_sur <- kk_matrices(e=e, model=model, type = "character")
-
+  
   X_names <- state_names
   X_lag_names <- state_lag_names
   Y_names <- observable_names
   Y_lag_names <- observable_lag_names
-
+  
   # Define equations
   lhs1 <- X_names
   rhs1 <- kk_mat_sur$FF %mx% X_lag_names
-
+  
   lhs2 <- Y_names
   rhs2 <- ((kk_mat_sur$II %diff% kk_mat_sur$GG) %prod% kk_mat_sur$FF ) %mx% Y_lag_names %sum% (kk_mat_sur$GG %mx% X_names)
-
+  
   equations <- list()
   formula <- stats::as.formula(paste0(lhs1[e+1], " ~ ", rhs1[e+1]))
   equations[[paste0("eq", 1)]] <- formula
@@ -165,7 +165,7 @@ kk_nowcast <- function(
     equations[[paste0("eq", eq)]] <- formula
     eq <- eq + 1
   }
-
+  
   # Arrange data
   X <- array(NA, c(nrow(df), e + 1))
   X_lag <- array(NA, c(nrow(df), e + 1))
@@ -177,35 +177,35 @@ kk_nowcast <- function(
   colnames(X) <- state_names
   X_lag <- tibble::tibble(as.data.frame(X_lag))
   colnames(X_lag) <- state_lag_names
-
+  
   Y <- array(NA, c(nrow(df), e ))
   Y_lag <- array(NA, c(nrow(df), e ))
   for (j in (e-1):0) {
-      Y[, (e) - j] <- dplyr::lag(dplyr::pull(df[paste0("release_",j)]), j)
-      Y_lag[, (e) - j] <- dplyr::lag(dplyr::pull(df[paste0("release_",j)]), j+1)
+    Y[, (e) - j] <- dplyr::lag(dplyr::pull(df[paste0("release_",j)]), j)
+    Y_lag[, (e) - j] <- dplyr::lag(dplyr::pull(df[paste0("release_",j)]), j+1)
   }
-
+  
   Y <- tibble::tibble(as.data.frame(Y))
   Y_lag <- tibble::tibble(as.data.frame(Y_lag))
   colnames(Y) <- c(paste0("release_", (e-1):0, "_lag_", (e-1):0))
   colnames(Y_lag) <- c(paste0("release_", (e-1):0, "_lag_", e:1))
-
+  
   sur_data <- cbind(X, Y, Y_lag) %>% stats::na.omit()
-
+  
   names(start_mat) <- names(kk_mat_sur$params)[1:n_param_mat]
-
+  
   fit <- systemfit::nlsystemfit(
     equations,
     method = "SUR",
     data = sur_data,
     startvals = start_mat,
     print.level = trace
-    )
-
+  )
+  
   params <- c(fit$b, (diag(fit$rcov)))
-
+  
   kk_mat_hat <- kk_matrices(e=e, model=model, params = params, type = "numeric")
-
+  
   sur_ss_mat <- kk_to_ss(
     II = kk_mat_hat$II,
     FF=kk_mat_hat$FF,
@@ -213,7 +213,7 @@ kk_nowcast <- function(
     R=kk_mat_hat$R,
     H=kk_mat_hat$H,
     epsilon = 1e-6
-    )
+  )
   
   
   Y <- array(NA, c(nrow(df), e+1))
@@ -232,13 +232,13 @@ kk_nowcast <- function(
     W = sur_ss_mat$W, 
     m0 = m0, 
     C0 = C0
-    )
-
+  )
+  
   # Filtered states
   filtered_states <- tibble::tibble(as.data.frame(kalman$filtered_states[1:nrow(kalman$filtered_states),1:((e+1))])) %>%
     dplyr::mutate(time = df$time[(e+1):(nrow(df))]) %>%
     dplyr::select(time, !!!stats::setNames(seq_along(state_names), state_names) )
-
+  
   # Smoothed states
   smoothed_states <- tibble::tibble(as.data.frame(kalman$smoothed_states[1:nrow(kalman$smoothed_states),1:((e+1))])) %>%
     dplyr::mutate(time = df$time[(e+1):(nrow(df))]) %>%
@@ -285,7 +285,7 @@ kk_nowcast <- function(
       dplyr::mutate(time = forecast_dates) %>%
       dplyr::select(dplyr::contains("obs_"), time) %>%
       dplyr::select(time, !!!stats::setNames(seq_along(observable_names), observable_names))
-
+    
   } else {
     forecast_states <- NULL
     forecast_observation <- NULL
@@ -295,7 +295,7 @@ kk_nowcast <- function(
   
   # Remove the parameters from the model
   kk_mat_hat$params  <- NULL
-
+  
   return(list(
     forecast_states = forecast_states,
     filtered_states = filtered_states,
@@ -306,7 +306,7 @@ kk_nowcast <- function(
     ss_model_mat = sur_ss_mat,
     params = params,
     fit = fit
-    ))
+  ))
 }
 
 
@@ -472,7 +472,7 @@ kk_matrices <- function(e, model, params = NULL, type = "numeric") {
     R <- apply(R, c(1, 2), as.numeric)
     H <- apply(H, c(1, 2), as.numeric)
   }
-
+  
   return(list(II = II, FF = FF, GG = GG, R = R, H = H, params = params))
 }
 
@@ -519,10 +519,10 @@ kk_to_ss <- function(II, FF, GG, R, H, epsilon = 1e-6) {
   Z <- cbind(II, II)
   
   # State transition matrix T
-   # Tmat <- rbind(
-   #   cbind(FF, matrix(0, e+1, e+1)),
-   #   Z
-   # )
+  # Tmat <- rbind(
+  #   cbind(FF, matrix(0, e+1, e+1)),
+  #   Z
+  # )
   
   Tmat <- rbind(
     cbind(FF, array(0, c(e+1, e+1))),
@@ -535,15 +535,15 @@ kk_to_ss <- function(II, FF, GG, R, H, epsilon = 1e-6) {
   # State noise covariance (x_t and y_t-1)
   # W <- array(0,c(2*(e+1), 2*(e+1)))
   # 
-   # for (jj in 2:(e+1)) {
-   #   V[jj,jj] <- H[jj,jj]  # e param for V0
-   #   W[jj+e+1,jj+e+1] <- H[jj,jj]  # same e param for W0
-   # }
+  # for (jj in 2:(e+1)) {
+  #   V[jj,jj] <- H[jj,jj]  # e param for V0
+  #   W[jj+e+1,jj+e+1] <- H[jj,jj]  # same e param for W0
+  # }
   # 
-   # V[1,1] <- epsilon
-   # 
-   # W[e+1,e+1] <- R[e+1,e+1]  # 1 param for W0
-
+  # V[1,1] <- epsilon
+  # 
+  # W[e+1,e+1] <- R[e+1,e+1]  # 1 param for W0
+  
   
   V <- array(0,c(e+1, e+1))
   W <- array(0,c(2*(e+1), 2*(e+1)))
@@ -556,7 +556,7 @@ kk_to_ss <- function(II, FF, GG, R, H, epsilon = 1e-6) {
   for (jj in c(1:e,e+2)) {
     W[jj,jj] <- epsilon
   }
-
+  
   
   return(list(Z = Z, Tmat = Tmat, V = V, W = W))
 }

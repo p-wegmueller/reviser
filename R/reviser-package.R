@@ -4,7 +4,7 @@
 #' @keywords internal
 "_PACKAGE"
 utils::globalVariables(c(
- ".", "final_value", "pub_date", "release", "time", "value", "value_ref"
+ ".", "final_value", "pub_date", "release", "time", "value", "value_ref", "target_date"
   ))
 
 #' @importFrom magrittr %>%

@@ -2,65 +2,110 @@ library(dplyr)
 library(tsbox)
 library(ggplot2)
 library(reviser)
+library(lubridate)
 
-gdp <- reviser::gdp
-gdp_wide <- vintages_wide(gdp)
-gdp_long_pc <- vintages_long(gdp_wide, keep_na = FALSE) %>% tsbox::ts_pc() %>% tsbox::ts_span(start="1980-01-01")
-
-generate_basic_report(data = gdp_long_pc, 
-                    title = "Revisions to US GDP growth rates",
-                    author = "Marc Burri"
-                    )
-
-
-gdp_long <- vintages_long(gdp_wide)
+load("~/Documents/GitHub/reviser/inst/exdata/pk_rt.RData")
+dta <- dta.real.csa %>% filter(id == "gdp") %>% mutate(id = "CH")
+load("~/Documents/GitHub/reviser/inst/exdata/usa_rt.RData")
+dta <- bind_rows(
+  dta %>% filter(time >= as.Date("2000-01-01")), 
+  tidy_data %>% filter(time >= as.Date("2000-01-01"))
+  )
 
 
-plot_vintages(gdp_long_pc %>% filter(pub_date > as.Date("2009-01-01") & pub_date < as.Date("2009-10-01")), type = "line") +
-  xlim(as.Date("2008-01-01"), as.Date("2010-01-01")) 
-
-gdp_wide2 <- vintages_wide(gdp_long)
-
-gdp_long_rev <- get_revisions(gdp_long_pc, nth_release = 2) 
-
-gdp_vertical <- get_nth_release(gdp_long_pc, n = c(0:2,6))
-plot_vintages(gdp_vertical, dim_col = "release", type = "line") +
-  xlim(as.Date("2008-01-01"), as.Date("2013-01-01")) 
-
-plot_vintages(gdp_long_rev %>% filter(pub_date > as.Date("2009-01-01") & pub_date < as.Date("2013-10-01")), 
-              type = "bar") +
-  xlim(as.Date("2008-01-01"), as.Date("2010-01-01")) 
-
-plot_vintages(gdp_long_rev, type = "boxplot")  + xlim(as.Date("2004-01-01"), as.Date("2006-01-01")) 
-
-final_release <- get_nth_release(gdp_long_pc, n = 16)
-df <- get_nth_release(gdp_long_pc, n = 0:6)
-#summary <- get_revision_analysis(df, final_release)
-
-eff_rel <- get_first_efficient_release(df, final_release)
-summary(eff_rel)
+dta1 <- get_days_to_release(dta)
+dta2 <- get_first_release(dta)
+dta3 <- get_latest_release(dta)
+dta4 <- get_nth_release(dta, n = 0:9)
+dta44 <- get_fixed_release(dta, years = 3, month = "September")
+dta5 <- get_releases_by_date(dta, as.Date("2007-10-01"))
+dta6 <- get_revisions(dta, interval = 1)
+dta11 <- get_revisions(dta4 %>% dplyr::select(-pub_date), interval = 1)
+dta7 <- get_revisions(dta, nth_release = "latest") 
+dta8 <- get_revisions(dta, nth_release = 1)
 
 
-df <- get_nth_release(tsbox::ts_span(tsbox::ts_pc(reviser::gdp), start = "1980-01-01"), n = 0:1)
+dta9 <- get_revision_analysis(dta, get_nth_release(dta, n = "latest"))
+
+dta10 <- reviser::get_first_efficient_release(
+  get_nth_release(dta #%>% 
+                    #filter(id == "CH"), 
+                  ,n = 0:9),
+  get_nth_release(dta #%>% 
+                    #filter(id == "CH"), 
+                  ,n = 16)
+)
+res<-summary(dta10)
+
+nowcast <- kk_nowcast(dta10$CH$data, e = dta10$CH$e, trace=1)
+nowcast$params
+ncast <- nowcast$filtered_states$release_3_lag_0
+actl <- tsbox::ts_wide(dta10$CH$data)$release_3[(dta10$CH$e+1):nrow(tsbox::ts_wide(dta10$CH$data))]
+
+# RMSE predicted efficient release
+rmse1 <- sqrt(mean((ncast - actl)^2, na.rm = T))
+
+# RMSE first release
+rmse2 <- sqrt(mean((tsbox::ts_wide(dta10$CH$data)$release_0[(dta10$CH$e+1):nrow(tsbox::ts_wide(dta10$CH$data))] - actl)^2, na.rm = T))
+
+rmse1/rmse2
+
+gdp <- reviser::gdp %>% ts_pc() %>% ts_span(start="2004-01-01")
+
+dta12 <- reviser::get_first_efficient_release(
+  get_nth_release(gdp, n = 0:150),
+  get_nth_release(gdp, n = 16)
+)
+summary(dta12)
+
+nowcast <- kk_nowcast(dta12$data, e=3, trace=1, h = 4)
+nowcast$params
+
+ncast <- nowcast$filtered_states$release_5_lag_0
+actl <- ts_wide(dta12$data)$release_5[(dta12$e+1):nrow(ts_wide(dta12$data))]
+
+# RMSE predicted efficient release
+rmse1 <- sqrt(mean((ncast - actl)^2, na.rm = T))
+
+# RMSE first release
+rmse2 <- sqrt(mean((ts_wide(dta12$data)$release_0[(dta12$e+1):nrow(ts_wide(dta12$data))] - actl)^2, na.rm = T))
+
+rmse1/rmse2
 
 
-kk_list <- kk_nowcast(df = df, e = 1, model = "KK", h = 5, trace=0)
 
-kk_list$params
 
-kk_list$kk_model_mat
-ss <- kk_list$ss_model_mat
+plot_vintages(dta2, dim_col = "id", title = "First GDP release")
+plot_vintages(dta3, dim_col = "id", title = "Latest GDP release")
 
-compare1 <- kk_list$filtered_states[, c("time","release_2_lag_0")]
-mean((df_wide$final[3:179] - compare1$release_2_lag_0)^2, na.rm = T)
-y1 <- kk_list$observations$release_0_lag_0
-y1<- (gdp_long %>% vintages_wide())$`2024-10-01`
-compare <- KalmanNowcastPrecision(y1, m0=0,C0= 0.5, initial_params = c(0, 0.5, 5))
-compare
-mse2 <- mean((df_wide$release_1[2:179] - compare[[1]][2:179])^2, na.rm=T)
-mean((df_wide$final[3:179] - df_wide$release_0[3:179])^2, na.rm=T)
-mean((df_wide$final[2:179] - df_wide$release_1[2:179])^2, na.rm=T)
-mean((df_wide$final[2:179] - df_wide$release_3[2:179])^2, na.rm=T)
-mean((df_wide$final[2:179] - df_wide$release_6[2:179])^2, na.rm=T)
+plot_vintages(dta4 %>% filter(id == "CH"), dim_col = "release", title = "Swiss GDP releases")
+plot_vintages(dta4 %>% filter(id == "USA"), dim_col = "release", title = "US GDP releases")
+
+plot_vintages(dta5 %>% select(id, value, time=pub_date, pub_date=time), dim_col = "id",
+              title= "GDP growth estimates", subtitle = "For the 2007-10-01 value")
+
+plot_vintages(dta6 %>% filter(id == "CH", pub_date == "2024-07-01"), type = "bar",
+              title = "Revisions to Swiss GDP growth rates", 
+              subtitle = "Latest release compared to previous quarter")
+
+plot_vintages(dta6 %>% filter(id == "CH", time >= "2020-01-01" & time < "2022-01-01" & pub_date < "2022-01-01"), type = "line",
+              title = "Revisions to Swiss GDP growth rates during Covid-19", 
+              subtitle = "Compared to previous quarter")
+
+plot_vintages(dta6 %>% filter(id == "USA", time >= "2020-01-01" & time < "2022-01-01" & pub_date < "2022-01-01"), type = "bar", 
+              title = "Revisions to U.S. GDP growth rates during Covid-19",
+              subtitle = "Compared to previous quarter")
+
+plot_vintages(dta7 %>% filter(id == "CH", time >= "2020-01-01" & time < "2022-01-01"), type = "point", 
+              title = "Revisions to Swiss GDP growth rates during Covid-19",
+              subtitle = "Compared to latest release")
+
+plot_vintages(dta8 %>% filter(id == "CH", pub_date == "2024-07-01"), type = "bar", 
+              title = "Revisions to Swiss GDP growth rates",
+              subtitle = "Latest compared to first release")
+
+
+
+
 
 
