@@ -39,7 +39,7 @@ for revisions between initial and final data releases.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_revision_analysis</span><span class="op">(</span><span class="va">df</span>, <span class="va">final_release</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_revision_analysis</span><span class="op">(</span><span class="va">df</span>, <span class="va">final_release</span>, degree <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -57,6 +57,15 @@ for revisions between initial and final data releases.</p>
 <dd><p>A data frame containing the final release data. Must include columns:</p><ul><li><p><code>time</code>: The time variable (matching the initial release data).</p></li>
 <li><p><code>value</code>: The observed values in the final release.</p></li>
 </ul></dd>
+
+
+<dt id="arg-degree">degree<a class="anchor" aria-label="anchor" href="#arg-degree"></a></dt>
+<dd><p>An integer between 1 and 5 specifying the level of detail for the output:
+1: Default, descriptive statistics (bias, min/max, standard deviation, noise/signal ratio, correlation).
+2: Efficiency tests (bias intercept and slope tests, efficiency tests for intercept and slope).
+3: Orthogonality tests (correlation, autocorrelation, Theil's U statistics, seasonality tests).
+4: News vs. noise tests (p-values for news and noise tests).
+5: Full set of all statistics and tests.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -117,20 +126,15 @@ the initial and final data releases. The function:</p><ul><li><p>Checks the inpu
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu">get_revision_analysis</span><span class="op">(</span><span class="va">df</span>, <span class="va">final_release</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 4 × 29</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   release      N Frequency `Bias (mean)` `Bias (p-value)` Bias (robust p-value…¹</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> release…   219         4         <span style="text-decoration: underline;">4</span>479.        7.81<span style="color: #949494;">e</span><span style="color: #BB0000;">-111</span>                  0.657</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> release…   218         4         <span style="text-decoration: underline;">4</span>443.        7.26<span style="color: #949494;">e</span><span style="color: #BB0000;">-110</span>                  0.509</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> release…   217         4         <span style="text-decoration: underline;">4</span>410.        5.54<span style="color: #949494;">e</span><span style="color: #BB0000;">-109</span>                  0.761</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> release…   216         4         <span style="text-decoration: underline;">4</span>377.        4.22<span style="color: #949494;">e</span><span style="color: #BB0000;">-108</span>                  0.817</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ abbreviated name: ¹​`Bias (robust p-value)`</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 23 more variables: `Bias (intercept)` &lt;dbl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `Bias (intercept p-value)` &lt;dbl&gt;, `Bias (slope)` &lt;dbl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `Bias (slope p-value)` &lt;dbl&gt;, `Efficiency (intercept)` &lt;dbl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `Efficiency (intercept p-value)` &lt;dbl&gt;, `Efficiency (slope)` &lt;dbl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `Efficiency (slope p-value)` &lt;dbl&gt;, Minimum &lt;dbl&gt;, Maximum &lt;dbl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `Std. Dev.` &lt;dbl&gt;, `Noise/Signal` &lt;dbl&gt;, Correlation &lt;dbl&gt;, …</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 4 × 10</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   release       N `Bias (mean)` `Bias (p-value)` Minimum Maximum `Std. Dev.`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> release_0   219         <span style="text-decoration: underline;">4</span>479.        7.81<span style="color: #949494;">e</span><span style="color: #BB0000;">-111</span>       0   <span style="text-decoration: underline;">6</span>919.       <span style="text-decoration: underline;">1</span>499.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> release_1   218         <span style="text-decoration: underline;">4</span>443.        7.26<span style="color: #949494;">e</span><span style="color: #BB0000;">-110</span>       0   <span style="text-decoration: underline;">6</span>803.       <span style="text-decoration: underline;">1</span>495.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> release_2   217         <span style="text-decoration: underline;">4</span>410.        5.54<span style="color: #949494;">e</span><span style="color: #BB0000;">-109</span>       0   <span style="text-decoration: underline;">6</span>737.       <span style="text-decoration: underline;">1</span>491.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> release_3   216         <span style="text-decoration: underline;">4</span>377.        4.22<span style="color: #949494;">e</span><span style="color: #BB0000;">-108</span>       0   <span style="text-decoration: underline;">6</span>658.       <span style="text-decoration: underline;">1</span>486.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 3 more variables: `Noise/Signal` &lt;dbl&gt;, Correlation &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `Correlation (p-value)` &lt;dbl&gt;</span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

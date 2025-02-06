@@ -101,28 +101,23 @@
 <span></span>
 <span><span class="va">summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_revision_analysis.html">get_revision_analysis</a></span><span class="op">(</span><span class="va">df</span>, <span class="va">final_release</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">summary</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 7 × 29</span></span>
-<span><span class="co">#&gt;   release      N Frequency `Bias (mean)` `Bias (p-value)` Bias (robust p-value…¹</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;    &lt;dbl&gt;     &lt;dbl&gt;         &lt;dbl&gt;            &lt;dbl&gt;                  &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 release…   163         4       0.00983            0.762                  0.753</span></span>
-<span><span class="co">#&gt; 2 release…   163         4      -0.0204             0.477                  0.478</span></span>
-<span><span class="co">#&gt; 3 release…   163         4      -0.0223             0.427                  0.433</span></span>
-<span><span class="co">#&gt; 4 release…   163         4      -0.0158             0.532                  0.527</span></span>
-<span><span class="co">#&gt; 5 release…   163         4      -0.0121             0.617                  0.607</span></span>
-<span><span class="co">#&gt; 6 release…   163         4      -0.0115             0.600                  0.609</span></span>
-<span><span class="co">#&gt; 7 release…   163         4      -0.0216             0.279                  0.312</span></span>
-<span><span class="co">#&gt; # ℹ abbreviated name: ¹​`Bias (robust p-value)`</span></span>
-<span><span class="co">#&gt; # ℹ 23 more variables: `Bias (intercept)` &lt;dbl&gt;,</span></span>
-<span><span class="co">#&gt; #   `Bias (intercept p-value)` &lt;dbl&gt;, `Bias (slope)` &lt;dbl&gt;,</span></span>
-<span><span class="co">#&gt; #   `Bias (slope p-value)` &lt;dbl&gt;, `Efficiency (intercept)` &lt;dbl&gt;,</span></span>
-<span><span class="co">#&gt; #   `Efficiency (intercept p-value)` &lt;dbl&gt;, `Efficiency (slope)` &lt;dbl&gt;,</span></span>
-<span><span class="co">#&gt; #   `Efficiency (slope p-value)` &lt;dbl&gt;, Minimum &lt;dbl&gt;, Maximum &lt;dbl&gt;,</span></span>
-<span><span class="co">#&gt; #   `Std. Dev.` &lt;dbl&gt;, `Noise/Signal` &lt;dbl&gt;, Correlation &lt;dbl&gt;, …</span></span></code></pre></div>
+<span><span class="co">#&gt; # A tibble: 7 × 10</span></span>
+<span><span class="co">#&gt;   release       N `Bias (mean)` `Bias (p-value)` Minimum Maximum `Std. Dev.`</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;     &lt;dbl&gt;         &lt;dbl&gt;            &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;       &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 release_0   163       0.00983            0.762  -1.34     1.60       0.414</span></span>
+<span><span class="co">#&gt; 2 release_1   163      -0.0204             0.477  -0.981    1.13       0.365</span></span>
+<span><span class="co">#&gt; 3 release_2   163      -0.0223             0.427  -0.981    1.13       0.357</span></span>
+<span><span class="co">#&gt; 4 release_3   163      -0.0158             0.532  -0.932    1.09       0.323</span></span>
+<span><span class="co">#&gt; 5 release_4   163      -0.0121             0.617  -0.932    1.05       0.307</span></span>
+<span><span class="co">#&gt; 6 release_5   163      -0.0115             0.600  -0.930    1.05       0.279</span></span>
+<span><span class="co">#&gt; 7 release_6   163      -0.0216             0.279  -0.603    1.05       0.254</span></span>
+<span><span class="co">#&gt; # ℹ 3 more variables: `Noise/Signal` &lt;dbl&gt;, Correlation &lt;dbl&gt;,</span></span>
+<span><span class="co">#&gt; #   `Correlation (p-value)` &lt;dbl&gt;</span></span></code></pre></div>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">efficient_release</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_first_efficient_release.html">get_first_efficient_release</a></span><span class="op">(</span><span class="va">df</span>, <span class="va">final_release</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">efficient_release</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Efficient release:  1 </span></span>
+<span><span class="co">#&gt; Efficient release:  0 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model summary: </span></span>
 <span><span class="co">#&gt; </span></span>
@@ -131,19 +126,19 @@
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Residuals:</span></span>
 <span><span class="co">#&gt;      Min       1Q   Median       3Q      Max </span></span>
-<span><span class="co">#&gt; -0.98452 -0.23844 -0.00011  0.24685  1.12034 </span></span>
+<span><span class="co">#&gt; -1.44976 -0.24845  0.06358  0.23515  0.90387 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
 <span><span class="co">#&gt;             Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
-<span><span class="co">#&gt; (Intercept)  0.01395    0.03165   0.441     0.66    </span></span>
-<span><span class="co">#&gt; release_1    0.94074    0.02481  37.920   &lt;2e-16 ***</span></span>
+<span><span class="co">#&gt; (Intercept)  0.04755    0.03551   1.339    0.182    </span></span>
+<span><span class="co">#&gt; release_0    0.93135    0.02827  32.943   &lt;2e-16 ***</span></span>
 <span><span class="co">#&gt; ---</span></span>
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Residual standard error: 0.3599 on 161 degrees of freedom</span></span>
+<span><span class="co">#&gt; Residual standard error: 0.4077 on 161 degrees of freedom</span></span>
 <span><span class="co">#&gt;   (16 observations deleted due to missingness)</span></span>
-<span><span class="co">#&gt; Multiple R-squared:  0.8993, Adjusted R-squared:  0.8987 </span></span>
-<span><span class="co">#&gt; F-statistic:  1438 on 1 and 161 DF,  p-value: &lt; 2.2e-16</span></span>
+<span><span class="co">#&gt; Multiple R-squared:  0.8708, Adjusted R-squared:   0.87 </span></span>
+<span><span class="co">#&gt; F-statistic:  1085 on 1 and 161 DF,  p-value: &lt; 2.2e-16</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Test summary: </span></span>
@@ -151,16 +146,16 @@
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Hypothesis:</span></span>
 <span><span class="co">#&gt; (Intercept) = 0</span></span>
-<span><span class="co">#&gt; release_1 = 1</span></span>
+<span><span class="co">#&gt; release_0 = 1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model 1: restricted model</span></span>
-<span><span class="co">#&gt; Model 2: final ~ release_1</span></span>
+<span><span class="co">#&gt; Model 2: final ~ release_0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Note: Coefficient covariance matrix supplied.</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;   Res.Df Df      F   Pr(&gt;F)   </span></span>
-<span><span class="co">#&gt; 1    163                      </span></span>
-<span><span class="co">#&gt; 2    161  2 5.1444 0.006828 **</span></span>
+<span><span class="co">#&gt;   Res.Df Df      F  Pr(&gt;F)  </span></span>
+<span><span class="co">#&gt; 1    163                    </span></span>
+<span><span class="co">#&gt; 2    161  2 2.8555 0.06045 .</span></span>
 <span><span class="co">#&gt; ---</span></span>
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre></div>
 </div>
