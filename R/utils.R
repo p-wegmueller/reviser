@@ -1,6 +1,6 @@
 #' Convert Vintages Data to Long Format
 #'
-#' Converts a vintages dataset from wide format to long format, optionally grouping by `id` if the input 
+#' Converts a vintages dataset from wide format to long format, optionally adding `id` if the input 
 #' is a list of data frames. The long format contains one row per combination of `time` and `names_to` 
 #' (e.g., `pub_date` or `release`), with values stored in a single `value` column.
 #'
@@ -42,7 +42,6 @@ vintages_long <- function(df, names_to = "pub_date", keep_na = FALSE) {
     rlang::abort("'keep_na' argument must be logical.")
   }
   
-  classes <- class(df)
   
   # If input is a list of wide data.frames
   if ("list" %in% class(df) ) {
@@ -58,10 +57,9 @@ vintages_long <- function(df, names_to = "pub_date", keep_na = FALSE) {
           names_to = names_to,
           values_to = "value"
         ) %>%
-        dplyr::mutate(pub_date = as.Date(pub_date), id = id) %>% 
-        dplyr::arrange(pub_date, time) # Ensure data is sorted by pub_date and time 
+        dplyr::mutate(id = id)
+      
       if (keep_na) {
-        class(long_df_tmp) <- classes # Restore original class
         return(long_df_tmp)
       } else {
         long_df_tmp <- long_df_tmp %>%
@@ -70,12 +68,13 @@ vintages_long <- function(df, names_to = "pub_date", keep_na = FALSE) {
     })
     # Combine into a single data.frame
     long_df <- dplyr::bind_rows(long_list)
+    long_df <- vintages_assign_class(long_df)
     return(long_df)
   } else {
     check <- vintages_check(df)
     if (check == "long") {
       rlang::warn("The input data is already in long format.")
-      class(df) <- classes # Restore original class
+      df <- vintages_assign_class(df)
       return(df)
     }
     # If input is a single wide data.frame
@@ -96,13 +95,13 @@ vintages_long <- function(df, names_to = "pub_date", keep_na = FALSE) {
     }
     
     if (keep_na) {
-      class(long_df) <- classes # Restore original class
+      long_df <- vintages_assign_class(long_df)
       return(long_df)
     } else {
       long_df <- long_df %>%
         dplyr::filter(!is.na(value)) 
     }
-    class(long_df) <- classes # Restore original class
+    long_df <- vintages_assign_class(long_df)
     return(long_df)
   }
 }
@@ -115,7 +114,7 @@ vintages_long <- function(df, names_to = "pub_date", keep_na = FALSE) {
 #'
 #' @param df A data frame or tibble containing vintages data in long format.
 #' @param names_from The name of the column whose unique values will be used as column names in the wide format. 
-#'        Defaults to `"pub_date"`.
+#'        Defaults to `"pub_date"`. Other: `"release"`.
 #'
 #' @return If an `id` column is present, the function returns a named list of wide-format data frames, 
 #'         one for each unique `id`. Otherwise, it returns a single wide-format data frame.
@@ -140,37 +139,36 @@ vintages_long <- function(df, names_to = "pub_date", keep_na = FALSE) {
 #'
 #' @export
 vintages_wide <- function(df, names_from = "pub_date") {
-  classes <- class(df)
   
   df <- standardize_val_col(df)
   
   check <- vintages_check(df)
   if (check == "wide") {
     rlang::warn("The input data is already in wide format.")
-    class(df) <- classes # Restore original class
     return(df)
   }
   
   # Check required columns
   required_cols <- c("time", names_from, "value")
   if (!all(required_cols %in% colnames(df))) {
-    rlang::abort("The input 'df' must contain the columns: 'time', 'pub_date', and 'value'.")
+    rlang::abort(paste0("The input 'df' must contain the columns: 'time', '",names_from ,"', and 'value'."))
   } 
   addidtional_columns <- setdiff(colnames(df), c(required_cols, "id"))
   if (length(addidtional_columns) > 0) {
     rlang::warn(paste0("Ignoring columns: ", paste0(addidtional_columns, collapse = ", ")))
-    
-    df <- df %>%
-      dplyr::select(dplyr::all_of(required_cols))
   }
   
   id_present <- "id" %in% colnames(df)
   if (id_present) {
     n_id <- df$id %>%
       unique() %>%
-      length()
+      length() 
+    df <- df %>%
+      dplyr::select(dplyr::all_of(c("id", required_cols)))
   } else {
     n_id <- 0
+    df <- df %>%
+      dplyr::select(dplyr::all_of(required_cols))
   }
   
   if (n_id > 0 ) {
@@ -179,9 +177,13 @@ vintages_wide <- function(df, names_from = "pub_date") {
       split(.$id) %>%
       lapply(function(sub_df) {
         sub_df <- sub_df %>%
-          dplyr::select(time, pub_date, value) %>%
+          dplyr::select(time, names_from, value) %>%
           tidyr::pivot_wider(names_from = names_from, values_from = value)
-        class(sub_df) <- classes # Restore original class
+        if (names_from == "pub_date") {
+          class(sub_df) <- c("tbl_pubdate", "tbl_df", "tbl", "data.frame")
+        } else  if (names_from == "release") {
+          class(sub_df) <- c("tbl_release", "tbl_df", "tbl", "data.frame")
+        } 
         sub_df
       })
     return(wide_list)
@@ -190,7 +192,11 @@ vintages_wide <- function(df, names_from = "pub_date") {
     wide_df <- df %>%
       tidyr::pivot_wider(names_from = names_from, values_from = value)
     
-    class(wide_df) <- classes # Restore original class
+    if (names_from == "pub_date") {
+      class(wide_df) <- c("tbl_pubdate", "tbl_df", "tbl", "data.frame")
+    } else  if (names_from == "release") {
+      class(wide_df) <- c("tbl_release", "tbl_df", "tbl", "data.frame")
+    } 
     return(wide_df)
   }
 }
@@ -253,7 +259,7 @@ vintages_rename <- function(
     rlang::abort("The input 'df' must be a data.frame or tibble.")
   }
   
-  classes <- class(df)
+  df <- vintages_assign_class(df)
   
   # Ensure column inputs can handle both quoted and unquoted names
   col_time <- rlang::enquo(col_time)
@@ -313,7 +319,7 @@ vintages_rename <- function(
       dplyr::mutate(id = as.character(id))
   }
   
-  class(df) <- classes # Restore original class
+  df <- vintages_assign_class(df)
   return(df)
 }
 
@@ -371,7 +377,7 @@ vintages_check <- function(df) {
   long_format <- all(c("pub_date", "value") %in% colnames(df)) ||
     all(c("pub_date", "values") %in% colnames(df)) ||  
     all(c("release", "value") %in% colnames(df)) || 
-    all(c("release", "value") %in% colnames(df)) 
+    all(c("release", "values") %in% colnames(df)) 
   
   if (long_format) {
     if("pub_date" %in% colnames(df)) {
@@ -388,10 +394,10 @@ vintages_check <- function(df) {
   
   # Check for "wide format"
   wide_format <- setdiff(colnames(df), "time")
-  if (length(wide_format) == 1) {
-    rlang::abort("Did you forget to add pub_date or release column?")
-  }
-  if (length(wide_format) > 1) {
+  #if (length(wide_format) == 1) {
+  #  rlang::abort("Did you forget to add pub_date or release column?")
+  #}
+  if (length(wide_format) > 0) {
     if (all(!is.na(as.Date(wide_format, format = "%Y-%m-%d"))) | all(grepl("release|final", wide_format))) {
       return("wide")
     } else {
@@ -399,6 +405,34 @@ vintages_check <- function(df) {
     }
   }
   rlang::abort("The data.frame does not conform to either 'long format' or 'wide format'.")
+}
+
+#' Assign class to vintages tibble depending on columns
+#' @param df data.frame
+#' @keywords internal
+#' @noRd
+vintages_assign_class <- function(df) {
+  
+  classes <- class(df) # Get the existing classes
+  
+  # Define column-class mappings
+  col_class_map <- list(
+    "pub_date" = "tbl_pubdate",
+    "release" = "tbl_release"
+  )
+  
+  # Loop through the mapping and update classes
+  for (col in names(col_class_map)) {
+    if (col %in% names(df)) {
+      classes <- union(col_class_map[[col]], classes) # Add class if column exists
+    } else {
+      classes <- setdiff(classes, col_class_map[[col]]) # Remove class if column is absent
+    }
+  }
+  
+  df <- standardize_val_col(df)
+  class(df) <- classes # Assign updated classes
+  return(df)
 }
 
 
