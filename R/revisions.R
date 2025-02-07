@@ -31,7 +31,7 @@
 #'
 #' @examples
 #' # Example data
-#' df <- reviser::gdp
+#' df <- reviser::gdp_us
 #'
 #' # Calculate revisions using an interval of 1
 #' revisions_interval <- get_revisions(df, interval = 1)
@@ -210,9 +210,9 @@ get_revisions <- function(df, interval = NULL, nth_release = NULL, ref_date = NU
 #'
 #' @examples
 #' # Example data
-#' df <- get_nth_release(tsbox::ts_pc(reviser::gdp), n = 0:3)
+#' df <- get_nth_release(tsbox::ts_pc(reviser::gdp_us), n = 0:3)
 #' 
-#' final_release <- get_nth_release(tsbox::ts_pc(reviser::gdp), n = 10)
+#' final_release <- get_nth_release(tsbox::ts_pc(reviser::gdp_us), n = 10)
 #'
 #' # Identify the first efficient release
 #' result <- get_first_efficient_release(df, final_release, significance = 0.05)
@@ -402,9 +402,9 @@ get_first_efficient_release <- function(df, final_release, significance=0.05, te
 #'
 #' @examples
 #' # Example usage
-#' df <- get_nth_release(tsbox::ts_pc(reviser::gdp), n = 1:4)
+#' df <- get_nth_release(tsbox::ts_pc(reviser::gdp_us), n = 1:4)
 #' 
-#' final_release <- get_nth_release(tsbox::ts_pc(reviser::gdp), n = 10)
+#' final_release <- get_nth_release(tsbox::ts_pc(reviser::gdp_us), n = 10)
 #'
 #' # Identify the first efficient release
 #' result <- get_first_efficient_release(df, final_release, significance = 0.05)
@@ -525,9 +525,9 @@ summary.lst_efficient <- function(object, ...) {
 #'
 #' @examples
 #' # Example usage:
-#' df <- get_nth_release(reviser::gdp, n = 0:3)
+#' df <- get_nth_release(reviser::gdp_us, n = 0:3)
 #' 
-#' final_release <- get_nth_release(reviser::gdp, n = "latest")
+#' final_release <- get_nth_release(reviser::gdp_us, n = "latest")
 #' 
 #' results <- get_revision_analysis(df, final_release)
 #' print(results)
@@ -865,7 +865,7 @@ qs_test <- function(series, lags = c(12, 24)) {
 #'
 #' @examples
 #' # Example data
-#' df <- reviser::gdp
+#' df <- reviser::gdp_us
 #'
 #' # Get the first release (n = 0)
 #' first_release <- get_nth_release(df, n = 0)
@@ -963,7 +963,7 @@ get_nth_release <- function(df, n = 0, diagonal = FALSE) {
 #'
 #' @examples
 #' # Example data
-#' df <- reviser::gdp
+#' df <- reviser::gdp_us
 #'
 #' # Get the first release for each time period
 #' first_release <- get_first_release(df)
@@ -1027,7 +1027,7 @@ get_first_release <- function(df, diagonal=FALSE) {
 #'
 #' @examples
 #' # Example data
-#' df <- reviser::gdp
+#' df <- reviser::gdp_us
 #'
 #' # Get the latest release for each time period
 #' latest_release <- get_latest_release(df)
@@ -1080,7 +1080,7 @@ get_latest_release <- function(df) {
 #' 
 #' @return A filtered data frame containing values matching the specified criteria.
 #' @examples
-#' df <- reviser::gdp
+#' df <- reviser::gdp_us
 #' dta <- get_fixed_release(df, month = "July", years = 3)
 #' dta <- get_fixed_release(df, month = 7, years = 3)
 #' dta <- get_fixed_release(df, quarter = 3, years = 3)
@@ -1162,7 +1162,7 @@ get_fixed_release <- function(df, years, month=NULL, quarter = NULL) {
 #'
 #' @examples
 #' # Example data
-#' df <- reviser::gdp
+#' df <- reviser::gdp_us
 #'
 #' # Get releases for a specific date
 #' date <- as.Date("2020-04-01")
@@ -1216,7 +1216,7 @@ get_releases_by_date <- function(df, date) {
 #'
 #' @examples
 #' # Example data
-#' df <- reviser::gdp
+#' df <- reviser::gdp_us
 #'
 #' # Calculate days to release
 #' df_with_days <- get_days_to_release(df)

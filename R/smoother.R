@@ -32,7 +32,7 @@
 #'
 #' @examples
 #' # Example usage:
-#' df <- get_nth_release(tsbox::ts_span(tsbox::ts_pc(reviser::gdp), start = "1980-01-01"), n = 0:1)
+#' df <- get_nth_release(tsbox::ts_span(tsbox::ts_pc(reviser::gdp_us), start = "1980-01-01"), n = 0:1)
 #' e <- 1  # Number of efficient release
 #' h <- 2  # Forecast horizon
 #' model_result <- kk_nowcast(df, e, h = h, model = "Kishor-Koenig")

@@ -15,7 +15,7 @@
 #'
 #' @examples
 #' # Example wide-format data
-#' long_data <- reviser::gdp
+#' long_data <- reviser::gdp_us
 #'
 #' # Convert to wide format
 #' wide_data <- vintages_wide(long_data)
@@ -122,7 +122,7 @@ vintages_long <- function(df, names_to = "pub_date", keep_na = FALSE) {
 #'
 #' @examples
 #' # Example wide-format data
-#' long_data <- reviser::gdp
+#' long_data <- reviser::gdp_us
 #'
 #' # Convert to wide format
 #' wide_data <- vintages_wide(long_data)

@@ -49,7 +49,7 @@ Input validation ensures that only one of \code{ref_date}, \code{nth_release}, o
 }
 \examples{
 # Example data
-df <- reviser::gdp
+df <- reviser::gdp_us
 
 # Calculate revisions using an interval of 1
 revisions_interval <- get_revisions(df, interval = 1)

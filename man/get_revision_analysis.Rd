@@ -91,9 +91,9 @@ The following statistics and tests are calculated:
 }
 \examples{
 # Example usage:
-df <- get_nth_release(reviser::gdp, n = 0:3)
+df <- get_nth_release(reviser::gdp_us, n = 0:3)
 
-final_release <- get_nth_release(reviser::gdp, n = "latest")
+final_release <- get_nth_release(reviser::gdp_us, n = "latest")
 
 results <- get_revision_analysis(df, final_release)
 print(results)

@@ -23,7 +23,7 @@ and adds a column \code{release} that labels the release as \code{release_N}, wh
 }
 \examples{
 # Example data
-df <- reviser::gdp
+df <- reviser::gdp_us
 
 # Get the latest release for each time period
 latest_release <- get_latest_release(df)

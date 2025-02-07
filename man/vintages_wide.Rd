@@ -23,7 +23,7 @@ The wide format uses one column per unique value of the \code{names_from} parame
 }
 \examples{
 # Example wide-format data
-long_data <- reviser::gdp
+long_data <- reviser::gdp_us
 
 # Convert to wide format
 wide_data <- vintages_wide(long_data)

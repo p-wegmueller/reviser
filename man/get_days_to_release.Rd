@@ -26,7 +26,7 @@ time period end. If the dataset is in wide format, it will first be transformed 
 }
 \examples{
 # Example data
-df <- reviser::gdp
+df <- reviser::gdp_us
 
 # Calculate days to release
 df_with_days <- get_days_to_release(df)

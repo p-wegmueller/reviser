@@ -1,8 +1,8 @@
 ## code to prepare `gdp` dataset goes here
 
-gdp <- readxl::read_excel("inst/exdata/ROUTPUTQvQd.xlsx")
+gdp_us <- readxl::read_excel("inst/exdata/ROUTPUTQvQd.xlsx")
 
-gdp <- gdp %>%
+gdp_us <- gdp_us %>%
   dplyr::mutate(
     time = zoo::as.Date(zoo::as.yearqtr(DATE, format = "%Y:Q%q")),
   ) %>%
@@ -22,4 +22,4 @@ gdp <- gdp %>%
     time >= as.Date("1970-01-01")
     ) 
 
-usethis::use_data(gdp, overwrite = TRUE)
+usethis::use_data(gdp_us, overwrite = TRUE)

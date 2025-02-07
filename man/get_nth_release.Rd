@@ -38,7 +38,7 @@ The behavior depends on the value of \code{n}:
 }
 \examples{
 # Example data
-df <- reviser::gdp
+df <- reviser::gdp_us
 
 # Get the first release (n = 0)
 first_release <- get_nth_release(df, n = 0)
