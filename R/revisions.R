@@ -249,8 +249,16 @@ get_first_efficient_release <- function(df, final_release, significance=0.05, te
   
   df_output <- NULL
   
-  if ("id" %in% colnames(df)) {
+  has_id <- "id" %in% colnames(df)
+  if (has_id) {
     if (length(unique(df$id)) > 1) {
+      has_ids <- TRUE
+    } else {
+      has_ids <- FALSE
+    }
+  }
+  
+  if (has_ids) {
       for (iidd in unique(df$id)) {
         models <- list()
         tests <- list()
@@ -309,8 +317,6 @@ get_first_efficient_release <- function(df, final_release, significance=0.05, te
         data <- vintages_assign_class(data)
         
         df_output[[iidd]] <- list('e' = efficient_release, 'data' = data, 'models' = models, 'tests' = tests)
-        
-        }
     }
   } else {
     models <- list()
@@ -455,6 +461,7 @@ summary.lst_efficient <- function(object, ...) {
   print(summary(object$models[[object$e+1]]))
   cat("\nTest summary: \n")
   print(object$tests[[object$e+1]])
+  if (!is.na(object$e)) {
   df_out <- tibble::tibble(
     e = object$e,
     alpha = stats::coef(summary(object$models[[object$e+1]]))[1,1],
@@ -462,6 +469,15 @@ summary.lst_efficient <- function(object, ...) {
     p_value = object$tests[[object$e+1]][2, 'Pr(>F)'],
     n_tested = length(object$tests)
   )
+  } else {
+    df_out <- tibble::tibble(
+      e = NA_real_,
+      alpha = stats::coef(summary(object$models[[length(object$tests)]]))[1,1],
+      beta = stats::coef(summary(object$models[[length(object$tests)]]))[2,1],
+      p_value = object$tests[[length(object$tests)]][2, 'Pr(>F)'],
+      n_tested = length(object$tests)
+    )
+  }
   }
   
   return(invisible(df_out))
