@@ -20,17 +20,17 @@ df <- dplyr::tibble(
 )
 
 # Revision if interval = 1
-rev_interval <- as.numeric(na.omit(c(
+rev_interval <- -as.numeric(na.omit(c(
   NA, 1.0, NA, 0.5, 0.6, NA, -0.2, 0.3, 0.3, NA
 )))
 
 # Revision compared to latest vintage
-rev_last <- c(
+rev_last <- -c(
     -1.3, -0.3, -0.9, 0.2, -0.3, -0.3, 0, 0, 0, 0
   ) 
 
 # Revision compared to first vintage
-rev_first <- c(
+rev_first <- -c(
     0, 1, 0, 1.5, 0.6, 0, 1.3, 0.9, 0.3, 0
   )
 
