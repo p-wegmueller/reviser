@@ -177,7 +177,7 @@ vintages_wide <- function(df, names_from = "pub_date") {
       split(.$id) %>%
       lapply(function(sub_df) {
         sub_df <- sub_df %>%
-          dplyr::select(time, names_from, value) %>%
+          dplyr::select(time, dplyr::all_of(names_from), value) %>%
           tidyr::pivot_wider(names_from = names_from, values_from = value)
         if (names_from == "pub_date") {
           class(sub_df) <- c("tbl_pubdate", "tbl_df", "tbl", "data.frame")

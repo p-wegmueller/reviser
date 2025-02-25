@@ -8,8 +8,7 @@ gdp_uk <- gdp_uk %>%
   rename(time = 1) %>%
   dplyr::mutate(
     time = lubridate::floor_date(as.Date(time), "quarter")
-    #time = zoo::as.Date(zoo::as.yearqtr(.[[1]], format = "%Y:Q%q")),
-  )# %>%
+  )
 
 colnames(gdp_uk) <- c(
   "time",
