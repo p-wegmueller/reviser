@@ -6,15 +6,16 @@ library(dplyr)
 file_name <- "logo.png"
 file_path <- "man/figures/"
 file_path <- paste0(file_path, file_name)
-file_path
 
-
-  
- ( reviser::plot_vintages(gdp_long_pc %>% filter(pub_date > as.Date("2009-01-01") & pub_date < as.Date("2012-10-01")), type = "line") +
-  xlim(as.Date("2008-01-01"), as.Date("2010-07-01")) +# + ylim(12500, 14500)
+(reviser::plot_vintages(
+  gdp_long_pc %>%
+    filter(pub_date > as.Date("2009-01-01") & pub_date < as.Date("2012-10-01")),
+  type = "line"
+) +
+  xlim(as.Date("2008-01-01"), as.Date("2010-07-01")) + # + ylim(12500, 14500)
   theme_void() +
   theme_transparent() +
-    theme(legend.position = "none") ) %>%
+  theme(legend.position = "none")) %>%
   hexSticker::sticker(
     package = "reviser",
     # Font size for package name.
@@ -31,9 +32,8 @@ file_path
     h_fill = "steelblue1",
     # Color for hexagon border.
     #h_color	= "cornflowerblue",
-    h_color	= "steelblue",
+    h_color = "steelblue",
     filename = file_path,
     url = "github.com/p-wegmueller/ReviseR",
     u_size = 4
   )
-

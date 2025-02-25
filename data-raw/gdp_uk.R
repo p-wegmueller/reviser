@@ -1,8 +1,10 @@
 ## code to prepare `gdp_uk` dataset goes here
 
-gdp_uk <- readxl::read_excel("inst/exdata/real-expenditure-long-run.xlsx", 
-                             sheet = 2,
-                             skip=3)
+gdp_uk <- readxl::read_excel(
+  "inst/exdata/real-expenditure-long-run.xlsx",
+  sheet = 2,
+  skip = 3
+)
 
 gdp_uk <- gdp_uk %>%
   rename(time = 1) %>%
@@ -12,7 +14,10 @@ gdp_uk <- gdp_uk %>%
 
 colnames(gdp_uk) <- c(
   "time",
-    as.character(as.Date(paste0("01",colnames(gdp_uk)[2:length(colnames(gdp_uk))]), format = "%d%b%Y"))
+  as.character(as.Date(
+    paste0("01", colnames(gdp_uk)[2:length(colnames(gdp_uk))]),
+    format = "%d%b%Y"
+  ))
 )
 
 gdp_uk <- vintages_long(gdp_uk)

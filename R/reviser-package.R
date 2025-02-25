@@ -4,10 +4,16 @@
 #' @keywords internal
 "_PACKAGE"
 utils::globalVariables(c(
- ".", "final_value", "pub_date", "release", "time", "value", "value_ref", "target_date"
-  ))
+  ".",
+  "final_value",
+  "pub_date",
+  "release",
+  "time",
+  "value",
+  "value_ref",
+  "target_date"
+))
 
 #' @importFrom magrittr %>%
 #' @importFrom calculus %mx% %diff% %sum% %prod%
 NULL
-

@@ -1,9 +1,9 @@
 #' Plot Vintages Data
 #'
-#' A flexible function to visualize vintage data using various plot types such as line plots, point plots, bar plots, or boxplots. 
+#' A flexible function to visualize vintage data using various plot types such as line plots, point plots, bar plots, or boxplots.
 #' The function ensures that input data is validated and appropriately transformed before plotting.
 #'
-#' @param df A data frame containing the vintage data to be plotted. Must include at least two columns: 
+#' @param df A data frame containing the vintage data to be plotted. Must include at least two columns:
 #' one for time (`time`) and one for value (`value`).
 #' @param type A character string specifying the type of plot to create. Options are:
 #' \itemize{
@@ -21,9 +21,9 @@
 #' @return A ggplot2 plot object representing the specified vintage data visualization.
 #'
 #' @details
-#' The `plot_vintages` function is designed to handle data frames in both wide and long formats. It ensures 
-#' that the provided data frame includes the necessary columns for plotting. If the `dim_col` column contains 
-#' more than 30 unique values, only the most recent 30 are plotted. Additionally, the function supports 
+#' The `plot_vintages` function is designed to handle data frames in both wide and long formats. It ensures
+#' that the provided data frame includes the necessary columns for plotting. If the `dim_col` column contains
+#' more than 30 unique values, only the most recent 30 are plotted. Additionally, the function supports
 #' custom themes and color scales using `scale_color_reviser`, `scale_fill_reviser`, and `theme_reviser`.
 #'
 #' The function raises an error if:
@@ -32,7 +32,7 @@
 #'  \item{The specified `dim_col` is not a column in `df`.}
 #'  \item{`title`, `subtitle`, or `ylab` are not character strings.}
 #' }
-#' 
+#'
 #' @seealso [theme_reviser()], [scale_color_reviser()], [scale_fill_reviser()]
 #' @examples
 #' # Example data
@@ -44,133 +44,181 @@
 #'
 #' # Line plot
 #' plot_vintages(
-#'   df, 
-#'   type = "line", 
-#'   dim_col = "pub_date", 
-#'   title = "Line plot", 
+#'   df,
+#'   type = "line",
+#'   dim_col = "pub_date",
+#'   title = "Line plot",
 #'   subtitle = "Randomly generated data"
 #'   )
 #'
 #' # Point plot
 #' plot_vintages(
-#'   df, 
-#'   type = "point", 
-#'   dim_col = "pub_date", 
-#'   title = "Scatter plot", 
+#'   df,
+#'   type = "point",
+#'   dim_col = "pub_date",
+#'   title = "Scatter plot",
 #'   subtitle = "Randomly generated data"
 #'   )
 #'
 #' # Bar plot
 #' plot_vintages(
-#'   df, 
-#'   type = "bar", 
-#'   dim_col = "pub_date", 
-#'   title = "Bar plot", 
+#'   df,
+#'   type = "bar",
+#'   dim_col = "pub_date",
+#'   title = "Bar plot",
 #'   subtitle = "Randomly generated data"
 #'   )
 #'
 #' # Boxplot
 #' plot_vintages(
-#'   df, 
-#'   type = "boxplot", 
-#'   dim_col = "pub_date", 
-#'   title = "Boxplot", 
+#'   df,
+#'   type = "boxplot",
+#'   dim_col = "pub_date",
+#'   title = "Boxplot",
 #'   subtitle = "Randomly generated data"
 #'   )
 #'
 #' @export
-plot_vintages <- function(df, type="line", dim_col = "pub_date", title="", subtitle="", ylab = "", p = NULL) {
-  
+plot_vintages <- function(
+  df,
+  type = "line",
+  dim_col = "pub_date",
+  title = "",
+  subtitle = "",
+  ylab = "",
+  p = NULL
+) {
   if (!missing(p)) {
     if (!"ggplot" %in% class(p)) {
-      rlang::abort("If argument 'p' is provided it must be a valid ggplot object.")
+      rlang::abort(
+        "If argument 'p' is provided it must be a valid ggplot object."
+      )
     }
   }
-  
+
   # Check type input
   if (!type %in% c("line", "point", "bar", "boxplot")) {
-    rlang::abort("The 'type' argument must be either 'line', 'point', 'bar' or 'boxplot'.")
+    rlang::abort(
+      "The 'type' argument must be either 'line', 'point', 'bar' or 'boxplot'."
+    )
   }
-  
+
   # Check 'dim_col' is column name of 'df'
   if (!dim_col %in% colnames(df)) {
     rlang::abort(
       paste0(
-        "The column ", dim_col, " is not found in 'df'."
+        "The column ",
+        dim_col,
+        " is not found in 'df'."
       )
     )
   }
-  
+
   # Check title and subtitle are character strings
-  if (!is.character(title) || !is.character(subtitle)|| !is.character(ylab)) {
-    rlang::abort("The 'title', 'subtitle', and 'ylab' arguments must be character strings.")
+  if (!is.character(title) || !is.character(subtitle) || !is.character(ylab)) {
+    rlang::abort(
+      "The 'title', 'subtitle', and 'ylab' arguments must be character strings."
+    )
   }
-  
-  
+
   dim_col <- as.name(dim_col)
-  
+
   check <- vintages_check(df)
-  if (check=="wide") {
+  if (check == "wide") {
     df <- vintages_long(df, keep_na = FALSE)
   }
-  
+
   if (ncol(df) <= 1L) {
     rlang::abort("'df' must have at least two columns.")
   }
-  
+
   n <- length(unique(df[[dim_col]]))
-  
+
   df <- df %>%
     dplyr::group_by(time) %>%
     dplyr::arrange(dplyr::desc(abs(value)), .by_group = TRUE) %>%
     dplyr::ungroup()
-  
- if (n > 1) {
-    
-    if (class(df[[dim_col]]) %in% c("Date","integer", "numeric")) {
+
+  if (n > 1) {
+    if (class(df[[dim_col]]) %in% c("Date", "integer", "numeric")) {
       df[[dim_col]] <- as.character(df[[dim_col]])
     }
-    
+
     if (n > 30) {
       rlang::warn(
-        paste0(n,
-        " time series supplied. Showing recent 30."
-      ))
+        paste0(n, " time series supplied. Showing recent 30.")
+      )
       df <- df %>%
         dplyr::filter(!!dim_col %in% utils::tail(unique(!!dim_col), 30))
     }
- }
+  }
   if (missing(p)) {
     p <- ggplot2::ggplot()
   }
   if (n == 1L) {
     if (type == "line") {
-      p <- p + ggplot2::geom_line(ggplot2::aes(x = time, y = value), data = df) + 
+      p <- p +
+        ggplot2::geom_line(ggplot2::aes(x = time, y = value), data = df) +
         scale_color_reviser()
     } else if (type == "point") {
-      p <- p + ggplot2::geom_point(ggplot2::aes(x = time, y = value), data = df) + 
+      p <- p +
+        ggplot2::geom_point(ggplot2::aes(x = time, y = value), data = df) +
         scale_color_reviser()
-    } else if(type == "bar") {
-      p <- p + ggplot2::geom_bar(ggplot2::aes(x = time, y = value), data = df, position = "identity", stat = "identity") + 
-        scale_color_reviser() + scale_fill_reviser()
-    } else if(type == "boxplot") {
-      rlang::abort("'type' boxplot not supported if 'dim_col' contains only one unique value.")
+    } else if (type == "bar") {
+      p <- p +
+        ggplot2::geom_bar(
+          ggplot2::aes(x = time, y = value),
+          data = df,
+          position = "identity",
+          stat = "identity"
+        ) +
+        scale_color_reviser() +
+        scale_fill_reviser()
+    } else if (type == "boxplot") {
+      rlang::abort(
+        "'type' boxplot not supported if 'dim_col' contains only one unique value."
+      )
     } else {
       rlang::abort("Invalid 'type' argument. Must be either 'line' or 'point'.")
     }
   } else {
     if (type == "line") {
-      p <- p + ggplot2::geom_line(ggplot2::aes(x = time, y = value, color = !!dim_col), data = df) + 
+      p <- p +
+        ggplot2::geom_line(
+          ggplot2::aes(x = time, y = value, color = !!dim_col),
+          data = df
+        ) +
         scale_color_reviser()
     } else if (type == "point") {
-      p <- p + ggplot2::geom_point(ggplot2::aes(x = time, y = value, color = !!dim_col), data = df) + 
+      p <- p +
+        ggplot2::geom_point(
+          ggplot2::aes(x = time, y = value, color = !!dim_col),
+          data = df
+        ) +
         scale_color_reviser()
-    } else if(type == "bar") {
-      p <- p + ggplot2::geom_bar(ggplot2::aes(x = time, y = value, color = !!dim_col, fill = !!dim_col), position = "identity", stat = "identity", data = df) + 
-        scale_color_reviser() + scale_fill_reviser()
-    } else if(type == "boxplot") {
-      p <- p + ggplot2::geom_boxplot(ggplot2::aes(x = time, y = value, fill = factor(time)), data = df) + 
-        scale_fill_reviser() + theme_reviser(legend.position ="none")
+    } else if (type == "bar") {
+      p <- p +
+        ggplot2::geom_bar(
+          ggplot2::aes(
+            x = time,
+            y = value,
+            color = !!dim_col,
+            fill = !!dim_col
+          ),
+          position = "identity",
+          stat = "identity",
+          data = df
+        ) +
+        scale_color_reviser() +
+        scale_fill_reviser()
+    } else if (type == "boxplot") {
+      p <- p +
+        ggplot2::geom_boxplot(
+          ggplot2::aes(x = time, y = value, fill = factor(time)),
+          data = df
+        ) +
+        scale_fill_reviser() +
+        theme_reviser(legend.position = "none")
     } else {
       rlang::abort("Invalid 'type' argument. Must be either 'line' or 'point'.")
     }
@@ -182,13 +230,18 @@ plot_vintages <- function(df, type="line", dim_col = "pub_date", title="", subti
     if (missing("subtitle")) subtitle <- NULL
     p <- p + ggplot2::ggtitle(label = title, subtitle = subtitle)
   }
-  
+
   if (!type == "boxplot") {
-  if (n > 5) {
-    p <- p + theme_reviser(legend.position ="right", legend.direction = "vertical")
-  } else {
-    p <- p + theme_reviser(legend.position ="bottom", legend.direction = "horizontal")
-  }
+    if (n > 5) {
+      p <- p +
+        theme_reviser(legend.position = "right", legend.direction = "vertical")
+    } else {
+      p <- p +
+        theme_reviser(
+          legend.position = "bottom",
+          legend.direction = "horizontal"
+        )
+    }
   }
   p
 }
@@ -196,7 +249,7 @@ plot_vintages <- function(df, type="line", dim_col = "pub_date", title="", subti
 
 #' Custom Visualization Theme and Color Scales for Reviser
 #'
-#' These functions provide a custom visualization theme and color scales for use with ggplot2, inspired by the `tsbox` package. 
+#' These functions provide a custom visualization theme and color scales for use with ggplot2, inspired by the `tsbox` package.
 #'
 #' @param base_size Numeric. The base font size for the theme. Default is 12.
 #' @param legend.position Character. Position of the legend. Default is "bottom".
@@ -221,20 +274,26 @@ plot_vintages <- function(df, type="line", dim_col = "pub_date", title="", subti
 #'   scale_color_reviser()
 #'
 #' @export
-theme_reviser <- function(base_size = 12, legend.position = "bottom", legend.direction = "horizontal") {
+theme_reviser <- function(
+  base_size = 12,
+  legend.position = "bottom",
+  legend.direction = "horizontal"
+) {
   half_line <- base_size / 2
   ggplot2::theme_minimal(base_size = base_size) +
     ggplot2::theme(
       axis.title.x = ggplot2::element_blank(),
       axis.title.y = ggplot2::element_text(
-        size = ggplot2::rel(0.9), color = "grey10",
+        size = ggplot2::rel(0.9),
+        color = "grey10",
         margin = ggplot2::margin(t = 0, r = 7, b = 0, l = 0)
       ),
       plot.title = ggplot2::element_text(
         color = "grey10",
         face = "bold",
         margin = ggplot2::margin(t = half_line * 2, b = half_line * 0.7),
-        hjust = 0, size = ggplot2::rel(1.2)
+        hjust = 0,
+        size = ggplot2::rel(1.2)
       ),
       plot.subtitle = ggplot2::element_text(
         color = "grey10",
@@ -263,7 +322,6 @@ theme_reviser <- function(base_size = 12, legend.position = "bottom", legend.dir
 }
 
 
-
 #' @export
 #' @name theme_reviser
 colors_reviser <- function() {
@@ -271,13 +329,37 @@ colors_reviser <- function() {
     # A soft black
     "#4D4D4D",
     # colorblindr
-    "#0072B2", "#D55E00", "#009E73", "#E69F00", "#56B4E9", "#CC79A7", 
-    "#F0E442", "#999999",
+    "#0072B2",
+    "#D55E00",
+    "#009E73",
+    "#E69F00",
+    "#56B4E9",
+    "#CC79A7",
+    "#F0E442",
+    "#999999",
     # Additional Colors
-    "#8D0808", "#461E78", "#4AFFF0", "#34BDCC", "#4F61A1", "#440A4F", "#C3FBC4",
-    "#85F9D6", "#79C7AD", "#A6CC7A", "#DFFF7B",
-    "#8D7B88", "#4E414F", "#BAADB5", "#2D2538", "#837A80", "#FFF68F",
-    "#800080", "#F8B1CC", "#C29BFF", "#FFD700", "#FF6347"
+    "#8D0808",
+    "#461E78",
+    "#4AFFF0",
+    "#34BDCC",
+    "#4F61A1",
+    "#440A4F",
+    "#C3FBC4",
+    "#85F9D6",
+    "#79C7AD",
+    "#A6CC7A",
+    "#DFFF7B",
+    "#8D7B88",
+    "#4E414F",
+    "#BAADB5",
+    "#2D2538",
+    "#837A80",
+    "#FFF68F",
+    "#800080",
+    "#F8B1CC",
+    "#C29BFF",
+    "#FFD700",
+    "#FF6347"
   )
 }
 
