@@ -256,6 +256,8 @@ get_first_efficient_release <- function(df, final_release, significance=0.05, te
     } else {
       has_ids <- FALSE
     }
+  } else {
+    has_ids <- FALSE
   }
   
   if (has_ids) {
@@ -423,12 +425,16 @@ summary.lst_efficient <- function(object, ...) {
   if (is_id_list) {
     for (iidd in names(object)) {
       cat("id: ", iidd, "\n")
+      if(is.na(object[[iidd]]$e)) {
+        cat("No efficient release found. Please provide further releases!")
+      } else {
       cat("Efficient release: ", object[[iidd]]$e, "\n\n")
       cat("Model summary: \n")
       print(summary(object[[iidd]]$models[[object[[iidd]]$e+1]]))
       cat("\nTest summary: \n")
       print(object[[iidd]]$tests[[object[[iidd]]$e+1]])
       cat("\n\n")
+      }
       if (!is.na(object[[iidd]]$e)) {
         df_out <- dplyr::bind_rows(
           df_out, 
@@ -456,11 +462,15 @@ summary.lst_efficient <- function(object, ...) {
       }
     }
   } else {
-  cat("Efficient release: ", object$e, "\n\n")
-  cat("Model summary: \n")
-  print(summary(object$models[[object$e+1]]))
-  cat("\nTest summary: \n")
-  print(object$tests[[object$e+1]])
+    if(is.na(object$e)) {
+      cat("No efficient release found. Please provide further releases!")
+    } else {
+      cat("Efficient release: ", object$e, "\n\n")
+      cat("Model summary: \n")
+      print(summary(object$models[[object$e+1]]))
+      cat("\nTest summary: \n")
+      print(object$tests[[object$e+1]])
+    }
   if (!is.na(object$e)) {
   df_out <- tibble::tibble(
     e = object$e,
