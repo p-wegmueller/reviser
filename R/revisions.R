@@ -251,9 +251,9 @@ get_first_efficient_release <- function(df, final_release, significance=0.05, te
   
   if ("id" %in% colnames(df)) {
     if (length(unique(df$id)) > 1) {
-      models <- list()
-      tests <- list()
       for (iidd in unique(df$id)) {
+        models <- list()
+        tests <- list()
         final_release_id <- final_release %>% 
           dplyr::filter(id == iidd) %>%
           dplyr::select(time, value) %>%
@@ -423,16 +423,31 @@ summary.lst_efficient <- function(object, ...) {
       cat("\nTest summary: \n")
       print(object[[iidd]]$tests[[object[[iidd]]$e+1]])
       cat("\n\n")
-      df_out <- dplyr::bind_rows(
-        df_out, 
-        tibble::tibble(
-          id = iidd,
-          e = object[[iidd]]$e,
-          alpha = stats::coef(summary(object[[iidd]]$models[[object[[iidd]]$e+1]]))[1,1],
-          beta = stats::coef(summary(object[[iidd]]$models[[object[[iidd]]$e+1]]))[2,1],
-          p_value = object[[iidd]]$tests[[object[[iidd]]$e+1]][2, 'Pr(>F)']
+      if (!is.na(object[[iidd]]$e)) {
+        df_out <- dplyr::bind_rows(
+          df_out, 
+          tibble::tibble(
+            id = iidd,
+            e = object[[iidd]]$e,
+            alpha = stats::coef(summary(object[[iidd]]$models[[object[[iidd]]$e+1]]))[1,1],
+            beta = stats::coef(summary(object[[iidd]]$models[[object[[iidd]]$e+1]]))[2,1],
+            p_value = object[[iidd]]$tests[[object[[iidd]]$e+1]][2, 'Pr(>F)'],
+            n_tested = length(object[[iidd]]$tests)
+          )
+          )
+      } else {
+        df_out <- dplyr::bind_rows(
+          df_out, 
+          tibble::tibble(
+            id = iidd,
+            e = NA_real_,
+            alpha = stats::coef(summary(object[[iidd]]$models[[length(object[[iidd]]$tests)]]))[1,1],
+            beta = stats::coef(summary(object[[iidd]]$models[[length(object[[iidd]]$tests)]]))[2,1],
+            p_value = object[[iidd]]$tests[[length(object[[iidd]]$tests)]][2, 'Pr(>F)'],
+            n_tested = length(object[[iidd]]$tests)
+          )
         )
-        )
+      }
     }
   } else {
   cat("Efficient release: ", object$e, "\n\n")
@@ -444,7 +459,8 @@ summary.lst_efficient <- function(object, ...) {
     e = object$e,
     alpha = stats::coef(summary(object$models[[object$e+1]]))[1,1],
     beta = stats::coef(summary(object$models[[object$e+1]]))[2,1],
-    p_value = object$tests[[object$e+1]][2, 'Pr(>F)']
+    p_value = object$tests[[object$e+1]][2, 'Pr(>F)'],
+    n_tested = length(object$tests)
   )
   }
   
@@ -600,7 +616,7 @@ get_revision_analysis <- function(df, final_release, degree = 1, grouping_var = 
     final_release <- dplyr::select(final_release, time, final_value, id)
     
     df <- df %>%
-      dplyr::select(time, value, df_var, id) 
+      dplyr::select(time, value, dplyr::all_of(df_var), id)
     
     df <- df %>%
       dplyr::left_join(final_release, by = c("time" = "time", "id" = "id")) %>%
