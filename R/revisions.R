@@ -406,7 +406,13 @@ get_first_efficient_release <- function(df, final_release, significance=0.05, te
 #' - `models`: A list of linear regression models for each release.
 #' - `tests`: A list of hypothesis test results corresponding to each release.
 #'
-#' @return This function does not return a value. It prints the summary to the console.
+#' @return Returns a tibble with the following columns:
+#' - `id`: The identifier of the time series (if present in input data).
+#' - `e`: The index of the first efficient release.
+#' - `alpha`: The intercept coefficient of the regression model.
+#' - `beta`: The coefficient of the slope.
+#' - `p-value`: The p-value of the joint hypothesis test (alpha = 0 and beta = 1).
+#' - `n_tested`: The number of releases tested.
 #'
 #' @examples
 #' # Example usage

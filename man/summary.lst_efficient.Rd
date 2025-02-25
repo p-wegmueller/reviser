@@ -13,7 +13,15 @@ The object must be of class \code{list_eff_rel}.}
 \item{...}{Additional arguments (not used).}
 }
 \value{
-This function does not return a value. It prints the summary to the console.
+Returns a tibble with the following columns:
+\itemize{
+\item \code{id}: The identifier of the time series (if present in input data).
+\item \code{e}: The index of the first efficient release.
+\item \code{alpha}: The intercept coefficient of the regression model.
+\item \code{beta}: The coefficient of the slope.
+\item \code{p-value}: The p-value of the joint hypothesis test (alpha = 0 and beta = 1).
+\item \code{n_tested}: The number of releases tested.
+}
 }
 \description{
 Provides a detailed summary of the regression model and hypothesis test for the first efficient release
