@@ -4,7 +4,7 @@
 \alias{get_revision_analysis}
 \title{Revision Analysis Summary Statistics}
 \usage{
-get_revision_analysis(df, final_release, degree = 1)
+get_revision_analysis(df, final_release, degree = 1, grouping_var = NULL)
 }
 \arguments{
 \item{df}{A data frame containing the initial data releases. Must include columns:
@@ -26,6 +26,9 @@ get_revision_analysis(df, final_release, degree = 1)
 3: Orthogonality tests (correlation, autocorrelation, Theil's U statistics, seasonality tests).
 4: News vs. noise tests (p-values for news and noise tests).
 5: Full set of all statistics and tests.}
+
+\item{grouping_var}{A character string specifying the grouping variable in the data frame. Defaults to
+\code{pub_date} or \code{release} if available.}
 }
 \value{
 A data frame with one row per grouping (if applicable) and columns for summary statistics and test results.
