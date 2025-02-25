@@ -58,8 +58,13 @@ The object must be of class <code>list_eff_rel</code>.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>This function does not return a value. It prints the summary to the console.</p>
-    </div>
+    <p>Returns a tibble with the following columns:</p><ul><li><p><code>id</code>: The identifier of the time series (if present in input data).</p></li>
+<li><p><code>e</code>: The index of the first efficient release.</p></li>
+<li><p><code>alpha</code>: The intercept coefficient of the regression model.</p></li>
+<li><p><code>beta</code>: The coefficient of the slope.</p></li>
+<li><p><code>p-value</code>: The p-value of the joint hypothesis test (alpha = 0 and beta = 1).</p></li>
+<li><p><code>n_tested</code>: The number of releases tested.</p></li>
+</ul></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>This function prints the following information:</p><ul><li><p>The index of the first efficient release.</p></li>
