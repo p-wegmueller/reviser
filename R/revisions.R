@@ -96,7 +96,7 @@ get_revisions <- function(df, interval = NULL, nth_release = NULL, ref_date = NU
           by = "time"
         ) %>% 
         dplyr::group_by(id, time) %>%
-        dplyr::mutate(value = value - value_ref) %>%
+        dplyr::mutate(value = value_ref - value) %>%
         dplyr::ungroup() %>%
         dplyr::select(id, pub_date, time, value)
       
@@ -107,7 +107,7 @@ get_revisions <- function(df, interval = NULL, nth_release = NULL, ref_date = NU
         dplyr::mutate(
           value_ref = dplyr::lag(value, n = interval, order_by = pub_date)
         ) %>%
-        dplyr::mutate(value = value - value_ref) %>%
+        dplyr::mutate(value = value_ref - value) %>%
         dplyr::ungroup() %>%
         dplyr::filter(!is.na(value)) %>%
         dplyr::select(id, pub_date, time, value)
@@ -120,7 +120,7 @@ get_revisions <- function(df, interval = NULL, nth_release = NULL, ref_date = NU
           by = "time"
         ) %>%
         dplyr::group_by(id, time) %>%
-        dplyr::mutate(value = value - value_ref) %>%
+        dplyr::mutate(value = value_ref - value) %>%
         dplyr::ungroup() %>%
         dplyr::filter(!is.na(value)) %>%
         dplyr::select(id, pub_date, time, value)
@@ -139,7 +139,7 @@ get_revisions <- function(df, interval = NULL, nth_release = NULL, ref_date = NU
             dplyr::select(time, value_ref = value),
           by = "time"
         ) %>%
-        dplyr::mutate(value = value - value_ref) %>%
+        dplyr::mutate(value = value_ref - value) %>%
         dplyr::select(pub_date, time, value)
       
     } else if (!is.null(interval)) {
@@ -150,7 +150,7 @@ get_revisions <- function(df, interval = NULL, nth_release = NULL, ref_date = NU
           value_ref = dplyr::lag(value, n = interval, order_by = pub_date)
         ) %>%
         dplyr::ungroup() %>%
-        dplyr::mutate(value = value - value_ref) %>%
+        dplyr::mutate(value = value_ref - value) %>%
         dplyr::filter(!is.na(value)) %>%
         dplyr::select(pub_date, time, value)
     } else if (!is.null(nth_release)) {
@@ -161,7 +161,7 @@ get_revisions <- function(df, interval = NULL, nth_release = NULL, ref_date = NU
             dplyr::select(time, value_ref = value),
           by = "time"
         ) %>%
-        dplyr::mutate(value = value - value_ref) %>%
+        dplyr::mutate(value = value_ref - value) %>%
         dplyr::filter(!is.na(value)) %>%
         dplyr::select(pub_date, time, value)
     }
@@ -470,6 +470,8 @@ summary.lst_efficient <- function(object, ...) {
 #'    3: Orthogonality tests (correlation, autocorrelation, Theil's U statistics, seasonality tests).
 #'    4: News vs. noise tests (p-values for news and noise tests).
 #'    5: Full set of all statistics and tests.
+#' @param grouping_var A character string specifying the grouping variable in the data frame. Defaults to
+#' `pub_date` or `release` if available.
 #'
 #' @details
 #' This function performs a variety of statistical analyses to understand the nature of revisions between 
@@ -533,10 +535,17 @@ summary.lst_efficient <- function(object, ...) {
 #' print(results)
 #'
 #' @export
-get_revision_analysis <- function(df, final_release, degree = 1) {
+get_revision_analysis <- function(df, final_release, degree = 1, grouping_var = NULL) {
   # Check degree in 1:5
   if (!degree %in% c(1:5)) {
     rlang::abort("The 'degree' must be an integer between 1 and 3.")
+  }
+  
+  # Check grouping variable present in both df and final_release
+  if (!is.null(grouping_var)) {
+    if (!grouping_var %in% colnames(df) | !grouping_var %in% colnames(final_release)) {
+      rlang::abort("The grouping variable must be present in both 'df' and 'final_release'.")
+    }
   }
   
   check <- vintages_check(df)
@@ -572,7 +581,9 @@ get_revision_analysis <- function(df, final_release, degree = 1) {
       dplyr::select(-pub_date)
   }
   
-  if(any(grepl("pub_date", colnames(df)))) {
+  if (!is.null(grouping_var)) {
+    df_var <- grouping_var
+  } else if(any(grepl("pub_date", colnames(df)))) {
     df_var <- "pub_date"
   } else if(any(grepl("release", colnames(df)))) {
     df_var <- "release"
@@ -731,6 +742,12 @@ get_revision_analysis <- function(df, final_release, degree = 1) {
   } else if (df_var %in% colnames(revisions)) {
     grouping_vars <- c(df_var)
   } 
+  
+  # Check that there are at least N = 10 observation paires per group
+  if (any(revisions %>% dplyr::count(dplyr::across(dplyr::all_of(grouping_vars))) %>% dplyr::pull(n) < 8)) {
+    rlang::abort("There must be at least 8 observations per group to compute the statistics.")
+  }
+  
   
   # Apply the computation to each group and combine the results
   results <- revisions %>%
