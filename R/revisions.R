@@ -54,16 +54,16 @@ get_revisions <- function(
     list(interval, nth_release, ref_date),
     function(x) !is.null(x)
   ))
-
+  
   # Default interval is 1
   if (specified_count == 0L) {
     interval <- 1
   }
-
+  
   if (specified_count > 1L) {
     rlang::abort("Specify only one of 'ref_date', 'nth_release' or 'interval'.")
   }
-
+  
   if (!is.null(ref_date)) {
     ref_date <- tryCatch(as.Date(ref_date), error = function(e) e)
     if (!c("Date") %in% class(ref_date)) {
@@ -84,27 +84,27 @@ get_revisions <- function(
       )
     }
   }
-
+  
   check <- vintages_check(df)
   if (check == "wide") {
     df <- vintages_long(df)
   }
   df <- vintages_assign_class(df)
-
+  
   # Check if id column present
   if ("id" %in% colnames(df)) {
     # Ensure data is sorted by pub_date and time
     df <- df %>%
       dplyr::arrange(id, pub_date, time)
-
+    
     if (!is.null(ref_date)) {
       # Calculate revisions against the specified reference date
       revisions <- df %>%
         dplyr::inner_join(
           df %>%
             dplyr::filter(pub_date == ref_date) %>%
-            dplyr::select(time, value_ref = value),
-          by = "time"
+            dplyr::select(id, time, value_ref = value),
+          by = c("id", "time")
         ) %>%
         dplyr::group_by(id, time) %>%
         dplyr::mutate(value = value_ref - value) %>%
@@ -126,8 +126,8 @@ get_revisions <- function(
       revisions <- df %>%
         dplyr::inner_join(
           get_nth_release(df, n = nth_release) %>%
-            dplyr::select(time, value_ref = value),
-          by = "time"
+            dplyr::select(id, time, value_ref = value),
+          by = c("id", "time")
         ) %>%
         dplyr::group_by(id, time) %>%
         dplyr::mutate(value = value_ref - value) %>%
@@ -139,7 +139,7 @@ get_revisions <- function(
     # Ensure data is sorted by pub_date and time
     df <- df %>%
       dplyr::arrange(pub_date, time)
-
+    
     if (!is.null(ref_date)) {
       # Calculate revisions against the specified reference date
       revisions <- df %>%
@@ -175,7 +175,7 @@ get_revisions <- function(
         dplyr::select(pub_date, time, value)
     }
   }
-
+  
   revisions <- vintages_assign_class(revisions)
   return(revisions)
 }
@@ -864,6 +864,33 @@ get_revision_analysis <- function(
       vcov = hac_se
     )
     news_p_value <- test[2, 'Pr(>F)']
+    
+    # Computes the fraction of sign changes
+    correct_sign <- data %>% 
+      mutate(early_sign = sign(value),
+             late_sign = sign(final_value)) %>%
+      summarise(
+        fraction_sign_correct = sum((early_sign - late_sign) == 0) / n(),
+        fraction_sign_wrong = 1 - fraction_sign_correct,
+        n = n()
+      ) %>%
+      ungroup() %>% 
+      pull(fraction_sign_correct)
+    
+    # Computes the fraction of changes in the sign of the change in the growth rate
+    correct_change <- data %>% 
+      mutate(diff_value = value - lag(value, 1), 
+             diff_final_value = final_value - lag(final_value, 1)) %>% 
+      mutate(early_sign = sign(diff_value),
+             late_sign = sign(diff_final_value)) %>%
+      summarise(
+        fraction_sign_correct = sum((early_sign - late_sign) == 0, na.rm = T) / n(),
+        fraction_sign_wrong = 1 - fraction_sign_correct,
+        n = n()
+      ) %>%
+      ungroup() %>% 
+      pull(fraction_sign_correct)
+    
 
     tibble::tibble(
       Statistic = c(
@@ -894,7 +921,9 @@ get_revision_analysis <- function(
         "Seasonality (Ljung-Box p-value)",
         "Seasonality (Friedman p-value)",
         "News test (p-value)",
-        "Noise test (p-value)"
+        "Noise test (p-value)", 
+        "Fraction of correct sign", 
+        "Fraction of correct growth rate change"
       ),
       Value = c(
         N,
@@ -924,7 +953,9 @@ get_revision_analysis <- function(
         ljung_box_seasonality_p_value,
         friedman_p_value,
         news_p_value,
-        noise_p_value
+        noise_p_value,
+        correct_sign,
+        correct_change
       )
     )
   }
