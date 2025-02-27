@@ -10,8 +10,7 @@ plot_vintages(
   dim_col = "pub_date",
   title = "",
   subtitle = "",
-  ylab = "",
-  p = NULL
+  ylab = ""
 )
 }
 \arguments{
@@ -33,8 +32,6 @@ one for time (\code{time}) and one for value (\code{value}).}
 \item{subtitle}{A character string specifying the subtitle of the plot. Defaults to an empty string.}
 
 \item{ylab}{A character string specifying the label for the y-axis. Defaults to an empty string.}
-
-\item{p}{A ggplot2 plot object to which the vintage data will be added. Defaults to \code{NULL}.}
 }
 \value{
 A ggplot2 plot object representing the specified vintage data visualization.
@@ -66,37 +63,37 @@ df <- data.frame(
 
 # Line plot
 plot_vintages(
-  df, 
-  type = "line", 
-  dim_col = "pub_date", 
-  title = "Line plot", 
+  df,
+  type = "line",
+  dim_col = "pub_date",
+  title = "Line plot",
   subtitle = "Randomly generated data"
   )
 
 # Point plot
 plot_vintages(
-  df, 
-  type = "point", 
-  dim_col = "pub_date", 
-  title = "Scatter plot", 
+  df,
+  type = "point",
+  dim_col = "pub_date",
+  title = "Scatter plot",
   subtitle = "Randomly generated data"
   )
 
 # Bar plot
 plot_vintages(
-  df, 
-  type = "bar", 
-  dim_col = "pub_date", 
-  title = "Bar plot", 
+  df,
+  type = "bar",
+  dim_col = "pub_date",
+  title = "Bar plot",
   subtitle = "Randomly generated data"
   )
 
 # Boxplot
 plot_vintages(
-  df, 
-  type = "boxplot", 
-  dim_col = "pub_date", 
-  title = "Boxplot", 
+  df,
+  type = "boxplot",
+  dim_col = "pub_date",
+  title = "Boxplot",
   subtitle = "Randomly generated data"
   )
 
