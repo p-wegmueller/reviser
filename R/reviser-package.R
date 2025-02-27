@@ -11,7 +11,12 @@ utils::globalVariables(c(
   "time",
   "value",
   "value_ref",
-  "target_date"
+  "target_date",
+  "diff_final_value",
+  "fraction_sign_correct",
+  "late_sign",
+  "diff_value",
+  "early_sign"
 ))
 
 #' @importFrom magrittr %>%
