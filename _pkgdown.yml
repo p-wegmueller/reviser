@@ -1,4 +1,12 @@
 url: https://p-wegmueller.github.io/reviser/
 template:
   bootstrap: 5
+  math-rendering: katex
+  light-switch: true
+
+authors:
+  Marc Burri:
+    href: https://marcburri.github.io
+  Philipp Wegmueller:
+    href: https://p-wegmueller.github.io
 
