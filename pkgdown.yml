@@ -1,8 +1,9 @@
 pandoc: 3.1.11
 pkgdown: 2.1.1
 pkgdown_sha: ~
-articles: {}
-last_built: 2025-02-27T09:53Z
+articles:
+  reviser: reviser.html
+last_built: 2025-02-27T16:57Z
 urls:
   reference: https://p-wegmueller.github.io/reviser/reference
   article: https://p-wegmueller.github.io/reviser/articles
