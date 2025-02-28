@@ -9,7 +9,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
-  out.width = "100%"
+  out.width = "100%" 
 )
 ```
 
@@ -43,7 +43,7 @@ devtools::install_github("p-wegmueller/reviser")
 library(reviser)
 suppressMessages(library(dplyr))
 
-gdp <- gdp %>% tsbox::ts_pc() %>% tsbox::ts_span(start = "1980-01-01") 
+gdp <- gdp_us %>% tsbox::ts_pc() %>% tsbox::ts_span(start = "1980-01-01")
 
 gdp_wide <- vintages_wide(gdp)
 

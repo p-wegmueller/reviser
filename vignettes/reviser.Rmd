@@ -7,7 +7,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-The `reviser` package provides tools to manipulate and analyze vintages of time series data subject to revisions. This vignette demonstrates how to get started and bring your data into the correct format, in accordance with the package's conventions. 
+The `reviser` package provides tools to manipulate and analyze vintages of time series data subject to revisions. This vignette demonstrates how to get started and structure your data according to the package’s conventions.
   
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
@@ -25,19 +25,21 @@ library(tsbox)
 
 ## Package conventions
 
-The most conventional way is to represent vintage data in a real-time data matrix, where each row represents a time period and each column represents successive releases of the data. This known as the wide format. The package supports data in wide format and assumes that the data is organized in the following columns:
+---
+
+The most conventional way is to represent vintage data in a real-time data matrix, where each **row** represents a time period and each **column** represents successive releases of the data. This known as the **wide format**. The package supports data in **wide format**. and assumes that the data is organized in the following columns:
 
 - `time`, the time period
 - Publication dates in  `'yyyy-mm-dd'` format or release numbers as `release_#`
 
-It is more practical to inspect the data in wide format, however it is easier to work with the data in the tidy (long) format, which organizes data into three key columns: 
+While wide format is practical for inspection, data manipulation is often easier in **long (tdy) format**, which consists of:
 
 - `time`, the time period
 - `pub_date` and/or `release`, the publication date or release number
 - `value`, the reported value.
 - `id`, an optional column to distinguish between different series
 
-This structure facilitates efficient data manipulation. For illustration, the package provides two datasets for Gross Domestic Product (GDP) in long format, `gdp_us` and `gdp_uk`. Let's take a look at the GDP growth rates for the US and the UK during the financial crisis of 2007-2009. 
+For illustration, the package provides two datasets in **long format**, `gdp_us` and `gdp_uk`. Below, we examine GDP growth rates for the US and UK during the 2007–2009 financial crisis.
 ```{r}
 # Example long-format US GDP data
 data("gdp_us")
@@ -66,7 +68,9 @@ head(gdp_uk_short)
 
 ## Convert Long to Wide Format
 
-The `vintages_wide()` function transforms a dataset from long to wide format, making it easier to inspect the data. The package convention requires the columns `time` and `value` together with either `pub_date` or `release` to be present. An `id` column can be used to distinguish between different series (see `?vintages_wide` for more details).
+---
+
+To transform a dataset from **long format** to **wide format**, use `vintages_wide()`. The function requires columns `time` and `value`, along with either `pub_date` or `release`. An optional `id` column can be used to distinguish between multiple series.
 
 ```{r}
 # Convert wide-format data to long format
@@ -76,7 +80,9 @@ head(wide_uk_short)
 
 ## Convert Wide to Long Format
 
-To revert back to long format, use `vintages_long()`. The package convention requires the column names to be a valid date or contain the string "release" (see `?vintages_long` for more details).
+---
+
+To revert to **long format**, use `vintages_long()`. The function expects column names in **wide format** to be valid dates or contain the string `"release"`.
 
 ```{r}
 # Convert back to long format
@@ -84,8 +90,11 @@ long_uk_short <- vintages_long(wide_uk_short)
 head(long_uk_short)
 ```
 
-## Switch Format with `id` Column
-If there is an `id` column in the data, the `vintages_wide()` and `vintages_long()` functions will use it to distinguish between different series. That is, `vintages_wide()` returns a list with one dataset in wide format per unique `id` value, and `vintages_long()` returns a dataset in long format with an `id` column.
+## Handling Multiple Series with `id`
+
+---
+
+If an `id` column is present, `vintages_wide()` returns a **list** with one dataset per unique `id`. Conversely, `vintages_long()` maintains the `id` column to distinguish between series.
 
 ```{r}
 gdp_short <- bind_rows(
@@ -97,7 +106,10 @@ head(gdp_wide_short)
 ```
 
 ## Extracting Releases
-Having data that satisfies the package conventions we can further analyze the data. For example it is often of interest to asses the quality of the first release, that is the diagonal of the real-time data matrix. The function `get_nth_release()` extracts the nth release from the data. Note that the function is 0-indexed and the first release corresponds to `n = 0`.
+
+---
+
+Once data follows the package conventions, it can be analyzed further. A common task is assessing the **first release** of data, which corresponds to the diagonal of the real-time data matrix. Use `get_nth_release()` to extract the **nth** release. This function is **0-indexed**, so the first release corresponds to `n = 0`.
 
 ```{r}
 # Get the first release and check in wide format
@@ -110,13 +122,19 @@ gdp_releases <- get_nth_release(gdp_short, n = 0:1)
 vintages_wide(gdp_releases, names_from = "release")
 ```
 
-To asses whether the first estimate is already an accurate representation of the final value, we first need to define what "final" means. Many statistical agencies never stop revising their data, so the final value is usually the latest release (corresponding to the last column of the real-time matrix). The function `get_nth_release()` can be used to extract the latest release. However some statistical agencies do stop revising their data after a certain period (e.g. Germany stops revising its GDP data in August four years after the initial release, UK stops 36 months after the initial release). The function `get_fixed_release()` can be used to extract such releases. 
+To assess data accuracy, we need to define the **final release**. Since many statistical agencies continue revising data indefinitely, the **latest release** is often used as a benchmark.
+
+Use `get_nth_release(n = "latest")` to extract the most recent vintage.
 
 ```{r}
 # Get the latest release
 gdp_final <- get_nth_release(gdp_short, n = "latest")
 vintages_wide(gdp_final)
+```
 
+Some agencies **fix** their data after a certain period (e.g., Germany finalizes GDP data in August four years after the intial release, while the UK stops revisions after 36 months). The function `get_fixed_release()` extracts these fixed releases.
+
+```{r}
 # Get the release three years after the initial release
 gdp_uk_longer <- gdp_uk %>% 
   ts_pc() %>% 
@@ -138,23 +156,51 @@ gdp_releases <- get_fixed_release(
 gdp_releases
 ```
 
+## Visualizing Vintage Data
 
-Having defined the final release, we can compare the first release to the final release. For example:
+---
 
-- Calculate the revisions with `get_revisons()`. See vignette [XXXX] on revisions for more details. 
-- Calculate descriptive statistics with `get_revison_analysis()`. See vignette [XXXX] on revision analysis for more details. 
-- Identify the first efficient release with `get_first efficient_release()`. See vignette [XXXX] for more details. 
-- Create nowcasts for future data revisions with `kk_nowcast()`. See vignette [XXXX] for more details. 
+The `reviser` package provides simple and flexible tools for visualizing real-time vintages. The primary function for this is `plot_vintages()`, which supports multiple plot types, including line plots, scatter plots, bar plots, and boxplots. It returns a `ggplot2` object, allowing for further customization with the `ggplot2` package.
 
-## Graphical Representation
-The package provides a set of functions to visualize the data. The function `plot_vintages()` creates a line plot of the data with different releases. The function `plot_revisions()` creates a line plot of the revisions between the first and the final release. The function `plot_revision_analysis()` creates a line plot of the revisions and adds a boxplot of the revisions for each time period. 
+To use `plot_vintages()`, provide a data frame containing:
+- A `time` column (representing the observation period),
+- A `value` column (containing the reported data),
+- A column indicating the publication date (`pub_date`) or release number (`release`), which determines the dimension along which the data is visualized.
 
+For example, to visualize how GDP estimates evolved over time, you can create a line plot comparing different vintages:
 
 ```{r}
-plot_vintages(gdp_us_short)
+# Line plot showing GDP vintages over the publication date dimension
+plot_vintages(
+  gdp_us_short,
+  title = "Real-time GDP Estimates for the US",
+  subtitle = "Growth Rate in %"
+  )
 
+# Line plot showing GDP vintages over the release dimension
 gdp_releases <- get_nth_release(gdp_us_short, n = 0:3)
 plot_vintages(gdp_releases, dim_col = "release")
-plot_vintages(gdp_releases, dim_col = "release", type = "point")
 ```
+
+By default, if `dim_col` (the dimension along which vintages are plotted) contains more than 30 unique values, only the most recent 30 are displayed to maintain readability.
+
+For further customization, you can apply custom themes and color scales using:
+
+- `scale_color_reviser()`
+- `scale_fill_reviser()`
+- `theme_reviser()`
+
+These functions ensure a consistent visual style tailored for vintage data analysis.
+
+
+## Analyzing Data Revisions and Releases
+
+---
+
+After defining the final release, we can analyze revisions and releases in multiple ways:
+
+- Calculate revisions: `get_revisions()`. See vignette [Understanding Data Revisions](understanding-revisions.html) for more details.  
+- Analyze the revisions: `get_revision_analysis()`. See vignette [Revision Patterns and Statistics](revision-analysis.html) for more details.  
+- Identify the first efficient release: `get_first_efficient_release()`. See vignette [Efficient Release Identification](efficient-release.html) for more details.  
+- Nowcast future revisions: `kk_nowcast()`. See vignette [Nowcasting Revisions](nowcasting-revisions.html) for more details.  
 

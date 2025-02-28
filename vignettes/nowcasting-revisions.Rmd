@@ -1,0 +1,21 @@
+---
+title: "Nowcasting Revisions"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{nowcasting-revisions}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+IN PROGRESS
+
+```{r setup}
+library(reviser)
+```
