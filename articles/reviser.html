@@ -38,6 +38,17 @@
       <ul class="navbar-nav me-auto">
 <li class="active nav-item"><a class="nav-link" href="../articles/reviser.html">Get started</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+<li><a class="dropdown-item" href="../articles/understanding-revisions.html">Understanding Data Revisions</a></li>
+    <li><a class="dropdown-item" href="../articles/revision-analysis.html">Revision Patterns and Statistics</a></li>
+    <li><a class="dropdown-item" href="../articles/efficient-release.html">Efficient Release Identification</a></li>
+    <li><a class="dropdown-item" href="../articles/nowcasting-revisions.html">Nowcasting Revisions</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
@@ -74,8 +85,8 @@
     
 <p>The <code>reviser</code> package provides tools to manipulate and
 analyze vintages of time series data subject to revisions. This vignette
-demonstrates how to get started and bring your data into the correct
-format, in accordance with the package’s conventions.</p>
+demonstrates how to get started and structure your data according to the
+package’s conventions.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># The packages used in this vignette</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://p-wegmueller.github.io/reviser/">reviser</a></span><span class="op">)</span></span>
@@ -84,11 +95,13 @@ format, in accordance with the package’s conventions.</p>
 <div class="section level2">
 <h2 id="package-conventions">Package conventions<a class="anchor" aria-label="anchor" href="#package-conventions"></a>
 </h2>
+<hr>
 <p>The most conventional way is to represent vintage data in a real-time
-data matrix, where each row represents a time period and each column
-represents successive releases of the data. This known as the wide
-format. The package supports data in wide format and assumes that the
-data is organized in the following columns:</p>
+data matrix, where each <strong>row</strong> represents a time period
+and each <strong>column</strong> represents successive releases of the
+data. This known as the <strong>wide format</strong>. The package
+supports data in <strong>wide format</strong>. and assumes that the data
+is organized in the following columns:</p>
 <ul>
 <li>
 <code>time</code>, the time period</li>
@@ -96,9 +109,9 @@ data is organized in the following columns:</p>
 numbers as <code>release_#</code>
 </li>
 </ul>
-<p>It is more practical to inspect the data in wide format, however it
-is easier to work with the data in the tidy (long) format, which
-organizes data into three key columns:</p>
+<p>While wide format is practical for inspection, data manipulation is
+often easier in <strong>long (tdy) format</strong>, which consists
+of:</p>
 <ul>
 <li>
 <code>time</code>, the time period</li>
@@ -111,11 +124,10 @@ date or release number</li>
 <code>id</code>, an optional column to distinguish between different
 series</li>
 </ul>
-<p>This structure facilitates efficient data manipulation. For
-illustration, the package provides two datasets for Gross Domestic
-Product (GDP) in long format, <code>gdp_us</code> and
-<code>gdp_uk</code>. Let’s take a look at the GDP growth rates for the
-US and the UK during the financial crisis of 2007-2009.</p>
+<p>For illustration, the package provides two datasets in <strong>long
+format</strong>, <code>gdp_us</code> and <code>gdp_uk</code>. Below, we
+examine GDP growth rates for the US and UK during the 2007–2009
+financial crisis.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Example long-format US GDP data</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"gdp_us"</span><span class="op">)</span></span>
@@ -153,12 +165,13 @@ US and the UK during the financial crisis of 2007-2009.</p>
 <div class="section level2">
 <h2 id="convert-long-to-wide-format">Convert Long to Wide Format<a class="anchor" aria-label="anchor" href="#convert-long-to-wide-format"></a>
 </h2>
-<p>The <code><a href="../reference/vintages_wide.html">vintages_wide()</a></code> function transforms a dataset from
-long to wide format, making it easier to inspect the data. The package
-convention requires the columns <code>time</code> and <code>value</code>
-together with either <code>pub_date</code> or <code>release</code> to be
-present. An <code>id</code> column can be used to distinguish between
-different series (see <code><a href="../reference/vintages_wide.html">?vintages_wide</a></code> for more details).</p>
+<hr>
+<p>To transform a dataset from <strong>long format</strong> to
+<strong>wide format</strong>, use <code><a href="../reference/vintages_wide.html">vintages_wide()</a></code>. The
+function requires columns <code>time</code> and <code>value</code>,
+along with either <code>pub_date</code> or <code>release</code>. An
+optional <code>id</code> column can be used to distinguish between
+multiple series.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Convert wide-format data to long format</span></span>
 <span><span class="va">wide_uk_short</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/vintages_wide.html">vintages_wide</a></span><span class="op">(</span><span class="va">gdp_uk_short</span><span class="op">)</span></span>
@@ -177,10 +190,11 @@ different series (see <code><a href="../reference/vintages_wide.html">?vintages_
 <div class="section level2">
 <h2 id="convert-wide-to-long-format">Convert Wide to Long Format<a class="anchor" aria-label="anchor" href="#convert-wide-to-long-format"></a>
 </h2>
-<p>To revert back to long format, use <code><a href="../reference/vintages_long.html">vintages_long()</a></code>. The
-package convention requires the column names to be a valid date or
-contain the string “release” (see <code><a href="../reference/vintages_long.html">?vintages_long</a></code> for more
-details).</p>
+<hr>
+<p>To revert to <strong>long format</strong>, use
+<code><a href="../reference/vintages_long.html">vintages_long()</a></code>. The function expects column names in
+<strong>wide format</strong> to be valid dates or contain the string
+<code>"release"</code>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Convert back to long format</span></span>
 <span><span class="va">long_uk_short</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/vintages_long.html">vintages_long</a></span><span class="op">(</span><span class="va">wide_uk_short</span><span class="op">)</span></span>
@@ -196,15 +210,13 @@ details).</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 2007-07-01 2007-12-01 0.663</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="switch-format-with-id-column">Switch Format with <code>id</code> Column<a class="anchor" aria-label="anchor" href="#switch-format-with-id-column"></a>
+<h2 id="handling-multiple-series-with-id">Handling Multiple Series with <code>id</code><a class="anchor" aria-label="anchor" href="#handling-multiple-series-with-id"></a>
 </h2>
-<p>If there is an <code>id</code> column in the data, the
-<code><a href="../reference/vintages_wide.html">vintages_wide()</a></code> and <code><a href="../reference/vintages_long.html">vintages_long()</a></code> functions
-will use it to distinguish between different series. That is,
-<code><a href="../reference/vintages_wide.html">vintages_wide()</a></code> returns a list with one dataset in wide
-format per unique <code>id</code> value, and
-<code><a href="../reference/vintages_long.html">vintages_long()</a></code> returns a dataset in long format with an
-<code>id</code> column.</p>
+<hr>
+<p>If an <code>id</code> column is present, <code><a href="../reference/vintages_wide.html">vintages_wide()</a></code>
+returns a <strong>list</strong> with one dataset per unique
+<code>id</code>. Conversely, <code><a href="../reference/vintages_long.html">vintages_long()</a></code> maintains the
+<code>id</code> column to distinguish between series.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gdp_short</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span></span>
 <span>  <span class="va">gdp_uk_short</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"UK"</span><span class="op">)</span>,</span>
@@ -241,11 +253,12 @@ format per unique <code>id</code> value, and
 <div class="section level2">
 <h2 id="extracting-releases">Extracting Releases<a class="anchor" aria-label="anchor" href="#extracting-releases"></a>
 </h2>
-<p>Having data that satisfies the package conventions we can further
-analyze the data. For example it is often of interest to asses the
-quality of the first release, that is the diagonal of the real-time data
-matrix. The function <code><a href="../reference/get_nth_release.html">get_nth_release()</a></code> extracts the nth
-release from the data. Note that the function is 0-indexed and the first
+<hr>
+<p>Once data follows the package conventions, it can be analyzed
+further. A common task is assessing the <strong>first release</strong>
+of data, which corresponds to the diagonal of the real-time data matrix.
+Use <code><a href="../reference/get_nth_release.html">get_nth_release()</a></code> to extract the <strong>nth</strong>
+release. This function is <strong>0-indexed</strong>, so the first
 release corresponds to <code>n = 0</code>.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Get the first release and check in wide format</span></span>
@@ -306,17 +319,12 @@ release corresponds to <code>n = 0</code>.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2008-01-01    0.149      0.218</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 2008-04-01    0.469      0.699</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> 2008-07-01   -<span style="color: #BB0000;">0.063</span><span style="color: #BB0000; text-decoration: underline;">1</span>    <span style="color: #BB0000;">NA</span></span></span></code></pre></div>
-<p>To asses whether the first estimate is already an accurate
-representation of the final value, we first need to define what “final”
-means. Many statistical agencies never stop revising their data, so the
-final value is usually the latest release (corresponding to the last
-column of the real-time matrix). The function
-<code><a href="../reference/get_nth_release.html">get_nth_release()</a></code> can be used to extract the latest
-release. However some statistical agencies do stop revising their data
-after a certain period (e.g. Germany stops revising its GDP data in
-August four years after the initial release, UK stops 36 months after
-the initial release). The function <code><a href="../reference/get_fixed_release.html">get_fixed_release()</a></code> can
-be used to extract such releases.</p>
+<p>To assess data accuracy, we need to define the <strong>final
+release</strong>. Since many statistical agencies continue revising data
+indefinitely, the <strong>latest release</strong> is often used as a
+benchmark.</p>
+<p>Use <code>get_nth_release(n = "latest")</code> to extract the most
+recent vintage.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Get the latest release</span></span>
 <span><span class="va">gdp_final</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_nth_release.html">get_nth_release</a></span><span class="op">(</span><span class="va">gdp_short</span>, n <span class="op">=</span> <span class="st">"latest"</span><span class="op">)</span></span>
@@ -344,9 +352,13 @@ be used to extract such releases.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2007-10-01      -<span style="color: #BB0000;">0.043</span><span style="color: #BB0000; text-decoration: underline;">0</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2008-01-01       0.218 </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 2008-04-01       0.699 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> 2008-07-01      -<span style="color: #BB0000;">0.063</span><span style="color: #BB0000; text-decoration: underline;">1</span></span></span>
-<span></span>
-<span><span class="co"># Get the release three years after the initial release</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> 2008-07-01      -<span style="color: #BB0000;">0.063</span><span style="color: #BB0000; text-decoration: underline;">1</span></span></span></code></pre></div>
+<p>Some agencies <strong>fix</strong> their data after a certain period
+(e.g., Germany finalizes GDP data in August four years after the intial
+release, while the UK stops revisions after 36 months). The function
+<code><a href="../reference/get_fixed_release.html">get_fixed_release()</a></code> extracts these fixed releases.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Get the release three years after the initial release</span></span>
 <span><span class="va">gdp_uk_longer</span> <span class="op">&lt;-</span> <span class="va">gdp_uk</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://docs.ropensci.org/tsbox/reference/ts_pc.html" class="external-link">ts_pc</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span></span>
@@ -389,42 +401,73 @@ be used to extract such releases.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2001-01-01 2005-09-01 0.763</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 2001-04-01 2005-09-01 0.388</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> 2001-07-01 2005-09-01 0.332</span></span></code></pre></div>
-<p>Having defined the final release, we can compare the first release to
-the final release. For example:</p>
-<ul>
-<li>Calculate the revisions with <code>get_revisons()</code>. See
-vignette [XXXX] on revisions for more details.</li>
-<li>Calculate descriptive statistics with
-<code>get_revison_analysis()</code>. See vignette [XXXX] on revision
-analysis for more details.</li>
-<li>Identify the first efficient release with
-<code>get_first efficient_release()</code>. See vignette [XXXX] for more
-details.</li>
-<li>Create nowcasts for future data revisions with
-<code><a href="../reference/kk_nowcast.html">kk_nowcast()</a></code>. See vignette [XXXX] for more details.</li>
-</ul>
 </div>
 <div class="section level2">
-<h2 id="graphical-representation">Graphical Representation<a class="anchor" aria-label="anchor" href="#graphical-representation"></a>
+<h2 id="visualizing-vintage-data">Visualizing Vintage Data<a class="anchor" aria-label="anchor" href="#visualizing-vintage-data"></a>
 </h2>
-<p>The package provides a set of functions to visualize the data. The
-function <code><a href="../reference/plot_vintages.html">plot_vintages()</a></code> creates a line plot of the data
-with different releases. The function <code>plot_revisions()</code>
-creates a line plot of the revisions between the first and the final
-release. The function <code>plot_revision_analysis()</code> creates a
-line plot of the revisions and adds a boxplot of the revisions for each
-time period.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_vintages.html">plot_vintages</a></span><span class="op">(</span><span class="va">gdp_us_short</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reviser_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
+<hr>
+<p>The <code>reviser</code> package provides simple and flexible tools
+for visualizing real-time vintages. The primary function for this is
+<code><a href="../reference/plot_vintages.html">plot_vintages()</a></code>, which supports multiple plot types,
+including line plots, scatter plots, bar plots, and boxplots. It returns
+a <code>ggplot2</code> object, allowing for further customization with
+the <code>ggplot2</code> package.</p>
+<p>To use <code><a href="../reference/plot_vintages.html">plot_vintages()</a></code>, provide a data frame containing:
+- A <code>time</code> column (representing the observation period), - A
+<code>value</code> column (containing the reported data), - A column
+indicating the publication date (<code>pub_date</code>) or release
+number (<code>release</code>), which determines the dimension along
+which the data is visualized.</p>
+<p>For example, to visualize how GDP estimates evolved over time, you
+can create a line plot comparing different vintages:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Line plot showing GDP vintages over the publication date dimension</span></span>
+<span><span class="fu"><a href="../reference/plot_vintages.html">plot_vintages</a></span><span class="op">(</span></span>
+<span>  <span class="va">gdp_us_short</span>,</span>
+<span>  title <span class="op">=</span> <span class="st">"Real-time GDP Estimates for the US"</span>,</span>
+<span>  subtitle <span class="op">=</span> <span class="st">"Growth Rate in %"</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
+<p><img src="reviser_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
+<span><span class="co"># Line plot showing GDP vintages over the release dimension</span></span>
 <span><span class="va">gdp_releases</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_nth_release.html">get_nth_release</a></span><span class="op">(</span><span class="va">gdp_us_short</span>, n <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/plot_vintages.html">plot_vintages</a></span><span class="op">(</span><span class="va">gdp_releases</span>, dim_col <span class="op">=</span> <span class="st">"release"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reviser_files/figure-html/unnamed-chunk-8-2.png" width="700"></p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_vintages.html">plot_vintages</a></span><span class="op">(</span><span class="va">gdp_releases</span>, dim_col <span class="op">=</span> <span class="st">"release"</span>, type <span class="op">=</span> <span class="st">"point"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reviser_files/figure-html/unnamed-chunk-8-3.png" width="700"></p>
+<p><img src="reviser_files/figure-html/unnamed-chunk-9-2.png" width="700"></p>
+<p>By default, if <code>dim_col</code> (the dimension along which
+vintages are plotted) contains more than 30 unique values, only the most
+recent 30 are displayed to maintain readability.</p>
+<p>For further customization, you can apply custom themes and color
+scales using:</p>
+<ul>
+<li><code><a href="../reference/theme_reviser.html">scale_color_reviser()</a></code></li>
+<li><code><a href="../reference/theme_reviser.html">scale_fill_reviser()</a></code></li>
+<li><code><a href="../reference/theme_reviser.html">theme_reviser()</a></code></li>
+</ul>
+<p>These functions ensure a consistent visual style tailored for vintage
+data analysis.</p>
+</div>
+<div class="section level2">
+<h2 id="analyzing-data-revisions-and-releases">Analyzing Data Revisions and Releases<a class="anchor" aria-label="anchor" href="#analyzing-data-revisions-and-releases"></a>
+</h2>
+<hr>
+<p>After defining the final release, we can analyze revisions and
+releases in multiple ways:</p>
+<ul>
+<li>Calculate revisions: <code><a href="../reference/get_revisions.html">get_revisions()</a></code>. See vignette <a href="understanding-revisions.html">Understanding Data Revisions</a> for
+more details.<br>
+</li>
+<li>Analyze the revisions: <code><a href="../reference/get_revision_analysis.html">get_revision_analysis()</a></code>. See
+vignette <a href="revision-analysis.html">Revision Patterns and
+Statistics</a> for more details.<br>
+</li>
+<li>Identify the first efficient release:
+<code><a href="../reference/get_first_efficient_release.html">get_first_efficient_release()</a></code>. See vignette <a href="efficient-release.html">Efficient Release Identification</a> for
+more details.<br>
+</li>
+<li>Nowcast future revisions: <code><a href="../reference/kk_nowcast.html">kk_nowcast()</a></code>. See vignette <a href="nowcasting-revisions.html">Nowcasting Revisions</a> for more
+details.</li>
+</ul>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
