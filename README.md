@@ -33,7 +33,7 @@ devtools::install_github("p-wegmueller/reviser")
 library(reviser)
 suppressMessages(library(dplyr))
 
-gdp <- gdp %>% tsbox::ts_pc() %>% tsbox::ts_span(start = "1980-01-01") 
+gdp <- gdp_us %>% tsbox::ts_pc() %>% tsbox::ts_span(start = "1980-01-01")
 
 gdp_wide <- vintages_wide(gdp)
 
@@ -59,6 +59,11 @@ final_release <- get_nth_release(gdp_long, n = 16)
 df <- get_nth_release(gdp_long, n = 0:6)
 
 summary <- get_revision_analysis(df, final_release)
+#> Warning: Both 'release' and 'pub_date' columns are present in 'df. The
+#> 'release' column will be used.
+```
+
+``` r
 print(summary)
 #> # A tibble: 7 × 10
 #>   release       N `Bias (mean)` `Bias (p-value)` Minimum Maximum `Std. Dev.`

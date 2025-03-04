@@ -1,0 +1,21 @@
+---
+title: "Efficient Release Identification"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{efficient-release}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(reviser)
+```
+
+IN PROGRESS

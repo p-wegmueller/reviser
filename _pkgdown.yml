@@ -1,4 +1,25 @@
 url: https://p-wegmueller.github.io/reviser/
 template:
   bootstrap: 5
+  math-rendering: katex
+  light-switch: true
+  
+articles:
+- title: "Main function"
+  navbar: ~
+  contents:
+  - understanding-revisions
+  - revision-analysis
+  - efficient-release
+  - nowcasting-revisions
+  
+- title: "Further examples"
+  contents:
+  - gdp_uk
+  
+authors:
+  Marc Burri:
+    href: https://marcburri.github.io
+  Philipp Wegmueller:
+    href: https://p-wegmueller.github.io
 
