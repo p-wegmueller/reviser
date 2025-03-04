@@ -4,11 +4,12 @@ pkgdown_sha: ~
 articles:
   efficient-release: efficient-release.html
   gdp_uk: gdp_uk.html
+  literature-review: literature-review.html
   nowcasting-revisions: nowcasting-revisions.html
   reviser: reviser.html
   revision-analysis: revision-analysis.html
   understanding-revisions: understanding-revisions.html
-last_built: 2025-02-28T13:29Z
+last_built: 2025-03-04T10:17Z
 urls:
   reference: https://p-wegmueller.github.io/reviser/reference
   article: https://p-wegmueller.github.io/reviser/articles
