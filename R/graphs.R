@@ -16,7 +16,6 @@
 #' @param title A character string specifying the title of the plot. Defaults to an empty string.
 #' @param subtitle A character string specifying the subtitle of the plot. Defaults to an empty string.
 #' @param ylab A character string specifying the label for the y-axis. Defaults to an empty string.
-#' @param p A ggplot2 plot object to which the vintage data will be added. Defaults to `NULL`.
 #'
 #' @return A ggplot2 plot object representing the specified vintage data visualization.
 #'
@@ -85,17 +84,8 @@ plot_vintages <- function(
   dim_col = "pub_date",
   title = "",
   subtitle = "",
-  ylab = "",
-  p = NULL
+  ylab = ""
 ) {
-  if (!missing(p)) {
-    if (!"ggplot" %in% class(p)) {
-      rlang::abort(
-        "If argument 'p' is provided it must be a valid ggplot object."
-      )
-    }
-  }
-
   # Check type input
   if (!type %in% c("line", "point", "bar", "boxplot")) {
     rlang::abort(
@@ -152,9 +142,9 @@ plot_vintages <- function(
         dplyr::filter(!!dim_col %in% utils::tail(unique(!!dim_col), 30))
     }
   }
-  if (missing(p)) {
-    p <- ggplot2::ggplot()
-  }
+
+  p <- ggplot2::ggplot()
+
   if (n == 1L) {
     if (type == "line") {
       p <- p +

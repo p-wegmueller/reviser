@@ -1,0 +1,51 @@
+---
+title: "Analysing GDP revisions in the UK"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{gdp_uk}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+IN PROGRESS
+
+```{r setup}
+library(reviser)
+library(dplyr)
+library(tsbox)
+```
+
+```{r, include=TRUE}
+data <- gdp_uk %>%
+  ts_pc() %>%
+  filter(time >= "2000-01-01") %>%
+  na.omit()
+
+data_wide <- vintages_wide(data)
+
+tail(data_wide[,c(1, (ncol(data_wide)-5):ncol(data_wide))])
+```
+
+```{r}
+data_long <- vintages_long(data)
+
+dta2 <- get_first_release(data_long)
+dta3 <- get_latest_release(data_long)
+p <- plot_vintages(dta2, dim_col = "release", title = "First GDP release")
+p
+```
+
+```{r}
+releases <- get_nth_release(data_long, n = 0:19, diagonal = TRUE)
+
+rev_summary <- get_revision_analysis(releases, get_latest_release(data_long))
+
+rev_summary
+```

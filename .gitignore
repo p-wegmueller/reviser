@@ -5,4 +5,9 @@
 docs
 inst/doc
 .DS_Store
+<<<<<<< HEAD
 report.tex
+=======
+/doc/
+/Meta/
+>>>>>>> 4545c234b77902405b1910fb20db268acd746ead

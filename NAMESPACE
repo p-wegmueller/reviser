@@ -2,7 +2,6 @@
 
 S3method(summary,lst_efficient)
 export(colors_reviser)
-export(generate_basic_report)
 export(get_days_to_release)
 export(get_first_efficient_release)
 export(get_first_release)
