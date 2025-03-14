@@ -746,6 +746,7 @@ get_revision_analysis <- function(
       1 / ((mean(((as.numeric(diff(unique(data$time))) / 360)), na.rm = TRUE)))
     )
     mean_revision <- mean(data$revision)
+    mean_abs_revision <- mean(abs(data$revision))
     min_revision <- min(data$revision)
     max_revision <- max(data$revision)
     std_dev_revision <- stats::sd(data$revision)
@@ -909,6 +910,7 @@ get_revision_analysis <- function(
         "Efficiency (slope p-value)",
         "Minimum",
         "Maximum",
+        "MAR",
         "Std. Dev.",
         "Noise/Signal",
         "Correlation",
@@ -941,6 +943,7 @@ get_revision_analysis <- function(
         coef_efficiency_p_value_slope,
         min_revision,
         max_revision,
+        mean_abs_revision,
         std_dev_revision,
         noise_to_signal,
         correlation,
@@ -1015,6 +1018,7 @@ get_revision_analysis <- function(
         "Bias (p-value)",
         "Minimum",
         "Maximum",
+        "MAR",
         "Std. Dev.",
         "Noise/Signal",
         "Correlation",

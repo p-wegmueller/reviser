@@ -28,9 +28,9 @@ Beyond identifying biases, revision magnitude is crucial for policymakers and fi
 
 ## The Dynamics of Revisions and What They Reveal
 
-Beyond magnitude, the study of revision patterns over time reveals important insights into data reliability, economic fluctuations, and statistical methodologies. The persistence of revisions—whether initial errors are short-lived or remain consistent over multiple revisions—indicates whether early estimates contain useful signals or are merely statistical noise [@Mankiw1986].
+Beyond magnitude, the study of revision patterns over time reveals important insights into data reliability, economic fluctuations, and statistical methodologies. The persistence of revisions—whether initial errors are short-lived or remain consistent over multiple revisions—indicates whether early estimates contain useful signals or are merely statistical noise [@mankiw1986news].
 
-Revisions also tend to vary across different phases of the economic cycle. Research has shown that during economic downturns, GDP and employment figures often undergo larger downward revisions than in periods of economic stability [@Sinclair2013]. This is partly because downturns involve sudden shifts in business conditions that are not fully captured in early estimates, requiring later revisions as more data become available.
+Revisions also tend to vary across different phases of the economic cycle. Research has shown that during economic downturns, GDP and employment figures often undergo larger downward revisions than in periods of economic stability [@sinclair2013examining]. This is partly because downturns involve sudden shifts in business conditions that are not fully captured in early estimates, requiring later revisions as more data become available.
 
 ## The Uses of Studying Revisions in Time Series Data
 
@@ -38,7 +38,7 @@ The analysis of revisions has several practical applications in statistics, econ
 
 Revisions also provide insights into statistical methodology and data collection processes. By examining which variables tend to be most heavily revised, statistical agencies can refine their estimation techniques to improve early releases [@Eurostat2023]. The ONS [@ONS2024] similarly notes that rebasing statistical indices and integrating new data sources can improve the stability of revisions over time.
 
-Another critical use of revision studies is in policymaking. Governments and central banks need reliable data to make informed decisions, and an awareness of revision trends allows them to interpret initial estimates with an appropriate level of caution. Some policymakers advocate for the publication of confidence intervals around preliminary estimates to convey the uncertainty associated with early releases [@Manski2015].
+Another critical use of revision studies is in policymaking. Governments and central banks need reliable data to make informed decisions, and an awareness of revision trends allows them to interpret initial estimates with an appropriate level of caution. Some policymakers advocate for the publication of confidence intervals around preliminary estimates to convey the uncertainty associated with early releases [@manski2014communicating].
 
 Transparency in revision processes is essential for maintaining credibility. Statistical agencies increasingly publish detailed revision histories, allowing users to track changes over time. The BEA, for example, provides documentation on how its GDP estimates evolve from preliminary to final releases, helping economists understand the sources and scale of revisions [@BEA2024].
 
