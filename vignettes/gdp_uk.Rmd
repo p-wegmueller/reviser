@@ -25,7 +25,7 @@ library(tsbox)
 ```{r, include=TRUE}
 data <- gdp_uk %>%
   ts_pc() %>%
-  filter(time >= "2000-01-01") %>%
+  filter(time >= "1980-01-01") %>%
   na.omit()
 
 data_wide <- vintages_wide(data)
@@ -43,9 +43,41 @@ p
 ```
 
 ```{r}
-releases <- get_nth_release(data_long, n = 0:19, diagonal = TRUE)
+releases <- get_nth_release(data_long, n = 0:10, diagonal = F)
+releases_wide <- vintages_wide(releases, names_from = "release")
 
 rev_summary <- get_revision_analysis(releases, get_latest_release(data_long))
 
 rev_summary
+```
+
+
+```{r}
+efficient <- get_first_efficient_release(releases, get_latest_release(data_long))
+
+summary(efficient)
+```
+
+
+```{r}
+nowcast <- kk_nowcast(efficient$data, e=efficient$e)
+
+# First release
+firstvals <- nowcast$observations[,c(1,efficient$e+2)]
+fv <- releases_wide[(efficient$e+1):nrow(releases_wide) ,c(1,2)]
+all.equal(firstvals$release_0_lag_0, fv$release_0)
+
+# Filtered release
+filteredvals <- nowcast$filtered_states[,c(1,efficient$e+2)]
+
+# True values
+truevals <- releases_wide[(efficient$e+1):nrow(releases_wide) ,c(1,efficient$e+2)]
+
+
+mse1 <- mean(((firstvals %ts-% truevals) %>% ts_xts())^2)
+
+msefil <- mean(((filteredvals %ts-% truevals) %>% ts_xts())^2)
+
+msefil/mse1
+
 ```
