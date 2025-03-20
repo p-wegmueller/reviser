@@ -99,7 +99,7 @@
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="va">gdp_uk</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://docs.ropensci.org/tsbox/reference/ts_pc.html" class="external-link">ts_pc</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">time</span> <span class="op">&gt;=</span> <span class="st">"2000-01-01"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">time</span> <span class="op">&gt;=</span> <span class="st">"1980-01-01"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">data_wide</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/vintages_wide.html">vintages_wide</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
@@ -125,38 +125,95 @@
 <span><span class="va">p</span></span></code></pre></div>
 <p><img src="gdp_uk_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">releases</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_nth_release.html">get_nth_release</a></span><span class="op">(</span><span class="va">data_long</span>, n <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">19</span>, diagonal <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">releases</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_nth_release.html">get_nth_release</a></span><span class="op">(</span><span class="va">data_long</span>, n <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">10</span>, diagonal <span class="op">=</span> <span class="cn">F</span><span class="op">)</span></span>
+<span><span class="va">releases_wide</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/vintages_wide.html">vintages_wide</a></span><span class="op">(</span><span class="va">releases</span>, names_from <span class="op">=</span> <span class="st">"release"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: Ignoring columns: pub_date</span></span>
 <span></span>
 <span><span class="va">rev_summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_revision_analysis.html">get_revision_analysis</a></span><span class="op">(</span><span class="va">releases</span>, <span class="fu"><a href="../reference/get_latest_release.html">get_latest_release</a></span><span class="op">(</span><span class="va">data_long</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Both 'release' and 'pub_date' columns are present in 'df. The</span></span>
 <span><span class="co">#&gt; 'release' column will be used.</span></span>
 <span></span>
 <span><span class="va">rev_summary</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 20 × 11</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 11 × 11</span></span></span>
 <span><span class="co">#&gt;    release        N `Bias (mean)` `Bias (p-value)` Minimum Maximum   MAR</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> release_0     66       0.065<span style="text-decoration: underline;">6</span>            0.168   -<span style="color: #BB0000;">1.04</span>    0.850 0.299</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> release_1     65       0.058<span style="text-decoration: underline;">4</span>            0.216   -<span style="color: #BB0000;">0.971</span>   0.865 0.301</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> release_10    56       0.046<span style="text-decoration: underline;">4</span>            0.312   -<span style="color: #BB0000;">0.807</span>   0.867 0.265</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> release_11    55       0.056<span style="text-decoration: underline;">6</span>            0.195   -<span style="color: #BB0000;">0.807</span>   0.867 0.247</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> release_12    54       0.067<span style="text-decoration: underline;">6</span>            0.127   -<span style="color: #BB0000;">0.750</span>   0.867 0.252</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> release_13    53       0.045<span style="text-decoration: underline;">6</span>            0.266   -<span style="color: #BB0000;">0.750</span>   0.674 0.233</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> release_14    52       0.029<span style="text-decoration: underline;">3</span>            0.446   -<span style="color: #BB0000;">0.750</span>   0.651 0.208</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> release_15    51       0.010<span style="text-decoration: underline;">6</span>            0.784   -<span style="color: #BB0000;">0.750</span>   0.651 0.206</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> release_16    50       0.009<span style="text-decoration: underline;">75</span>           0.823   -<span style="color: #BB0000;">0.741</span>   0.839 0.228</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> release_17    49       0.015<span style="text-decoration: underline;">9</span>            0.731   -<span style="color: #BB0000;">0.741</span>   0.839 0.245</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span> release_18    48       0.017<span style="text-decoration: underline;">6</span>            0.700   -<span style="color: #BB0000;">0.741</span>   0.839 0.236</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">12</span> release_19    47       0.051<span style="text-decoration: underline;">3</span>            0.267   -<span style="color: #BB0000;">0.741</span>   0.839 0.235</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">13</span> release_2     64       0.071<span style="text-decoration: underline;">5</span>            0.137   -<span style="color: #BB0000;">0.945</span>   0.892 0.311</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">14</span> release_3     63       0.084<span style="text-decoration: underline;">1</span>            0.083<span style="text-decoration: underline;">3</span>  -<span style="color: #BB0000;">0.962</span>   0.976 0.308</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">15</span> release_4     62       0.061<span style="text-decoration: underline;">8</span>            0.200   -<span style="color: #BB0000;">0.758</span>   0.817 0.295</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">16</span> release_5     61       0.079<span style="text-decoration: underline;">7</span>            0.098<span style="text-decoration: underline;">4</span>  -<span style="color: #BB0000;">0.758</span>   0.711 0.304</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">17</span> release_6     60       0.067<span style="text-decoration: underline;">5</span>            0.163   -<span style="color: #BB0000;">0.789</span>   0.711 0.307</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">18</span> release_7     59       0.067<span style="text-decoration: underline;">1</span>            0.157   -<span style="color: #BB0000;">0.789</span>   0.711 0.299</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">19</span> release_8     58       0.050<span style="text-decoration: underline;">5</span>            0.261   -<span style="color: #BB0000;">0.789</span>   0.711 0.273</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">20</span> release_9     57       0.041<span style="text-decoration: underline;">6</span>            0.353   -<span style="color: #BB0000;">0.807</span>   0.711 0.264</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> release_0    146        0.159           0.008<span style="text-decoration: underline;">58</span>   -<span style="color: #BB0000;">1.63</span>    3.81 0.494</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> release_1    145        0.136           0.017<span style="text-decoration: underline;">2</span>    -<span style="color: #BB0000;">1.86</span>    3.04 0.471</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> release_10   136        0.080<span style="text-decoration: underline;">0</span>          0.081<span style="text-decoration: underline;">4</span>    -<span style="color: #BB0000;">1.51</span>    1.96 0.378</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> release_2    144        0.158           0.003<span style="text-decoration: underline;">60</span>   -<span style="color: #BB0000;">1.71</span>    2.95 0.453</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> release_3    143        0.149           0.006<span style="text-decoration: underline;">11</span>   -<span style="color: #BB0000;">1.83</span>    2.30 0.462</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> release_4    142        0.102           0.035<span style="text-decoration: underline;">3</span>    -<span style="color: #BB0000;">1.54</span>    2.43 0.423</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> release_5    141        0.102           0.041<span style="text-decoration: underline;">0</span>    -<span style="color: #BB0000;">1.65</span>    2.30 0.426</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> release_6    140        0.104           0.034<span style="text-decoration: underline;">8</span>    -<span style="color: #BB0000;">1.49</span>    2.66 0.417</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> release_7    139        0.132           0.008<span style="text-decoration: underline;">12</span>   -<span style="color: #BB0000;">1.50</span>    2.22 0.422</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> release_8    138        0.070<span style="text-decoration: underline;">7</span>          0.112     -<span style="color: #BB0000;">1.64</span>    1.85 0.374</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span> release_9    137        0.073<span style="text-decoration: underline;">0</span>          0.109     -<span style="color: #BB0000;">1.63</span>    2.08 0.375</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 4 more variables: `Std. Dev.` &lt;dbl&gt;, `Noise/Signal` &lt;dbl&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   Correlation &lt;dbl&gt;, `Correlation (p-value)` &lt;dbl&gt;</span></span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">efficient</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_first_efficient_release.html">get_first_efficient_release</a></span><span class="op">(</span><span class="va">releases</span>, <span class="fu"><a href="../reference/get_latest_release.html">get_latest_release</a></span><span class="op">(</span><span class="va">data_long</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">efficient</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Efficient release:  9 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Model summary: </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt; stats::lm(formula = formula, data = df_wide)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Residuals:</span></span>
+<span><span class="co">#&gt;      Min       1Q   Median       3Q      Max </span></span>
+<span><span class="co">#&gt; -1.33845 -0.27345 -0.01401  0.24091  1.65913 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt;             Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
+<span><span class="co">#&gt; (Intercept)  0.20331    0.04884   4.162 5.58e-05 ***</span></span>
+<span><span class="co">#&gt; release_9    0.71403    0.05610  12.727  &lt; 2e-16 ***</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Residual standard error: 0.4872 on 135 degrees of freedom</span></span>
+<span><span class="co">#&gt;   (9 observations deleted due to missingness)</span></span>
+<span><span class="co">#&gt; Multiple R-squared:  0.5454, Adjusted R-squared:  0.5421 </span></span>
+<span><span class="co">#&gt; F-statistic:   162 on 1 and 135 DF,  p-value: &lt; 2.2e-16</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Test summary: </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Linear hypothesis test:</span></span>
+<span><span class="co">#&gt; (Intercept) = 0</span></span>
+<span><span class="co">#&gt; release_9 = 1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Model 1: restricted model</span></span>
+<span><span class="co">#&gt; Model 2: final ~ release_9</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Note: Coefficient covariance matrix supplied.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Res.Df Df      F Pr(&gt;F)  </span></span>
+<span><span class="co">#&gt; 1    137                   </span></span>
+<span><span class="co">#&gt; 2    135  2 2.6616 0.0735 .</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">nowcast</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/kk_nowcast.html">kk_nowcast</a></span><span class="op">(</span><span class="va">efficient</span><span class="op">$</span><span class="va">data</span>, e<span class="op">=</span><span class="va">efficient</span><span class="op">$</span><span class="va">e</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># First release</span></span>
+<span><span class="va">firstvals</span> <span class="op">&lt;-</span> <span class="va">nowcast</span><span class="op">$</span><span class="va">observations</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="va">efficient</span><span class="op">$</span><span class="va">e</span><span class="op">+</span><span class="fl">2</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="va">fv</span> <span class="op">&lt;-</span> <span class="va">releases_wide</span><span class="op">[</span><span class="op">(</span><span class="va">efficient</span><span class="op">$</span><span class="va">e</span><span class="op">+</span><span class="fl">1</span><span class="op">)</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">releases_wide</span><span class="op">)</span> ,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">firstvals</span><span class="op">$</span><span class="va">release_0_lag_0</span>, <span class="va">fv</span><span class="op">$</span><span class="va">release_0</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Filtered release</span></span>
+<span><span class="va">filteredvals</span> <span class="op">&lt;-</span> <span class="va">nowcast</span><span class="op">$</span><span class="va">filtered_states</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="va">efficient</span><span class="op">$</span><span class="va">e</span><span class="op">+</span><span class="fl">2</span><span class="op">)</span><span class="op">]</span></span>
+<span></span>
+<span><span class="co"># True values</span></span>
+<span><span class="va">truevals</span> <span class="op">&lt;-</span> <span class="va">releases_wide</span><span class="op">[</span><span class="op">(</span><span class="va">efficient</span><span class="op">$</span><span class="va">e</span><span class="op">+</span><span class="fl">1</span><span class="op">)</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">releases_wide</span><span class="op">)</span> ,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="va">efficient</span><span class="op">$</span><span class="va">e</span><span class="op">+</span><span class="fl">2</span><span class="op">)</span><span class="op">]</span></span>
+<span></span>
+<span></span>
+<span><span class="va">mse1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="op">(</span><span class="va">firstvals</span> <span class="op"><a href="https://docs.ropensci.org/tsbox/reference/ts_arithmetic.html" class="external-link">%ts-%</a></span> <span class="va">truevals</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://docs.ropensci.org/tsbox/reference/ts_ts.html" class="external-link">ts_xts</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">msefil</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="op">(</span><span class="va">filteredvals</span> <span class="op"><a href="https://docs.ropensci.org/tsbox/reference/ts_arithmetic.html" class="external-link">%ts-%</a></span> <span class="va">truevals</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://docs.ropensci.org/tsbox/reference/ts_ts.html" class="external-link">ts_xts</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">msefil</span><span class="op">/</span><span class="va">mse1</span></span></code></pre></div>
   </main>
 </div>
 
