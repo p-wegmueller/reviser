@@ -16,7 +16,8 @@ utils::globalVariables(c(
   "fraction_sign_correct",
   "late_sign",
   "diff_value",
-  "early_sign"
+  "early_sign",
+  "realtime_period"
 ))
 
 #' @importFrom magrittr %>%
