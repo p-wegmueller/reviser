@@ -35,7 +35,9 @@ Imports:
     scales,
     tibble,
     glue,
-    lubridate
+    lubridate,
+    alfred, 
+    purrr
 Suggests: 
     tsbox,
     testthat (>= 3.0.0),
