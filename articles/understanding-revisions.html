@@ -83,10 +83,287 @@
 
     
     
-<p>IN PROGRESS</p>
+<p>This vignette introduces the <strong>notation</strong> used in the
+literature and presents the <strong>revision triangle</strong> as a
+foundational structure for analyzing revisions. Then, it illustrates how
+to use the function <code><a href="../reference/get_revisions.html">get_revisions()</a></code> to extract revisions
+from time series data. Finally, we illustrate with a detailed example
+how data revisions can be extracted and illustrated.</p>
+<div class="section level2">
+<h2 id="introduction-why-do-data-revisions-occur">📌 Introduction: Why do data revisions occur?<a class="anchor" aria-label="anchor" href="#introduction-why-do-data-revisions-occur"></a>
+</h2>
+<p>Economic and statistical data, in particular time series data, are
+frequently <strong>revised</strong> after their initial publication.
+These revisions occur due to a variety of reasons, including
+methodological updates, newly available data, and technical adjustments.
+Understanding why revisions happen is crucial for properly interpreting
+economic indicators and assessing data reliability.</p>
+<p>Revisions can be classified into several key categories:</p>
+<table class="table">
+<colgroup>
+<col width="66%">
+<col width="33%">
+</colgroup>
+<thead><tr class="header">
+<th><strong>Type of Revision</strong></th>
+<th><strong>Cause</strong></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><strong>Content Revisions</strong></td>
+<td>Updates due to the incorporation of newly available information</td>
+</tr>
+<tr class="even">
+<td><strong>Base Data Revisions</strong></td>
+<td>Adjustments when new benchmark data is released</td>
+</tr>
+<tr class="odd">
+<td><strong>Benchmark Revisions</strong></td>
+<td>Structural changes in methodology</td>
+</tr>
+<tr class="even">
+<td><strong>Minor Changes in Estimation Methods</strong></td>
+<td>Continuous refinements in models</td>
+</tr>
+<tr class="odd">
+<td><strong>Technical Adjustments</strong></td>
+<td>Data corrections or econometric technique updates</td>
+</tr>
+<tr class="even">
+<td><strong>Economic Events &amp; Shocks</strong></td>
+<td>Large-scale disruptions necessitating revisions</td>
+</tr>
+<tr class="odd">
+<td><strong>Technological Advances</strong></td>
+<td>Integration of new data sources or methods</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<div class="section level3">
+<h3 id="incorporation-of-newly-available-or-updated-data">
+<strong>1️⃣ Incorporation of newly available or updated
+data</strong><a class="anchor" aria-label="anchor" href="#incorporation-of-newly-available-or-updated-data"></a>
+</h3>
+<p>Initial estimates of economic indicators are often based on
+<strong>partial or preliminary data</strong>. As more comprehensive
+information becomes available, statistical agencies revise their figures
+to reflect the most accurate representation of economic activity. This
+is common for <strong>GDP estimates</strong>, labor statistics, and to a
+lesser extent also inflation measures. Many statistical agencies use
+<strong>interpolation and extrapolation techniques</strong> to estimate
+quarterly indicators based on incomplete information. When new input
+data becomes available, past estimates are revised to align with the
+improved dataset <span class="citation">[@sax2013temporal]</span>.</p>
+<p>📌 <em>Example:</em> The <strong>U.S. Bureau of Economic Analysis
+(BEA)</strong> revises GDP estimates multiple times as more data becomes
+available.</p>
+<hr>
+</div>
+<div class="section level3">
+<h3 id="base-data-revisions">
+<strong>2️⃣Base data revisions</strong><a class="anchor" aria-label="anchor" href="#base-data-revisions"></a>
+</h3>
+<p>Annual macroeconomic data, such as <strong>national accounts and
+GDP</strong>, are often revised when new yearly aggregates are released.
+Statistical offices typically revise figures for the most recent
+<strong>two to three years</strong>, while older data remains unchanged
+unless there is a major methodological update.</p>
+<p>📌 <em>Example:</em> The <strong>Swiss Federal Statistical Office
+(SFSO)</strong> revises past two years of annual GDP each August.</p>
+<hr>
+</div>
+<div class="section level3">
+<h3 id="benchmark-revisions-methodological-changes">
+<strong>3️⃣ Benchmark revisions (methodological
+changes)</strong><a class="anchor" aria-label="anchor" href="#benchmark-revisions-methodological-changes"></a>
+</h3>
+<p>Concepts and methodologies used in national accounts <strong>evolve
+over time</strong> to comply with new international standards and
+improve accuracy. <strong>Benchmark revisions</strong> introduce major
+changes that may affect the entire historical time series.</p>
+<p>📌 <em>Examples of benchmark revisions in Swiss GDP
+measurement:</em></p>
+<table class="table">
+<thead><tr class="header">
+<th><strong>Year</strong></th>
+<th><strong>Major Change</strong></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><strong>2004</strong></td>
+<td>Adjustments to European System of Accounts (ESA 1995)</td>
+</tr>
+<tr class="even">
+<td><strong>2009</strong></td>
+<td>Shift from direct to indirect seasonal adjustment</td>
+</tr>
+<tr class="odd">
+<td><strong>2014</strong></td>
+<td>Transition to ESA 2010 standards</td>
+</tr>
+</tbody>
+</table>
+<p>These revisions can significantly alter <strong>growth rates, levels,
+and historical trends</strong>.</p>
+<hr>
+</div>
+<div class="section level3">
+<h3 id="minor-changes-in-estimation-methods">
+<strong>4️⃣ Minor changes in estimation methods</strong><a class="anchor" aria-label="anchor" href="#minor-changes-in-estimation-methods"></a>
+</h3>
+<p>Even when large-scale benchmark revisions do not occur, statistical
+agencies <strong>continuously refine</strong> their estimation
+methods:</p>
+<ul>
+<li>Adjustments to <strong>seasonal adjustment techniques</strong>.</li>
+<li>Replacing outdated indicators with new ones.</li>
+<li>Improving econometric models for <strong>nowcasting and
+forecasting</strong>.</li>
+</ul>
+<p>📌 <em>Example:</em> Changes in how <strong>consumer confidence
+indexes</strong> are incorporated into GDP forecasts.</p>
+<hr>
+</div>
+<div class="section level3">
+<h3 id="technical-adjustments-error-corrections">
+<strong>5️⃣ Technical adjustments &amp; error
+corrections</strong><a class="anchor" aria-label="anchor" href="#technical-adjustments-error-corrections"></a>
+</h3>
+<p>Revisions can occur due to <strong>simple technical
+adjustments</strong>, including:</p>
+<ul>
+<li>Correction of <strong>data entry errors</strong>.</li>
+<li>Adjustments due to <strong>missing or late-reported
+data</strong>.</li>
+<li>Revisions in <strong>survey weighting methods</strong>.</li>
+</ul>
+<p>📌 <em>Example:</em> The <strong>Bureau of Labor Statistics
+(BLS)</strong> revises employment data as late reports from firms are
+incorporated.</p>
+<hr>
+</div>
+<div class="section level3">
+<h3 id="economic-events-shocks">
+<strong>6️⃣ Economic events &amp; shocks</strong><a class="anchor" aria-label="anchor" href="#economic-events-shocks"></a>
+</h3>
+<p>Unforeseen economic events often require <strong>large-scale
+revisions</strong> due to structural breaks in economic activity.</p>
+<p>📌 <em>Examples:</em></p>
+<ul>
+<li>
+<strong>COVID-19 pandemic</strong>: GDP estimates revised
+significantly as lockdowns disrupted economic data collection.</li>
+<li>
+<strong>Financial crises</strong>: Banking sector collapses lead to
+re-evaluation of past financial statistics.</li>
+</ul>
+<p>These events create <strong>higher-than-normal uncertainty</strong>,
+necessitating <strong>frequent revisions</strong>.</p>
+<hr>
+</div>
+<div class="section level3">
+<h3 id="technological-advances-in-data-collection">
+<strong>7️⃣ Technological advances in data collection</strong><a class="anchor" aria-label="anchor" href="#technological-advances-in-data-collection"></a>
+</h3>
+<p>The adoption of <strong>big data, machine learning, and AI</strong>
+in economic statistics has introduced new ways to process and analyze
+data. These <strong>technological advances</strong> can lead to
+revisions as agencies shift to more sophisticated data integration
+methods.</p>
+<p>📌 <em>Example:</em> <strong>Nowcasting models</strong> using
+high-frequency data (e.g., credit card transactions) influence revisions
+in real-time GDP estimates.</p>
+<hr>
+</div>
+<div class="section level3">
+<h3 id="some-mathematical-notation">🖋 <strong>Some mathematical notation</strong><a class="anchor" aria-label="anchor" href="#some-mathematical-notation"></a>
+</h3>
+<p>The notation follows standard conventions in the literature:</p>
+<ul>
+<li>Superscripts (<strong>vintage</strong>) refer to when the estimate
+was available.</li>
+<li>Subscripts (<strong>time</strong>) refer to when the observation was
+recorded.</li>
+</ul>
+<p>For example: \( y_1^t \) is the estimate available at time \( t \) of
+the value of variable \( y \) at time <strong>1</strong>.</p>
+<p>In general: \( y_j^t \) represents the estimate of \( y \) at time \(
+j \), released in <strong>vintage</strong> \( t \).</p>
+<p>Revisions are often studied in the form of a <strong>revision
+triangle</strong>, where:</p>
+<p>\[ Y = \begin{bmatrix} y_1^1 &amp; &amp; y_1^{t-l} &amp; &amp; y_1^t
+\\ &amp; \ddots &amp; \vdots &amp; \vdots &amp; \vdots \\ &amp; &amp;
+y_{t-l}^{t-l} &amp; \cdots &amp; y_{t-l}^t \\ &amp; &amp; &amp; \ddots
+&amp; \vdots \\ &amp; &amp; &amp; &amp; y_t^t \\ \end{bmatrix} \]</p>
+<p>where <strong>each row</strong> corresponds to a specific time period
+and <strong>each column</strong> corresponds to a successive release of
+the data. As we move <strong>rightward</strong>, we see later vintages
+(<strong>updated data releases</strong>).As we move
+<strong>downward</strong>, we observe later time periods.</p>
+<hr>
+</div>
+</div>
+<div class="section level2">
+<h2 id="extracting-revisions-with-reviser">🔗 <strong>Extracting revisions with reviser</strong><a class="anchor" aria-label="anchor" href="#extracting-revisions-with-reviser"></a>
+</h2>
+<p>Now that we understand <strong>why revisions occur</strong>, the next
+step is to <strong>quantify and analyze them</strong>. In economic
+statistics, <strong>real-time data</strong> consists of <strong>multiple
+vintages</strong> of observations, where each vintage represents a
+<strong>successive release</strong> of the data. These vintages are
+stored in a <strong>revision triangle</strong>, also known as a
+<strong>real-time data matrix</strong>, where:</p>
+<ul>
+<li>
+<strong>Rows</strong> represent the time periods of the original
+observations.</li>
+<li>
+<strong>Columns</strong> represent successive
+<strong>vintages</strong> (or releases) of the data.</li>
+</ul>
+<div class="section level3">
+<h3 id="the-get_revisions-function">📊 <strong>The <code>get_revisions()</code> function</strong><a class="anchor" aria-label="anchor" href="#the-get_revisions-function"></a>
+</h3>
+<p>Once the data under scrutiny is formatted along the lines illustrated
+in the <a href="reviser.html">introduction to reviser</a>, i.e., in long
+tidy format the data tibble consists of:</p>
+<ul>
+<li>
+<code>time</code>, the time period</li>
+<li>
+<code>pub_date</code> and/or <code>release</code>, the publication
+date or release number</li>
+<li>
+<code>value</code>, the reported value.</li>
+<li>
+<code>id</code>, an optional column to distinguish between different
+series</li>
+</ul>
+<p>then we can extract the revisions inherent in our time series
+vintages with the function <code><a href="../reference/get_revisions.html">get_revisions()</a></code>. The function
+allows users to compute revisions by comparing different vintages of a
+time series dataset. It supports three primary methods:</p>
+<ul>
+<li><p><em>Fixed Reference Date</em> (<code>ref_date</code>): Computes
+revisions relative to a fixed publication date.</p></li>
+<li><p><em>Nth Release</em> (<code>nth_release</code>): Compares
+revisions to the nth release of a data point.</p></li>
+<li><p><em>Interval Lag</em> (<code>interval</code>): Measures changes
+between vintages published a fixed number of periods apart.</p></li>
+</ul>
+</div>
+<div class="section level3">
+<h3 id="example-usage">🚀 Example Usage<a class="anchor" aria-label="anchor" href="#example-usage"></a>
+</h3>
+<p>In the next section, we explore a practical application and
+visualization techniques for revision analysis.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://p-wegmueller.github.io/reviser/">reviser</a></span><span class="op">)</span></span></code></pre></div>
-  </main>
+</div>
+</div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 
