@@ -14,8 +14,161 @@ knitr::opts_chunk$set(
 )
 ```
 
-IN PROGRESS
+This vignette introduces the **notation** used in the literature and presents the **revision triangle** as a foundational structure for analyzing revisions. Then, it illustrates how to use the function `get_revisions()` to extract revisions from time series data. Finally, we illustrate with a detailed example how data revisions can be extracted and illustrated. 
 
-```{r setup}
+# 📌 Introduction: Why do data revisions occur?
+
+Economic and statistical data, in particular time series data, are frequently **revised** after their initial publication. These revisions occur due to a variety of reasons, including methodological updates, newly available data, and technical adjustments. Understanding why revisions happen is crucial for properly interpreting economic indicators and assessing data reliability.
+
+Revisions can be classified into several key categories:
+
+| **Type of Revision** | **Cause** |
+|----------------------|-----------|
+| **Content Revisions** | Updates due to the incorporation of newly available information |
+| **Base Data Revisions** | Adjustments when new benchmark data is released |
+| **Benchmark Revisions** | Structural changes in methodology |
+| **Minor Changes in Estimation Methods** | Continuous refinements in models |
+| **Technical Adjustments** | Data corrections or econometric technique updates |
+| **Economic Events & Shocks** | Large-scale disruptions necessitating revisions |
+| **Technological Advances** | Integration of new data sources or methods |
+
+---
+
+## **1️⃣ Incorporation of newly available or updated data**
+
+Initial estimates of economic indicators are often based on **partial or preliminary data**. As more comprehensive information becomes available, statistical agencies revise their figures to reflect the most accurate representation of economic activity. This is common for **GDP estimates**, labor statistics, and to a lesser extent also inflation measures. Many statistical agencies use **interpolation and extrapolation techniques** to estimate quarterly indicators based on incomplete information. When new input data becomes available, past estimates are revised to align with the improved dataset [@sax2013temporal].
+
+📌 *Example:* The **U.S. Bureau of Economic Analysis (BEA)** revises GDP estimates multiple times as more data becomes available.
+
+---
+
+## **2️⃣Base data revisions**
+
+Annual macroeconomic data, such as **national accounts and GDP**, are often revised when new yearly aggregates are released. Statistical offices typically revise figures for the most recent **two to three years**, while older data remains unchanged unless there is a major methodological update.
+
+📌 *Example:* The **Swiss Federal Statistical Office (SFSO)** revises past two years of annual GDP each August.
+
+---
+
+## **3️⃣ Benchmark revisions (methodological changes)**
+
+Concepts and methodologies used in national accounts **evolve over time** to comply with new international standards and improve accuracy. **Benchmark revisions** introduce major changes that may affect the entire historical time series.
+
+📌 *Examples of benchmark revisions in Swiss GDP measurement:*
+
+| **Year** | **Major Change** |
+|------------|---------------|
+| **2004** | Adjustments to European System of Accounts (ESA 1995) |
+| **2009** | Shift from direct to indirect seasonal adjustment |
+| **2014** | Transition to ESA 2010 standards |
+
+These revisions can significantly alter **growth rates, levels, and historical trends**.
+
+---
+
+## **4️⃣ Minor changes in estimation methods**
+
+Even when large-scale benchmark revisions do not occur, statistical agencies **continuously refine** their estimation methods:
+
+- Adjustments to **seasonal adjustment techniques**.
+- Replacing outdated indicators with new ones.
+- Improving econometric models for **nowcasting and forecasting**.
+
+📌 *Example:* Changes in how **consumer confidence indexes** are incorporated into GDP forecasts.
+
+---
+
+## **5️⃣ Technical adjustments & error corrections**
+
+Revisions can occur due to **simple technical adjustments**, including:
+
+- Correction of **data entry errors**.
+- Adjustments due to **missing or late-reported data**.
+- Revisions in **survey weighting methods**.
+
+📌 *Example:* The **Bureau of Labor Statistics (BLS)** revises employment data as late reports from firms are incorporated.
+
+---
+
+## **6️⃣ Economic events & shocks**
+
+Unforeseen economic events often require **large-scale revisions** due to structural breaks in economic activity.
+
+📌 *Examples:*
+
+- **COVID-19 pandemic**: GDP estimates revised significantly as lockdowns disrupted economic data collection.
+- **Financial crises**: Banking sector collapses lead to re-evaluation of past financial statistics.
+
+These events create **higher-than-normal uncertainty**, necessitating **frequent revisions**.
+
+---
+
+## **7️⃣ Technological advances in data collection**
+
+The adoption of **big data, machine learning, and AI** in economic statistics has introduced new ways to process and analyze data. These **technological advances** can lead to revisions as agencies shift to more sophisticated data integration methods.
+
+📌 *Example:* **Nowcasting models** using high-frequency data (e.g., credit card transactions) influence revisions in real-time GDP estimates.
+
+---
+
+## 🖋 **Some mathematical notation**
+
+The notation follows standard conventions in the literature:
+
+- Superscripts (**vintage**) refer to when the estimate was available.
+- Subscripts (**time**) refer to when the observation was recorded.
+
+For example:
+\\( y_1^t \\) is the estimate available at time \\( t \\) of the value of variable \\( y \\) at time **1**.
+
+In general:
+\\( y_j^t \\) represents the estimate of \\( y \\) at time \\( j \\), released in **vintage** \\( t \\).
+
+Revisions are often studied in the form of a **revision triangle**, where:
+
+\\[
+Y =
+\\begin{bmatrix}
+y_1^1 & \cdots & y_1^{t-l} & \cdots & y_1^t  \\\\
+\phantom{a} & \\ddots & \\vdots & \\vdots & \\vdots  \\\\
+\phantom{a} & \phantom{a} & y_{t-l}^{t-l} & \\cdots & y_{t-l}^t  \\\\
+\phantom{a} & \phantom{a} & \phantom{a} & \\ddots & \\vdots \\\\
+\phantom{a} & \phantom{a} & \phantom{a} & \phantom{a} & y_t^t  \\\\
+\\end{bmatrix}
+\\]
+
+where **each row** corresponds to a specific time period and **each column** corresponds to a successive release of the data. As we move **rightward**, we see later vintages (**updated data releases**).As we move **downward**, we observe later time periods.
+
+---
+
+# 🔗 **Extracting revisions with reviser**
+
+Now that we understand **why revisions occur**, the next step is to **quantify and analyze them**. In economic statistics, **real-time data** consists of **multiple vintages** of observations, where each vintage represents a **successive release** of the data. These vintages are stored in a **revision triangle**, also known as a **real-time data matrix**, where:
+
+- **Rows** represent the time periods of the original observations.
+- **Columns** represent successive **vintages** (or releases) of the data.
+
+## 📊 **The `get_revisions()` function**
+
+Once the data under scrutiny is formatted along the lines illustrated in the [introduction to reviser](reviser.html), i.e., in long tidy format the data tibble consists of:
+
+- `time`, the time period
+- `pub_date` and/or `release`, the publication date or release number
+- `value`, the reported value.
+- `id`, an optional column to distinguish between different series
+
+then we can extract the revisions inherent in our time series vintages with the function `get_revisions()`. The function allows users to compute revisions by comparing different vintages of a time series dataset. It supports three primary methods:
+
+- *Fixed Reference Date* (`ref_date`): Computes revisions relative to a fixed publication date.
+
+- *Nth Release* (`nth_release`): Compares revisions to the nth release of a data point.
+
+- *Interval Lag* (`interval`): Measures changes between vintages published a fixed number of periods apart.
+
+## 🚀 Example Usage
+
+In the next section, we explore a practical application and visualization techniques for revision analysis.
+
+```{r example}
 library(reviser)
 ```
