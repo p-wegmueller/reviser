@@ -59,7 +59,7 @@ summary(efficient)
 ```
 
 
-```{r}
+```{r, eval=FALSE}
 nowcast <- kk_nowcast(efficient$data, e=efficient$e)
 
 # First release
