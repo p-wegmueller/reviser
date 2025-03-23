@@ -90,6 +90,9 @@ gdp <- dplyr::bind_rows(
   dplyr::filter(
     pub_date >= vintage_start & pub_date <= vintage_end,
     time >= period_start & time <= period_end
+  ) %>%
+  dplyr::mutate(
+    time = as.Date(time)
   )
 
 usethis::use_data(gdp, overwrite = TRUE)

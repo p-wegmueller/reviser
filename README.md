@@ -33,7 +33,10 @@ devtools::install_github("p-wegmueller/reviser")
 library(reviser)
 suppressMessages(library(dplyr))
 
-gdp <- gdp_us %>% tsbox::ts_pc() %>% tsbox::ts_span(start = "1980-01-01")
+gdp <- gdp %>% 
+  filter(id == "US") %>%
+  tsbox::ts_pc() %>% 
+  tsbox::ts_span(start = "1980-01-01")
 
 gdp_wide <- vintages_wide(gdp)
 
@@ -65,18 +68,18 @@ summary <- get_revision_analysis(df, final_release)
 
 ``` r
 print(summary)
-#> # A tibble: 7 × 10
-#>   release       N `Bias (mean)` `Bias (p-value)` Minimum Maximum `Std. Dev.`
-#>   <chr>     <dbl>         <dbl>            <dbl>   <dbl>   <dbl>       <dbl>
-#> 1 release_0   163       0.00983            0.762  -1.34     1.60       0.414
-#> 2 release_1   163      -0.0204             0.477  -0.981    1.13       0.365
-#> 3 release_2   163      -0.0223             0.427  -0.981    1.13       0.357
-#> 4 release_3   163      -0.0158             0.532  -0.932    1.09       0.323
-#> 5 release_4   163      -0.0121             0.617  -0.932    1.05       0.307
-#> 6 release_5   163      -0.0115             0.600  -0.930    1.05       0.279
-#> 7 release_6   163      -0.0216             0.279  -0.603    1.05       0.254
-#> # ℹ 3 more variables: `Noise/Signal` <dbl>, Correlation <dbl>,
-#> #   `Correlation (p-value)` <dbl>
+#> # A tibble: 7 × 12
+#>   id    release       N `Bias (mean)` `Bias (p-value)` Minimum Maximum    MAR
+#>   <chr> <chr>     <dbl>         <dbl>            <dbl>   <dbl>   <dbl>  <dbl>
+#> 1 US    release_0   154       -0.0296          0.162    -0.844   1.01  0.188 
+#> 2 US    release_1   154       -0.0304          0.133    -0.801   0.706 0.186 
+#> 3 US    release_2   154       -0.0287          0.161    -0.930   0.706 0.185 
+#> 4 US    release_3   154       -0.0259          0.118    -0.930   0.662 0.111 
+#> 5 US    release_4   154       -0.0290          0.0654   -0.930   0.662 0.103 
+#> 6 US    release_5   154       -0.0363          0.0101   -0.930   0.468 0.0919
+#> 7 US    release_6   154       -0.0336          0.00369  -0.574   0.359 0.0735
+#> # ℹ 4 more variables: `Std. Dev.` <dbl>, `Noise/Signal` <dbl>,
+#> #   Correlation <dbl>, `Correlation (p-value)` <dbl>
 ```
 
 ``` r
@@ -92,19 +95,19 @@ summary(efficient_release)
 #> 
 #> Residuals:
 #>      Min       1Q   Median       3Q      Max 
-#> -1.44976 -0.24845  0.06358  0.23515  0.90387 
+#> -0.82139 -0.12266  0.04048  0.13457  1.00888 
 #> 
 #> Coefficients:
-#>             Estimate Std. Error t value Pr(>|t|)    
-#> (Intercept)  0.04755    0.03551   1.339    0.182    
-#> release_0    0.93135    0.02827  32.943   <2e-16 ***
+#>              Estimate Std. Error t value Pr(>|t|)    
+#> (Intercept) -0.005314   0.029173  -0.182    0.856    
+#> release_0    0.963024   0.030626  31.445   <2e-16 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
-#> Residual standard error: 0.4077 on 161 degrees of freedom
+#> Residual standard error: 0.2617 on 152 degrees of freedom
 #>   (16 observations deleted due to missingness)
-#> Multiple R-squared:  0.8708, Adjusted R-squared:   0.87 
-#> F-statistic:  1085 on 1 and 161 DF,  p-value: < 2.2e-16
+#> Multiple R-squared:  0.8668, Adjusted R-squared:  0.8659 
+#> F-statistic: 988.8 on 1 and 152 DF,  p-value: < 2.2e-16
 #> 
 #> 
 #> Test summary: 
@@ -120,8 +123,8 @@ summary(efficient_release)
 #> Note: Coefficient covariance matrix supplied.
 #> 
 #>   Res.Df Df      F  Pr(>F)  
-#> 1    163                    
-#> 2    161  2 2.8555 0.06045 .
+#> 1    154                    
+#> 2    152  2 2.4805 0.08708 .
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
