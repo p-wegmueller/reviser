@@ -39,11 +39,12 @@ While wide format is practical for inspection, data manipulation is often easier
 - `value`, the reported value.
 - `id`, an optional column to distinguish between different series
 
-For illustration, the package provides two datasets in **long format**, `gdp_us` and `gdp_uk`. Below, we examine GDP growth rates for the US and UK during the 2007–2009 financial crisis.
+For illustration, the package provides a dataset in **long format**, `gdp`. Below, we examine GDP growth rates for the US and Euro Area during the 2007–2009 financial crisis.
 ```{r}
 # Example long-format US GDP data
-data("gdp_us")
-gdp_us_short <- gdp_us %>%
+data("gdp")
+gdp_us_short <- gdp %>% 
+  dplyr::filter(id == "US") %>%
   ts_pc() %>%
   filter(
     pub_date >= as.Date("2007-01-01"),
@@ -53,8 +54,8 @@ gdp_us_short <- gdp_us %>%
   )
 
 # Example long-format UK GDP data
-data("gdp_uk")
-gdp_uk_short <- gdp_uk %>%
+gdp_ea_short <- gdp %>%
+  dplyr::filter(id == "EA") %>%
   ts_pc() %>%
   filter(
     pub_date >= as.Date("2007-01-01"),
@@ -63,7 +64,7 @@ gdp_uk_short <- gdp_uk %>%
     time < as.Date("2009-01-01")
   )
 
-head(gdp_uk_short)
+head(gdp_ea_short)
 ```
 
 ## Convert Long to Wide Format
@@ -74,8 +75,8 @@ To transform a dataset from **long format** to **wide format**, use `vintages_wi
 
 ```{r}
 # Convert wide-format data to long format
-wide_uk_short <- vintages_wide(gdp_uk_short)
-head(wide_uk_short)
+wide_ea_short <- vintages_wide(gdp_ea_short)
+head(wide_ea_short)
 ```
 
 ## Convert Wide to Long Format
@@ -86,8 +87,8 @@ To revert to **long format**, use `vintages_long()`. The function expects column
 
 ```{r}
 # Convert back to long format
-long_uk_short <- vintages_long(wide_uk_short)
-head(long_uk_short)
+long_ea_short <- vintages_long(wide_ea_short)
+head(long_ea_short)
 ```
 
 ## Handling Multiple Series with `id`
@@ -98,7 +99,7 @@ If an `id` column is present, `vintages_wide()` returns a **list** with one data
 
 ```{r}
 gdp_short <- bind_rows(
-  gdp_uk_short %>% mutate(id = "UK"),
+  gdp_ea_short %>% mutate(id = "UK"),
   gdp_us_short %>% mutate(id = "US")
 )
 gdp_wide_short <- vintages_wide(gdp_short)
@@ -132,11 +133,12 @@ gdp_final <- get_nth_release(gdp_short, n = "latest")
 vintages_wide(gdp_final)
 ```
 
-Some agencies **fix** their data after a certain period (e.g., Germany finalizes GDP data in August four years after the intial release, while the UK stops revisions after 36 months). The function `get_fixed_release()` extracts these fixed releases.
+Some agencies **fix** their data after a certain period (e.g., Germany finalizes GDP data in August four years after the initial release, while the UK stops revisions after 36 months). The function `get_fixed_release()` extracts these fixed releases.
 
 ```{r}
 # Get the release three years after the initial release
-gdp_uk_longer <- gdp_uk %>% 
+gdp_ea_longer <- gdp %>% 
+  dplyr::filter(id == "EA") %>%
   ts_pc() %>% 
   filter(
     time >= as.Date("2000-01-01"),
@@ -144,14 +146,14 @@ gdp_uk_longer <- gdp_uk %>%
     pub_date >= as.Date("2000-01-01"),
     pub_date <= as.Date("2006-01-01")
     )
-gdp_releases <- get_nth_release(gdp_uk_longer, n = 12)
+gdp_releases <- get_nth_release(gdp_ea_longer, n = 12)
 gdp_releases
 
 # Get the release from September four years after the initial release
 gdp_releases <- get_fixed_release(
-  gdp_uk_longer, 
+  gdp_ea_longer, 
   years = 4, 
-  month = "September"
+  month = "October"
   )
 gdp_releases
 ```

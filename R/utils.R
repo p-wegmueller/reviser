@@ -15,15 +15,15 @@
 #'
 #' @examples
 #' # Example wide-format data
-#' long_data <- reviser::gdp %>% dplyr::filter(id=="US")
+#' long_data <- dplyr::filter(reviser::gdp, id=="US")
 #'
 #' # Convert to wide format
 #' wide_data <- vintages_wide(long_data)
 #'
 #' # Example list of wide-format data frames
 #' wide_list <- list(
-#'   A = wide_data,
-#'   B = wide_data
+#'   A = wide_data$US,
+#'   B = wide_data$US
 #' )
 #'
 #' # Convert list to long format
@@ -120,15 +120,15 @@ vintages_long <- function(df, names_to = "pub_date", keep_na = FALSE) {
 #'
 #' @examples
 #' # Example wide-format data
-#' long_data <- reviser::gdp %>% dplyr::filter(id=="US")
+#' long_data <- dplyr::filter(reviser::gdp, id=="US")
 #'
 #' # Convert to wide format
 #' wide_data <- vintages_wide(long_data)
 #'
 #' # Example list of wide-format data frames
 #' wide_list <- list(
-#'   A = wide_data,
-#'   B = wide_data
+#'   A = wide_data$US,
+#'   B = wide_data$US
 #' )
 #'
 #' # Convert list to long format
