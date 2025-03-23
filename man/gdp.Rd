@@ -13,8 +13,8 @@ A collection of real-time datasets.
 \details{
 \itemize{
 \item \link{gdp}: Quarterly Vintages (Billions of real dollars, seasonally adjusted)
-\item Timeframe: Q1 2003 - Q4 2022
-\item Real-Time Vintages: January 1980 - October 2024
+\item Timeframe: Q1 1980 - Q4 2022
+\item Real-Time Vintages: Q1 2003 - Q4 2022
 \item Frequency: Quarterly
 \item Format: A tibble with quarterly observations and 3 variables:
 \itemize{
@@ -29,22 +29,23 @@ A collection of real-time datasets.
 
 \itemize{
 \item All the data is taken from the realtime database of Indergand and Leist (2014).
-\item \link{CHE}:
+\item Countries:
+\item CHE:
 \itemize{
 \item Switzerland
 \item Source: \href{https://www.seco.admin.ch/seco/de/home/wirtschaftslage---wirtschaftspolitik/Wirtschaftslage/bip-quartalsschaetzungen-/daten.html}{SECO}
 }
-\item \link{US}:
+\item US:
 \itemize{
 \item United States
 \item Sources: FRED, OECD
 }
-\item \link{EA}:
+\item EA:
 \itemize{
 \item Euro Area
 \item Sources: Eurostat, OECD
 }
-\item \link{JP}:
+\item JP:
 \itemize{
 \item Japan
 \item Sources: Cabinet Office (Japan), OECD

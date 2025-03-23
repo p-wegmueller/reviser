@@ -25,7 +25,7 @@ from a given month or quarter a specified  number of years after the
 initial release.
 }
 \examples{
-df <- reviser::gdp_us
+df <- dplyr::filter(reviser::gdp, id=="US")
 dta <- get_fixed_release(df, month = "July", years = 3)
 dta <- get_fixed_release(df, month = 7, years = 3)
 dta <- get_fixed_release(df, quarter = 3, years = 3)

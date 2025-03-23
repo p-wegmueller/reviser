@@ -14,19 +14,20 @@
 #'
 #' @section Sources:
 #' * All the data is taken from the realtime database of Indergand and Leist (2014).
-#' * [CHE]:
+#' * Countries:
+#' * CHE:
 #'   * Switzerland
 #'   * Source: [SECO](https://www.seco.admin.ch/seco/de/home/wirtschaftslage---wirtschaftspolitik/Wirtschaftslage/bip-quartalsschaetzungen-/daten.html)
 #'
-#' * [US]:
+#' * US:
 #'   * United States
 #'   * Sources: FRED, OECD
 #'
-#' * [EA]:
+#' * EA:
 #'   * Euro Area
 #'   * Sources: Eurostat, OECD
 #'
-#' * [JP]:
+#' * JP:
 #'   * Japan
 #'   * Sources: Cabinet Office (Japan), OECD
 #'

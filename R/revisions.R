@@ -31,7 +31,7 @@
 #'
 #' @examples
 #' # Example data
-#' df <- reviser::gdp_us
+#' df <- dplyr::filter(reviser::gdp , id=="US")
 #'
 #' # Calculate revisions using an interval of 1
 #' revisions_interval <- get_revisions(df, interval = 1)
@@ -54,16 +54,16 @@ get_revisions <- function(
     list(interval, nth_release, ref_date),
     function(x) !is.null(x)
   ))
-  
+
   # Default interval is 1
   if (specified_count == 0L) {
     interval <- 1
   }
-  
+
   if (specified_count > 1L) {
     rlang::abort("Specify only one of 'ref_date', 'nth_release' or 'interval'.")
   }
-  
+
   if (!is.null(ref_date)) {
     ref_date <- tryCatch(as.Date(ref_date), error = function(e) e)
     if (!c("Date") %in% class(ref_date)) {
@@ -84,19 +84,19 @@ get_revisions <- function(
       )
     }
   }
-  
+
   check <- vintages_check(df)
   if (check == "wide") {
     df <- vintages_long(df)
   }
   df <- vintages_assign_class(df)
-  
+
   # Check if id column present
   if ("id" %in% colnames(df)) {
     # Ensure data is sorted by pub_date and time
     df <- df %>%
       dplyr::arrange(id, pub_date, time)
-    
+
     if (!is.null(ref_date)) {
       # Calculate revisions against the specified reference date
       revisions <- df %>%
@@ -139,7 +139,7 @@ get_revisions <- function(
     # Ensure data is sorted by pub_date and time
     df <- df %>%
       dplyr::arrange(pub_date, time)
-    
+
     if (!is.null(ref_date)) {
       # Calculate revisions against the specified reference date
       revisions <- df %>%
@@ -175,7 +175,7 @@ get_revisions <- function(
         dplyr::select(pub_date, time, value)
     }
   }
-  
+
   revisions <- vintages_assign_class(revisions)
   return(revisions)
 }
@@ -219,9 +219,9 @@ get_revisions <- function(
 #'
 #' @examples
 #' # Example data
-#' df <- get_nth_release(tsbox::ts_pc(reviser::gdp_us), n = 0:3)
+#' df <- get_nth_release(tsbox::ts_pc(dplyr::filter(reviser::gdp, id=="US")), n = 0:3)
 #'
-#' final_release <- get_nth_release(tsbox::ts_pc(reviser::gdp_us), n = 10)
+#' final_release <- get_nth_release(tsbox::ts_pc(dplyr::filter(reviser::gdp, id=="US")), n = 10)
 #'
 #' # Identify the first efficient release
 #' result <- get_first_efficient_release(df, final_release, significance = 0.05)
@@ -455,9 +455,9 @@ get_first_efficient_release <- function(
 #'
 #' @examples
 #' # Example usage
-#' df <- get_nth_release(tsbox::ts_pc(reviser::gdp_us), n = 1:4)
+#' df <- get_nth_release(tsbox::ts_pc(dplyr::filter(reviser::gdp , id=="US")), n = 1:4)
 #'
-#' final_release <- get_nth_release(tsbox::ts_pc(reviser::gdp_us), n = 10)
+#' final_release <- get_nth_release(tsbox::ts_pc(dplyr::filter(reviser::gdp, id=="US")), n = 10)
 #'
 #' # Identify the first efficient release
 #' result <- get_first_efficient_release(df, final_release, significance = 0.05)
@@ -631,9 +631,9 @@ summary.lst_efficient <- function(object, ...) {
 #'
 #' @examples
 #' # Example usage:
-#' df <- get_nth_release(reviser::gdp_us, n = 0:3)
+#' df <- get_nth_release( dplyr::filter(reviser::gdp, id=="US"), n = 0:3)
 #'
-#' final_release <- get_nth_release(reviser::gdp_us, n = "latest")
+#' final_release <- get_nth_release(dplyr::filter(reviser::gdp, id=="US"), n = "latest")
 #'
 #' results <- get_revision_analysis(df, final_release)
 #' print(results)
@@ -865,33 +865,36 @@ get_revision_analysis <- function(
       vcov = hac_se
     )
     news_p_value <- test[2, 'Pr(>F)']
-    
+
     # Computes the fraction of sign changes
-    correct_sign <- data %>% 
-      mutate(early_sign = sign(value),
-             late_sign = sign(final_value)) %>%
+    correct_sign <- data %>%
+      mutate(early_sign = sign(value), late_sign = sign(final_value)) %>%
       summarise(
         fraction_sign_correct = sum((early_sign - late_sign) == 0) / n(),
         fraction_sign_wrong = 1 - fraction_sign_correct,
         n = n()
       ) %>%
-      ungroup() %>% 
+      ungroup() %>%
       pull(fraction_sign_correct)
-    
+
     # Computes the fraction of changes in the sign of the change in the growth rate
-    correct_change <- data %>% 
-      mutate(diff_value = value - lag(value, 1), 
-             diff_final_value = final_value - lag(final_value, 1)) %>% 
-      mutate(early_sign = sign(diff_value),
-             late_sign = sign(diff_final_value)) %>%
+    correct_change <- data %>%
+      mutate(
+        diff_value = value - lag(value, 1),
+        diff_final_value = final_value - lag(final_value, 1)
+      ) %>%
+      mutate(
+        early_sign = sign(diff_value),
+        late_sign = sign(diff_final_value)
+      ) %>%
       summarise(
-        fraction_sign_correct = sum((early_sign - late_sign) == 0, na.rm = T) / n(),
+        fraction_sign_correct = sum((early_sign - late_sign) == 0, na.rm = T) /
+          n(),
         fraction_sign_wrong = 1 - fraction_sign_correct,
         n = n()
       ) %>%
-      ungroup() %>% 
+      ungroup() %>%
       pull(fraction_sign_correct)
-    
 
     tibble::tibble(
       Statistic = c(
@@ -923,8 +926,8 @@ get_revision_analysis <- function(
         "Seasonality (Ljung-Box p-value)",
         "Seasonality (Friedman p-value)",
         "News test (p-value)",
-        "Noise test (p-value)", 
-        "Fraction of correct sign", 
+        "Noise test (p-value)",
+        "Fraction of correct sign",
         "Fraction of correct growth rate change"
       ),
       Value = c(
@@ -1166,7 +1169,7 @@ qs_test <- function(series, lags = c(12, 24)) {
 #'
 #' @examples
 #' # Example data
-#' df <- reviser::gdp_us
+#' df <- dplyr::filter(reviser::gdp, id=="US")
 #'
 #' # Get the first release (n = 0)
 #' first_release <- get_nth_release(df, n = 0)
@@ -1265,7 +1268,7 @@ get_nth_release <- function(df, n = 0, diagonal = FALSE) {
 #'
 #' @examples
 #' # Example data
-#' df <- reviser::gdp_us
+#' df <- dplyr::filter(reviser::gdp, id=="US")
 #'
 #' # Get the first release for each time period
 #' first_release <- get_first_release(df)
@@ -1328,7 +1331,7 @@ get_first_release <- function(df, diagonal = FALSE) {
 #'
 #' @examples
 #' # Example data
-#' df <- reviser::gdp_us
+#' df <- dplyr::filter(reviser::gdp, id=="US")
 #'
 #' # Get the latest release for each time period
 #' latest_release <- get_latest_release(df)
@@ -1380,7 +1383,7 @@ get_latest_release <- function(df) {
 #'
 #' @return A filtered data frame containing values matching the specified criteria.
 #' @examples
-#' df <- reviser::gdp_us
+#' df <- dplyr::filter(reviser::gdp, id=="US")
 #' dta <- get_fixed_release(df, month = "July", years = 3)
 #' dta <- get_fixed_release(df, month = 7, years = 3)
 #' dta <- get_fixed_release(df, quarter = 3, years = 3)
@@ -1471,7 +1474,7 @@ get_fixed_release <- function(df, years, month = NULL, quarter = NULL) {
 #'
 #' @examples
 #' # Example data
-#' df <- reviser::gdp_us
+#' df <- dplyr::filter(reviser::gdp, id=="US")
 #'
 #' # Get releases for a specific date
 #' date <- as.Date("2020-04-01")
@@ -1524,7 +1527,7 @@ get_releases_by_date <- function(df, date) {
 #'
 #' @examples
 #' # Example data
-#' df <- reviser::gdp_us
+#' df <- dplyr::filter(reviser::gdp, id=="US")
 #'
 #' # Calculate days to release
 #' df_with_days <- get_days_to_release(df)

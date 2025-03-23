@@ -25,7 +25,7 @@ is a list of data frames. The long format contains one row per combination of \c
 }
 \examples{
 # Example wide-format data
-long_data <- reviser::gdp_us
+long_data <- reviser::gdp \%>\% dplyr::filter(id=="US")
 
 # Convert to wide format
 wide_data <- vintages_wide(long_data)

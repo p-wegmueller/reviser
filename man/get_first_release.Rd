@@ -27,7 +27,7 @@ vintages exist are not returned.
 }
 \examples{
 # Example data
-df <- reviser::gdp_us
+df <- dplyr::filter(reviser::gdp, id=="US")
 
 # Get the first release for each time period
 first_release <- get_first_release(df)

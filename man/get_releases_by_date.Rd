@@ -27,7 +27,7 @@ If the dataset is in wide format, it will first be transformed into long format 
 }
 \examples{
 # Example data
-df <- reviser::gdp_us
+df <- dplyr::filter(reviser::gdp, id=="US")
 
 # Get releases for a specific date
 date <- as.Date("2020-04-01")

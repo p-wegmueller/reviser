@@ -15,7 +15,7 @@
 #'
 #' @examples
 #' # Example wide-format data
-#' long_data <- reviser::gdp_us
+#' long_data <- reviser::gdp %>% dplyr::filter(id=="US")
 #'
 #' # Convert to wide format
 #' wide_data <- vintages_wide(long_data)
@@ -120,7 +120,7 @@ vintages_long <- function(df, names_to = "pub_date", keep_na = FALSE) {
 #'
 #' @examples
 #' # Example wide-format data
-#' long_data <- reviser::gdp_us
+#' long_data <- reviser::gdp %>% dplyr::filter(id=="US")
 #'
 #' # Convert to wide format
 #' wide_data <- vintages_wide(long_data)
@@ -486,7 +486,7 @@ standardize_val_col <- function(df) {
 #'   - `value`: The reported value for the given observation and vintage.
 #'
 #' @examples
-#' 
+#'
 #' # Fetch real-time CPI and PCE data from ALFRED
 #' data <- fetch_alfred_data(
 #'   series_id = c("CPIAUCSL", "PCEPI"),
@@ -496,19 +496,20 @@ standardize_val_col <- function(df) {
 #'   realtime_start = "2000-01-01",
 #'   realtime_end = "2024-01-31"
 #' )
-#' 
+#'
 #' head(data)
 #'
 #' @import alfred dplyr tidyr purrr
 #' @export
-fetch_alfred_data <- function(series_id, 
-                              series_name = NULL, 
-                              observation_start = "1995-01-01", 
-                              observation_end = "2024-12-01", 
-                              realtime_start = "2015-01-01", 
-                              realtime_end = "2022-01-01", 
-                              api_key = NULL) {
-  
+fetch_alfred_data <- function(
+  series_id,
+  series_name = NULL,
+  observation_start = "1995-01-01",
+  observation_end = "2024-12-01",
+  realtime_start = "2015-01-01",
+  realtime_end = "2022-01-01",
+  api_key = NULL
+) {
   # Load required packages
   if (!requireNamespace("alfred", quietly = TRUE)) {
     stop("Package 'alfred' is required but not installed.")
@@ -522,22 +523,24 @@ fetch_alfred_data <- function(series_id,
   if (!requireNamespace("purrr", quietly = TRUE)) {
     stop("Package 'purrr' is required but not installed.")
   }
-  
+
   # Ensure series_id is a character vector
   if (!is.character(series_id)) {
-    stop("'series_id' must be a character vector of one or more ALFRED series IDs.")
+    stop(
+      "'series_id' must be a character vector of one or more ALFRED series IDs."
+    )
   }
-  
+
   # Default series_name to series_id if NULL
   if (is.null(series_name)) {
     series_name <- series_id
   }
-  
+
   # Ensure series_name is the same length as series_id
   if (length(series_name) != length(series_id)) {
     stop("'series_name' must be the same length as 'series_id'.")
   }
-  
+
   # Function to fetch and format data for a single series
   fetch_single_series <- function(id, name) {
     data <- alfred::get_alfred_series(
@@ -548,20 +551,22 @@ fetch_alfred_data <- function(series_id,
       realtime_end = realtime_end,
       api_key = api_key
     )
-    
+
     # Rename and transform data
     data <- data %>%
       dplyr::rename(time = date, pub_date = realtime_period) %>%
-      tidyr::pivot_longer(-c(time, pub_date), 
-                          names_to = "id", 
-                          values_to = "value") %>%
+      tidyr::pivot_longer(
+        -c(time, pub_date),
+        names_to = "id",
+        values_to = "value"
+      ) %>%
       dplyr::mutate(id = name)
-    
+
     return(data)
   }
-  
+
   # Fetch data for all series and combine results
   all_data <- purrr::map2_dfr(series_id, series_name, fetch_single_series)
-  
+
   return(all_data)
 }
