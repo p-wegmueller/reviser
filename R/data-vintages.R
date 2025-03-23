@@ -3,8 +3,8 @@
 #' A collection of real-time datasets.
 #'
 #' * [gdp]: Quarterly Vintages (Billions of real dollars, seasonally adjusted)
-#' * Timeframe: Q1 2003 - Q4 2022
-#' * Real-Time Vintages: January 1980 - October 2024
+#' * Timeframe: Q1 1980 - Q4 2022
+#' * Real-Time Vintages: Q1 2003 - Q4 2022
 #' * Frequency: Quarterly
 #' * Format: A tibble with quarterly observations and 3 variables:
 #'     * `time`: Date of the observation.
