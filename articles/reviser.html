@@ -139,7 +139,7 @@ for the US and Euro Area during the 2007–2009 financial crisis.</p>
 <span>    <span class="va">time</span> <span class="op">&lt;</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2009-01-01"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Example long-format UK GDP data</span></span>
+<span><span class="co"># Example long-format EA GDP data</span></span>
 <span><span class="va">gdp_ea_short</span> <span class="op">&lt;-</span> <span class="va">gdp</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">id</span> <span class="op">==</span> <span class="st">"EA"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://docs.ropensci.org/tsbox/reference/ts_pc.html" class="external-link">ts_pc</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -220,12 +220,12 @@ returns a <strong>list</strong> with one dataset per unique
 <code>id</code> column to distinguish between series.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gdp_short</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span></span>
-<span>  <span class="va">gdp_ea_short</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"UK"</span><span class="op">)</span>,</span>
+<span>  <span class="va">gdp_ea_short</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"EA"</span><span class="op">)</span>,</span>
 <span>  <span class="va">gdp_us_short</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"US"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">gdp_wide_short</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/vintages_wide.html">vintages_wide</a></span><span class="op">(</span><span class="va">gdp_short</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">gdp_wide_short</span><span class="op">)</span></span>
-<span><span class="co">#&gt; $UK</span></span>
+<span><span class="co">#&gt; $EA</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 7 × 8</span></span></span>
 <span><span class="co">#&gt;   time       `2007-04-01` `2007-07-01` `2007-10-01` `2008-01-01` `2008-04-01`</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
@@ -266,7 +266,7 @@ release corresponds to <code>n = 0</code>.</p>
 <span><span class="va">gdp_releases</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_nth_release.html">get_nth_release</a></span><span class="op">(</span><span class="va">gdp_short</span>, n <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/vintages_wide.html">vintages_wide</a></span><span class="op">(</span><span class="va">gdp_releases</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Ignoring columns: release</span></span>
-<span><span class="co">#&gt; $UK</span></span>
+<span><span class="co">#&gt; $EA</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 7 × 8</span></span></span>
 <span><span class="co">#&gt;   time       `2007-04-01` `2007-07-01` `2007-10-01` `2008-01-01` `2008-04-01`</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
@@ -297,7 +297,7 @@ release corresponds to <code>n = 0</code>.</p>
 <span><span class="va">gdp_releases</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_nth_release.html">get_nth_release</a></span><span class="op">(</span><span class="va">gdp_short</span>, n <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/vintages_wide.html">vintages_wide</a></span><span class="op">(</span><span class="va">gdp_releases</span>, names_from <span class="op">=</span> <span class="st">"release"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Ignoring columns: pub_date</span></span>
-<span><span class="co">#&gt; $UK</span></span>
+<span><span class="co">#&gt; $EA</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 7 × 3</span></span></span>
 <span><span class="co">#&gt;   time       release_0 release_1</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
@@ -331,7 +331,7 @@ recent vintage.</p>
 <span><span class="va">gdp_final</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_nth_release.html">get_nth_release</a></span><span class="op">(</span><span class="va">gdp_short</span>, n <span class="op">=</span> <span class="st">"latest"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/vintages_wide.html">vintages_wide</a></span><span class="op">(</span><span class="va">gdp_final</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Ignoring columns: release</span></span>
-<span><span class="co">#&gt; $UK</span></span>
+<span><span class="co">#&gt; $EA</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 7 × 2</span></span></span>
 <span><span class="co">#&gt;   time       `2008-10-01`</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
@@ -356,8 +356,8 @@ recent vintage.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> 2008-07-01      -<span style="color: #BB0000;">0.129</span></span></span></code></pre></div>
 <p>Some agencies <strong>fix</strong> their data after a certain period
 (e.g., Germany finalizes GDP data in August four years after the initial
-release, while the UK stops revisions after 36 months). The function
-<code><a href="../reference/get_fixed_release.html">get_fixed_release()</a></code> extracts these fixed releases.</p>
+release). The function <code><a href="../reference/get_fixed_release.html">get_fixed_release()</a></code> extracts these
+fixed releases.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Get the release three years after the initial release</span></span>
 <span><span class="va">gdp_ea_longer</span> <span class="op">&lt;-</span> <span class="va">gdp</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
