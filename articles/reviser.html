@@ -416,12 +416,16 @@ for visualizing real-time vintages. The primary function for this is
 including line plots, scatter plots, bar plots, and boxplots. It returns
 a <code>ggplot2</code> object, allowing for further customization with
 the <code>ggplot2</code> package.</p>
-<p>To use <code><a href="../reference/plot_vintages.html">plot_vintages()</a></code>, provide a data frame containing:
-- A <code>time</code> column (representing the observation period), - A
-<code>value</code> column (containing the reported data), - A column
-indicating the publication date (<code>pub_date</code>) or release
-number (<code>release</code>), which determines the dimension along
-which the data is visualized.</p>
+<p>To use <code><a href="../reference/plot_vintages.html">plot_vintages()</a></code>, provide a data frame
+containing:</p>
+<ul>
+<li>A <code>time</code> column (representing the observation
+period),</li>
+<li>A <code>value</code> column (containing the reported data),</li>
+<li>A column indicating the publication date (<code>pub_date</code>) or
+release number (<code>release</code>), which determines the dimension
+along which the data is visualized.</li>
+</ul>
 <p>For example, to visualize how GDP estimates evolved over time, you
 can create a line plot comparing different vintages:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
