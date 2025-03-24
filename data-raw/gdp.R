@@ -1,13 +1,13 @@
 ## code to prepare `gdp` dataset goes here
 
-vintage_start <- as.Date("2003-01-01")
-vintage_end <- as.Date("2022-10-01")
+vintage_start <- as.Date("2002-10-01")
+vintage_end <- as.Date("2024-10-01")
 period_start <- as.Date("1980-01-01")
-period_end <- as.Date("2022-10-01")
+period_end <- as.Date("2024-10-01")
 
 gdp_ch <- readxl::read_excel(
   "inst/exdata/realtime_database.xlsx",
-  sheet = 2,
+  sheet = "gdp",
   skip = 10
 ) %>%
   tidyr::pivot_longer(

@@ -13,8 +13,8 @@ A collection of real-time datasets.
 \details{
 \itemize{
 \item \link{gdp}: Quarterly Vintages (Billions of real dollars, seasonally adjusted)
-\item Timeframe: Q1 1980 - Q4 2022
-\item Real-Time Vintages: Q1 2003 - Q4 2022
+\item Timeframe: Q1 1980 - Q4 2024
+\item Real-Time Vintages: Q4 2002 - Q4 2024
 \item Frequency: Quarterly
 \item Format: A tibble with quarterly observations and 3 variables:
 \itemize{
@@ -29,7 +29,7 @@ A collection of real-time datasets.
 
 \itemize{
 \item All the data is taken from the realtime database of Indergand and Leist (2014).
-\item Countries:
+\strong{Countries}:
 \item CHE:
 \itemize{
 \item Switzerland
@@ -58,6 +58,6 @@ A collection of real-time datasets.
 data(gdp)
 }
 \references{
-Indergand, R., Leist, S. A Real-Time Data Set for Switzerland. Swiss J Economics Statistics 150, 331–352 (2014). https://doi.org/10.1007/BF03399410
+Indergand, R., Leist, S. A Real-Time Data Set for Switzerland. Swiss J Economics Statistics 150, 331–352 (2014). \url{https://doi.org/10.1007/BF03399410}
 }
 \keyword{datasets}
