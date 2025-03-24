@@ -680,7 +680,7 @@ get_revision_analysis <- function(
 
   # Check that id is present in both data.frames or neither
   if ("id" %in% colnames(df) & "id" %in% colnames(final_release)) {
-    if (!identical(unique(df$id), unique(final_release$id))) {
+    if (!identical(sort(unique(df$id)), sort(unique(final_release$id)))) {
       rlang::abort("The same 'id' must be present in 'df' and 'final_release'.")
     }
   } else if ("id" %in% colnames(df) | "id" %in% colnames(final_release)) {
@@ -858,9 +858,9 @@ get_revision_analysis <- function(
       vcov = hac_se
     )
     noise_p_value <- test[2, 'Pr(>F)']
-    noise_intercept <- coef(noise_test)[1]
+    noise_intercept <- stats::coef(noise_test)[1]
     noise_intercept_stderr <- sqrt(diag(hac_se))[1]
-    noise_coeff <- coef(noise_test)[2]
+    noise_coeff <- stats::coef(noise_test)[2]
     noise_coeff_stderr <- sqrt(diag(hac_se))[2]
 
     # News test
@@ -872,11 +872,11 @@ get_revision_analysis <- function(
       vcov = hac_se
     )
     news_p_value <- test[2, 'Pr(>F)']
-    news_intercept <- coef(news_test)[1]
+    news_intercept <- stats::coef(news_test)[1]
     news_intercept_stderr <- sqrt(diag(hac_se))[1]
-    news_coeff <- coef(news_test)[2]
+    news_coeff <- stats::coef(news_test)[2]
     news_coeff_stderr <- sqrt(diag(hac_se))[2]
-    
+
     # Computes the fraction of sign changes
     correct_sign <- data %>%
       mutate(early_sign = sign(value), late_sign = sign(final_value)) %>%
@@ -924,7 +924,7 @@ get_revision_analysis <- function(
         "Efficiency (slope p-value)",
         "Minimum",
         "Maximum",
-        "10Q", 
+        "10Q",
         "Median",
         "90Q",
         "MAR",
