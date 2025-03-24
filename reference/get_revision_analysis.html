@@ -134,25 +134,13 @@ the initial and final data releases. The function:</p><ul><li><p>Checks the inpu
 <li><p><strong>Theil's U2</strong>: A measure comparing forecast changes to actual changes.</p></li>
 <li><p><strong>Seasonality (Ljung-Box p-value)</strong>: Tests for seasonality in revisions using the Ljung-Box test for lags matching the data frequency.</p></li>
 <li><p><strong>Seasonality (Friedman p-value)</strong>: Tests for seasonality in revisions using the Friedman test.</p></li>
-<li><p><strong>News test (p-value)</strong>: Tests whether revisions are explained by information in final values.</p></li>
-<li><p><strong>Noise test (p-value)</strong>: Tests whether revisions are uncorrelated with initial values.</p></li>
+<li><p><strong>News test (p-value)</strong>: Tests whether revisions are uncorrelated with initial values.</p></li>
+<li><p><strong>Noise test (p-value)</strong>: Tests whether revisions are explained by information in final values.</p></li>
 </ul></div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Example usage:</span></span></span>
-<span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_nth_release.html">get_nth_release</a></span><span class="op">(</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu">tsbox</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/tsbox/reference/ts_pc.html" class="external-link">ts_pc</a></span><span class="op">(</span><span class="fu">reviser</span><span class="fu">::</span><span class="va"><a href="gdp.html">gdp</a></span>, <span class="va">id</span><span class="op">==</span><span class="st">"US"</span><span class="op">)</span><span class="op">)</span>, n <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in tsbox::ts_pc(reviser::gdp, id == "US"):</span> unused argument (id == "US")</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">final_release</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_nth_release.html">get_nth_release</a></span><span class="op">(</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu">tsbox</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/tsbox/reference/ts_pc.html" class="external-link">ts_pc</a></span><span class="op">(</span><span class="fu">reviser</span><span class="fu">::</span><span class="va"><a href="gdp.html">gdp</a></span>, <span class="va">id</span><span class="op">==</span><span class="st">"US"</span><span class="op">)</span><span class="op">)</span>, n <span class="op">=</span> <span class="st">"latest"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in tsbox::ts_pc(reviser::gdp, id == "US"):</span> unused argument (id == "US")</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu">get_revision_analysis</span><span class="op">(</span><span class="va">df</span>, <span class="va">final_release</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in vintages_check(df):</span> The provided object is not a data.frame or tibble.</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'results' not found</span>
-<span class="r-in"><span></span></span>
-</code></pre></div>
+
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
