@@ -749,6 +749,9 @@ get_revision_analysis <- function(
     mean_abs_revision <- mean(abs(data$revision))
     min_revision <- min(data$revision)
     max_revision <- max(data$revision)
+    q10 <- stats::quantile(data$revision, 0.1)
+    q50 <- stats::median(data$revision)
+    q90 <- stats::quantile(data$revision, 0.9)
     std_dev_revision <- stats::sd(data$revision)
     noise_to_signal <- std_dev_revision / stats::sd(data$final_value)
     correlation <- stats::cor(data$revision, data$value, use = "complete.obs")
@@ -847,25 +850,33 @@ get_revision_analysis <- function(
     }
 
     # Noise test
-    noise_test <- stats::lm(revision ~ value, data = data)
+    noise_test <- stats::lm(revision ~ final_value, data = data)
     hac_se <- sandwich::vcovHAC(noise_test)
     test <- car::linearHypothesis(
       noise_test,
-      c("(Intercept) = 0", "value = 0"),
-      vcov = hac_se
-    )
-    noise_p_value <- test[2, 'Pr(>F)']
-
-    # News test
-    news_test <- stats::lm(revision ~ final_value, data = data)
-    hac_se <- sandwich::vcovHAC(news_test)
-    test <- car::linearHypothesis(
-      news_test,
       c("(Intercept) = 0", "final_value = 0"),
       vcov = hac_se
     )
-    news_p_value <- test[2, 'Pr(>F)']
+    noise_p_value <- test[2, 'Pr(>F)']
+    noise_intercept <- coef(noise_test)[1]
+    noise_intercept_stderr <- sqrt(diag(hac_se))[1]
+    noise_coeff <- coef(noise_test)[2]
+    noise_coeff_stderr <- sqrt(diag(hac_se))[2]
 
+    # News test
+    news_test <- stats::lm(revision ~ value, data = data)
+    hac_se <- sandwich::vcovHAC(news_test)
+    test <- car::linearHypothesis(
+      news_test,
+      c("(Intercept) = 0", "value = 0"),
+      vcov = hac_se
+    )
+    news_p_value <- test[2, 'Pr(>F)']
+    news_intercept <- coef(news_test)[1]
+    news_intercept_stderr <- sqrt(diag(hac_se))[1]
+    news_coeff <- coef(news_test)[2]
+    news_coeff_stderr <- sqrt(diag(hac_se))[2]
+    
     # Computes the fraction of sign changes
     correct_sign <- data %>%
       mutate(early_sign = sign(value), late_sign = sign(final_value)) %>%
@@ -913,6 +924,9 @@ get_revision_analysis <- function(
         "Efficiency (slope p-value)",
         "Minimum",
         "Maximum",
+        "10Q", 
+        "Median",
+        "90Q",
         "MAR",
         "Std. Dev.",
         "Noise/Signal",
@@ -925,7 +939,15 @@ get_revision_analysis <- function(
         "Theil's U2",
         "Seasonality (Ljung-Box p-value)",
         "Seasonality (Friedman p-value)",
+        "News test Intercept",
+        "News test Intercept (std.err)",
+        "News test Coefficient",
+        "News test Coefficient (std.err)",
         "News test (p-value)",
+        "Noise test Intercept",
+        "Noise test Intercept (std.err)",
+        "Noise test Coefficient",
+        "Noise test Coefficient (std.err)",
         "Noise test (p-value)",
         "Fraction of correct sign",
         "Fraction of correct growth rate change"
@@ -946,6 +968,9 @@ get_revision_analysis <- function(
         coef_efficiency_p_value_slope,
         min_revision,
         max_revision,
+        q10,
+        q50,
+        q90,
         mean_abs_revision,
         std_dev_revision,
         noise_to_signal,
@@ -958,7 +983,15 @@ get_revision_analysis <- function(
         theils_u2,
         ljung_box_seasonality_p_value,
         friedman_p_value,
+        news_intercept,
+        news_intercept_stderr,
+        news_coeff,
+        news_coeff_stderr,
         news_p_value,
+        noise_intercept,
+        noise_intercept_stderr,
+        noise_coeff,
+        noise_coeff_stderr,
         noise_p_value,
         correct_sign,
         correct_change
@@ -1073,7 +1106,15 @@ get_revision_analysis <- function(
           grouping_vars
         ),
         "N",
+        "News test Intercept",
+        "News test Intercept (std.err)",
+        "News test Coefficient",
+        "News test Coefficient (std.err)",
         "News test (p-value)",
+        "Noise test Intercept",
+        "Noise test Intercept (std.err)",
+        "Noise test Coefficient",
+        "Noise test Coefficient (std.err)",
         "Noise test (p-value)"
       )
     return(results)
