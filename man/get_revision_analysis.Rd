@@ -101,7 +101,6 @@ df <- get_nth_release(
         reviser::gdp)
             ),
         id=="US"
-      )
      ),
    n = 0:3
  )

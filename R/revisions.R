@@ -638,7 +638,6 @@ summary.lst_efficient <- function(object, ...) {
 #'         reviser::gdp)
 #'             ),
 #'         id=="US"
-#'       )
 #'      ),
 #'    n = 0:3
 #'  )
