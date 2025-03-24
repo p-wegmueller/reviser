@@ -631,9 +631,9 @@ summary.lst_efficient <- function(object, ...) {
 #'
 #' @examples
 #' # Example usage:
-#' df <- get_nth_release( dplyr::filter(reviser::gdp, id=="US"), n = 0:3)
+#' df <- get_nth_release(dplyr::filter(tsbox::ts_pc(reviser::gdp, id=="US")), n = 0:3)
 #'
-#' final_release <- get_nth_release(dplyr::filter(reviser::gdp, id=="US"), n = "latest")
+#' final_release <- get_nth_release(dplyr::filter(tsbox::ts_pc(reviser::gdp, id=="US")), n = "latest")
 #'
 #' results <- get_revision_analysis(df, final_release)
 #' print(results)
