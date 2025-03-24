@@ -88,17 +88,40 @@ The following statistics and tests are calculated:
 \item \strong{Theil's U2}: A measure comparing forecast changes to actual changes.
 \item \strong{Seasonality (Ljung-Box p-value)}: Tests for seasonality in revisions using the Ljung-Box test for lags matching the data frequency.
 \item \strong{Seasonality (Friedman p-value)}: Tests for seasonality in revisions using the Friedman test.
-\item \strong{News test (p-value)}: Tests whether revisions are explained by information in final values.
-\item \strong{Noise test (p-value)}: Tests whether revisions are uncorrelated with initial values.
+\item \strong{News test (p-value)}: Tests whether revisions are uncorrelated with initial values.
+\item \strong{Noise test (p-value)}: Tests whether revisions are explained by information in final values.
 }
 }
 \examples{
 # Example usage:
-df <- get_nth_release(dplyr::filter(tsbox::ts_pc(reviser::gdp, id=="US")), n = 0:3)
+df <- get_nth_release(
+  dplyr::filter(
+    na.omit(
+      tsbox::ts_pc(
+        reviser::gdp)
+            ),
+        id=="US"
+      )
+     ),
+   n = 0:3
+ )
 
-final_release <- get_nth_release(dplyr::filter(tsbox::ts_pc(reviser::gdp, id=="US")), n = "latest")
+final_release <- get_nth_release(
+  dplyr::filter(
+  na.omit(
+  tsbox::ts_pc(
+    reviser::gdp)
+       ),
+    id=="US"
+   ),
+ n = "latest"
+)
 
-results <- get_revision_analysis(df, final_release)
+results <- get_revision_analysis(
+  df,
+  final_release
+ )
+
 print(results)
 
 }
