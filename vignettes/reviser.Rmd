@@ -165,9 +165,10 @@ gdp_releases
 The `reviser` package provides simple and flexible tools for visualizing real-time vintages. The primary function for this is `plot_vintages()`, which supports multiple plot types, including line plots, scatter plots, bar plots, and boxplots. It returns a `ggplot2` object, allowing for further customization with the `ggplot2` package.
 
 To use `plot_vintages()`, provide a data frame containing:
-- A `time` column (representing the observation period),
-- A `value` column (containing the reported data),
-- A column indicating the publication date (`pub_date`) or release number (`release`), which determines the dimension along which the data is visualized.
+
+  - A `time` column (representing the observation period),
+  - A `value` column (containing the reported data),
+  - A column indicating the publication date (`pub_date`) or release number (`release`), which determines the dimension along which the data is visualized.
 
 For example, to visualize how GDP estimates evolved over time, you can create a line plot comparing different vintages:
 
