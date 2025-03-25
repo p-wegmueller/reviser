@@ -14,8 +14,95 @@ knitr::opts_chunk$set(
 )
 ```
 
-IN PROGRESS
 
 ```{r setup}
 library(reviser)
+library(dplyr)
+library(tsbox)
 ```
+
+# Revision Analysis: A Comprehensive Guide
+
+## Introduction
+
+This vignette provides a detailed explanation of the statistical measures and hypothesis tests used in `get_revision_analysis()`. The function is designed to analyze revisions between initial and final data releases, helping to assess bias, efficiency, correlation, seasonality, and the relative contributions of news and noise in revisions.
+
+## Definitions and Notation
+
+Let:
+- \( Y_t^0 \) denote the initially released value at time \( t \)
+- \( Y_t^f \) denote the final revised value at time \( t \)
+- \( R_t^f = Y_t^f - Y_t^0 \) be the final revision at time \( t \)
+
+## Summary Statistics
+
+### 1. Bias (Mean Revision)
+The mean revision quantifies systematic bias:
+\[ \text{Bias} = \frac{1}{N} \sum_{t=1}^{N} R_t \]
+A t-test is used to test if the mean revision is significantly different from zero.
+
+### 2. Standard Deviation of Revisions
+Measures the dispersion of revisions:
+\[ \sigma_R = \sqrt{ \frac{1}{N-1} \sum_{t=1}^{N} (R_t - \bar{R})^2 } \]
+
+### 3. Noise-to-Signal Ratio
+\[ \frac{\sigma_R}{\sigma_Y} \]
+where \( \sigma_Y \) is the standard deviation of \( Y_t \).
+
+## Hypothesis Tests
+
+### 4. Bias Tests
+We estimate:
+\[ Y_t = \alpha + \beta X_t + \varepsilon_t \]
+Tests:
+- \( H_0: \alpha = 0 \) (intercept bias test)
+- \( H_0: \beta = 1 \) (slope bias test)
+
+### 5. Efficiency Tests
+A regression of \( R_t \) on \( X_t \):
+\[ R_t = \gamma + \delta X_t + \nu_t \]
+Tests:
+- \( H_0: \gamma = 0 \) (intercept efficiency test)
+- \( H_0: \delta = 0 \) (slope efficiency test)
+
+### 6. Correlation and Autocorrelation
+Pearson correlation coefficient:
+\[ \rho_{X,Y} = \frac{\sum (X_t - \bar{X}) (Y_t - \bar{Y})}{\sqrt{\sum (X_t - \bar{X})^2 \sum (Y_t - \bar{Y})^2}} \]
+
+Autocorrelation of order \( k \):
+\[ \rho_k = \frac{\sum (R_t - \bar{R}) (R_{t-k} - \bar{R})}{\sum (R_t - \bar{R})^2} \]
+
+### 7. Theil’s U Statistics
+Theil’s U1:
+\[ U_1 = \frac{\sqrt{\frac{1}{N} \sum_{t=1}^{N} (R_t)^2}}{\sqrt{\frac{1}{N} \sum_{t=1}^{N} (Y_t^2 + X_t^2)}} \]
+
+Theil’s U2:
+\[ U_2 = \frac{\sqrt{\sum (Y_t - Y_{t-1})^2}}{\sqrt{\sum (X_t - X_{t-1})^2}} \]
+
+### 8. Seasonality Tests
+- Ljung-Box test for autocorrelation at seasonal lags.
+- Friedman test for seasonality in revisions.
+
+### 9. News vs. Noise Tests
+- \( H_0: R_t \) is uncorrelated with \( X_t \) (news test).
+- \( H_0: R_t \) is explained by \( Y_t \) (noise test).
+
+## References
+- Mankiw, N. G., & Shapiro, M. D. (1986). "News or Noise? An Analysis of GNP Revisions."
+- Theil, H. (1966). "Applied Economic Forecasting."
+- Harvey, A. C. (1989). "Forecasting, Structural Time Series Models and the Kalman Filter."
+
+## Example Usage
+```{r}
+# Example dataset
+gdp <- reviser::gdp %>%
+  ts_pc() %>%
+  na.omit()
+
+df <- get_nth_release(gdp, 0:1)
+final_release <- get_latest_release(gdp)
+
+results <- get_revision_analysis(df, final_release)
+print(results)
+```
+
