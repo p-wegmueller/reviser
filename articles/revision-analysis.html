@@ -16,7 +16,9 @@
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><script src="../deps/MathJax-3.2.2/tex-chtml.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Revision Patterns and Statistics">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Revision Patterns and Statistics">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -110,11 +112,24 @@ contributions of news and noise in revisions.</p>
 <div class="section level3">
 <h3 id="definitions-and-notation">Definitions and Notation<a class="anchor" aria-label="anchor" href="#definitions-and-notation"></a>
 </h3>
-<p>Let: - <span class="math inline">\(Y_t^0\)</span> denote the
-initially released value at time <span class="math inline">\(t\)</span>
-- <span class="math inline">\(Y_t^f\)</span> denote the final revised
-value at time <span class="math inline">\(t\)</span> - <span class="math inline">\(R_t^f = Y_t^f - Y_t^0\)</span> be the final
-revision at time <span class="math inline">\(t\)</span></p>
+<p>Let:</p>
+<ul>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>Y</mi><mi>t</mi><mn>0</mn></msubsup><annotation encoding="application/x-tex">Y_t^0</annotation></semantics></math>
+denote the initially released value at time
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>
+</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup><annotation encoding="application/x-tex">Y_t^f</annotation></semantics></math>
+denote the final revised value at time
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>
+</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>R</mi><mi>t</mi><mi>f</mi></msubsup><mo>=</mo><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup><mo>−</mo><msubsup><mi>Y</mi><mi>t</mi><mn>0</mn></msubsup></mrow><annotation encoding="application/x-tex">R_t^f = Y_t^f - Y_t^0</annotation></semantics></math>
+be the final revision at time
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>
+</li>
+</ul>
 </div>
 <div class="section level3">
 <h3 id="summary-statistics">Summary Statistics<a class="anchor" aria-label="anchor" href="#summary-statistics"></a>
@@ -122,23 +137,25 @@ revision at time <span class="math inline">\(t\)</span></p>
 <div class="section level4">
 <h4 id="bias-mean-revision">1. Bias (Mean Revision)<a class="anchor" aria-label="anchor" href="#bias-mean-revision"></a>
 </h4>
-<p>The mean revision quantifies systematic bias: <span class="math display">\[ \text{Bias} = \frac{1}{N} \sum_{t=1}^{N} R_t
-\]</span> A t-test is used to test if the mean revision is significantly
-different from zero.</p>
+<p>The mean revision quantifies systematic bias:
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">Bias</mtext><mo>=</mo><mfrac><mn>1</mn><mi>N</mi></mfrac><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><msub><mi>R</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex"> \text{Bias} = \frac{1}{N} \sum_{t=1}^{N} R_t </annotation></semantics></math>
+A t-test is used to test if the mean revision is significantly different
+from zero.</p>
 </div>
 <div class="section level4">
 <h4 id="standard-deviation-of-revisions">2. Standard Deviation of Revisions<a class="anchor" aria-label="anchor" href="#standard-deviation-of-revisions"></a>
 </h4>
-<p>Measures the dispersion of revisions: <span class="math display">\[
-\sigma_R = \sqrt{ \frac{1}{N-1} \sum_{t=1}^{N} (R_t - \bar{R})^2 }
-\]</span></p>
+<p>Measures the dispersion of revisions:
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>σ</mi><mi>R</mi></msub><mo>=</mo><msqrt><mrow><mfrac><mn>1</mn><mrow><mi>N</mi><mo>−</mo><mn>1</mn></mrow></mfrac><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><msup><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>R</mi><mi>t</mi></msub><mo>−</mo><mover><mi>R</mi><mo accent="true">‾</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></msqrt></mrow><annotation encoding="application/x-tex"> \sigma_R = \sqrt{ \frac{1}{N-1} \sum_{t=1}^{N} (R_t - \bar{R})^2 } </annotation></semantics></math></p>
 </div>
 <div class="section level4">
 <h4 id="noise-to-signal-ratio">3. Noise-to-Signal Ratio<a class="anchor" aria-label="anchor" href="#noise-to-signal-ratio"></a>
 </h4>
-<p><span class="math display">\[ \frac{\sigma_R}{\sigma_Y} \]</span>
-where <span class="math inline">\(\sigma_Y\)</span> is the standard
-deviation of <span class="math inline">\(Y_t\)</span>.</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mfrac><msub><mi>σ</mi><mi>R</mi></msub><msub><mi>σ</mi><mi>Y</mi></msub></mfrac><annotation encoding="application/x-tex"> \frac{\sigma_R}{\sigma_Y} </annotation></semantics></math>
+where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>σ</mi><mi>Y</mi></msub><annotation encoding="application/x-tex">\sigma_Y</annotation></semantics></math>
+is the standard deviation of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>Y</mi><mi>t</mi></msub><annotation encoding="application/x-tex">Y_t</annotation></semantics></math>.</p>
 </div>
 </div>
 <div class="section level3">
@@ -147,37 +164,44 @@ deviation of <span class="math inline">\(Y_t\)</span>.</p>
 <div class="section level4">
 <h4 id="bias-tests">4. Bias Tests<a class="anchor" aria-label="anchor" href="#bias-tests"></a>
 </h4>
-<p>We estimate: <span class="math display">\[ Y_t = \alpha + \beta X_t +
-\varepsilon_t \]</span> Tests: - <span class="math inline">\(H_0: \alpha
-= 0\)</span> (intercept bias test) - <span class="math inline">\(H_0:
-\beta = 1\)</span> (slope bias test)</p>
+<p>We estimate:
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>Y</mi><mi>t</mi></msub><mo>=</mo><mi>α</mi><mo>+</mo><mi>β</mi><msub><mi>X</mi><mi>t</mi></msub><mo>+</mo><msub><mi>ε</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex"> Y_t = \alpha + \beta X_t + \varepsilon_t </annotation></semantics></math>
+Tests: -
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>H</mi><mn>0</mn></msub><mo>:</mo><mi>α</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">H_0: \alpha = 0</annotation></semantics></math>
+(intercept bias test) -
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>H</mi><mn>0</mn></msub><mo>:</mo><mi>β</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">H_0: \beta = 1</annotation></semantics></math>
+(slope bias test)</p>
 </div>
 <div class="section level4">
 <h4 id="efficiency-tests">5. Efficiency Tests<a class="anchor" aria-label="anchor" href="#efficiency-tests"></a>
 </h4>
-<p>A regression of <span class="math inline">\(R_t\)</span> on <span class="math inline">\(X_t\)</span>: <span class="math display">\[ R_t =
-\gamma + \delta X_t + \nu_t \]</span> Tests: - <span class="math inline">\(H_0: \gamma = 0\)</span> (intercept efficiency
-test) - <span class="math inline">\(H_0: \delta = 0\)</span> (slope
-efficiency test)</p>
+<p>A regression of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>R</mi><mi>t</mi></msub><annotation encoding="application/x-tex">R_t</annotation></semantics></math>
+on
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>X</mi><mi>t</mi></msub><annotation encoding="application/x-tex">X_t</annotation></semantics></math>:
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>R</mi><mi>t</mi></msub><mo>=</mo><mi>γ</mi><mo>+</mo><mi>δ</mi><msub><mi>X</mi><mi>t</mi></msub><mo>+</mo><msub><mi>ν</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex"> R_t = \gamma + \delta X_t + \nu_t </annotation></semantics></math>
+Tests: -
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>H</mi><mn>0</mn></msub><mo>:</mo><mi>γ</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">H_0: \gamma = 0</annotation></semantics></math>
+(intercept efficiency test) -
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>H</mi><mn>0</mn></msub><mo>:</mo><mi>δ</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">H_0: \delta = 0</annotation></semantics></math>
+(slope efficiency test)</p>
 </div>
 <div class="section level4">
 <h4 id="correlation-and-autocorrelation">6. Correlation and Autocorrelation<a class="anchor" aria-label="anchor" href="#correlation-and-autocorrelation"></a>
 </h4>
-<p>Pearson correlation coefficient: <span class="math display">\[
-\rho_{X,Y} = \frac{\sum (X_t - \bar{X}) (Y_t - \bar{Y})}{\sqrt{\sum (X_t
-- \bar{X})^2 \sum (Y_t - \bar{Y})^2}} \]</span></p>
-<p>Autocorrelation of order <span class="math inline">\(k\)</span>:
-<span class="math display">\[ \rho_k = \frac{\sum (R_t - \bar{R})
-(R_{t-k} - \bar{R})}{\sum (R_t - \bar{R})^2} \]</span></p>
+<p>Pearson correlation coefficient:
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ρ</mi><mrow><mi>X</mi><mo>,</mo><mi>Y</mi></mrow></msub><mo>=</mo><mfrac><mrow><mo>∑</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>X</mi><mi>t</mi></msub><mo>−</mo><mover><mi>X</mi><mo accent="true">‾</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>Y</mi><mi>t</mi></msub><mo>−</mo><mover><mi>Y</mi><mo accent="true">‾</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow></mrow><msqrt><mrow><mo>∑</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>X</mi><mi>t</mi></msub><mo>−</mo><mover><mi>X</mi><mo accent="true">‾</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup><mo>∑</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>Y</mi><mi>t</mi></msub><mo>−</mo><mover><mi>Y</mi><mo accent="true">‾</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></msqrt></mfrac></mrow><annotation encoding="application/x-tex"> \rho_{X,Y} = \frac{\sum (X_t - \bar{X}) (Y_t - \bar{Y})}{\sqrt{\sum (X_t - \bar{X})^2 \sum (Y_t - \bar{Y})^2}} </annotation></semantics></math></p>
+<p>Autocorrelation of order
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>:
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ρ</mi><mi>k</mi></msub><mo>=</mo><mfrac><mrow><mo>∑</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>R</mi><mi>t</mi></msub><mo>−</mo><mover><mi>R</mi><mo accent="true">‾</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>R</mi><mrow><mi>t</mi><mo>−</mo><mi>k</mi></mrow></msub><mo>−</mo><mover><mi>R</mi><mo accent="true">‾</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mo>∑</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>R</mi><mi>t</mi></msub><mo>−</mo><mover><mi>R</mi><mo accent="true">‾</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></mfrac></mrow><annotation encoding="application/x-tex"> \rho_k = \frac{\sum (R_t - \bar{R}) (R_{t-k} - \bar{R})}{\sum (R_t - \bar{R})^2} </annotation></semantics></math></p>
 </div>
 <div class="section level4">
 <h4 id="theils-u-statistics">7. Theil’s U Statistics<a class="anchor" aria-label="anchor" href="#theils-u-statistics"></a>
 </h4>
-<p>Theil’s U1: <span class="math display">\[ U_1 =
-\frac{\sqrt{\frac{1}{N} \sum_{t=1}^{N} (R_t)^2}}{\sqrt{\frac{1}{N}
-\sum_{t=1}^{N} (Y_t^2 + X_t^2)}} \]</span></p>
-<p>Theil’s U2: <span class="math display">\[ U_2 = \frac{\sqrt{\sum (Y_t
-- Y_{t-1})^2}}{\sqrt{\sum (X_t - X_{t-1})^2}} \]</span></p>
+<p>Theil’s U1:
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>U</mi><mn>1</mn></msub><mo>=</mo><mfrac><msqrt><mrow><mfrac><mn>1</mn><mi>N</mi></mfrac><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><msup><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>R</mi><mi>t</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></msqrt><msqrt><mrow><mfrac><mn>1</mn><mi>N</mi></mfrac><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>Y</mi><mi>t</mi><mn>2</mn></msubsup><mo>+</mo><msubsup><mi>X</mi><mi>t</mi><mn>2</mn></msubsup><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msqrt></mfrac></mrow><annotation encoding="application/x-tex"> U_1 = \frac{\sqrt{\frac{1}{N} \sum_{t=1}^{N} (R_t)^2}}{\sqrt{\frac{1}{N} \sum_{t=1}^{N} (Y_t^2 + X_t^2)}} </annotation></semantics></math></p>
+<p>Theil’s U2:
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>U</mi><mn>2</mn></msub><mo>=</mo><mfrac><msqrt><mrow><mo>∑</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>Y</mi><mi>t</mi></msub><mo>−</mo><msub><mi>Y</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></msqrt><msqrt><mrow><mo>∑</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>X</mi><mi>t</mi></msub><mo>−</mo><msub><mi>X</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></msqrt></mfrac></mrow><annotation encoding="application/x-tex"> U_2 = \frac{\sqrt{\sum (Y_t - Y_{t-1})^2}}{\sqrt{\sum (X_t - X_{t-1})^2}} </annotation></semantics></math></p>
 </div>
 <div class="section level4">
 <h4 id="seasonality-tests">8. Seasonality Tests<a class="anchor" aria-label="anchor" href="#seasonality-tests"></a>
@@ -192,10 +216,15 @@ efficiency test)</p>
 </h4>
 <ul>
 <li>
-<span class="math inline">\(H_0: R_t\)</span> is uncorrelated with
-<span class="math inline">\(X_t\)</span> (news test).</li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>H</mi><mn>0</mn></msub><mo>:</mo><msub><mi>R</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">H_0: R_t</annotation></semantics></math>
+is uncorrelated with
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>X</mi><mi>t</mi></msub><annotation encoding="application/x-tex">X_t</annotation></semantics></math>
+(news test).</li>
 <li>
-<span class="math inline">\(H_0: R_t\)</span> is explained by <span class="math inline">\(Y_t\)</span> (noise test).</li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>H</mi><mn>0</mn></msub><mo>:</mo><msub><mi>R</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">H_0: R_t</annotation></semantics></math>
+is explained by
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>Y</mi><mi>t</mi></msub><annotation encoding="application/x-tex">Y_t</annotation></semantics></math>
+(noise test).</li>
 </ul>
 </div>
 </div>
