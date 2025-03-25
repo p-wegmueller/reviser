@@ -119,7 +119,7 @@ get_revisions <- function(
         ) %>%
         dplyr::mutate(value = value_ref - value) %>%
         dplyr::ungroup() %>%
-        dplyr::filter(!is.na(value)) %>%
+        #dplyr::filter(!is.na(value)) %>%
         dplyr::select(id, pub_date, time, value)
     } else if (!is.null(nth_release)) {
       # Calculate revisions relative to the nth release
@@ -132,7 +132,7 @@ get_revisions <- function(
         dplyr::group_by(id, time) %>%
         dplyr::mutate(value = value_ref - value) %>%
         dplyr::ungroup() %>%
-        dplyr::filter(!is.na(value)) %>%
+        #dplyr::filter(!is.na(value)) %>%
         dplyr::select(id, pub_date, time, value)
     }
   } else {
@@ -160,7 +160,7 @@ get_revisions <- function(
         ) %>%
         dplyr::ungroup() %>%
         dplyr::mutate(value = value_ref - value) %>%
-        dplyr::filter(!is.na(value)) %>%
+        #dplyr::filter(!is.na(value)) %>%
         dplyr::select(pub_date, time, value)
     } else if (!is.null(nth_release)) {
       # Calculate revisions relative to the nth release
@@ -171,7 +171,7 @@ get_revisions <- function(
           by = "time"
         ) %>%
         dplyr::mutate(value = value_ref - value) %>%
-        dplyr::filter(!is.na(value)) %>%
+        #dplyr::filter(!is.na(value)) %>%
         dplyr::select(pub_date, time, value)
     }
   }

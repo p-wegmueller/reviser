@@ -190,9 +190,9 @@ revisions_interval <- get_revisions(gdp, interval = 1)
 plot_vintages(
   revisions_interval %>% 
     filter(id == "US") %>%
-    get_nth_release(0:1),
+    get_nth_release(1:2),
   dim_col = "release",
-  title = "Revisions of 2nd (release_0) and 3rd (release_1) release",
+  title = "Revisions of 2nd (release_1) and 3rd (release_2) release",
   subtitle = "For the US"
 )
 
@@ -230,7 +230,7 @@ plot_vintages(
 
 ### Example 3: Revisions to the Nth Release
 
-Instead of comparing consecutive releases, we can compare each data point against its nth release. For example, if we want to evaluate revisions between the first and second releases:
+Instead of comparing consecutive releases, we can compare each data point against its nth release. For example, if we want to evaluate revisions between the first and last releases:
 
 ```{r}
 revisions_nth <- get_revisions(gdp, nth_release = 0)
