@@ -176,6 +176,7 @@ The most common use case is to analyze how reported values evolve over time. By 
 ```{r}
 library(dplyr)
 library(reviser)
+library(tsbox)
 
 # Example dataset
 gdp <- reviser::gdp %>%
@@ -248,8 +249,6 @@ plot_vintages(
 This is useful for assessing how much initial estimates deviate from later, more refined estimates.
 
 These visualizations can help detect bias in revisions, identify persistent trends, and inform decision-making.
-
-## Conclusion
 
 The `get_revisions()` function in the `reviser` package provides a flexible way to analyze time series data revisions. By allowing users to compute revisions using different methods, it helps assess the reliability of early estimates and understand the dynamics of data revisions over time.
 
