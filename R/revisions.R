@@ -569,10 +569,10 @@ summary.lst_efficient <- function(object, ...) {
 #'   - `time`: The time variable (matching the initial release data).
 #'   - `value`: The observed values in the final release.
 #' @param degree An integer between 1 and 5 specifying the level of detail for the output:
-#'    1: Default, descriptive statistics (bias, min/max, standard deviation, noise/signal ratio, correlation).
-#'    2: Efficiency tests (bias intercept and slope tests, efficiency tests for intercept and slope).
-#'    3: Orthogonality tests (correlation, autocorrelation, Theil's U statistics, seasonality tests).
-#'    4: News vs. noise tests (p-values for news and noise tests).
+#'    1: Default, includes information about revision size.
+#'    2: includes correlation statistics of revision.
+#'    3: includes news and noise tests.
+#'    4: includes sign switches, seasonality analysis and Theil’s U.
 #'    5: Full set of all statistics and tests.
 #' @param grouping_var A character string specifying the grouping variable in the data frame. Defaults to
 #' `pub_date` or `release` if available.
@@ -588,7 +588,6 @@ summary.lst_efficient <- function(object, ...) {
 #'
 #' Key tests include:
 #' - **Bias Tests**: Tests for the presence of mean bias and regression bias.
-#' - **Efficiency Tests**: Tests whether revisions are orthogonal to initial values.
 #' - **Autocorrelation and Seasonality**: Tests for serial correlation and seasonal patterns in revisions.
 #' - **Theil's U Statistics**: Measures predictive accuracy of the initial releases relative to the final values.
 #' - **Noise vs. News**: Differentiates between unpredictable errors (noise) and systematic adjustments (news).
@@ -669,7 +668,7 @@ get_revision_analysis <- function(
 ) {
   # Check degree in 1:5
   if (!degree %in% c(1:5)) {
-    rlang::abort("The 'degree' must be an integer between 1 and 3.")
+    rlang::abort("The 'degree' must be an integer between 1 and 5.")
   }
 
   # Check grouping variable present in both df and final_release
@@ -1037,31 +1036,19 @@ get_revision_analysis <- function(
         "N",
         "Bias (mean)",
         "Bias (p-value)",
+        "Bias (robust p-value)",
         "Minimum",
         "Maximum",
+        "10Q",
+        "Median",
+        "90Q",
         "MAR",
         "Std. Dev.",
-        "Noise/Signal",
-        "Correlation",
-        "Correlation (p-value)"
+        "Noise/Signal"
       )
     return(results)
   } else if (degree == 2) {
-    # Efficiency
-    results <- results %>%
-      dplyr::select(
-        dplyr::all_of(
-          grouping_vars
-        ),
-        "N",
-        "Bias (intercept)",
-        "Bias (intercept p-value)",
-        "Bias (slope)",
-        "Bias (slope p-value)",
-      )
-    return(results)
-  } else if (degree == 3) {
-    # Orthogonality
+    # Correlation
     results <- results %>%
       dplyr::select(
         dplyr::all_of(
@@ -1072,14 +1059,11 @@ get_revision_analysis <- function(
         "Correlation (p-value)",
         "Autocorrelation (1st)",
         "Autocorrelation (1st p-value)",
-        "Autocorrelation up to 4th (Ljung-Box p-value)",
-        "Theil's U1",
-        "Theil's U2",
-        "Seasonality (Friedman p-value)"
+        "Autocorrelation up to 1yr (Ljung-Box p-value)"
       )
     return(results)
-  } else if (degree == 4) {
-    # News and noise tests
+  } else if (degree == 3) {
+    # News/Noise tests
     results <- results %>%
       dplyr::select(
         dplyr::all_of(
@@ -1099,7 +1083,22 @@ get_revision_analysis <- function(
         "Noise test Coefficient",
         "Noise test Coefficient (std.err)",
         "Noise test Coefficient (p-value)",
-        "Noise joint test (p-value)",
+        "Noise joint test (p-value)"
+      )
+    return(results)
+  } else if (degree == 4) {
+    # News and noise tests
+    results <- results %>%
+      dplyr::select(
+        dplyr::all_of(
+          grouping_vars
+        ),
+        "N",
+        "Fraction of correct sign",
+        "Fraction of correct growth rate change",
+        "Theil's U1",
+        "Theil's U2",
+        "Seasonality (Friedman p-value)"
       )
     return(results)
   } else if (degree == 5) {

@@ -1,6 +1,9 @@
 ---
 title: "Revision Patterns and Statistics"
 output: rmarkdown::html_vignette
+bibliography: references.bib
+biblio-style: apalike
+link-citations: true
 vignette: >
   %\VignetteIndexEntry{revision-analysis}
   %\VignetteEngine{knitr::rmarkdown}
@@ -14,14 +17,28 @@ knitr::opts_chunk$set(
 )
 ```
 
-This vignette provides a detailed explanation of the statistical measures and hypothesis tests used in `get_revision_analysis()`. The function is designed to analyze revisions between initial and final data releases, helping to assess bias, efficiency, correlation, seasonality, and the relative contributions of news and noise in revisions. The function returns a tibble with the desired statistics and hypothesis tests. In the following sections, we provide a detailed explanation of the statistics and hypothesis tests used in the function and provide the corresponding column name in brackets to assess it.
+This vignette provides a detailed explanation of the statistical measures and hypothesis tests used in `get_revision_analysis()`. The function is designed to analyze revisions between preliminary and final data releases, helping to assess bias, efficiency, correlation, seasonality, and the relative contributions of news and noise in revisions. The function returns a tibble with the desired statistics and hypothesis tests. In the following sections, we provide a detailed explanation of the statistics and hypothesis tests used in the function and provide the corresponding column name in brackets to assess it.
 
 Let's define some notation to facilitate the discussion of the statistics and hypothesis tests used in the function:
 
-- \( Y_t^h \) denote the $h$th released value for time \( t \) with $h=0$ being the initial release
+- \( Y_t^h \) denote the $h$th released value for time \( t \) with $h=0$ being the preliminary release
 - \( Y_t^f \) denote the final revised value for time \( t \)
 - \( R_t^f = Y_t^f - Y_t^h \) be the final revision compared to the $h$th release for time \( t \)
 - \( N \) is the number of observations
+
+The function argument `degree` allows users to specify which statistics and hypothesis tests to include in the output:
+
+ - `degree = 1` includes information about revision size (default)
+ - `degree = 2` includes correlation statistics of revision
+ - `degree = 3` includes news and noise tests
+ - `degree = 4` includes sign switches, seasonality analysis and Theil's U
+ - `degree = 5` includes all the statistics and hypothesis tests
+ 
+```{r setup, message=FALSE, warning=FALSE}
+library(reviser)
+library(dplyr)
+library(tsbox)
+```
 
 ## Summary Statistics
 
@@ -74,6 +91,22 @@ Revisions provide insights into the reliability of initial data releases. Variou
 
    where \( \sigma_Y \) is the standard deviation of the final value \( Y_t^f \). A high noise-to-signal ratio suggests that revisions are large relative to the underlying variability in the final data, indicating high uncertainty in initial estimates.
 
+```{r, warning=FALSE}
+gdp <- reviser::gdp %>%
+  ts_pc() %>%
+  na.omit()
+
+df <- get_nth_release(gdp, 0:1)
+final_release <- get_latest_release(gdp)
+
+results <- get_revision_analysis(
+  df, 
+  final_release,
+  degree = 1
+  )
+
+head(results)
+```
 
 ### Correlation of Revisions  
 
@@ -120,6 +153,16 @@ Understanding how revisions relate to initial releases and past revisions can re
 
 These metrics collectively help evaluate the reliability, predictability, and potential biases in data revisions.
 
+```{r, warning=FALSE}
+results <- get_revision_analysis(
+  df, 
+  final_release,
+  degree = 2
+  )
+
+head(results)
+```
+
 ### Sign Switches
 Sign switches in data revisions can occur when the direction of an economic indicator changes between its initial release and later revisions. We define two key metrics to assess the stability of these directional signals:
 
@@ -144,9 +187,9 @@ Sign switches in data revisions can occur when the direction of an economic indi
 A high fraction of incorrect signs in either metric suggests that early estimates may be unreliable in capturing the true direction of the variable.
 
 ## Hypothesis Tests
-### **News and Noise Tests for Data Revisions**
+### News and Noise Tests for Data Revisions
 
-The **news and noise tests** analyze the properties of **data revisions** in relation to the final and preliminary releases of an economic variable. These tests help to evaluate whether the revisions are systematic, whether they contain new information, or whether they are simply noisy adjustments. 
+The **news and noise tests** analyze the properties of **data revisions** in relation to the final and preliminary releases of an economic variable. These tests help to evaluate whether the revisions are systematic, whether they contain new information, or whether they are simply noisy adjustments [@mankiwNewsNoiseAnalysis1986; @aruobaDataRevisionsAre2008]. 
 
 **Final revisions** can be classified into two categories:
 
@@ -170,9 +213,9 @@ To test these categories, we run **two regression tests:**
   H_0: \alpha = 0, \quad \beta = 0
   \]
   
-  - The function tests the joint hypothesis (`"noise_wald_p_value"`) that both \( \alpha = 0 \) and \( \beta = 0 \) using a **heteroskedasticity and autocorrelation consistent (HAC) covariance matrix** to ensure robust inference.
-  - \( \alpha = 0 \) tests (`"noise_intercept_p_value"`) whether the revisions have a systematic bias.
-  - \( \beta = 0 \) tests (`"noise_coeff_p_value"`) whether the revisions are correlated with the final value, indicating inefficiency.
+  - The function tests the joint hypothesis (`"Noise joint test (p-value)"`) that both \( \alpha = 0 \) and \( \beta = 0 \) using a **heteroskedasticity and autocorrelation consistent (HAC) covariance matrix** to ensure robust inference.
+  - \( \alpha = 0 \) tests (`"News test Intercept (p-value)"`) whether the revisions have a systematic bias.
+  - \( \beta = 0 \) tests (`"News test Coefficient (p-value)"`) whether the revisions are correlated with the final value, indicating inefficiency.
 
 ####  2. **The News Test**
 
@@ -188,16 +231,26 @@ Here, we test whether revisions are **systematically related** to the initial va
 H_0: \alpha = 0, \quad \beta = 0
 \]
 
-  - The function tests the joint hypothesis (`"news_wald_p_value"`) that both \( \alpha = 0 \) and \( \beta = 0 \) using a **HAC covariance matrix** to ensure robust inference.
-  - \( \alpha = 0 \) tests (`"news_intercept_p_value"`) whether the revisions have a systematic bias.
-  - \( \beta = 0 \) tests (`"news_coeff_p_value"`) whether the revisions are correlated with the initial value, indicating inefficiency.
+  - The function tests the joint hypothesis (`"News joint test (p-value)"`) that both \( \alpha = 0 \) and \( \beta = 0 \) using a **HAC covariance matrix** to ensure robust inference.
+  - \( \alpha = 0 \) tests (`"News test Intercept (p-value)"`) whether the revisions have a systematic bias.
+  - \( \beta = 0 \) tests (`"News test Coefficient (p-value)"`) whether the revisions are correlated with the initial value, indicating inefficiency.
 
 Note: Instead of regressing $R_t^f$ on $Y_t^f$ or $Y_t^h$, one can similarly regress 
 \[
   \text{Noise: } \quad Y_t^h = \alpha + \beta \cdot Y_t^f + \epsilon_t \\
   \text{News: } \quad Y_t^f = \alpha + \beta \cdot Y_t^h + \epsilon_t
-   \]
+\]
 and test \( \alpha = 0 \) and \( \beta = 1 \) for the presence of noise and news in the data revisions. 
+
+```{r, warning=FALSE}
+results <- get_revision_analysis(
+  df, 
+  final_release,
+  degree = 3
+  )
+
+head(results)
+```
 
 ### Test of Seasonality in Revisions
 
@@ -205,13 +258,14 @@ To test whether seasonality is present in revisions, we employ a Friedman test. 
 
 #### **Friedman Test**
 
-The Friedman test is a non-parametric statistical test that examines whether the distribution of ranked data differs systematically across seasonal periods, such as months or quarters. It does not require distributional assumptions, making it a robust tool for detecting seasonality in revision series. The test is applied by first transforming the revision series into a matrix where each row represents a year and each column represents a specific month or quarter. It is constructed as follows. Consider first the matrix of data \( \{x_{ij}\}_{n \times k} \) with \( n \) rows (i.e., the number of years in the sample) and \( k \) columns (i.e., either 12 months or 4 quarters, depending on the frequency of the data). The data matrix needs to be replaced by a new matrix \( \{r_{ij}\}_{n \times k} \), where the entry \( r_{ij} \) is the rank of \( x_{ij} \) within the row \( i \). The test is executed using the [stats::friedman.test()] function. The null hypothesis is that the average ranking across columns is the same, indicating no seasonality in the revisions.
+The Friedman test (`"Seasonality (Friedman p-value)"`) is a non-parametric statistical test that examines whether the distribution of ranked data differs systematically across seasonal periods, such as months or quarters. It does not require distributional assumptions, making it a robust tool for detecting seasonality in revision series. The test is applied by first transforming the revision series into a matrix where each row represents a year and each column represents a specific month or quarter. It is constructed as follows. Consider first the matrix of data \( \{x_{ij}\}_{n \times k} \) with \( n \) rows (i.e., the number of years in the sample) and \( k \) columns (i.e., either 12 months or 4 quarters, depending on the frequency of the data). The data matrix needs to be replaced by a new matrix \( \{r_{ij}\}_{n \times k} \), where the entry \( r_{ij} \) is the rank of \( x_{ij} \) within the row \( i \). The test is executed using the `stats::friedman.test()` function. The null hypothesis is that the average ranking across columns is the same, indicating no seasonality in the revisions.
 
 
-### **Theil’s U Statistics**
+### Theil’s U Statistics
+
 In the context of revision analysis, **Theil’s inequality coefficient**, or **Theil’s U**, provides a measure of the accuracy of a initial estimates (\( Y_t^h \)) relative to final or more refined values (\( Y_t^f \)). Various definitions of Theil’s statistics exist, leading to different interpretations. This package considers two widely used variants: **U1** and **U2**.  
 
-#### 1. **Theil’s U1 Statistic**  
+#### 1. **Theil’s U1 Statistic** (`"Theil's U1"`)
 
 The first measure, **U1**, is given by:  
 
@@ -224,11 +278,11 @@ The **U1 statistic is bounded between 0 and 1**:
 - A value of **0** implies perfect forecasting (\( Y_t^h = Y_t^f \) for all \( t \)).  
 - A value **closer to 1** indicates lower accuracy.  
 
-However, U1 suffers from **several limitations**, as highlighted by **Granger & Newbold (1973)**. A critical issue arises when **one of \( Y_t^h \) or \( Y_t^f \) equals zero in all periods**. In such cases, the denominator and numerator become equal, leading to **U1 = 1** even when preliminary estimates are close to the final values.  
+However, U1 suffers from **several limitations**, as highlighted by @Granger01031973. A critical issue arises when **one of \( Y_t^h \) or \( Y_t^f \) equals zero in all periods**. In such cases, the denominator and numerator become equal, leading to **U1 = 1** even when preliminary estimates are close to the final values.  
 
-#### 2. **Theil’s U2 Statistic**  
+#### 2. **Theil’s U2 Statistic** (`"Theil's U2"`)
 
-To address these shortcomings, Theil (1966) proposed an alternative measure, **U2**, which is defined as:  
+To address these shortcomings, @theil1966applied proposed an alternative measure, **U2**, which is defined as:  
 
 \[
 U_2 = \frac{\sqrt{\sum_{t=1}^{n} \left( \frac{Y_{t+1}^h- Y_{t+1}^f}{Y_t^f} \right)^2}}{\sqrt{\sum_{t=1}^{n} \left( \frac{Y_{t+1}^f - Y_t^f}{Y_t^f} \right)^2}}
@@ -242,35 +296,37 @@ where:
 Unlike U1, **U2 is not bounded between 0 and 1**. Instead: 
 
 - A value of **0** implies perfect accuracy (\( Y_{t}^h = Y_{t}^f \) for all \( t \)).  
-- **\( U_2 = 1 \)** means the accuracy of the preliminary estimates is equal to a **naïve random walk**.  
+- **\( U_2 = 1 \)** means the accuracy of the preliminary estimates is equal to a **naïve forecast**.  
 - **\( U_2 > 1 \)** suggests the preliminary estimates are **less accurate** than the naïve approach.  
 - **\( U_2 < 1 \)** indicates the preliminary estimates are **more accurate** than the naïve method.  
 
 Whenever possible (**if \( Y_{t}^f \neq 0 \) for all \( t \)**), **U2 is the preferred metric** for evaluating preliminary estimates.  
 
+```{r, warning=FALSE}
+results <- get_revision_analysis(
+  df, 
+  final_release,
+  degree = 4
+  )
 
-
-## Example Usage
-```{r setup, message=FALSE, warning=FALSE}
-library(reviser)
-library(dplyr)
-library(tsbox)
+head(results)
 ```
 
-```{r}
-# Example dataset
-gdp <- reviser::gdp %>%
-  ts_pc() %>%
-  na.omit()
+In the above examples, we compare the final release of GDP with the first and second release (diagonal of the real-time data matrix). However, it is also possible to compare revisions between given publication dates. In the example below, we compare revisions between GDP releases in April and July 2024 and the final release from October 2024. The grouping of the statistics takes place over the `pub_date` or `release` column.
 
-df <- get_nth_release(gdp, 0:1)
-final_release <- get_latest_release(gdp)
 
-results <- get_revision_analysis(df, final_release)
-print(results)
+```{r, warning=FALSE}
+df <- gdp %>%
+  filter(pub_date %in% c("2024-04-01", "2024-07-01"))
+
+
+results <- get_revision_analysis(
+  df, 
+  final_release,
+  degree = 5
+  )
+
+head(results)
 ```
 
 ## References
-- Mankiw, N. G., & Shapiro, M. D. (1986). "News or Noise? An Analysis of GNP Revisions."
-- Theil, H. (1966). "Applied Economic Forecasting."
-- Harvey, A. C. (1989). "Forecasting, Structural Time Series Models and the Kalman Filter."
