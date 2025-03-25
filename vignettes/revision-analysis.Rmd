@@ -14,33 +14,27 @@ knitr::opts_chunk$set(
 )
 ```
 
-
-```{r setup}
-library(reviser)
-library(dplyr)
-library(tsbox)
-```
-
-# Revision Analysis: A Comprehensive Guide
-
-## Introduction
-
 This vignette provides a detailed explanation of the statistical measures and hypothesis tests used in `get_revision_analysis()`. The function is designed to analyze revisions between initial and final data releases, helping to assess bias, efficiency, correlation, seasonality, and the relative contributions of news and noise in revisions.
 
 ## Definitions and Notation
 
 Let:
 
-- \( Y_t^0 \) denote the initially released value at time \( t \)
-- \( Y_t^f \) denote the final revised value at time \( t \)
-- \( R_t^f = Y_t^f - Y_t^0 \) be the final revision at time \( t \)
+- \( Y_t^h \) denote the $h$th released value for time \( t \) with $h=0$ being the initial release
+- \( Y_t^f \) denote the final revised value for time \( t \)
+- \( R_t^f = Y_t^f - Y_t^h \) be the final revision compared to the $h$th release for time \( t \)
+- \( N \) is the number of observations
+
 
 ## Summary Statistics
 
+The function `get_revision_analysis()` calculates the following statistics:
+
 ### 1. Bias (Mean Revision)
 The mean revision quantifies systematic bias:
-\[ \text{Bias} = \frac{1}{N} \sum_{t=1}^{N} R_t \]
-A t-test is used to test if the mean revision is significantly different from zero.
+\[ \text{Bias} =  \bar{R} = \frac{1}{N} \sum_{t=1}^{N} R_t^{f} \]
+A t-test is used to test if the mean revision is significantly different from zero. 
+Standard and robust p-values are provided.
 
 ### 2. Standard Deviation of Revisions
 Measures the dispersion of revisions:
@@ -56,6 +50,7 @@ where \( \sigma_Y \) is the standard deviation of \( Y_t \).
 We estimate:
 \[ Y_t = \alpha + \beta X_t + \varepsilon_t \]
 Tests:
+
 - \( H_0: \alpha = 0 \) (intercept bias test)
 - \( H_0: \beta = 1 \) (slope bias test)
 
@@ -63,6 +58,7 @@ Tests:
 A regression of \( R_t \) on \( X_t \):
 \[ R_t = \gamma + \delta X_t + \nu_t \]
 Tests:
+
 - \( H_0: \gamma = 0 \) (intercept efficiency test)
 - \( H_0: \delta = 0 \) (slope efficiency test)
 
@@ -81,19 +77,23 @@ Theil’s U2:
 \[ U_2 = \frac{\sqrt{\sum (Y_t - Y_{t-1})^2}}{\sqrt{\sum (X_t - X_{t-1})^2}} \]
 
 ### 8. Seasonality Tests
+
 - Ljung-Box test for autocorrelation at seasonal lags.
 - Friedman test for seasonality in revisions.
 
 ### 9. News vs. Noise Tests
+
 - \( H_0: R_t \) is uncorrelated with \( X_t \) (news test).
 - \( H_0: R_t \) is explained by \( Y_t \) (noise test).
 
-## References
-- Mankiw, N. G., & Shapiro, M. D. (1986). "News or Noise? An Analysis of GNP Revisions."
-- Theil, H. (1966). "Applied Economic Forecasting."
-- Harvey, A. C. (1989). "Forecasting, Structural Time Series Models and the Kalman Filter."
 
 ## Example Usage
+```{r setup, message=FALSE, warning=FALSE}
+library(reviser)
+library(dplyr)
+library(tsbox)
+```
+
 ```{r}
 # Example dataset
 gdp <- reviser::gdp %>%
@@ -107,3 +107,7 @@ results <- get_revision_analysis(df, final_release)
 print(results)
 ```
 
+## References
+- Mankiw, N. G., & Shapiro, M. D. (1986). "News or Noise? An Analysis of GNP Revisions."
+- Theil, H. (1966). "Applied Economic Forecasting."
+- Harvey, A. C. (1989). "Forecasting, Structural Time Series Models and the Kalman Filter."
