@@ -82,10 +82,167 @@
 
     
     
-<p>IN PROGRESS</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://p-wegmueller.github.io/reviser/">reviser</a></span><span class="op">)</span></span></code></pre></div>
-  </main>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://p-wegmueller.github.io/reviser/">reviser</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attaching package: 'dplyr'</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     filter, lag</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://docs.ropensci.org/tsbox/" class="external-link">tsbox</a></span><span class="op">)</span></span></code></pre></div>
+<div class="section level2">
+<h2 id="revision-analysis-a-comprehensive-guide">Revision Analysis: A Comprehensive Guide<a class="anchor" aria-label="anchor" href="#revision-analysis-a-comprehensive-guide"></a>
+</h2>
+<div class="section level3">
+<h3 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+</h3>
+<p>This vignette provides a detailed explanation of the statistical
+measures and hypothesis tests used in
+<code><a href="../reference/get_revision_analysis.html">get_revision_analysis()</a></code>. The function is designed to
+analyze revisions between initial and final data releases, helping to
+assess bias, efficiency, correlation, seasonality, and the relative
+contributions of news and noise in revisions.</p>
+</div>
+<div class="section level3">
+<h3 id="definitions-and-notation">Definitions and Notation<a class="anchor" aria-label="anchor" href="#definitions-and-notation"></a>
+</h3>
+<p>Let: - <span class="math inline">\(Y_t^0\)</span> denote the
+initially released value at time <span class="math inline">\(t\)</span>
+- <span class="math inline">\(Y_t^f\)</span> denote the final revised
+value at time <span class="math inline">\(t\)</span> - <span class="math inline">\(R_t^f = Y_t^f - Y_t^0\)</span> be the final
+revision at time <span class="math inline">\(t\)</span></p>
+</div>
+<div class="section level3">
+<h3 id="summary-statistics">Summary Statistics<a class="anchor" aria-label="anchor" href="#summary-statistics"></a>
+</h3>
+<div class="section level4">
+<h4 id="bias-mean-revision">1. Bias (Mean Revision)<a class="anchor" aria-label="anchor" href="#bias-mean-revision"></a>
+</h4>
+<p>The mean revision quantifies systematic bias: <span class="math display">\[ \text{Bias} = \frac{1}{N} \sum_{t=1}^{N} R_t
+\]</span> A t-test is used to test if the mean revision is significantly
+different from zero.</p>
+</div>
+<div class="section level4">
+<h4 id="standard-deviation-of-revisions">2. Standard Deviation of Revisions<a class="anchor" aria-label="anchor" href="#standard-deviation-of-revisions"></a>
+</h4>
+<p>Measures the dispersion of revisions: <span class="math display">\[
+\sigma_R = \sqrt{ \frac{1}{N-1} \sum_{t=1}^{N} (R_t - \bar{R})^2 }
+\]</span></p>
+</div>
+<div class="section level4">
+<h4 id="noise-to-signal-ratio">3. Noise-to-Signal Ratio<a class="anchor" aria-label="anchor" href="#noise-to-signal-ratio"></a>
+</h4>
+<p><span class="math display">\[ \frac{\sigma_R}{\sigma_Y} \]</span>
+where <span class="math inline">\(\sigma_Y\)</span> is the standard
+deviation of <span class="math inline">\(Y_t\)</span>.</p>
+</div>
+</div>
+<div class="section level3">
+<h3 id="hypothesis-tests">Hypothesis Tests<a class="anchor" aria-label="anchor" href="#hypothesis-tests"></a>
+</h3>
+<div class="section level4">
+<h4 id="bias-tests">4. Bias Tests<a class="anchor" aria-label="anchor" href="#bias-tests"></a>
+</h4>
+<p>We estimate: <span class="math display">\[ Y_t = \alpha + \beta X_t +
+\varepsilon_t \]</span> Tests: - <span class="math inline">\(H_0: \alpha
+= 0\)</span> (intercept bias test) - <span class="math inline">\(H_0:
+\beta = 1\)</span> (slope bias test)</p>
+</div>
+<div class="section level4">
+<h4 id="efficiency-tests">5. Efficiency Tests<a class="anchor" aria-label="anchor" href="#efficiency-tests"></a>
+</h4>
+<p>A regression of <span class="math inline">\(R_t\)</span> on <span class="math inline">\(X_t\)</span>: <span class="math display">\[ R_t =
+\gamma + \delta X_t + \nu_t \]</span> Tests: - <span class="math inline">\(H_0: \gamma = 0\)</span> (intercept efficiency
+test) - <span class="math inline">\(H_0: \delta = 0\)</span> (slope
+efficiency test)</p>
+</div>
+<div class="section level4">
+<h4 id="correlation-and-autocorrelation">6. Correlation and Autocorrelation<a class="anchor" aria-label="anchor" href="#correlation-and-autocorrelation"></a>
+</h4>
+<p>Pearson correlation coefficient: <span class="math display">\[
+\rho_{X,Y} = \frac{\sum (X_t - \bar{X}) (Y_t - \bar{Y})}{\sqrt{\sum (X_t
+- \bar{X})^2 \sum (Y_t - \bar{Y})^2}} \]</span></p>
+<p>Autocorrelation of order <span class="math inline">\(k\)</span>:
+<span class="math display">\[ \rho_k = \frac{\sum (R_t - \bar{R})
+(R_{t-k} - \bar{R})}{\sum (R_t - \bar{R})^2} \]</span></p>
+</div>
+<div class="section level4">
+<h4 id="theils-u-statistics">7. Theil’s U Statistics<a class="anchor" aria-label="anchor" href="#theils-u-statistics"></a>
+</h4>
+<p>Theil’s U1: <span class="math display">\[ U_1 =
+\frac{\sqrt{\frac{1}{N} \sum_{t=1}^{N} (R_t)^2}}{\sqrt{\frac{1}{N}
+\sum_{t=1}^{N} (Y_t^2 + X_t^2)}} \]</span></p>
+<p>Theil’s U2: <span class="math display">\[ U_2 = \frac{\sqrt{\sum (Y_t
+- Y_{t-1})^2}}{\sqrt{\sum (X_t - X_{t-1})^2}} \]</span></p>
+</div>
+<div class="section level4">
+<h4 id="seasonality-tests">8. Seasonality Tests<a class="anchor" aria-label="anchor" href="#seasonality-tests"></a>
+</h4>
+<ul>
+<li>Ljung-Box test for autocorrelation at seasonal lags.</li>
+<li>Friedman test for seasonality in revisions.</li>
+</ul>
+</div>
+<div class="section level4">
+<h4 id="news-vs--noise-tests">9. News vs. Noise Tests<a class="anchor" aria-label="anchor" href="#news-vs--noise-tests"></a>
+</h4>
+<ul>
+<li>
+<span class="math inline">\(H_0: R_t\)</span> is uncorrelated with
+<span class="math inline">\(X_t\)</span> (news test).</li>
+<li>
+<span class="math inline">\(H_0: R_t\)</span> is explained by <span class="math inline">\(Y_t\)</span> (noise test).</li>
+</ul>
+</div>
+</div>
+<div class="section level3">
+<h3 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h3>
+<ul>
+<li>Mankiw, N. G., &amp; Shapiro, M. D. (1986). “News or Noise? An
+Analysis of GNP Revisions.”</li>
+<li>Theil, H. (1966). “Applied Economic Forecasting.”</li>
+<li>Harvey, A. C. (1989). “Forecasting, Structural Time Series Models
+and the Kalman Filter.”</li>
+</ul>
+</div>
+<div class="section level3">
+<h3 id="example-usage">Example Usage<a class="anchor" aria-label="anchor" href="#example-usage"></a>
+</h3>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Example dataset</span></span>
+<span><span class="va">gdp</span> <span class="op">&lt;-</span> <span class="fu">reviser</span><span class="fu">::</span><span class="va"><a href="../reference/gdp.html">gdp</a></span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://docs.ropensci.org/tsbox/reference/ts_pc.html" class="external-link">ts_pc</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_nth_release.html">get_nth_release</a></span><span class="op">(</span><span class="va">gdp</span>, <span class="fl">0</span><span class="op">:</span><span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">final_release</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_latest_release.html">get_latest_release</a></span><span class="op">(</span><span class="va">gdp</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_revision_analysis.html">get_revision_analysis</a></span><span class="op">(</span><span class="va">df</span>, <span class="va">final_release</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: Both 'release' and 'pub_date' columns are present in 'df. The</span></span>
+<span><span class="co">#&gt; 'release' column will be used.</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 8 × 12</span></span></span>
+<span><span class="co">#&gt;   id    release       N `Bias (mean)` `Bias (p-value)` Minimum Maximum   MAR</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> CHE   release_0   178       0.110            0.006<span style="text-decoration: underline;">92</span>  -<span style="color: #BB0000;">2.76</span>    1.69  0.405</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> CHE   release_1   177       0.096<span style="text-decoration: underline;">0</span>           0.014<span style="text-decoration: underline;">8</span>   -<span style="color: #BB0000;">2.51</span>    1.69  0.393</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> EA    release_0   178       0.055<span style="text-decoration: underline;">3</span>           0.001<span style="text-decoration: underline;">67</span>  -<span style="color: #BB0000;">0.789</span>   0.984 0.175</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> EA    release_1   177       0.050<span style="text-decoration: underline;">2</span>           0.003<span style="text-decoration: underline;">67</span>  -<span style="color: #BB0000;">0.770</span>   0.931 0.170</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> JP    release_0   178       0.009<span style="text-decoration: underline;">89</span>          0.848    -<span style="color: #BB0000;">1.66</span>    2.41  0.530</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> JP    release_1   177       0.009<span style="text-decoration: underline;">20</span>          0.859    -<span style="color: #BB0000;">1.97</span>    2.83  0.521</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> US    release_0   178       0.022<span style="text-decoration: underline;">9</span>           0.300    -<span style="color: #BB0000;">0.695</span>   1.18  0.215</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span> US    release_1   177       0.019<span style="text-decoration: underline;">9</span>           0.347    -<span style="color: #BB0000;">0.644</span>   1.08  0.208</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 4 more variables: `Std. Dev.` &lt;dbl&gt;, `Noise/Signal` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   Correlation &lt;dbl&gt;, `Correlation (p-value)` &lt;dbl&gt;</span></span></span></code></pre></div>
+</div>
+</div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 
