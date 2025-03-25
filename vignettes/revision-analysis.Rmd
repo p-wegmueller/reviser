@@ -16,10 +16,7 @@ knitr::opts_chunk$set(
 
 This vignette provides a detailed explanation of the statistical measures and hypothesis tests used in `get_revision_analysis()`. The function is designed to analyze revisions between initial and final data releases, helping to assess bias, efficiency, correlation, seasonality, and the relative contributions of news and noise in revisions. The function returns a tibble with the desired statistics and hypothesis tests. In the following sections, we provide a detailed explanation of the statistics and hypothesis tests used in the function and provide the corresponding column name in brackets to assess it.
 
-
-## Definitions and Notation
-
-Let:
+Let's define some notation to facilitate the discussion of the statistics and hypothesis tests used in the function:
 
 - \( Y_t^h \) denote the $h$th released value for time \( t \) with $h=0$ being the initial release
 - \( Y_t^f \) denote the final revised value for time \( t \)
@@ -32,18 +29,19 @@ Let:
 
 Revisions provide insights into the reliability of initial data releases. Various metrics assess their magnitude and distribution:
 
-1. **Mean Revision** (`"Bias (mean)"`):  
+#### 1. **Mean Revision** (`"Bias (mean)"`)
    The mean revision quantifies systematic bias in the revisions:  
 
    \[
    \text{Bias} = \bar{R} = \frac{1}{N} \sum_{t=1}^{N} R_t^{f}
    \]
 
-   If the mean revision is significantly different from zero, it indicates a tendency for initial releases to be systematically over- or under-estimated. A **t-test** is conducted to test the null hypothesis \( H_0: \bar{R} = 0 \).  
+   If the mean revision is significantly different from zero, it indicates a tendency for initial releases to be systematically over- or under-estimated. A **t-test** is conducted to test the null hypothesis \( H_0: \bar{R} = 0 \).
+   
    - `"Bias (p-value)"` reports the standard t-test p-value.  
    - `"Bias (robust p-value)"` provides a heteroskedasticity-robust alternative.
 
-2. **Mean Absolute Revision** (`"MAR"`):  
+#### 2. **Mean Absolute Revision** (`"MAR"`)  
    The mean absolute revision measures the average size of revisions, regardless of direction:
 
    \[
@@ -52,13 +50,13 @@ Revisions provide insights into the reliability of initial data releases. Variou
 
    This metric is useful when evaluating the magnitude of revisions rather than their direction.
 
-3. **Minimum and Maximum Revisions** (`"Minimum"`, `"Maximum"`):  
+#### 3. **Minimum and Maximum Revisions** (`"Minimum"`, `"Maximum"`)  
    These statistics capture the most extreme downward and upward revisions in the dataset.
 
-4. **Percentiles of Revisions** (`"10Q"`, `"Median"`, `"90Q"`):  
+#### 4. **Percentiles of Revisions** (`"10Q"`, `"Median"`, `"90Q"`)  
    The 10th, 50th (median), and 90th percentiles provide a distributional perspective, helping to identify skewness and tail behavior in revisions.
 
-5. **Standard Deviation of Revisions** (`"Std. Dev."`):  
+#### 5. **Standard Deviation of Revisions** (`"Std. Dev."`)  
    The standard deviation quantifies the dispersion of revisions:
 
    \[
@@ -67,7 +65,7 @@ Revisions provide insights into the reliability of initial data releases. Variou
 
    A higher standard deviation indicates greater variability in the revision process.
 
-6. **Noise-to-Signal Ratio** (`"Noise/Signal"`):  
+#### 6. **Noise-to-Signal Ratio** (`"Noise/Signal"`)  
    This metric measures the relative size of revisions compared to the total variance in the final data:
 
    \[
@@ -81,7 +79,7 @@ Revisions provide insights into the reliability of initial data releases. Variou
 
 Understanding how revisions relate to initial releases and past revisions can reveal patterns in the revision process:
 
-1. **Correlation Between Revisions and Initial Releases** (`"Correlation"`):  
+#### 1. **Correlation Between Revisions and Initial Releases** (`"Correlation"`)  
    This measures whether revisions are systematically related to the initial release \( Y_t^h \), which serves as a proxy for available information at the time of release:
 
    \[
@@ -90,7 +88,7 @@ Understanding how revisions relate to initial releases and past revisions can re
 
    A significant correlation suggests that initial estimates contain information that predicts later revisions. A **t-test** (`"Correlation (p-value)"`) is used to test whether \( \rho \) is significantly different from zero.
 
-2. **Autocorrelation of Revisions** (`"Autocorrelation (1st)"`):  
+#### 2. **1st order Autocorrelation of Revisions** (`"Autocorrelation (1st)"`)  
    The **first-order autocorrelation** measures the persistence in the revision process by examining whether past revisions predict future revisions:
 
    \[
@@ -99,13 +97,33 @@ Understanding how revisions relate to initial releases and past revisions can re
 
    If revisions exhibit strong autocorrelation, it may indicate a systematic pattern in the revision process rather than purely random adjustments.  
    A **t-test** (`"Autocorrelation (1st p-value)"`) is used to assess whether \( \rho_1 \) is significantly different from zero.
+   
+#### 3. **Autocorrelation of Revisions up to 1 year** (`"Autocorrelation up to 1yr (Ljung-Box p-value)"`)   
+  This metric assesses the autocorrelation of revisions up to a lag of 1 year using the Ljung-Box test. The null hypothesis of the Ljung-Box test is that there is **no autocorrelation** up to the specified lag. In other words, the revisions are independent of one another. The alternative hypothesis is that there **is autocorrelation** in the revisions.
+
+   - **For quarterly data (4 observations per year)**, the test checks for autocorrelation up to **4 lags**.
+   - **For monthly data (12 observations per year)**, the test checks for autocorrelation up to **12 lags**.
+   - **For other frequencies**, the test is skipped.
+
+  The Ljung-Box test statistic is computed using the following formula:
+
+  \[
+  Q = N(N + 2) \sum_{k=1}^{m} \frac{\hat{\rho}_k^2}{N - k}
+  \]
+
+  - \( Q \) is the Ljung-Box statistic.
+  - \( N \) is the number of observations in the time series.
+  - \( \hat{\rho}_k \) is the **sample autocorrelation** at lag \( k \). This measures the correlation between the revisions at time \( t \) and time \( t-k \).
+  - \( m \) is the number of lags considered (which corresponds to the frequency of the data: 4 for quarterly data, 12 for monthly data).  
+  
+       The test statistic \( Q \) is used to determine whether there is significant autocorrelation. If the autocorrelation at a particular lag is large, it suggests that the revisions at that lag are not independent of each other. The larger the \( Q \)-statistic, the stronger the evidence that the revisions are autocorrelated.
 
 These metrics collectively help evaluate the reliability, predictability, and potential biases in data revisions.
 
 ### Sign Switches
 Sign switches in data revisions can occur when the direction of an economic indicator changes between its initial release and later revisions. We define two key metrics to assess the stability of these directional signals:
 
-1. **Fraction of sign changes:**  
+#### 1. **Fraction of sign changes**  
    This metric (`"Fraction of correct sign"`) evaluates how often the sign of the initially reported value \( Y_t^0 \) differs from the final revised value \( Y_t^f \). Mathematically, we compute:  
 
    \[
@@ -114,7 +132,7 @@ Sign switches in data revisions can occur when the direction of an economic indi
 
    where \( \mathbb{1}(\cdot) \) is an indicator function that equals 1 if the signs match and 0 otherwise.
 
-2. **Fraction of sign changes in the growth rate:**  
+#### 2. **Fraction of sign changes in the growth rate**  
    This metric (` "Fraction of correct growth rate change"`) assesses whether the direction of change in the variable remains consistent after revisions. Specifically, we compare the sign of the period-over-period differences:
 
    \[
@@ -126,46 +144,110 @@ Sign switches in data revisions can occur when the direction of an economic indi
 A high fraction of incorrect signs in either metric suggests that early estimates may be unreliable in capturing the true direction of the variable.
 
 ## Hypothesis Tests
+### **News and Noise Tests for Data Revisions**
 
-### Bias Tests
-We estimate:
-\[ Y_t = \alpha + \beta X_t + \varepsilon_t \]
-Tests:
+The **news and noise tests** analyze the properties of **data revisions** in relation to the final and preliminary releases of an economic variable. These tests help to evaluate whether the revisions are systematic, whether they contain new information, or whether they are simply noisy adjustments. 
 
-- \( H_0: \alpha = 0 \) (intercept bias test)
-- \( H_0: \beta = 1 \) (slope bias test)
+**Final revisions** can be classified into two categories:
 
-### Efficiency Tests
-A regression of \( R_t \) on \( X_t \):
-\[ R_t = \gamma + \delta X_t + \nu_t \]
-Tests:
+(i) **Noise:** The initial announcement is an observation of the final series, measured with error. This means that the revision is uncorrelated with the final value but correlated with the data available when the estimate is made.
 
-- \( H_0: \gamma = 0 \) (intercept efficiency test)
-- \( H_0: \delta = 0 \) (slope efficiency test)
+(ii) **News:** The initial announcement is an efficient forecast that reflects all available information, and subsequent estimates reduce the forecast error by incorporating new information. The revision is correlated with the final value but uncorrelated with the data available when the estimate is made, i.e., unpredictable using the information set at the time of the initial announcement.
 
-### Correlation and Autocorrelation
-Pearson correlation coefficient:
-\[ \rho_{X,Y} = \frac{\sum (X_t - \bar{X}) (Y_t - \bar{Y})}{\sqrt{\sum (X_t - \bar{X})^2 \sum (Y_t - \bar{Y})^2}} \]
 
-Autocorrelation of order \( k \):
-\[ \rho_k = \frac{\sum (R_t - \bar{R}) (R_{t-k} - \bar{R})}{\sum (R_t - \bar{R})^2} \]
+To test these categories, we run **two regression tests:**
 
-### Theil’s U Statistics
-Theil’s U1:
-\[ U_1 = \frac{\sqrt{\frac{1}{N} \sum_{t=1}^{N} (R_t)^2}}{\sqrt{\frac{1}{N} \sum_{t=1}^{N} (Y_t^2 + X_t^2)}} \]
+#### 1. **The Noise Test**
+   The **noise test** examines whether the **revision** can be predicted by the final value:
 
-Theil’s U2:
-\[ U_2 = \frac{\sqrt{\sum (Y_t - Y_{t-1})^2}}{\sqrt{\sum (X_t - X_{t-1})^2}} \]
+  \[
+  {R}_t^f = \alpha + \beta \cdot {Y_t^f} + \epsilon_t
+  \]  
+    
+   If the preliminary value were an **efficient and unbiased estimate** of the final value (i.e incorporating all relevant information), revisions should be **uncorrelated** with the final value. The null hypothesis is:
 
-### Seasonality Tests
+  \[
+  H_0: \alpha = 0, \quad \beta = 0
+  \]
+  
+  - The function tests the joint hypothesis (`"noise_wald_p_value"`) that both \( \alpha = 0 \) and \( \beta = 0 \) using a **heteroskedasticity and autocorrelation consistent (HAC) covariance matrix** to ensure robust inference.
+  - \( \alpha = 0 \) tests (`"noise_intercept_p_value"`) whether the revisions have a systematic bias.
+  - \( \beta = 0 \) tests (`"noise_coeff_p_value"`) whether the revisions are correlated with the final value, indicating inefficiency.
 
-- Ljung-Box test for autocorrelation at seasonal lags.
-- Friedman test for seasonality in revisions.
+####  2. **The News Test**
 
-### News vs. Noise Tests
+The **news test** examines whether the revision is predictable using the preliminary release:
 
-- \( H_0: R_t \) is uncorrelated with \( X_t \) (news test).
-- \( H_0: R_t \) is explained by \( Y_t \) (noise test).
+\[
+{R}_t^f = \alpha + \beta \cdot {Y}_t^h + \epsilon_t
+\]
+
+Here, we test whether revisions are **systematically related** to the initial value. The null hypothesis is:
+
+\[
+H_0: \alpha = 0, \quad \beta = 0
+\]
+
+  - The function tests the joint hypothesis (`"news_wald_p_value"`) that both \( \alpha = 0 \) and \( \beta = 0 \) using a **HAC covariance matrix** to ensure robust inference.
+  - \( \alpha = 0 \) tests (`"news_intercept_p_value"`) whether the revisions have a systematic bias.
+  - \( \beta = 0 \) tests (`"news_coeff_p_value"`) whether the revisions are correlated with the initial value, indicating inefficiency.
+
+Note: Instead of regressing $R_t^f$ on $Y_t^f$ or $Y_t^h$, one can similarly regress 
+\[
+  \text{Noise: } \quad Y_t^h = \alpha + \beta \cdot Y_t^f + \epsilon_t \\
+  \text{News: } \quad Y_t^f = \alpha + \beta \cdot Y_t^h + \epsilon_t
+   \]
+and test \( \alpha = 0 \) and \( \beta = 1 \) for the presence of noise and news in the data revisions. 
+
+### Test of Seasonality in Revisions
+
+To test whether seasonality is present in revisions, we employ a Friedman test. Note that this test is always performed on first-differentiated series.
+
+#### **Friedman Test**
+
+The Friedman test is a non-parametric statistical test that examines whether the distribution of ranked data differs systematically across seasonal periods, such as months or quarters. It does not require distributional assumptions, making it a robust tool for detecting seasonality in revision series. The test is applied by first transforming the revision series into a matrix where each row represents a year and each column represents a specific month or quarter. It is constructed as follows. Consider first the matrix of data \( \{x_{ij}\}_{n \times k} \) with \( n \) rows (i.e., the number of years in the sample) and \( k \) columns (i.e., either 12 months or 4 quarters, depending on the frequency of the data). The data matrix needs to be replaced by a new matrix \( \{r_{ij}\}_{n \times k} \), where the entry \( r_{ij} \) is the rank of \( x_{ij} \) within the row \( i \). The test is executed using the [stats::friedman.test()] function. The null hypothesis is that the average ranking across columns is the same, indicating no seasonality in the revisions.
+
+
+### **Theil’s U Statistics**
+In the context of revision analysis, **Theil’s inequality coefficient**, or **Theil’s U**, provides a measure of the accuracy of a initial estimates (\( Y_t^h \)) relative to final or more refined values (\( Y_t^f \)). Various definitions of Theil’s statistics exist, leading to different interpretations. This package considers two widely used variants: **U1** and **U2**.  
+
+#### 1. **Theil’s U1 Statistic**  
+
+The first measure, **U1**, is given by:  
+
+\[
+U_1 = \frac{\sqrt{\frac{1}{n}\sum^n_{t=1}(Y_t^f-Y_t^h)^2}}{\sqrt{\frac{1}{n}\sum^n_{t=1}{Y_t^f}^2}+\sqrt{\frac{1}{n}\sum^n_{t=1}{Y_t^h}^2}}
+\]
+
+The **U1 statistic is bounded between 0 and 1**:  
+
+- A value of **0** implies perfect forecasting (\( Y_t^h = Y_t^f \) for all \( t \)).  
+- A value **closer to 1** indicates lower accuracy.  
+
+However, U1 suffers from **several limitations**, as highlighted by **Granger & Newbold (1973)**. A critical issue arises when **one of \( Y_t^h \) or \( Y_t^f \) equals zero in all periods**. In such cases, the denominator and numerator become equal, leading to **U1 = 1** even when preliminary estimates are close to the final values.  
+
+#### 2. **Theil’s U2 Statistic**  
+
+To address these shortcomings, Theil (1966) proposed an alternative measure, **U2**, which is defined as:  
+
+\[
+U_2 = \frac{\sqrt{\sum_{t=1}^{n} \left( \frac{Y_{t+1}^h- Y_{t+1}^f}{Y_t^f} \right)^2}}{\sqrt{\sum_{t=1}^{n} \left( \frac{Y_{t+1}^f - Y_t^f}{Y_t^f} \right)^2}}
+\]
+
+where:  
+
+- The numerator captures the **relative errors** in the preliminary estimates.  
+- The denominator measures the **magnitude of changes** in the final values over time.  
+
+Unlike U1, **U2 is not bounded between 0 and 1**. Instead: 
+
+- A value of **0** implies perfect accuracy (\( Y_{t}^h = Y_{t}^f \) for all \( t \)).  
+- **\( U_2 = 1 \)** means the accuracy of the preliminary estimates is equal to a **naïve random walk**.  
+- **\( U_2 > 1 \)** suggests the preliminary estimates are **less accurate** than the naïve approach.  
+- **\( U_2 < 1 \)** indicates the preliminary estimates are **more accurate** than the naïve method.  
+
+Whenever possible (**if \( Y_{t}^f \neq 0 \) for all \( t \)**), **U2 is the preferred metric** for evaluating preliminary estimates.  
+
 
 
 ## Example Usage

@@ -794,28 +794,6 @@ get_revision_analysis <- function(
     mean_nw_t_stat <- stats::coef(mean_test_model)[1] / mean_test_se
     mean_nw_p_value <- 2 * (1 - stats::pt(abs(mean_nw_t_stat), df = N - 1)) # Two-sided p-value
 
-    # Significance test for the Bias (intercept and slope)
-    bias_test_model <- stats::lm(final_value ~ value, data = data)
-    coef_test_intercept <- summary(bias_test_model)$coefficients[1, 1]
-    coef_test_slope <- summary(bias_test_model)$coefficients[2, 1]
-    coef_p_value_intercept <- summary(bias_test_model)$coefficients[1, 4]
-    test <- car::linearHypothesis(bias_test_model, c("value = 1"))
-    coef_p_value_slope <- test[2, 'Pr(>F)']
-
-    # Efficiency test
-    efficiency_test_model <- stats::lm(revision ~ value, data = data)
-    coef_efficiency_intercept <- summary(efficiency_test_model)$coefficients[
-      1,
-      1
-    ]
-    coef_efficiency_slope <- summary(efficiency_test_model)$coefficients[2, 1]
-    coef_efficiency_p_value_intercept <- summary(
-      efficiency_test_model
-    )$coefficients[1, 4]
-    coef_efficiency_p_value_slope <- summary(
-      efficiency_test_model
-    )$coefficients[2, 4]
-
     # Significance test for correlation
     cor_t_stat <- correlation * sqrt((N - 2) / (1 - correlation^2))
     cor_p_value <- 2 * (1 - stats::pt(abs(cor_t_stat), df = N - 2)) # Two-sided p-value
@@ -825,15 +803,20 @@ get_revision_analysis <- function(
     auto_p_value <- 2 * (1 - stats::pt(abs(auto_t_stat), df = N - 2)) # Two-sided p-value
 
     # Ljung Box:
-    ljung_box <- stats::Box.test(
-      data$revision,
-      lag = 4,
-      type = "Ljung-Box",
-      fitdf = 1
-    )$p.value
+    if (freq %in% c(4, 12)) {
+      ljung_box <- stats::Box.test(
+        data$revision,
+        lag = freq,
+        type = "Ljung-Box",
+        fitdf = 1
+      )$p.value
+    } else {
+      ljung_box <- NA
+    }
 
     theils_u1 <- sqrt(mean((data$final_value - data$value)^2)) /
       (sqrt(mean(data$final_value^2)) + sqrt(mean(data$value^2)))
+
     theils_u2 <- sqrt(
       sum(
         (data$value[-1] - data$final_value[-1]) /
@@ -848,27 +831,13 @@ get_revision_analysis <- function(
       )
 
     # Seasonality test
-    if (freq == 12) {
+    if (freq %in% c(4, 12)) {
       friedman_p_value <- friedman_test(
         data$revision,
         frequency = freq
-      )$`p_value`
-      ljung_box_seasonality_p_value <- qs_test(
-        data$revision,
-        lags = c(12, 24)
-      )$`p_value`
-    } else if (freq == 4) {
-      friedman_p_value <- friedman_test(
-        data$revision,
-        frequency = freq
-      )$`p_value`
-      ljung_box_seasonality_p_value <- qs_test(
-        data$revision,
-        lags = c(4, 8)
       )$`p_value`
     } else {
       friedman_p_value <- NA
-      ljung_box_seasonality_p_value <- NA
     }
 
     # Noise test
@@ -879,11 +848,13 @@ get_revision_analysis <- function(
       c("(Intercept) = 0", "final_value = 0"),
       vcov = hac_se
     )
-    noise_p_value <- test[2, 'Pr(>F)']
+    noise_wald_p_value <- test[2, 'Pr(>F)']
     noise_intercept <- stats::coef(noise_test)[1]
     noise_intercept_stderr <- sqrt(diag(hac_se))[1]
+    noise_intercept_p_value <- summary(noise_test)$coefficients[1, 4]
     noise_coeff <- stats::coef(noise_test)[2]
     noise_coeff_stderr <- sqrt(diag(hac_se))[2]
+    noise_coeff_p_value <- summary(noise_test)$coefficients[2, 4]
 
     # News test
     news_test <- stats::lm(revision ~ value, data = data)
@@ -893,11 +864,13 @@ get_revision_analysis <- function(
       c("(Intercept) = 0", "value = 0"),
       vcov = hac_se
     )
-    news_p_value <- test[2, 'Pr(>F)']
+    news_wald_p_value <- test[2, 'Pr(>F)']
     news_intercept <- stats::coef(news_test)[1]
     news_intercept_stderr <- sqrt(diag(hac_se))[1]
+    news_intercept_p_value <- summary(news_test)$coefficients[1, 4]
     news_coeff <- stats::coef(news_test)[2]
     news_coeff_stderr <- sqrt(diag(hac_se))[2]
+    news_coeff_p_value <- summary(news_test)$coefficients[2, 4]
 
     # Computes the fraction of sign changes
     correct_sign <- data %>%
@@ -936,14 +909,6 @@ get_revision_analysis <- function(
         "Bias (mean)",
         "Bias (p-value)",
         "Bias (robust p-value)",
-        "Bias (intercept)",
-        "Bias (intercept p-value)",
-        "Bias (slope)",
-        "Bias (slope p-value)",
-        "Efficiency (intercept)",
-        "Efficiency (intercept p-value)",
-        "Efficiency (slope)",
-        "Efficiency (slope p-value)",
         "Minimum",
         "Maximum",
         "10Q",
@@ -956,21 +921,24 @@ get_revision_analysis <- function(
         "Correlation (p-value)",
         "Autocorrelation (1st)",
         "Autocorrelation (1st p-value)",
-        "Autocorrelation up to 4th (Ljung-Box p-value)",
+        "Autocorrelation up to 1yr (Ljung-Box p-value)",
         "Theil's U1",
         "Theil's U2",
-        "Seasonality (Ljung-Box p-value)",
         "Seasonality (Friedman p-value)",
         "News test Intercept",
         "News test Intercept (std.err)",
+        "News test Intercept (p-value)",
         "News test Coefficient",
         "News test Coefficient (std.err)",
-        "News test (p-value)",
+        "News test Coefficient (p-value)",
+        "News joint test (p-value)",
         "Noise test Intercept",
         "Noise test Intercept (std.err)",
+        "Noise test Intercept (p-value)",
         "Noise test Coefficient",
         "Noise test Coefficient (std.err)",
-        "Noise test (p-value)",
+        "Noise test Coefficient (p-value)",
+        "Noise joint test (p-value)",
         "Fraction of correct sign",
         "Fraction of correct growth rate change"
       ),
@@ -980,14 +948,6 @@ get_revision_analysis <- function(
         mean_revision,
         mean_p_value,
         mean_nw_p_value,
-        coef_test_intercept,
-        coef_p_value_intercept,
-        coef_test_slope,
-        coef_p_value_slope,
-        coef_efficiency_intercept,
-        coef_efficiency_p_value_intercept,
-        coef_efficiency_slope,
-        coef_efficiency_p_value_slope,
         min_revision,
         max_revision,
         q10,
@@ -1003,18 +963,21 @@ get_revision_analysis <- function(
         ljung_box,
         theils_u1,
         theils_u2,
-        ljung_box_seasonality_p_value,
         friedman_p_value,
         news_intercept,
         news_intercept_stderr,
+        news_intercept_p_value,
         news_coeff,
         news_coeff_stderr,
-        news_p_value,
+        news_coeff_p_value,
+        news_wald_p_value,
         noise_intercept,
         noise_intercept_stderr,
+        noise_intercept_p_value,
         noise_coeff,
         noise_coeff_stderr,
-        noise_p_value,
+        noise_coeff_p_value,
+        noise_wald_p_value,
         correct_sign,
         correct_change
       )
@@ -1095,10 +1058,6 @@ get_revision_analysis <- function(
         "Bias (intercept p-value)",
         "Bias (slope)",
         "Bias (slope p-value)",
-        "Efficiency (intercept)",
-        "Efficiency (intercept p-value)",
-        "Efficiency (slope)",
-        "Efficiency (slope p-value)"
       )
     return(results)
   } else if (degree == 3) {
@@ -1116,7 +1075,6 @@ get_revision_analysis <- function(
         "Autocorrelation up to 4th (Ljung-Box p-value)",
         "Theil's U1",
         "Theil's U2",
-        "Seasonality (Ljung-Box p-value)",
         "Seasonality (Friedman p-value)"
       )
     return(results)
@@ -1130,14 +1088,18 @@ get_revision_analysis <- function(
         "N",
         "News test Intercept",
         "News test Intercept (std.err)",
+        "News test Intercept (p-value)",
         "News test Coefficient",
         "News test Coefficient (std.err)",
-        "News test (p-value)",
+        "News test Coefficient (p-value)",
+        "News joint test (p-value)",
         "Noise test Intercept",
         "Noise test Intercept (std.err)",
+        "Noise test Intercept (p-value)",
         "Noise test Coefficient",
         "Noise test Coefficient (std.err)",
-        "Noise test (p-value)"
+        "Noise test Coefficient (p-value)",
+        "Noise joint test (p-value)",
       )
     return(results)
   } else if (degree == 5) {
@@ -1156,54 +1118,31 @@ friedman_test <- function(series, frequency = 12) {
 
   # Reshape the series into blocks (years) and treatments (months or quarters)
   n <- length(diff_series)
-  n_blocks <- n %/% frequency # Number of years (or periods of 'frequency' data)
+  n_blocks <- n %/% frequency # Number of full periods (years)
 
-  # Reshape the series into a matrix of ranks
-  diff_matrix <- matrix(
-    diff_series[1:(n_blocks * frequency)],
-    nrow = n_blocks,
-    ncol = frequency
+  # Truncate the series to fit into a complete matrix
+  diff_series <- diff_series[1:(n_blocks * frequency)]
+
+  # Create block and treatment identifiers
+  blocks <- rep(1:n_blocks, each = frequency) # e.g., Year number
+  treatments <- rep(1:frequency, times = n_blocks) # e.g., Month number
+
+  # Convert to a data frame
+  friedman_data <- data.frame(
+    value = diff_series,
+    block = factor(blocks),
+    treatment = factor(treatments)
   )
-  ranked_matrix <- apply(diff_matrix, 2, rank)
 
-  # Compute the test statistic
-  row_means <- apply(ranked_matrix, 1, mean)
-  total_mean <- mean(row_means)
+  # Perform Friedman test
+  test_result <- stats::friedman.test(
+    value ~ treatment | block,
+    data = friedman_data
+  )
 
-  Q <- sum((row_means - total_mean)^2) / sum((ranked_matrix - total_mean)^2)
-
-  # Degrees of freedom for the chi-squared distribution
-  df <- frequency - 1
-  p_value <- 1 - stats::pchisq(Q, df)
-
-  return(list(p_value = p_value))
+  # Return p-value
+  return(list(p_value = test_result$p.value))
 }
-
-
-#' Function for the QS test used in `get_revision_analysis`
-#' @param series vector
-#' @param lags vector of seasonal lags
-#' @noRd
-qs_test <- function(series, lags = c(12, 24)) {
-  # First-difference the series
-  diff_series <- diff(series)
-
-  # Compute autocorrelations for seasonal lags
-  acf_vals <- stats::acf(diff_series, lag.max = max(lags), plot = FALSE)$acf
-
-  # Compute QS statistic
-  n <- length(diff_series)
-  QS <- sum((pmax(0, acf_vals[lags])^2) * (n * (n + 2) / (n - lags)))
-
-  # Chi-squared distribution with 'k' degrees of freedom
-  k <- length(lags)
-
-  # Compare QS statistic to chi-squared critical value
-  p_value <- 1 - stats::pchisq(QS, df = k)
-
-  return(list(p_value = p_value))
-}
-
 
 #' Extract the Nth Data Release (Vintage)
 #'
