@@ -357,10 +357,115 @@ between vintages published a fixed number of periods apart.</p></li>
 <h3 id="example-usage">
 <strong>Example usage</strong><a class="anchor" aria-label="anchor" href="#example-usage"></a>
 </h3>
-<p>In the next section, we explore a practical application and
-visualization techniques for revision analysis.</p>
+<p>Once we have formatted our dataset in the appropriate long tidy
+format, we can apply the <code><a href="../reference/get_revisions.html">get_revisions()</a></code> function to
+analyze revisions using different methods. Below are some practical
+examples using GDP revision data.</p>
+<div class="section level4">
+<h4 id="example-1-revisions-using-an-interval">Example 1: Revisions Using an Interval<a class="anchor" aria-label="anchor" href="#example-1-revisions-using-an-interval"></a>
+</h4>
+<p>The most common use case is to analyze how reported values evolve
+over time. By setting <code>interval = 1</code>, we compute revisions
+between consecutive releases:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://p-wegmueller.github.io/reviser/">reviser</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attaching package: 'dplyr'</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     filter, lag</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://p-wegmueller.github.io/reviser/">reviser</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://docs.ropensci.org/tsbox/" class="external-link">tsbox</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Example dataset</span></span>
+<span><span class="va">gdp</span> <span class="op">&lt;-</span> <span class="fu">reviser</span><span class="fu">::</span><span class="va"><a href="../reference/gdp.html">gdp</a></span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://docs.ropensci.org/tsbox/reference/ts_pc.html" class="external-link">ts_pc</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">revisions_interval</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_revisions.html">get_revisions</a></span><span class="op">(</span><span class="va">gdp</span>, interval <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Preview results</span></span>
+<span><span class="co"># How do the 2nd and 3rd release revise compared to previous quarter?</span></span>
+<span><span class="fu"><a href="../reference/plot_vintages.html">plot_vintages</a></span><span class="op">(</span></span>
+<span>  <span class="va">revisions_interval</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">id</span> <span class="op">==</span> <span class="st">"US"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="../reference/get_nth_release.html">get_nth_release</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">1</span><span class="op">)</span>,</span>
+<span>  dim_col <span class="op">=</span> <span class="st">"release"</span>,</span>
+<span>  title <span class="op">=</span> <span class="st">"Revisions of 2nd (release_0) and 3rd (release_1) release"</span>,</span>
+<span>  subtitle <span class="op">=</span> <span class="st">"For the US"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="understanding-revisions_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="co"># Revisions of the latest release</span></span>
+<span><span class="fu"><a href="../reference/plot_vintages.html">plot_vintages</a></span><span class="op">(</span></span>
+<span>  <span class="va">revisions_interval</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/get_latest_release.html">get_latest_release</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  dim_col <span class="op">=</span> <span class="st">"id"</span>,</span>
+<span>  title <span class="op">=</span> <span class="st">"Revisions of the latest release"</span>,</span>
+<span>  subtitle <span class="op">=</span> <span class="st">"For several countries"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="understanding-revisions_files/figure-html/unnamed-chunk-2-2.png" width="700"></p>
+<p>This helps identify patterns in how the data is revised over time,
+whether revisions are systematic or random, and their magnitude.</p>
+</div>
+<div class="section level4">
+<h4 id="example-2-revisions-relative-to-a-fixed-reference-date">Example 2: Revisions Relative to a Fixed Reference Date<a class="anchor" aria-label="anchor" href="#example-2-revisions-relative-to-a-fixed-reference-date"></a>
+</h4>
+<p>To compare all reported values against a fixed publication date, use
+the <code>ref_date</code> argument. This is useful when benchmarking
+against an initial estimate:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="va">revisions_date</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_revisions.html">get_revisions</a></span><span class="op">(</span><span class="va">gdp</span>, ref_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2005-10-01"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Preview results</span></span>
+<span><span class="co"># Revisions of the latest release</span></span>
+<span><span class="fu"><a href="../reference/plot_vintages.html">plot_vintages</a></span><span class="op">(</span></span>
+<span>  <span class="va">revisions_date</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/get_latest_release.html">get_latest_release</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  dim_col <span class="op">=</span> <span class="st">"id"</span>,</span>
+<span>  title <span class="op">=</span> <span class="st">"Revisions of the latest release compared to Q4 2005"</span>,</span>
+<span>  subtitle <span class="op">=</span> <span class="st">"For several countries"</span>,</span>
+<span>  type<span class="op">=</span><span class="st">"bar"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="understanding-revisions_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
+</div>
+<div class="section level4">
+<h4 id="example-3-revisions-to-the-nth-release">Example 3: Revisions to the Nth Release<a class="anchor" aria-label="anchor" href="#example-3-revisions-to-the-nth-release"></a>
+</h4>
+<p>Instead of comparing consecutive releases, we can compare each data
+point against its nth release. For example, if we want to evaluate
+revisions between the first and second releases:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">revisions_nth</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_revisions.html">get_revisions</a></span><span class="op">(</span><span class="va">gdp</span>, nth_release <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Preview results</span></span>
+<span><span class="co"># Revisions of the latest release</span></span>
+<span><span class="fu"><a href="../reference/plot_vintages.html">plot_vintages</a></span><span class="op">(</span></span>
+<span>  <span class="va">revisions_nth</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/get_latest_release.html">get_latest_release</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  dim_col <span class="op">=</span> <span class="st">"id"</span>,</span>
+<span>  title <span class="op">=</span> <span class="st">"Revisions of the latest compared to first release"</span>,</span>
+<span>  subtitle <span class="op">=</span> <span class="st">"For several countries"</span>,</span>
+<span>  type<span class="op">=</span><span class="st">"bar"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="understanding-revisions_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
+<p>This is useful for assessing how much initial estimates deviate from
+later, more refined estimates.</p>
+<p>These visualizations can help detect bias in revisions, identify
+persistent trends, and inform decision-making.</p>
+<p>The <code><a href="../reference/get_revisions.html">get_revisions()</a></code> function in the <code>reviser</code>
+package provides a flexible way to analyze time series data revisions.
+By allowing users to compute revisions using different methods, it helps
+assess the reliability of early estimates and understand the dynamics of
+data revisions over time.</p>
+<p>For further analysis, users can integrate
+<code><a href="../reference/get_revisions.html">get_revisions()</a></code> with other functions in the
+<code>reviser</code> package, such as summary statistics and revision
+diagnostics (<code><a href="../reference/get_revision_analysis.html">get_revision_analysis()</a></code>), to gain deeper
+insights into the revision process.</p>
+</div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
