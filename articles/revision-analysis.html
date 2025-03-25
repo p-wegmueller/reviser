@@ -94,10 +94,8 @@ tibble with the desired statistics and hypothesis tests. In the
 following sections, we provide a detailed explanation of the statistics
 and hypothesis tests used in the function and provide the corresponding
 column name in brackets to assess it.</p>
-<div class="section level2">
-<h2 id="definitions-and-notation">Definitions and Notation<a class="anchor" aria-label="anchor" href="#definitions-and-notation"></a>
-</h2>
-<p>Let:</p>
+<p>Let’s define some notation to facilitate the discussion of the
+statistics and hypothesis tests used in the function:</p>
 <ul>
 <li>
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><annotation encoding="application/x-tex">Y_t^h</annotation></semantics></math>
@@ -124,7 +122,6 @@ release for time
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>N</mi><annotation encoding="application/x-tex">N</annotation></semantics></math>
 is the number of observations</li>
 </ul>
-</div>
 <div class="section level2">
 <h2 id="summary-statistics">Summary Statistics<a class="anchor" aria-label="anchor" href="#summary-statistics"></a>
 </h2>
@@ -133,14 +130,13 @@ is the number of observations</li>
 </h3>
 <p>Revisions provide insights into the reliability of initial data
 releases. Various metrics assess their magnitude and distribution:</p>
-<ol style="list-style-type: decimal">
-<li>
-<p><strong>Mean Revision</strong>
-(<code>"Bias (mean)"</code>):<br>
-The mean revision quantifies systematic bias in the revisions:</p>
+<div class="section level4">
+<h4 id="mean-revision-bias-mean">1. <strong>Mean Revision</strong> (<code>"Bias (mean)"</code>)<a class="anchor" aria-label="anchor" href="#mean-revision-bias-mean"></a>
+</h4>
+<p>The mean revision quantifies systematic bias in the revisions:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">Bias</mtext><mo>=</mo><mover><mi>R</mi><mo accent="true">‾</mo></mover><mo>=</mo><mfrac><mn>1</mn><mi>N</mi></mfrac><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><msubsup><mi>R</mi><mi>t</mi><mi>f</mi></msubsup></mrow><annotation encoding="application/x-tex">
-\text{Bias} = \bar{R} = \frac{1}{N} \sum_{t=1}^{N} R_t^{f}
-</annotation></semantics></math></p>
+   \text{Bias} = \bar{R} = \frac{1}{N} \sum_{t=1}^{N} R_t^{f}
+   </annotation></semantics></math></p>
 <p>If the mean revision is significantly different from zero, it
 indicates a tendency for initial releases to be systematically over- or
 under-estimated. A <strong>t-test</strong> is conducted to test the null
@@ -155,45 +151,53 @@ p-value.<br>
 <code>"Bias (robust p-value)"</code> provides a
 heteroskedasticity-robust alternative.</li>
 </ul>
-</li>
-<li>
-<p><strong>Mean Absolute Revision</strong>
-(<code>"MAR"</code>):<br>
-The mean absolute revision measures the average size of revisions,
+</div>
+<div class="section level4">
+<h4 id="mean-absolute-revision-mar">2. <strong>Mean Absolute Revision</strong> (<code>"MAR"</code>)<a class="anchor" aria-label="anchor" href="#mean-absolute-revision-mar"></a>
+</h4>
+<p>The mean absolute revision measures the average size of revisions,
 regardless of direction:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">MAR</mtext><mo>=</mo><mfrac><mn>1</mn><mi>N</mi></mfrac><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><mrow><mo stretchy="true" form="prefix">|</mo><msubsup><mi>R</mi><mi>t</mi><mi>f</mi></msubsup><mo stretchy="true" form="postfix">|</mo></mrow></mrow><annotation encoding="application/x-tex">
-\text{MAR} = \frac{1}{N} \sum_{t=1}^{N} |R_t^{f}|
-</annotation></semantics></math></p>
+   \text{MAR} = \frac{1}{N} \sum_{t=1}^{N} |R_t^{f}|
+   </annotation></semantics></math></p>
 <p>This metric is useful when evaluating the magnitude of revisions
 rather than their direction.</p>
-</li>
-<li><p><strong>Minimum and Maximum Revisions</strong>
-(<code>"Minimum"</code>, <code>"Maximum"</code>):<br>
-These statistics capture the most extreme downward and upward revisions
-in the dataset.</p></li>
-<li><p><strong>Percentiles of Revisions</strong> (<code>"10Q"</code>,
-<code>"Median"</code>, <code>"90Q"</code>):<br>
-The 10th, 50th (median), and 90th percentiles provide a distributional
-perspective, helping to identify skewness and tail behavior in
-revisions.</p></li>
-<li>
-<p><strong>Standard Deviation of Revisions</strong>
-(<code>"Std. Dev."</code>):<br>
-The standard deviation quantifies the dispersion of revisions:</p>
+</div>
+<div class="section level4">
+<h4 id="minimum-and-maximum-revisions-minimum-maximum">3. <strong>Minimum and Maximum Revisions</strong>
+(<code>"Minimum"</code>, <code>"Maximum"</code>)<a class="anchor" aria-label="anchor" href="#minimum-and-maximum-revisions-minimum-maximum"></a>
+</h4>
+<p>These statistics capture the most extreme downward and upward
+revisions in the dataset.</p>
+</div>
+<div class="section level4">
+<h4 id="percentiles-of-revisions-10q-median-90q">4. <strong>Percentiles of Revisions</strong> (<code>"10Q"</code>,
+<code>"Median"</code>, <code>"90Q"</code>)<a class="anchor" aria-label="anchor" href="#percentiles-of-revisions-10q-median-90q"></a>
+</h4>
+<p>The 10th, 50th (median), and 90th percentiles provide a
+distributional perspective, helping to identify skewness and tail
+behavior in revisions.</p>
+</div>
+<div class="section level4">
+<h4 id="standard-deviation-of-revisions-std--dev-">5. <strong>Standard Deviation of Revisions</strong>
+(<code>"Std. Dev."</code>)<a class="anchor" aria-label="anchor" href="#standard-deviation-of-revisions-std--dev-"></a>
+</h4>
+<p>The standard deviation quantifies the dispersion of revisions:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>σ</mi><mi>R</mi></msub><mo>=</mo><msqrt><mrow><mfrac><mn>1</mn><mrow><mi>N</mi><mo>−</mo><mn>1</mn></mrow></mfrac><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><msup><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>R</mi><mi>t</mi><mi>f</mi></msubsup><mo>−</mo><mover><mi>R</mi><mo accent="true">‾</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></msqrt></mrow><annotation encoding="application/x-tex">
-\sigma_R = \sqrt{ \frac{1}{N-1} \sum_{t=1}^{N} (R_t^{f} - \bar{R})^2 }
-</annotation></semantics></math></p>
+   \sigma_R = \sqrt{ \frac{1}{N-1} \sum_{t=1}^{N} (R_t^{f} - \bar{R})^2 }
+   </annotation></semantics></math></p>
 <p>A higher standard deviation indicates greater variability in the
 revision process.</p>
-</li>
-<li>
-<p><strong>Noise-to-Signal Ratio</strong>
-(<code>"Noise/Signal"</code>):<br>
-This metric measures the relative size of revisions compared to the
+</div>
+<div class="section level4">
+<h4 id="noise-to-signal-ratio-noisesignal">6. <strong>Noise-to-Signal Ratio</strong>
+(<code>"Noise/Signal"</code>)<a class="anchor" aria-label="anchor" href="#noise-to-signal-ratio-noisesignal"></a>
+</h4>
+<p>This metric measures the relative size of revisions compared to the
 total variance in the final data:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mfrac><msub><mi>σ</mi><mi>R</mi></msub><msub><mi>σ</mi><mi>Y</mi></msub></mfrac><annotation encoding="application/x-tex">
-\frac{\sigma_R}{\sigma_Y}
-</annotation></semantics></math></p>
+   \frac{\sigma_R}{\sigma_Y}
+   </annotation></semantics></math></p>
 <p>where
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>σ</mi><mi>Y</mi></msub><annotation encoding="application/x-tex">\sigma_Y</annotation></semantics></math>
 is the standard deviation of the final value
@@ -201,41 +205,41 @@ is the standard deviation of the final value
 A high noise-to-signal ratio suggests that revisions are large relative
 to the underlying variability in the final data, indicating high
 uncertainty in initial estimates.</p>
-</li>
-</ol>
+</div>
 </div>
 <div class="section level3">
 <h3 id="correlation-of-revisions">Correlation of Revisions<a class="anchor" aria-label="anchor" href="#correlation-of-revisions"></a>
 </h3>
 <p>Understanding how revisions relate to initial releases and past
 revisions can reveal patterns in the revision process:</p>
-<ol style="list-style-type: decimal">
-<li>
-<p><strong>Correlation Between Revisions and Initial
-Releases</strong> (<code>"Correlation"</code>):<br>
-This measures whether revisions are systematically related to the
+<div class="section level4">
+<h4 id="correlation-between-revisions-and-initial-releases-correlation">1. <strong>Correlation Between Revisions and Initial
+Releases</strong> (<code>"Correlation"</code>)<a class="anchor" aria-label="anchor" href="#correlation-between-revisions-and-initial-releases-correlation"></a>
+</h4>
+<p>This measures whether revisions are systematically related to the
 initial release
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><annotation encoding="application/x-tex">Y_t^h</annotation></semantics></math>,
 which serves as a proxy for available information at the time of
 release:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ρ</mi><mo>=</mo><mfrac><mrow><mo>∑</mo><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><mo>−</mo><msup><mover><mi>Y</mi><mo accent="true">‾</mo></mover><mi>h</mi></msup><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>R</mi><mi>t</mi><mi>f</mi></msubsup><mo>−</mo><mover><mi>R</mi><mo accent="true">‾</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><msqrt><mrow><mo>∑</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><mo>−</mo><msup><mover><mi>Y</mi><mo accent="true">‾</mo></mover><mi>h</mi></msup><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></msqrt><msqrt><mrow><mo>∑</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>R</mi><mi>t</mi><mi>f</mi></msubsup><mo>−</mo><mover><mi>R</mi><mo accent="true">‾</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></msqrt></mrow></mfrac></mrow><annotation encoding="application/x-tex">
-\rho = \frac{\sum (Y_t^h - \bar{Y}^h) (R_t^f - \bar{R})}{\sqrt{\sum (Y_t^h - \bar{Y}^h)^2}  \sqrt{\sum (R_t^f - \bar{R})^2}}
-</annotation></semantics></math></p>
+   \rho = \frac{\sum (Y_t^h - \bar{Y}^h) (R_t^f - \bar{R})}{\sqrt{\sum (Y_t^h - \bar{Y}^h)^2}  \sqrt{\sum (R_t^f - \bar{R})^2}}
+   </annotation></semantics></math></p>
 <p>A significant correlation suggests that initial estimates contain
 information that predicts later revisions. A <strong>t-test</strong>
 (<code>"Correlation (p-value)"</code>) is used to test whether
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ρ</mi><annotation encoding="application/x-tex">\rho</annotation></semantics></math>
 is significantly different from zero.</p>
-</li>
-<li>
-<p><strong>Autocorrelation of Revisions</strong>
-(<code>"Autocorrelation (1st)"</code>):<br>
-The <strong>first-order autocorrelation</strong> measures the
+</div>
+<div class="section level4">
+<h4 id="st-order-autocorrelation-of-revisions-autocorrelation-1st">2. <strong>1st order Autocorrelation of Revisions</strong>
+(<code>"Autocorrelation (1st)"</code>)<a class="anchor" aria-label="anchor" href="#st-order-autocorrelation-of-revisions-autocorrelation-1st"></a>
+</h4>
+<p>The <strong>first-order autocorrelation</strong> measures the
 persistence in the revision process by examining whether past revisions
 predict future revisions:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ρ</mi><mn>1</mn></msub><mo>=</mo><mfrac><mrow><mo>∑</mo><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>R</mi><mi>t</mi><mi>f</mi></msubsup><mo>−</mo><mover><mi>R</mi><mo accent="true">‾</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>R</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow><mi>f</mi></msubsup><mo>−</mo><mover><mi>R</mi><mo accent="true">‾</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><msqrt><mrow><mo>∑</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>R</mi><mi>t</mi><mi>f</mi></msubsup><mo>−</mo><mover><mi>R</mi><mo accent="true">‾</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></msqrt><msqrt><mrow><mo>∑</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>R</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow><mi>f</mi></msubsup><mo>−</mo><mover><mi>R</mi><mo accent="true">‾</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></msqrt></mrow></mfrac></mrow><annotation encoding="application/x-tex">
-\rho_1 = \frac{\sum (R_t^f - \bar{R}) (R_{t-1}^f - \bar{R})}{\sqrt{\sum (R_t^f - \bar{R})^2 } \sqrt{\sum (R_{t-1}^f - \bar{R})^2}}
-</annotation></semantics></math></p>
+   \rho_1 = \frac{\sum (R_t^f - \bar{R}) (R_{t-1}^f - \bar{R})}{\sqrt{\sum (R_t^f - \bar{R})^2 } \sqrt{\sum (R_{t-1}^f - \bar{R})^2}}
+   </annotation></semantics></math></p>
 <p>If revisions exhibit strong autocorrelation, it may indicate a
 systematic pattern in the revision process rather than purely random
 adjustments.<br>
@@ -243,10 +247,61 @@ A <strong>t-test</strong> (<code>"Autocorrelation (1st p-value)"</code>)
 is used to assess whether
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>ρ</mi><mn>1</mn></msub><annotation encoding="application/x-tex">\rho_1</annotation></semantics></math>
 is significantly different from zero.</p>
+</div>
+<div class="section level4">
+<h4 id="autocorrelation-of-revisions-up-to-1-year-autocorrelation-up-to-1yr-ljung-box-p-value">3. <strong>Autocorrelation of Revisions up to 1 year</strong>
+(<code>"Autocorrelation up to 1yr (Ljung-Box p-value)"</code>)<a class="anchor" aria-label="anchor" href="#autocorrelation-of-revisions-up-to-1-year-autocorrelation-up-to-1yr-ljung-box-p-value"></a>
+</h4>
+<p>This metric assesses the autocorrelation of revisions up to a lag of
+1 year using the Ljung-Box test. The null hypothesis of the Ljung-Box
+test is that there is <strong>no autocorrelation</strong> up to the
+specified lag. In other words, the revisions are independent of one
+another. The alternative hypothesis is that there <strong>is
+autocorrelation</strong> in the revisions.</p>
+<ul>
+<li>
+<strong>For quarterly data (4 observations per year)</strong>, the
+test checks for autocorrelation up to <strong>4 lags</strong>.</li>
+<li>
+<strong>For monthly data (12 observations per year)</strong>, the
+test checks for autocorrelation up to <strong>12 lags</strong>.</li>
+<li>
+<strong>For other frequencies</strong>, the test is skipped.</li>
+</ul>
+<p>The Ljung-Box test statistic is computed using the following
+formula:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Q</mi><mo>=</mo><mi>N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>N</mi><mo>+</mo><mn>2</mn><mo stretchy="true" form="postfix">)</mo></mrow><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>m</mi></munderover><mfrac><msubsup><mover><mi>ρ</mi><mo accent="true">̂</mo></mover><mi>k</mi><mn>2</mn></msubsup><mrow><mi>N</mi><mo>−</mo><mi>k</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">
+  Q = N(N + 2) \sum_{k=1}^{m} \frac{\hat{\rho}_k^2}{N - k}
+  </annotation></semantics></math></p>
+<ul>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Q</mi><annotation encoding="application/x-tex">Q</annotation></semantics></math>
+is the Ljung-Box statistic.</p></li>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>N</mi><annotation encoding="application/x-tex">N</annotation></semantics></math>
+is the number of observations in the time series.</p></li>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mover><mi>ρ</mi><mo accent="true">̂</mo></mover><mi>k</mi></msub><annotation encoding="application/x-tex">\hat{\rho}_k</annotation></semantics></math>
+is the <strong>sample autocorrelation</strong> at lag
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>.
+This measures the correlation between the revisions at time
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>
+and time
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi><mo>−</mo><mi>k</mi></mrow><annotation encoding="application/x-tex">t-k</annotation></semantics></math>.</p></li>
+<li>
+<p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>m</mi><annotation encoding="application/x-tex">m</annotation></semantics></math>
+is the number of lags considered (which corresponds to the frequency of
+the data: 4 for quarterly data, 12 for monthly data).</p>
+<p>The test statistic
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Q</mi><annotation encoding="application/x-tex">Q</annotation></semantics></math>
+is used to determine whether there is significant autocorrelation. If
+the autocorrelation at a particular lag is large, it suggests that the
+revisions at that lag are not independent of each other. The larger the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Q</mi><annotation encoding="application/x-tex">Q</annotation></semantics></math>-statistic,
+the stronger the evidence that the revisions are
+autocorrelated.</p>
 </li>
-</ol>
+</ul>
 <p>These metrics collectively help evaluate the reliability,
 predictability, and potential biases in data revisions.</p>
+</div>
 </div>
 <div class="section level3">
 <h3 id="sign-switches">Sign Switches<a class="anchor" aria-label="anchor" href="#sign-switches"></a>
@@ -255,122 +310,276 @@ predictability, and potential biases in data revisions.</p>
 economic indicator changes between its initial release and later
 revisions. We define two key metrics to assess the stability of these
 directional signals:</p>
-<ol style="list-style-type: decimal">
-<li>
-<p><strong>Fraction of sign changes:</strong><br>
-This metric (<code>"Fraction of correct sign"</code>) evaluates how
+<div class="section level4">
+<h4 id="fraction-of-sign-changes">1. <strong>Fraction of sign changes</strong><a class="anchor" aria-label="anchor" href="#fraction-of-sign-changes"></a>
+</h4>
+<p>This metric (<code>"Fraction of correct sign"</code>) evaluates how
 often the sign of the initially reported value
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>Y</mi><mi>t</mi><mn>0</mn></msubsup><annotation encoding="application/x-tex">Y_t^0</annotation></semantics></math>
 differs from the final revised value
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup><annotation encoding="application/x-tex">Y_t^f</annotation></semantics></math>.
 Mathematically, we compute:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">Fraction of sign consistency</mtext><mo>=</mo><mfrac><mrow><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>T</mi></munderover><mn>𝟙</mn><mrow><mo stretchy="true" form="prefix">(</mo><mtext mathvariant="normal">sign</mtext><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>Y</mi><mi>t</mi><mn>0</mn></msubsup><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mtext mathvariant="normal">sign</mtext><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mi>T</mi></mfrac></mrow><annotation encoding="application/x-tex">
-\text{Fraction of sign consistency} = \frac{\sum_{t=1}^{T} \mathbb{1}(\text{sign}(Y_t^0) = \text{sign}(Y_t^f))}{T}
-</annotation></semantics></math></p>
+   \text{Fraction of sign consistency} = \frac{\sum_{t=1}^{T} \mathbb{1}(\text{sign}(Y_t^0) = \text{sign}(Y_t^f))}{T}
+   </annotation></semantics></math></p>
 <p>where
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>𝟙</mn><mrow><mo stretchy="true" form="prefix">(</mo><mo>⋅</mo><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathbb{1}(\cdot)</annotation></semantics></math>
 is an indicator function that equals 1 if the signs match and 0
 otherwise.</p>
-</li>
-<li>
-<p><strong>Fraction of sign changes in the growth
-rate:</strong><br>
-This metric (<code>"Fraction of correct growth rate change"</code>)
+</div>
+<div class="section level4">
+<h4 id="fraction-of-sign-changes-in-the-growth-rate">2. <strong>Fraction of sign changes in the growth rate</strong><a class="anchor" aria-label="anchor" href="#fraction-of-sign-changes-in-the-growth-rate"></a>
+</h4>
+<p>This metric (<code>"Fraction of correct growth rate change"</code>)
 assesses whether the direction of change in the variable remains
 consistent after revisions. Specifically, we compare the sign of the
 period-over-period differences:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">Fraction of sign consistency in growth</mtext><mo>=</mo><mfrac><mrow><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>2</mn></mrow><mi>T</mi></munderover><mn>𝟙</mn><mrow><mo stretchy="true" form="prefix">(</mo><mtext mathvariant="normal">sign</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mi>Δ</mi><msubsup><mi>Y</mi><mi>t</mi><mn>0</mn></msubsup><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mtext mathvariant="normal">sign</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mi>Δ</mi><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mi>T</mi><mo>−</mo><mn>1</mn></mrow></mfrac></mrow><annotation encoding="application/x-tex">
-\text{Fraction of sign consistency in growth} = \frac{\sum_{t=2}^{T} \mathbb{1}(\text{sign}(\Delta Y_t^0) = \text{sign}(\Delta Y_t^f))}{T-1}
-</annotation></semantics></math></p>
+   \text{Fraction of sign consistency in growth} = \frac{\sum_{t=2}^{T} \mathbb{1}(\text{sign}(\Delta Y_t^0) = \text{sign}(\Delta Y_t^f))}{T-1}
+   </annotation></semantics></math></p>
 <p>where
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Δ</mi><msubsup><mi>Y</mi><mi>t</mi><mn>0</mn></msubsup><mo>=</mo><msubsup><mi>Y</mi><mi>t</mi><mn>0</mn></msubsup><mo>−</mo><msubsup><mi>Y</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow><mn>0</mn></msubsup></mrow><annotation encoding="application/x-tex">\Delta Y_t^0 = Y_t^0 - Y_{t-1}^0</annotation></semantics></math>
 and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Δ</mi><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup><mo>=</mo><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup><mo>−</mo><msubsup><mi>Y</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow><mi>f</mi></msubsup></mrow><annotation encoding="application/x-tex">\Delta Y_t^f = Y_t^f - Y_{t-1}^f</annotation></semantics></math>
 represent the first differences of the initially reported and final
 values, respectively.</p>
-</li>
-</ol>
 <p>A high fraction of incorrect signs in either metric suggests that
 early estimates may be unreliable in capturing the true direction of the
 variable.</p>
+</div>
 </div>
 </div>
 <div class="section level2">
 <h2 id="hypothesis-tests">Hypothesis Tests<a class="anchor" aria-label="anchor" href="#hypothesis-tests"></a>
 </h2>
 <div class="section level3">
-<h3 id="bias-tests">Bias Tests<a class="anchor" aria-label="anchor" href="#bias-tests"></a>
+<h3 id="news-and-noise-tests-for-data-revisions">
+<strong>News and Noise Tests for Data Revisions</strong><a class="anchor" aria-label="anchor" href="#news-and-noise-tests-for-data-revisions"></a>
 </h3>
-<p>We estimate:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>Y</mi><mi>t</mi></msub><mo>=</mo><mi>α</mi><mo>+</mo><mi>β</mi><msub><mi>X</mi><mi>t</mi></msub><mo>+</mo><msub><mi>ε</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex"> Y_t = \alpha + \beta X_t + \varepsilon_t </annotation></semantics></math>
-Tests:</p>
+<p>The <strong>news and noise tests</strong> analyze the properties of
+<strong>data revisions</strong> in relation to the final and preliminary
+releases of an economic variable. These tests help to evaluate whether
+the revisions are systematic, whether they contain new information, or
+whether they are simply noisy adjustments.</p>
+<p><strong>Final revisions</strong> can be classified into two
+categories:</p>
+<ol style="list-style-type: lower-roman">
+<li><p><strong>Noise:</strong> The initial announcement is an
+observation of the final series, measured with error. This means that
+the revision is uncorrelated with the final value but correlated with
+the data available when the estimate is made.</p></li>
+<li><p><strong>News:</strong> The initial announcement is an efficient
+forecast that reflects all available information, and subsequent
+estimates reduce the forecast error by incorporating new information.
+The revision is correlated with the final value but uncorrelated with
+the data available when the estimate is made, i.e., unpredictable using
+the information set at the time of the initial announcement.</p></li>
+</ol>
+<p>To test these categories, we run <strong>two regression
+tests:</strong></p>
+<div class="section level4">
+<h4 id="the-noise-test">1. <strong>The Noise Test</strong><a class="anchor" aria-label="anchor" href="#the-noise-test"></a>
+</h4>
+<p>The <strong>noise test</strong> examines whether the
+<strong>revision</strong> can be predicted by the final value:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>R</mi><mi>t</mi><mi>f</mi></msubsup><mo>=</mo><mi>α</mi><mo>+</mo><mi>β</mi><mo>⋅</mo><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup><mo>+</mo><msub><mi>ϵ</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">
+  {R}_t^f = \alpha + \beta \cdot {Y_t^f} + \epsilon_t
+  </annotation></semantics></math></p>
+<p>If the preliminary value were an <strong>efficient and unbiased
+estimate</strong> of the final value (i.e incorporating all relevant
+information), revisions should be <strong>uncorrelated</strong> with the
+final value. The null hypothesis is:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>H</mi><mn>0</mn></msub><mo>:</mo><mi>α</mi><mo>=</mo><mn>0</mn><mo>,</mo><mspace width="1.0em"></mspace><mi>β</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">
+  H_0: \alpha = 0, \quad \beta = 0
+  </annotation></semantics></math></p>
 <ul>
+<li>The function tests the joint hypothesis
+(<code>"noise_wald_p_value"</code>) that both
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\alpha = 0</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>β</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\beta = 0</annotation></semantics></math>
+using a <strong>heteroskedasticity and autocorrelation consistent (HAC)
+covariance matrix</strong> to ensure robust inference.</li>
 <li>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>H</mi><mn>0</mn></msub><mo>:</mo><mi>α</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">H_0: \alpha = 0</annotation></semantics></math>
-(intercept bias test)</li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\alpha = 0</annotation></semantics></math>
+tests (<code>"noise_intercept_p_value"</code>) whether the revisions
+have a systematic bias.</li>
 <li>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>H</mi><mn>0</mn></msub><mo>:</mo><mi>β</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">H_0: \beta = 1</annotation></semantics></math>
-(slope bias test)</li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>β</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\beta = 0</annotation></semantics></math>
+tests (<code>"noise_coeff_p_value"</code>) whether the revisions are
+correlated with the final value, indicating inefficiency.</li>
 </ul>
 </div>
-<div class="section level3">
-<h3 id="efficiency-tests">Efficiency Tests<a class="anchor" aria-label="anchor" href="#efficiency-tests"></a>
-</h3>
-<p>A regression of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>R</mi><mi>t</mi></msub><annotation encoding="application/x-tex">R_t</annotation></semantics></math>
+<div class="section level4">
+<h4 id="the-news-test">2. <strong>The News Test</strong><a class="anchor" aria-label="anchor" href="#the-news-test"></a>
+</h4>
+<p>The <strong>news test</strong> examines whether the revision is
+predictable using the preliminary release:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>R</mi><mi>t</mi><mi>f</mi></msubsup><mo>=</mo><mi>α</mi><mo>+</mo><mi>β</mi><mo>⋅</mo><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><mo>+</mo><msub><mi>ϵ</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">
+{R}_t^f = \alpha + \beta \cdot {Y}_t^h + \epsilon_t
+</annotation></semantics></math></p>
+<p>Here, we test whether revisions are <strong>systematically
+related</strong> to the initial value. The null hypothesis is:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>H</mi><mn>0</mn></msub><mo>:</mo><mi>α</mi><mo>=</mo><mn>0</mn><mo>,</mo><mspace width="1.0em"></mspace><mi>β</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">
+H_0: \alpha = 0, \quad \beta = 0
+</annotation></semantics></math></p>
+<ul>
+<li>The function tests the joint hypothesis
+(<code>"news_wald_p_value"</code>) that both
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\alpha = 0</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>β</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\beta = 0</annotation></semantics></math>
+using a <strong>HAC covariance matrix</strong> to ensure robust
+inference.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\alpha = 0</annotation></semantics></math>
+tests (<code>"news_intercept_p_value"</code>) whether the revisions have
+a systematic bias.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>β</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\beta = 0</annotation></semantics></math>
+tests (<code>"news_coeff_p_value"</code>) whether the revisions are
+correlated with the initial value, indicating inefficiency.</li>
+</ul>
+<p>Note: Instead of regressing
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>R</mi><mi>t</mi><mi>f</mi></msubsup><annotation encoding="application/x-tex">R_t^f</annotation></semantics></math>
 on
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>X</mi><mi>t</mi></msub><annotation encoding="application/x-tex">X_t</annotation></semantics></math>:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>R</mi><mi>t</mi></msub><mo>=</mo><mi>γ</mi><mo>+</mo><mi>δ</mi><msub><mi>X</mi><mi>t</mi></msub><mo>+</mo><msub><mi>ν</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex"> R_t = \gamma + \delta X_t + \nu_t </annotation></semantics></math>
-Tests:</p>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup><annotation encoding="application/x-tex">Y_t^f</annotation></semantics></math>
+or
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><annotation encoding="application/x-tex">Y_t^h</annotation></semantics></math>,
+one can similarly regress <span class="math display">$$
+  \text{Noise: } \quad Y_t^h = \alpha + \beta \cdot Y_t^f + \epsilon_t
+\\
+  \text{News: } \quad Y_t^f = \alpha + \beta \cdot Y_t^h + \epsilon_t
+   $$</span> and test
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\alpha = 0</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>β</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\beta = 1</annotation></semantics></math>
+for the presence of noise and news in the data revisions.</p>
+</div>
+</div>
+<div class="section level3">
+<h3 id="test-of-seasonality-in-revisions">Test of Seasonality in Revisions<a class="anchor" aria-label="anchor" href="#test-of-seasonality-in-revisions"></a>
+</h3>
+<p>To test whether seasonality is present in revisions, we employ a
+Friedman test. Note that this test is always performed on
+first-differentiated series.</p>
+<div class="section level4">
+<h4 id="friedman-test">
+<strong>Friedman Test</strong><a class="anchor" aria-label="anchor" href="#friedman-test"></a>
+</h4>
+<p>The Friedman test is a non-parametric statistical test that examines
+whether the distribution of ranked data differs systematically across
+seasonal periods, such as months or quarters. It does not require
+distributional assumptions, making it a robust tool for detecting
+seasonality in revision series. The test is applied by first
+transforming the revision series into a matrix where each row represents
+a year and each column represents a specific month or quarter. It is
+constructed as follows. Consider first the matrix of data
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><msub><mi>x</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><msub><mo stretchy="false" form="postfix">}</mo><mrow><mi>n</mi><mo>×</mo><mi>k</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\{x_{ij}\}_{n \times k}</annotation></semantics></math>
+with
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+rows (i.e., the number of years in the sample) and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
+columns (i.e., either 12 months or 4 quarters, depending on the
+frequency of the data). The data matrix needs to be replaced by a new
+matrix
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><msub><mi>r</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><msub><mo stretchy="false" form="postfix">}</mo><mrow><mi>n</mi><mo>×</mo><mi>k</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\{r_{ij}\}_{n \times k}</annotation></semantics></math>,
+where the entry
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>r</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><annotation encoding="application/x-tex">r_{ij}</annotation></semantics></math>
+is the rank of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>x</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><annotation encoding="application/x-tex">x_{ij}</annotation></semantics></math>
+within the row
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>.
+The test is executed using the [stats::friedman.test()] function. The
+null hypothesis is that the average ranking across columns is the same,
+indicating no seasonality in the revisions.</p>
+</div>
+</div>
+<div class="section level3">
+<h3 id="theils-u-statistics">
+<strong>Theil’s U Statistics</strong><a class="anchor" aria-label="anchor" href="#theils-u-statistics"></a>
+</h3>
+<p>In the context of revision analysis, <strong>Theil’s inequality
+coefficient</strong>, or <strong>Theil’s U</strong>, provides a measure
+of the accuracy of a initial estimates
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><annotation encoding="application/x-tex">Y_t^h</annotation></semantics></math>)
+relative to final or more refined values
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup><annotation encoding="application/x-tex">Y_t^f</annotation></semantics></math>).
+Various definitions of Theil’s statistics exist, leading to different
+interpretations. This package considers two widely used variants:
+<strong>U1</strong> and <strong>U2</strong>.</p>
+<div class="section level4">
+<h4 id="theils-u1-statistic">1. <strong>Theil’s U1 Statistic</strong><a class="anchor" aria-label="anchor" href="#theils-u1-statistic"></a>
+</h4>
+<p>The first measure, <strong>U1</strong>, is given by:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>U</mi><mn>1</mn></msub><mo>=</mo><mfrac><msqrt><mrow><mfrac><mn>1</mn><mi>n</mi></mfrac><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><msup><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup><mo>−</mo><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></msqrt><mrow><msqrt><mrow><mfrac><mn>1</mn><mi>n</mi></mfrac><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><msup><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup><mn>2</mn></msup></mrow></msqrt><mo>+</mo><msqrt><mrow><mfrac><mn>1</mn><mi>n</mi></mfrac><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><msup><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><mn>2</mn></msup></mrow></msqrt></mrow></mfrac></mrow><annotation encoding="application/x-tex">
+U_1 = \frac{\sqrt{\frac{1}{n}\sum^n_{t=1}(Y_t^f-Y_t^h)^2}}{\sqrt{\frac{1}{n}\sum^n_{t=1}{Y_t^f}^2}+\sqrt{\frac{1}{n}\sum^n_{t=1}{Y_t^h}^2}}
+</annotation></semantics></math></p>
+<p>The <strong>U1 statistic is bounded between 0 and 1</strong>:</p>
 <ul>
-<li>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>H</mi><mn>0</mn></msub><mo>:</mo><mi>γ</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">H_0: \gamma = 0</annotation></semantics></math>
-(intercept efficiency test)</li>
-<li>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>H</mi><mn>0</mn></msub><mo>:</mo><mi>δ</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">H_0: \delta = 0</annotation></semantics></math>
-(slope efficiency test)</li>
+<li>A value of <strong>0</strong> implies perfect forecasting
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><mo>=</mo><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup></mrow><annotation encoding="application/x-tex">Y_t^h = Y_t^f</annotation></semantics></math>
+for all
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>).<br>
+</li>
+<li>A value <strong>closer to 1</strong> indicates lower accuracy.</li>
 </ul>
+<p>However, U1 suffers from <strong>several limitations</strong>, as
+highlighted by <strong>Granger &amp; Newbold (1973)</strong>. A critical
+issue arises when <strong>one of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><annotation encoding="application/x-tex">Y_t^h</annotation></semantics></math>
+or
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup><annotation encoding="application/x-tex">Y_t^f</annotation></semantics></math>
+equals zero in all periods</strong>. In such cases, the denominator and
+numerator become equal, leading to <strong>U1 = 1</strong> even when
+preliminary estimates are close to the final values.</p>
 </div>
-<div class="section level3">
-<h3 id="correlation-and-autocorrelation">Correlation and Autocorrelation<a class="anchor" aria-label="anchor" href="#correlation-and-autocorrelation"></a>
-</h3>
-<p>Pearson correlation coefficient:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ρ</mi><mrow><mi>X</mi><mo>,</mo><mi>Y</mi></mrow></msub><mo>=</mo><mfrac><mrow><mo>∑</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>X</mi><mi>t</mi></msub><mo>−</mo><mover><mi>X</mi><mo accent="true">‾</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>Y</mi><mi>t</mi></msub><mo>−</mo><mover><mi>Y</mi><mo accent="true">‾</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow></mrow><msqrt><mrow><mo>∑</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>X</mi><mi>t</mi></msub><mo>−</mo><mover><mi>X</mi><mo accent="true">‾</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup><mo>∑</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>Y</mi><mi>t</mi></msub><mo>−</mo><mover><mi>Y</mi><mo accent="true">‾</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></msqrt></mfrac></mrow><annotation encoding="application/x-tex"> \rho_{X,Y} = \frac{\sum (X_t - \bar{X}) (Y_t - \bar{Y})}{\sqrt{\sum (X_t - \bar{X})^2 \sum (Y_t - \bar{Y})^2}} </annotation></semantics></math></p>
-<p>Autocorrelation of order
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ρ</mi><mi>k</mi></msub><mo>=</mo><mfrac><mrow><mo>∑</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>R</mi><mi>t</mi></msub><mo>−</mo><mover><mi>R</mi><mo accent="true">‾</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>R</mi><mrow><mi>t</mi><mo>−</mo><mi>k</mi></mrow></msub><mo>−</mo><mover><mi>R</mi><mo accent="true">‾</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mo>∑</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>R</mi><mi>t</mi></msub><mo>−</mo><mover><mi>R</mi><mo accent="true">‾</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></mfrac></mrow><annotation encoding="application/x-tex"> \rho_k = \frac{\sum (R_t - \bar{R}) (R_{t-k} - \bar{R})}{\sum (R_t - \bar{R})^2} </annotation></semantics></math></p>
-</div>
-<div class="section level3">
-<h3 id="theils-u-statistics">Theil’s U Statistics<a class="anchor" aria-label="anchor" href="#theils-u-statistics"></a>
-</h3>
-<p>Theil’s U1:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>U</mi><mn>1</mn></msub><mo>=</mo><mfrac><msqrt><mrow><mfrac><mn>1</mn><mi>N</mi></mfrac><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><msup><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>R</mi><mi>t</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></msqrt><msqrt><mrow><mfrac><mn>1</mn><mi>N</mi></mfrac><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>Y</mi><mi>t</mi><mn>2</mn></msubsup><mo>+</mo><msubsup><mi>X</mi><mi>t</mi><mn>2</mn></msubsup><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msqrt></mfrac></mrow><annotation encoding="application/x-tex"> U_1 = \frac{\sqrt{\frac{1}{N} \sum_{t=1}^{N} (R_t)^2}}{\sqrt{\frac{1}{N} \sum_{t=1}^{N} (Y_t^2 + X_t^2)}} </annotation></semantics></math></p>
-<p>Theil’s U2:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>U</mi><mn>2</mn></msub><mo>=</mo><mfrac><msqrt><mrow><mo>∑</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>Y</mi><mi>t</mi></msub><mo>−</mo><msub><mi>Y</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></msqrt><msqrt><mrow><mo>∑</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>X</mi><mi>t</mi></msub><mo>−</mo><msub><mi>X</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></msqrt></mfrac></mrow><annotation encoding="application/x-tex"> U_2 = \frac{\sqrt{\sum (Y_t - Y_{t-1})^2}}{\sqrt{\sum (X_t - X_{t-1})^2}} </annotation></semantics></math></p>
-</div>
-<div class="section level3">
-<h3 id="seasonality-tests">Seasonality Tests<a class="anchor" aria-label="anchor" href="#seasonality-tests"></a>
-</h3>
+<div class="section level4">
+<h4 id="theils-u2-statistic">2. <strong>Theil’s U2 Statistic</strong><a class="anchor" aria-label="anchor" href="#theils-u2-statistic"></a>
+</h4>
+<p>To address these shortcomings, Theil (1966) proposed an alternative
+measure, <strong>U2</strong>, which is defined as:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>U</mi><mn>2</mn></msub><mo>=</mo><mfrac><msqrt><mrow><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><msup><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><msubsup><mi>Y</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow><mi>h</mi></msubsup><mo>−</mo><msubsup><mi>Y</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow><mi>f</mi></msubsup></mrow><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></msqrt><msqrt><mrow><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><msup><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><msubsup><mi>Y</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow><mi>f</mi></msubsup><mo>−</mo><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup></mrow><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></msqrt></mfrac></mrow><annotation encoding="application/x-tex">
+U_2 = \frac{\sqrt{\sum_{t=1}^{n} \left( \frac{Y_{t+1}^h- Y_{t+1}^f}{Y_t^f} \right)^2}}{\sqrt{\sum_{t=1}^{n} \left( \frac{Y_{t+1}^f - Y_t^f}{Y_t^f} \right)^2}}
+</annotation></semantics></math></p>
+<p>where:</p>
 <ul>
-<li>Ljung-Box test for autocorrelation at seasonal lags.</li>
-<li>Friedman test for seasonality in revisions.</li>
+<li>The numerator captures the <strong>relative errors</strong> in the
+preliminary estimates.<br>
+</li>
+<li>The denominator measures the <strong>magnitude of changes</strong>
+in the final values over time.</li>
 </ul>
-</div>
-<div class="section level3">
-<h3 id="news-vs--noise-tests">News vs. Noise Tests<a class="anchor" aria-label="anchor" href="#news-vs--noise-tests"></a>
-</h3>
+<p>Unlike U1, <strong>U2 is not bounded between 0 and 1</strong>.
+Instead:</p>
 <ul>
+<li>A value of <strong>0</strong> implies perfect accuracy
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><mo>=</mo><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup></mrow><annotation encoding="application/x-tex">Y_{t}^h = Y_{t}^f</annotation></semantics></math>
+for all
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>).<br>
+</li>
 <li>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>H</mi><mn>0</mn></msub><mo>:</mo><msub><mi>R</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">H_0: R_t</annotation></semantics></math>
-is uncorrelated with
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>X</mi><mi>t</mi></msub><annotation encoding="application/x-tex">X_t</annotation></semantics></math>
-(news test).</li>
+<strong><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>U</mi><mn>2</mn></msub><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">U_2 = 1</annotation></semantics></math></strong>
+means the accuracy of the preliminary estimates is equal to a
+<strong>naïve random walk</strong>.<br>
+</li>
 <li>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>H</mi><mn>0</mn></msub><mo>:</mo><msub><mi>R</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">H_0: R_t</annotation></semantics></math>
-is explained by
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>Y</mi><mi>t</mi></msub><annotation encoding="application/x-tex">Y_t</annotation></semantics></math>
-(noise test).</li>
+<strong><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>U</mi><mn>2</mn></msub><mo>&gt;</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">U_2 &gt; 1</annotation></semantics></math></strong>
+suggests the preliminary estimates are <strong>less accurate</strong>
+than the naïve approach.<br>
+</li>
+<li>
+<strong><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>U</mi><mn>2</mn></msub><mo>&lt;</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">U_2 &lt; 1</annotation></semantics></math></strong>
+indicates the preliminary estimates are <strong>more accurate</strong>
+than the naïve method.</li>
 </ul>
+<p>Whenever possible (<strong>if
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup><mo>≠</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">Y_{t}^f \neq 0</annotation></semantics></math>
+for all
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math></strong>),
+<strong>U2 is the preferred metric</strong> for evaluating preliminary
+estimates.</p>
+</div>
 </div>
 </div>
 <div class="section level2">
