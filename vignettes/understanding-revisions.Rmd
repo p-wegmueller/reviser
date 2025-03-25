@@ -167,8 +167,92 @@ then we can extract the revisions inherent in our time series vintages with the 
 
 ## **Example usage**
 
-In the next section, we explore a practical application and visualization techniques for revision analysis.
+Once we have formatted our dataset in the appropriate long tidy format, we can apply the `get_revisions()` function to analyze revisions using different methods. Below are some practical examples using GDP revision data.
 
-```{r example}
+### Example 1: Revisions Using an Interval
+
+The most common use case is to analyze how reported values evolve over time. By setting `interval = 1`, we compute revisions between consecutive releases:
+
+```{r}
+library(dplyr)
 library(reviser)
+
+# Example dataset
+gdp <- reviser::gdp %>%
+  ts_pc() %>%
+  na.omit()
+
+revisions_interval <- get_revisions(gdp, interval = 1)
+
+# Preview results
+# How do the 2nd and 3rd release revise compared to previous quarter?
+plot_vintages(
+  revisions_interval %>% 
+    filter(id == "US") %>%
+    get_nth_release(0:1),
+  dim_col = "release",
+  title = "Revisions of 2nd (release_0) and 3rd (release_1) release",
+  subtitle = "For the US"
+)
+
+# Revisions of the latest release
+plot_vintages(
+  revisions_interval %>% get_latest_release(),
+  dim_col = "id",
+  title = "Revisions of the latest release",
+  subtitle = "For several countries"
+)
+
 ```
+
+This helps identify patterns in how the data is revised over time, whether revisions are systematic or random, and their magnitude.
+
+### Example 2: Revisions Relative to a Fixed Reference Date
+
+To compare all reported values against a fixed publication date, use the `ref_date` argument. This is useful when benchmarking against an initial estimate:
+
+```{r}
+
+revisions_date <- get_revisions(gdp, ref_date = as.Date("2005-10-01"))
+
+# Preview results
+# Revisions of the latest release
+plot_vintages(
+  revisions_date %>% get_latest_release(),
+  dim_col = "id",
+  title = "Revisions of the latest release compared to Q4 2005",
+  subtitle = "For several countries",
+  type="bar"
+)
+```
+
+
+### Example 3: Revisions to the Nth Release
+
+Instead of comparing consecutive releases, we can compare each data point against its nth release. For example, if we want to evaluate revisions between the first and second releases:
+
+```{r}
+revisions_nth <- get_revisions(gdp, nth_release = 0)
+
+# Preview results
+# Revisions of the latest release
+plot_vintages(
+  revisions_nth %>% get_latest_release(),
+  dim_col = "id",
+  title = "Revisions of the latest compared to first release",
+  subtitle = "For several countries",
+  type="bar"
+)
+```
+
+This is useful for assessing how much initial estimates deviate from later, more refined estimates.
+
+These visualizations can help detect bias in revisions, identify persistent trends, and inform decision-making.
+
+## Conclusion
+
+The `get_revisions()` function in the `reviser` package provides a flexible way to analyze time series data revisions. By allowing users to compute revisions using different methods, it helps assess the reliability of early estimates and understand the dynamics of data revisions over time.
+
+For further analysis, users can integrate `get_revisions()` with other functions in the `reviser` package, such as summary statistics and revision diagnostics (`get_revision_analysis()`), to gain deeper insights into the revision process.
+
+
