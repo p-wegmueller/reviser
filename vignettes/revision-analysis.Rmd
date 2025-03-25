@@ -30,6 +30,7 @@ This vignette provides a detailed explanation of the statistical measures and hy
 ## Definitions and Notation
 
 Let:
+
 - \( Y_t^0 \) denote the initially released value at time \( t \)
 - \( Y_t^f \) denote the final revised value at time \( t \)
 - \( R_t^f = Y_t^f - Y_t^0 \) be the final revision at time \( t \)
