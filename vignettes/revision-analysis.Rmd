@@ -14,7 +14,8 @@ knitr::opts_chunk$set(
 )
 ```
 
-This vignette provides a detailed explanation of the statistical measures and hypothesis tests used in `get_revision_analysis()`. The function is designed to analyze revisions between initial and final data releases, helping to assess bias, efficiency, correlation, seasonality, and the relative contributions of news and noise in revisions.
+This vignette provides a detailed explanation of the statistical measures and hypothesis tests used in `get_revision_analysis()`. The function is designed to analyze revisions between initial and final data releases, helping to assess bias, efficiency, correlation, seasonality, and the relative contributions of news and noise in revisions. The function returns a tibble with the desired statistics and hypothesis tests. In the following sections, we provide a detailed explanation of the statistics and hypothesis tests used in the function and provide the corresponding column name in brackets to assess it.
+
 
 ## Definitions and Notation
 
@@ -25,28 +26,108 @@ Let:
 - \( R_t^f = Y_t^f - Y_t^h \) be the final revision compared to the $h$th release for time \( t \)
 - \( N \) is the number of observations
 
-
 ## Summary Statistics
 
-The function `get_revision_analysis()` calculates the following statistics:
+### Revision Size  
 
-### 1. Bias (Mean Revision)
-The mean revision quantifies systematic bias:
-\[ \text{Bias} =  \bar{R} = \frac{1}{N} \sum_{t=1}^{N} R_t^{f} \]
-A t-test is used to test if the mean revision is significantly different from zero. 
-Standard and robust p-values are provided.
+Revisions provide insights into the reliability of initial data releases. Various metrics assess their magnitude and distribution:
 
-### 2. Standard Deviation of Revisions
-Measures the dispersion of revisions:
-\[ \sigma_R = \sqrt{ \frac{1}{N-1} \sum_{t=1}^{N} (R_t - \bar{R})^2 } \]
+1. **Mean Revision** (`"Bias (mean)"`):  
+   The mean revision quantifies systematic bias in the revisions:  
 
-### 3. Noise-to-Signal Ratio
-\[ \frac{\sigma_R}{\sigma_Y} \]
-where \( \sigma_Y \) is the standard deviation of \( Y_t \).
+   \[
+   \text{Bias} = \bar{R} = \frac{1}{N} \sum_{t=1}^{N} R_t^{f}
+   \]
+
+   If the mean revision is significantly different from zero, it indicates a tendency for initial releases to be systematically over- or under-estimated. A **t-test** is conducted to test the null hypothesis \( H_0: \bar{R} = 0 \).  
+   - `"Bias (p-value)"` reports the standard t-test p-value.  
+   - `"Bias (robust p-value)"` provides a heteroskedasticity-robust alternative.
+
+2. **Mean Absolute Revision** (`"MAR"`):  
+   The mean absolute revision measures the average size of revisions, regardless of direction:
+
+   \[
+   \text{MAR} = \frac{1}{N} \sum_{t=1}^{N} |R_t^{f}|
+   \]
+
+   This metric is useful when evaluating the magnitude of revisions rather than their direction.
+
+3. **Minimum and Maximum Revisions** (`"Minimum"`, `"Maximum"`):  
+   These statistics capture the most extreme downward and upward revisions in the dataset.
+
+4. **Percentiles of Revisions** (`"10Q"`, `"Median"`, `"90Q"`):  
+   The 10th, 50th (median), and 90th percentiles provide a distributional perspective, helping to identify skewness and tail behavior in revisions.
+
+5. **Standard Deviation of Revisions** (`"Std. Dev."`):  
+   The standard deviation quantifies the dispersion of revisions:
+
+   \[
+   \sigma_R = \sqrt{ \frac{1}{N-1} \sum_{t=1}^{N} (R_t^{f} - \bar{R})^2 }
+   \]
+
+   A higher standard deviation indicates greater variability in the revision process.
+
+6. **Noise-to-Signal Ratio** (`"Noise/Signal"`):  
+   This metric measures the relative size of revisions compared to the total variance in the final data:
+
+   \[
+   \frac{\sigma_R}{\sigma_Y}
+   \]
+
+   where \( \sigma_Y \) is the standard deviation of the final value \( Y_t^f \). A high noise-to-signal ratio suggests that revisions are large relative to the underlying variability in the final data, indicating high uncertainty in initial estimates.
+
+
+### Correlation of Revisions  
+
+Understanding how revisions relate to initial releases and past revisions can reveal patterns in the revision process:
+
+1. **Correlation Between Revisions and Initial Releases** (`"Correlation"`):  
+   This measures whether revisions are systematically related to the initial release \( Y_t^h \), which serves as a proxy for available information at the time of release:
+
+   \[
+   \rho = \frac{\sum (Y_t^h - \bar{Y}^h) (R_t^f - \bar{R})}{\sqrt{\sum (Y_t^h - \bar{Y}^h)^2}  \sqrt{\sum (R_t^f - \bar{R})^2}}
+   \]
+
+   A significant correlation suggests that initial estimates contain information that predicts later revisions. A **t-test** (`"Correlation (p-value)"`) is used to test whether \( \rho \) is significantly different from zero.
+
+2. **Autocorrelation of Revisions** (`"Autocorrelation (1st)"`):  
+   The **first-order autocorrelation** measures the persistence in the revision process by examining whether past revisions predict future revisions:
+
+   \[
+   \rho_1 = \frac{\sum (R_t^f - \bar{R}) (R_{t-1}^f - \bar{R})}{\sqrt{\sum (R_t^f - \bar{R})^2 } \sqrt{\sum (R_{t-1}^f - \bar{R})^2}}
+   \]
+
+   If revisions exhibit strong autocorrelation, it may indicate a systematic pattern in the revision process rather than purely random adjustments.  
+   A **t-test** (`"Autocorrelation (1st p-value)"`) is used to assess whether \( \rho_1 \) is significantly different from zero.
+
+These metrics collectively help evaluate the reliability, predictability, and potential biases in data revisions.
+
+### Sign Switches
+Sign switches in data revisions can occur when the direction of an economic indicator changes between its initial release and later revisions. We define two key metrics to assess the stability of these directional signals:
+
+1. **Fraction of sign changes:**  
+   This metric (`"Fraction of correct sign"`) evaluates how often the sign of the initially reported value \( Y_t^0 \) differs from the final revised value \( Y_t^f \). Mathematically, we compute:  
+
+   \[
+   \text{Fraction of sign consistency} = \frac{\sum_{t=1}^{T} \mathbb{1}(\text{sign}(Y_t^0) = \text{sign}(Y_t^f))}{T}
+   \]
+
+   where \( \mathbb{1}(\cdot) \) is an indicator function that equals 1 if the signs match and 0 otherwise.
+
+2. **Fraction of sign changes in the growth rate:**  
+   This metric (` "Fraction of correct growth rate change"`) assesses whether the direction of change in the variable remains consistent after revisions. Specifically, we compare the sign of the period-over-period differences:
+
+   \[
+   \text{Fraction of sign consistency in growth} = \frac{\sum_{t=2}^{T} \mathbb{1}(\text{sign}(\Delta Y_t^0) = \text{sign}(\Delta Y_t^f))}{T-1}
+   \]
+
+   where \( \Delta Y_t^0 = Y_t^0 - Y_{t-1}^0 \) and \( \Delta Y_t^f = Y_t^f - Y_{t-1}^f \) represent the first differences of the initially reported and final values, respectively.
+
+A high fraction of incorrect signs in either metric suggests that early estimates may be unreliable in capturing the true direction of the variable.
 
 ## Hypothesis Tests
 
-### 4. Bias Tests
+### Bias Tests
 We estimate:
 \[ Y_t = \alpha + \beta X_t + \varepsilon_t \]
 Tests:
@@ -54,7 +135,7 @@ Tests:
 - \( H_0: \alpha = 0 \) (intercept bias test)
 - \( H_0: \beta = 1 \) (slope bias test)
 
-### 5. Efficiency Tests
+### Efficiency Tests
 A regression of \( R_t \) on \( X_t \):
 \[ R_t = \gamma + \delta X_t + \nu_t \]
 Tests:
@@ -62,26 +143,26 @@ Tests:
 - \( H_0: \gamma = 0 \) (intercept efficiency test)
 - \( H_0: \delta = 0 \) (slope efficiency test)
 
-### 6. Correlation and Autocorrelation
+### Correlation and Autocorrelation
 Pearson correlation coefficient:
 \[ \rho_{X,Y} = \frac{\sum (X_t - \bar{X}) (Y_t - \bar{Y})}{\sqrt{\sum (X_t - \bar{X})^2 \sum (Y_t - \bar{Y})^2}} \]
 
 Autocorrelation of order \( k \):
 \[ \rho_k = \frac{\sum (R_t - \bar{R}) (R_{t-k} - \bar{R})}{\sum (R_t - \bar{R})^2} \]
 
-### 7. Theil’s U Statistics
+### Theil’s U Statistics
 Theil’s U1:
 \[ U_1 = \frac{\sqrt{\frac{1}{N} \sum_{t=1}^{N} (R_t)^2}}{\sqrt{\frac{1}{N} \sum_{t=1}^{N} (Y_t^2 + X_t^2)}} \]
 
 Theil’s U2:
 \[ U_2 = \frac{\sqrt{\sum (Y_t - Y_{t-1})^2}}{\sqrt{\sum (X_t - X_{t-1})^2}} \]
 
-### 8. Seasonality Tests
+### Seasonality Tests
 
 - Ljung-Box test for autocorrelation at seasonal lags.
 - Friedman test for seasonality in revisions.
 
-### 9. News vs. Noise Tests
+### News vs. Noise Tests
 
 - \( H_0: R_t \) is uncorrelated with \( X_t \) (news test).
 - \( H_0: R_t \) is explained by \( Y_t \) (noise test).
