@@ -455,20 +455,25 @@ revisions between the first and last releases:</p>
 <span>  type<span class="op">=</span><span class="st">"bar"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="understanding-revisions_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
-<p>This is useful for assessing how much initial estimates deviate from
-later, more refined estimates.</p>
-<p>These visualizations can help detect bias in revisions, identify
-persistent trends, and inform decision-making.</p>
-<p>The <code><a href="../reference/get_revisions.html">get_revisions()</a></code> function in the <code>reviser</code>
-package provides a flexible way to analyze time series data revisions.
-By allowing users to compute revisions using different methods, it helps
-assess the reliability of early estimates and understand the dynamics of
-data revisions over time.</p>
-<p>For further analysis, users can integrate
-<code><a href="../reference/get_revisions.html">get_revisions()</a></code> with other functions in the
-<code>reviser</code> package, such as summary statistics and revision
-diagnostics (<code><a href="../reference/get_revision_analysis.html">get_revision_analysis()</a></code>), to gain deeper
-insights into the revision process.</p>
+</div>
+<div class="section level4">
+<h4 id="example-4-how-does-the-growth-rate-of-gdp-change-over-time">Example 4: How does the growth rate of GDP change over time?<a class="anchor" aria-label="anchor" href="#example-4-how-does-the-growth-rate-of-gdp-change-over-time"></a>
+</h4>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="va">growthrates_q405</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_releases_by_date.html">get_releases_by_date</a></span><span class="op">(</span><span class="fu">tsbox</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/tsbox/reference/ts_pc.html" class="external-link">ts_pc</a></span><span class="op">(</span><span class="va">gdp</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2005-10-01"</span><span class="op">)</span><span class="op">)</span></span>
+<span>  </span>
+<span></span>
+<span><span class="co"># Preview results</span></span>
+<span><span class="fu"><a href="../reference/plot_vintages.html">plot_vintages</a></span><span class="op">(</span></span>
+<span>  <span class="va">growthrates_q405</span>,</span>
+<span>  dim_col <span class="op">=</span> <span class="st">"id"</span>,</span>
+<span>  time_col <span class="op">=</span> <span class="st">"pub_date"</span>,</span>
+<span>  title <span class="op">=</span> <span class="st">"Evolution of growth rates for GDP Q4 2005"</span>,</span>
+<span>  subtitle <span class="op">=</span> <span class="st">"For several countries"</span>,</span>
+<span>  type<span class="op">=</span><span class="st">"line"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="understanding-revisions_files/figure-html/unnamed-chunk-5-1.png" width="700"></p>
 </div>
 </div>
 </div>
