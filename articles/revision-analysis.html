@@ -122,6 +122,12 @@ release for time
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>N</mi><annotation encoding="application/x-tex">N</annotation></semantics></math>
 is the number of observations</li>
 </ul>
+<p>The function takes two mandatory arguments:</p>
+<ol style="list-style-type: decimal">
+<li>A data frame containing the preliminary data releases.</li>
+<li>A data frame containing the final release data against which the
+revisions are calculated and preliminary data will be compared.</li>
+</ol>
 <p>The function argument <code>degree</code> allows users to specify
 which statistics and hypothesis tests to include in the output:</p>
 <ul>
@@ -140,10 +146,6 @@ and Theil’s U</li>
 <code>degree = 5</code> includes all the statistics and hypothesis
 tests</li>
 </ul>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://p-wegmueller.github.io/reviser/">reviser</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://docs.ropensci.org/tsbox/" class="external-link">tsbox</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="summary-statistics">Summary Statistics<a class="anchor" aria-label="anchor" href="#summary-statistics"></a>
 </h2>
@@ -227,8 +229,12 @@ is the standard deviation of the final value
 A high noise-to-signal ratio suggests that revisions are large relative
 to the underlying variability in the final data, indicating high
 uncertainty in initial estimates.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">gdp</span> <span class="op">&lt;-</span> <span class="fu">reviser</span><span class="fu">::</span><span class="va"><a href="../reference/gdp.html">gdp</a></span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://p-wegmueller.github.io/reviser/">reviser</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://docs.ropensci.org/tsbox/" class="external-link">tsbox</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">gdp</span> <span class="op">&lt;-</span> <span class="fu">reviser</span><span class="fu">::</span><span class="va"><a href="../reference/gdp.html">gdp</a></span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://docs.ropensci.org/tsbox/reference/ts_pc.html" class="external-link">ts_pc</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
@@ -349,7 +355,7 @@ autocorrelated.</p>
 </ul>
 <p>These metrics collectively help evaluate the reliability,
 predictability, and potential biases in data revisions.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_revision_analysis.html">get_revision_analysis</a></span><span class="op">(</span></span>
 <span>  <span class="va">df</span>, </span>
 <span>  <span class="va">final_release</span>,</span>
@@ -524,7 +530,7 @@ $$</span> and test
 and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>β</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\beta = 1</annotation></semantics></math>
 for the presence of noise and news in the data revisions.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_revision_analysis.html">get_revision_analysis</a></span><span class="op">(</span></span>
 <span>  <span class="va">df</span>, </span>
 <span>  <span class="va">final_release</span>,</span>
@@ -675,7 +681,7 @@ for all
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math></strong>),
 <strong>U2 is the preferred metric</strong> for evaluating preliminary
 estimates.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_revision_analysis.html">get_revision_analysis</a></span><span class="op">(</span></span>
 <span>  <span class="va">df</span>, </span>
 <span>  <span class="va">final_release</span>,</span>
@@ -696,14 +702,16 @@ estimates.</p>
 <span><span class="co">#&gt; <span style="color: #949494;">#   ²​`Fraction of correct growth rate change`</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 more variables: `Theil's U2` &lt;dbl&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   `Seasonality (Friedman p-value)` &lt;dbl&gt;</span></span></span></code></pre></div>
-<p>In the above examples, we compare the final release of GDP with the
-first and second release (diagonal of the real-time data matrix).
-However, it is also possible to compare revisions between given
-publication dates. In the example below, we compare revisions between
-GDP releases in April and July 2024 and the final release from October
-2024. The grouping of the statistics takes place over the
-<code>pub_date</code> or <code>release</code> column.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<p>In the above examples, we analyze GDP revisions by comparing the
+final release with the first and second releases, which correspond to
+the diagonal elements of the real-time data matrix. This approach
+provides insight into how initial estimates evolve over time.</p>
+<p>Alternatively, we can compare GDP revisions between specific
+publication dates. In the example below, we analyze revisions from the
+GDP releases from April and July 2024, using the final release from
+October 2024 as the benchmark. The grouping of statistics is determined
+by the <code>pub_date</code> or <code>release</code> column.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">gdp</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">pub_date</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2024-04-01"</span>, <span class="st">"2024-07-01"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -724,6 +732,51 @@ GDP releases in April and July 2024 and the final release from October
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> EA    2024-07-01   177         4       0.002<span style="text-decoration: underline;">05</span>            0.520</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> JP    2024-04-01   176         4      -<span style="color: #BB0000;">0.003</span><span style="color: #BB0000; text-decoration: underline;">23</span>            0.490</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> JP    2024-07-01   177         4      -<span style="color: #BB0000;">0.002</span><span style="color: #BB0000; text-decoration: underline;">76</span>            0.305</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 33 more variables: `Bias (robust p-value)` &lt;dbl&gt;, Minimum &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   Maximum &lt;dbl&gt;, `10Q` &lt;dbl&gt;, Median &lt;dbl&gt;, `90Q` &lt;dbl&gt;, MAR &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `Std. Dev.` &lt;dbl&gt;, `Noise/Signal` &lt;dbl&gt;, Correlation &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `Correlation (p-value)` &lt;dbl&gt;, `Autocorrelation (1st)` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `Autocorrelation (1st p-value)` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `Autocorrelation up to 1yr (Ljung-Box p-value)` &lt;dbl&gt;, `Theil's U1` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `Theil's U2` &lt;dbl&gt;, `Seasonality (Friedman p-value)` &lt;dbl&gt;, …</span></span></span></code></pre></div>
+<p>The <code><a href="../reference/get_revision_analysis.html">get_revision_analysis()</a></code> function requires a single
+time series in <code>final_release</code> and compares it to multiple
+time series in <code>df</code> for the same <code>id</code>. To always
+compare two consecutive publication dates, it is necessary to structure
+the analysis sequentially. The code below iterates over consecutive
+publication dates in the gdp dataset, comparing revisions between each
+pair. For each pair of consecutive dates, it extracts the corresponding
+data, runs get_revision_analysis() to analyze revisions, and then
+combines the results into a single dataframe.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Get unique sorted publication dates</span></span>
+<span><span class="va">pub_dates</span> <span class="op">&lt;-</span> <span class="va">gdp</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="va">pub_date</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">pub_date</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">pub_date</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Run the function for each pair of consecutive publication dates</span></span>
+<span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map_dfr.html" class="external-link">map_dfr</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">pub_dates</span><span class="op">[</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">pub_dates</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  </span>
+<span>  <span class="va">df</span> <span class="op">&lt;-</span> <span class="va">gdp</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">pub_date</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">pub_dates</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="va">final_release</span> <span class="op">&lt;-</span> <span class="va">gdp</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">pub_date</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">pub_dates</span><span class="op">[</span><span class="va">i</span> <span class="op">+</span> <span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="fu"><a href="../reference/get_revision_analysis.html">get_revision_analysis</a></span><span class="op">(</span><span class="va">df</span>, <span class="va">final_release</span>, degree <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 39</span></span></span>
+<span><span class="co">#&gt;   id    pub_date       N Frequency `Bias (mean)` `Bias (p-value)`</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> CHE   2002-10-01    90         4      0.000<span style="text-decoration: underline;">632</span>            0.634</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> EA    2002-10-01    90         4      0.001<span style="text-decoration: underline;">06</span>             0.512</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> JP    2002-10-01    90         4      0.023<span style="text-decoration: underline;">1</span>              0.629</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> US    2002-10-01    90         4      0                 <span style="color: #BB0000;">NaN</span>    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> CHE   2003-01-01    91         4     -<span style="color: #BB0000;">0.003</span><span style="color: #BB0000; text-decoration: underline;">84</span>             0.563</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> EA    2003-01-01    91         4      0.001<span style="text-decoration: underline;">92</span>             0.750</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 33 more variables: `Bias (robust p-value)` &lt;dbl&gt;, Minimum &lt;dbl&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   Maximum &lt;dbl&gt;, `10Q` &lt;dbl&gt;, Median &lt;dbl&gt;, `90Q` &lt;dbl&gt;, MAR &lt;dbl&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   `Std. Dev.` &lt;dbl&gt;, `Noise/Signal` &lt;dbl&gt;, Correlation &lt;dbl&gt;,</span></span></span>
