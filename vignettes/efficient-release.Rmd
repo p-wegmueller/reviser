@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-Macroeconomic data are often subject to revisions, reflecting the integration of new information, methodological improvements, and statistical adjustments. Understanding the optimal properties of a revision process is essential to ensure that early data releases provide a reliable foundation for policy decisions and economic forecasting. This vignette discusses the characteristics of optimal revisions, formalizes initial estimates as truth measured with noise, and presents an iterative approach to identify the point at which revisions become unpredictable also known as the efficient release. Further, examples are provided to illustrate the application of these concepts to real-world data.
+Macroeconomic data are often subject to revisions, reflecting the integration of new information, methodological improvements, and statistical adjustments. Understanding the optimal properties of a revision process is essential to ensure that early data releases provide a reliable foundation for policy decisions and economic forecasting. This vignette discusses the characteristics of optimal revisions, formalizes initial estimates as truth measured with noise, and presents an iterative approach to identify the point at which revisions become unpredictable also known as the efficient release. Further, examples are provided to illustrate the application of these concepts to GDP data.
 
 ### Optimal Properties of Revisions
 

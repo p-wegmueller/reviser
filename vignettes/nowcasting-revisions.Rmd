@@ -16,6 +16,82 @@ knitr::opts_chunk$set(
 
 IN PROGRESS
 
+**The Kishor-Koenig Model: A Detailed Explanation**
+
+**1. Introduction**
+
+The Kishor-Koenig (KK) model extends the traditional Vector Autoregression (VAR) framework to account for data revisions explicitly. Unlike conventional models that treat data as final and accurate, the KK model recognizes that initial releases are subject to revisions, leading to biased and inefficient forecasts. By incorporating the revision process into a state-space framework, the KK model provides a more reliable approach to estimating and forecasting economic variables. This paper provides a detailed explanation of the model, using the notation from Strohsal and Wolf (2020) to ensure consistency with empirical applications.
+
+**2. The Structure of the Kishor-Koenig Model**
+
+### 2.1 Data Revision Process
+Let the true (but unobserved) economic variable be denoted by \( x_t \). The statistical agency releases an initial estimate \( y_t^0 \), which is subject to revisions over time. The final value, \( x_t^f \), is available only after multiple revisions. The relationship between the initial release and the true value can be expressed as:
+\[
+y_t^0 = x_t + \eta_t,
+\]
+where \( \eta_t \) is a measurement error that may be serially correlated.
+
+Subsequent releases \( y_t^i \) incorporate additional information and follow:
+\[
+y_t^i = y_t^{i-1} + r_t^i,
+\]
+where \( r_t^i \) is the revision made at stage \( i \). If revisions follow an autoregressive process, we can write:
+\[
+r_t^i = \phi r_{t-1}^{i-1} + \epsilon_t^i,
+\]
+where \( \phi \) captures the persistence of revisions, and \( \epsilon_t^i \) is an independent noise term.
+
+The autoregressive nature of revisions is crucial because it implies that past revisions contain information about future revisions. If \( \phi \) is significantly different from zero, it suggests that revisions are predictable, meaning the initial release does not fully incorporate available information. This is a key insight of the KK model, as it allows for improved real-time estimates by exploiting the systematic behavior of revisions.
+
+### 2.2 State-Space Representation
+The KK model is formulated as a state-space system, consisting of a state equation describing the evolution of the true economic variable and an observation equation relating observed releases to the true value.
+
+#### State Equation
+The true value follows an autoregressive process:
+\[
+x_t = F x_{t-1} + \nu_t,
+\]
+where \( F \) is a coefficient matrix and \( \nu_t \) is a white noise error term.
+
+#### Observation Equation
+Observed releases are linked to the true value through:
+\[
+y_t^i = (I - G) F y_{t-1}^i + G x_t + \epsilon_t^i,
+\]
+where \( G \) is a gain matrix capturing the weight placed on new information, and \( \epsilon_t^i \) is a measurement error.
+
+The matrices governing the revision process, \( F \) and \( G \), are structured as:
+\[
+F = \begin{bmatrix} 0 & 1 & 0 & \dots & 0 \\
+                      0 & 0 & 1 & \dots & 0 \\
+                      \vdots & \vdots & \vdots & \ddots & \vdots \\
+                      0 & 0 & 0 & \dots & 1 \\
+                      0 & 0 & 0 & \dots & F_0 \end{bmatrix},
+\]
+\[
+G = \begin{bmatrix} 1 & 0 & \dots & 0 \\
+                      G_{e-1,e} & G_{e-1,e-1} & \dots & G_{e-1,0} \\
+                      G_{e-2,e} & G_{e-2,e-1} & \dots & G_{e-2,0} \\
+                      \vdots & \vdots & \ddots & \vdots \\
+                      G_{0,e} & G_{0,e-1} & \dots & G_{0,0} \end{bmatrix}.
+\]
+
+These matrices determine how revisions evolve over time and how efficiently new information is incorporated into data releases.
+
+### 2.3 Model Estimation
+The KK model is estimated using the Seemingly Unrelated Regression (SUR) method, allowing for correlations between measurement errors and the underlying economic variable. The Kalman filter is then applied to extract the best estimate of \( x_t \) from the observed data series \( y_t^i \). The Kalman update step is given by:
+\[
+\hat{x}_t = \hat{F} \hat{x}_{t-1} + K (y_t - H \hat{x}_t),
+\]
+where \( K \) is the Kalman gain matrix, and \( H \) is the observation mapping matrix.
+
+**3. Conclusion**
+
+The Kishor-Koenig model provides a robust framework for handling data revisions in macroeconomic forecasting. The autoregressive term in the revision process plays a crucial role by capturing the persistence of revisions, which helps refine early estimates by incorporating information from past revisions. If revisions are predictable, they should be accounted for in real-time estimates to enhance forecast accuracy. By explicitly modeling the revision process, the KK model offers a significant improvement over traditional VAR models, making it a valuable tool for policymakers and economists seeking to generate more accurate real-time estimates. The use of the state-space approach, combined with Kalman filtering, ensures that forecasts are dynamically updated as new information becomes available.
+
+
+
+
 ```{r setup}
 library(reviser)
 ```
