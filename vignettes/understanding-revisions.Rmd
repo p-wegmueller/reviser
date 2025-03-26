@@ -249,7 +249,7 @@ plot_vintages(
 ### Example 4: How does the growth rate of GDP change over time?
 ```{r}
 
-growthrates_q405 <- get_releases_by_date(tsbox::ts_pc(gdp), as.Date("2005-10-01"))
+growthrates_q405 <- get_releases_by_date(gdp, as.Date("2005-10-01"))
   
 
 # Preview results

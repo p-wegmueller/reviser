@@ -618,7 +618,7 @@ summary.lst_efficient <- function(object, ...) {
 #'   \item **Theil's U1**: A normalized measure of forecast accuracy, comparing the root mean squared error (RMSE) of revisions to the RMSE of final and initial values.
 #'   \item **Theil's U2**: A measure comparing forecast changes to actual changes.
 #'   \item **Seasonality (Friedman p-value)**: p-value from the Friedman test for seasonality in revisions.
-#'   \item **"News joint test (p-value)"**: p-value for the joint news test.
+#'   \item **News joint test (p-value)**: p-value for the joint news test.
 #'   \item **News test Intercept**: The estimated intercept from the news test regression.
 #'   \item **News test Intercept (std.err)**: The standard error of the intercept in the news test regression.
 #'   \item **News test Intercept (p-value)**: p-value for the intercept in the news test regression.

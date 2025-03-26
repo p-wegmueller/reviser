@@ -83,7 +83,7 @@ The following statistics and tests are calculated:
 \item \strong{Theil's U1}: A normalized measure of forecast accuracy, comparing the root mean squared error (RMSE) of revisions to the RMSE of final and initial values.
 \item \strong{Theil's U2}: A measure comparing forecast changes to actual changes.
 \item \strong{Seasonality (Friedman p-value)}: p-value from the Friedman test for seasonality in revisions.
-\item \strong{"News joint test (p-value)"}: p-value for the joint news test.
+\item \strong{News joint test (p-value)}: p-value for the joint news test.
 \item \strong{News test Intercept}: The estimated intercept from the news test regression.
 \item \strong{News test Intercept (std.err)}: The standard error of the intercept in the news test regression.
 \item \strong{News test Intercept (p-value)}: p-value for the intercept in the news test regression.
