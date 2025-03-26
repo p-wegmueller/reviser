@@ -59,6 +59,7 @@ The function ensures that input data is validated and appropriately transformed 
 <span>  <span class="va">df</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">"line"</span>,</span>
 <span>  dim_col <span class="op">=</span> <span class="st">"pub_date"</span>,</span>
+<span>  time_col <span class="op">=</span> <span class="st">"time"</span>,</span>
 <span>  title <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  subtitle <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  ylab <span class="op">=</span> <span class="st">""</span></span>
@@ -84,6 +85,10 @@ one for time (<code>time</code>) and one for value (<code>value</code>).</p></dd
 
 <dt id="arg-dim-col">dim_col<a class="anchor" aria-label="anchor" href="#arg-dim-col"></a></dt>
 <dd><p>A character string specifying the column name in <code>df</code> that represents publication dates or other grouping dimensions (e.g. <code>"release"</code>). Defaults to <code>"pub_date"</code>.</p></dd>
+
+
+<dt id="arg-time-col">time_col<a class="anchor" aria-label="anchor" href="#arg-time-col"></a></dt>
+<dd><p>A character string specifying the column name in <code>df</code> that represents the time variable. Defaults to <code>"time"</code>.</p></dd>
 
 
 <dt id="arg-title">title<a class="anchor" aria-label="anchor" href="#arg-title"></a></dt>

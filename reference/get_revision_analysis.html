@@ -77,10 +77,10 @@ for revisions between initial and final data releases.</p>
 
 <dt id="arg-degree">degree<a class="anchor" aria-label="anchor" href="#arg-degree"></a></dt>
 <dd><p>An integer between 1 and 5 specifying the level of detail for the output:
-1: Default, descriptive statistics (bias, min/max, standard deviation, noise/signal ratio, correlation).
-2: Efficiency tests (bias intercept and slope tests, efficiency tests for intercept and slope).
-3: Orthogonality tests (correlation, autocorrelation, Theil's U statistics, seasonality tests).
-4: News vs. noise tests (p-values for news and noise tests).
+1: Default, includes information about revision size.
+2: includes correlation statistics of revision.
+3: includes news and noise tests.
+4: includes sign switches, seasonality analysis and Theil’s U.
 5: Full set of all statistics and tests.</p></dd>
 
 
@@ -103,39 +103,48 @@ the initial and final data releases. The function:</p><ul><li><p>Checks the inpu
 <li><p>Performs hypothesis tests for bias, efficiency, and correlation using robust methods (e.g., Newey-West standard errors).</p></li>
 <li><p>Includes tests for seasonality, noise, and news effects.</p></li>
 </ul><p>Key tests include:</p><ul><li><p><strong>Bias Tests</strong>: Tests for the presence of mean bias and regression bias.</p></li>
-<li><p><strong>Efficiency Tests</strong>: Tests whether revisions are orthogonal to initial values.</p></li>
 <li><p><strong>Autocorrelation and Seasonality</strong>: Tests for serial correlation and seasonal patterns in revisions.</p></li>
 <li><p><strong>Theil's U Statistics</strong>: Measures predictive accuracy of the initial releases relative to the final values.</p></li>
 <li><p><strong>Noise vs. News</strong>: Differentiates between unpredictable errors (noise) and systematic adjustments (news).</p></li>
 </ul><p>The function supports grouped calculations based on the presence of <code>id</code> or <code>release</code> columns in the input.</p>
-<p>The following statistics and tests are calculated:</p><ul><li><p><strong>N</strong>: The number of observations in the group.</p></li>
+<p>The following statistics and tests are calculated:</p>
+<ul><li><p><strong>N</strong>: The number of observations in the group.</p></li>
 <li><p><strong>Frequency</strong>: The inferred data frequency (e.g., 12 for monthly or 4 for quarterly data).</p></li>
 <li><p><strong>Bias (mean)</strong>: The mean revision, testing whether revisions are systematically biased.</p></li>
 <li><p><strong>Bias (p-value)</strong>: p-value from a t-test evaluating the significance of the mean revision.</p></li>
 <li><p><strong>Bias (robust p-value)</strong>: Newey-West HAC robust p-value for the mean revision test.</p></li>
-<li><p><strong>Bias (intercept)</strong>: Intercept of a regression of final values on initial values, testing for systematic bias.</p></li>
-<li><p><strong>Bias (intercept p-value)</strong>: p-value for the intercept test.</p></li>
-<li><p><strong>Bias (slope)</strong>: Slope of the regression of final values on initial values, testing the alignment between them.</p></li>
-<li><p><strong>Bias (slope p-value)</strong>: p-value for the slope test, with the null hypothesis of slope = 1.</p></li>
-<li><p><strong>Efficiency (intercept)</strong>: Intercept of the regression of revisions on initial values, testing forecast efficiency.</p></li>
-<li><p><strong>Efficiency (intercept p-value)</strong>: p-value for the efficiency intercept test.</p></li>
-<li><p><strong>Efficiency (slope)</strong>: Slope of the regression of revisions on initial values, testing forecast efficiency.</p></li>
-<li><p><strong>Efficiency (slope p-value)</strong>: p-value for the efficiency slope test, with the null hypothesis of slope = 0.</p></li>
 <li><p><strong>Minimum</strong>: The minimum revision in the group.</p></li>
 <li><p><strong>Maximum</strong>: The maximum revision in the group.</p></li>
+<li><p><strong>10Q</strong>: The 10th percentile revision.</p></li>
+<li><p><strong>Median</strong>: The median revision.</p></li>
+<li><p><strong>90Q</strong>: The 90th percentile revision.</p></li>
+<li><p><strong>MAR</strong>: The mean absolute revision.</p></li>
 <li><p><strong>Std. Dev.</strong>: The standard deviation of revisions, indicating their variability.</p></li>
 <li><p><strong>Noise/Signal</strong>: The ratio of the standard deviation of revisions to the standard deviation of final values.</p></li>
 <li><p><strong>Correlation</strong>: The Pearson correlation between revisions and initial values, testing the relationship.</p></li>
 <li><p><strong>Correlation (p-value)</strong>: p-value for the significance of the correlation.</p></li>
 <li><p><strong>Autocorrelation (1st)</strong>: The first-order autocorrelation of revisions, measuring persistence.</p></li>
 <li><p><strong>Autocorrelation (1st p-value)</strong>: p-value for the first-order autocorrelation test.</p></li>
-<li><p><strong>Autocorrelation up to 4th (Ljung-Box p-value)</strong>: p-value for the Ljung-Box test for higher-order autocorrelation.</p></li>
+<li><p><strong>Autocorrelation up to 1yr (Ljung-Box p-value)</strong>: p-value for the Ljung-Box test for higher-order autocorrelation.</p></li>
 <li><p><strong>Theil's U1</strong>: A normalized measure of forecast accuracy, comparing the root mean squared error (RMSE) of revisions to the RMSE of final and initial values.</p></li>
 <li><p><strong>Theil's U2</strong>: A measure comparing forecast changes to actual changes.</p></li>
-<li><p><strong>Seasonality (Ljung-Box p-value)</strong>: Tests for seasonality in revisions using the Ljung-Box test for lags matching the data frequency.</p></li>
-<li><p><strong>Seasonality (Friedman p-value)</strong>: Tests for seasonality in revisions using the Friedman test.</p></li>
-<li><p><strong>News test (p-value)</strong>: Tests whether revisions are uncorrelated with initial values.</p></li>
-<li><p><strong>Noise test (p-value)</strong>: Tests whether revisions are explained by information in final values.</p></li>
+<li><p><strong>Seasonality (Friedman p-value)</strong>: p-value from the Friedman test for seasonality in revisions.</p></li>
+<li><p><strong>"News joint test (p-value)"</strong>: p-value for the joint news test.</p></li>
+<li><p><strong>News test Intercept</strong>: The estimated intercept from the news test regression.</p></li>
+<li><p><strong>News test Intercept (std.err)</strong>: The standard error of the intercept in the news test regression.</p></li>
+<li><p><strong>News test Intercept (p-value)</strong>: p-value for the intercept in the news test regression.</p></li>
+<li><p><strong>News test Coefficient</strong>: The estimated coefficient for the <code>value</code> in the news test regression.</p></li>
+<li><p><strong>News test Coefficient (std.err)</strong>: The standard error of the coefficient in the news test regression.</p></li>
+<li><p><strong>News test Coefficient (p-value)</strong>: p-value for the coefficient in the news test regression.</p></li>
+<li><p><strong>Noise joint test (p-value)</strong>: p-value for the joint noise test.</p></li>
+<li><p><strong>Noise test Intercept</strong>: The estimated intercept from the noise test regression.</p></li>
+<li><p><strong>Noise test Intercept (std.err)</strong>: The standard error of the intercept in the noise test regression.</p></li>
+<li><p><strong>Noise test Intercept (p-value)</strong>: p-value for the intercept in the noise test regression.</p></li>
+<li><p><strong>Noise test Coefficient</strong>: The estimated coefficient for the <code>final_value</code> in the noise test regression.</p></li>
+<li><p><strong>Noise test Coefficient (std.err)</strong>: The standard error of the coefficient in the noise test regression.</p></li>
+<li><p><strong>Noise test Coefficient (p-value)</strong>: p-value for the coefficient in the noise test regression.</p></li>
+<li><p><strong>Fraction of correct sign</strong>: The fraction of correct sign changes in revisions.</p></li>
+<li><p><strong>Fraction of correct growth rate change</strong>: The fraction of correct sign changes of growth rates in revisions.</p></li>
 </ul></div>
 
     <div class="section level2">
