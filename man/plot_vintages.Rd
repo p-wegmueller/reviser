@@ -8,6 +8,7 @@ plot_vintages(
   df,
   type = "line",
   dim_col = "pub_date",
+  time_col = "time",
   title = "",
   subtitle = "",
   ylab = ""
@@ -26,6 +27,8 @@ one for time (\code{time}) and one for value (\code{value}).}
 }}
 
 \item{dim_col}{A character string specifying the column name in \code{df} that represents publication dates or other grouping dimensions (e.g. \code{"release"}). Defaults to \code{"pub_date"}.}
+
+\item{time_col}{A character string specifying the column name in \code{df} that represents the time variable. Defaults to \code{"time"}.}
 
 \item{title}{A character string specifying the title of the plot. Defaults to an empty string.}
 

@@ -13,6 +13,7 @@
 #'   \item{ "boxplot": Boxplot.}
 #'   }
 #' @param dim_col A character string specifying the column name in `df` that represents publication dates or other grouping dimensions (e.g. `"release"`). Defaults to `"pub_date"`.
+#' @param time_col A character string specifying the column name in `df` that represents the time variable. Defaults to `"time"`.
 #' @param title A character string specifying the title of the plot. Defaults to an empty string.
 #' @param subtitle A character string specifying the subtitle of the plot. Defaults to an empty string.
 #' @param ylab A character string specifying the label for the y-axis. Defaults to an empty string.

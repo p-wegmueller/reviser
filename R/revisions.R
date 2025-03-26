@@ -596,34 +596,45 @@ summary.lst_efficient <- function(object, ...) {
 #'
 #' The following statistics and tests are calculated:
 #'
-#' - **N**: The number of observations in the group.
-#' - **Frequency**: The inferred data frequency (e.g., 12 for monthly or 4 for quarterly data).
-#' - **Bias (mean)**: The mean revision, testing whether revisions are systematically biased.
-#' - **Bias (p-value)**: p-value from a t-test evaluating the significance of the mean revision.
-#' - **Bias (robust p-value)**: Newey-West HAC robust p-value for the mean revision test.
-#' - **Bias (intercept)**: Intercept of a regression of final values on initial values, testing for systematic bias.
-#' - **Bias (intercept p-value)**: p-value for the intercept test.
-#' - **Bias (slope)**: Slope of the regression of final values on initial values, testing the alignment between them.
-#' - **Bias (slope p-value)**: p-value for the slope test, with the null hypothesis of slope = 1.
-#' - **Efficiency (intercept)**: Intercept of the regression of revisions on initial values, testing forecast efficiency.
-#' - **Efficiency (intercept p-value)**: p-value for the efficiency intercept test.
-#' - **Efficiency (slope)**: Slope of the regression of revisions on initial values, testing forecast efficiency.
-#' - **Efficiency (slope p-value)**: p-value for the efficiency slope test, with the null hypothesis of slope = 0.
-#' - **Minimum**: The minimum revision in the group.
-#' - **Maximum**: The maximum revision in the group.
-#' - **Std. Dev.**: The standard deviation of revisions, indicating their variability.
-#' - **Noise/Signal**: The ratio of the standard deviation of revisions to the standard deviation of final values.
-#' - **Correlation**: The Pearson correlation between revisions and initial values, testing the relationship.
-#' - **Correlation (p-value)**: p-value for the significance of the correlation.
-#' - **Autocorrelation (1st)**: The first-order autocorrelation of revisions, measuring persistence.
-#' - **Autocorrelation (1st p-value)**: p-value for the first-order autocorrelation test.
-#' - **Autocorrelation up to 4th (Ljung-Box p-value)**: p-value for the Ljung-Box test for higher-order autocorrelation.
-#' - **Theil's U1**: A normalized measure of forecast accuracy, comparing the root mean squared error (RMSE) of revisions to the RMSE of final and initial values.
-#' - **Theil's U2**: A measure comparing forecast changes to actual changes.
-#' - **Seasonality (Ljung-Box p-value)**: Tests for seasonality in revisions using the Ljung-Box test for lags matching the data frequency.
-#' - **Seasonality (Friedman p-value)**: Tests for seasonality in revisions using the Friedman test.
-#' - **News test (p-value)**: Tests whether revisions are uncorrelated with initial values.
-#' - **Noise test (p-value)**: Tests whether revisions are explained by information in final values.
+#' \itemize{
+#'   \item **N**: The number of observations in the group.
+#'   \item **Frequency**: The inferred data frequency (e.g., 12 for monthly or 4 for quarterly data).
+#'   \item **Bias (mean)**: The mean revision, testing whether revisions are systematically biased.
+#'   \item **Bias (p-value)**: p-value from a t-test evaluating the significance of the mean revision.
+#'   \item **Bias (robust p-value)**: Newey-West HAC robust p-value for the mean revision test.
+#'   \item **Minimum**: The minimum revision in the group.
+#'   \item **Maximum**: The maximum revision in the group.
+#'   \item **10Q**: The 10th percentile revision.
+#'   \item **Median**: The median revision.
+#'   \item **90Q**: The 90th percentile revision.
+#'   \item **MAR**: The mean absolute revision.
+#'   \item **Std. Dev.**: The standard deviation of revisions, indicating their variability.
+#'   \item **Noise/Signal**: The ratio of the standard deviation of revisions to the standard deviation of final values.
+#'   \item **Correlation**: The Pearson correlation between revisions and initial values, testing the relationship.
+#'   \item **Correlation (p-value)**: p-value for the significance of the correlation.
+#'   \item **Autocorrelation (1st)**: The first-order autocorrelation of revisions, measuring persistence.
+#'   \item **Autocorrelation (1st p-value)**: p-value for the first-order autocorrelation test.
+#'   \item **Autocorrelation up to 1yr (Ljung-Box p-value)**: p-value for the Ljung-Box test for higher-order autocorrelation.
+#'   \item **Theil's U1**: A normalized measure of forecast accuracy, comparing the root mean squared error (RMSE) of revisions to the RMSE of final and initial values.
+#'   \item **Theil's U2**: A measure comparing forecast changes to actual changes.
+#'   \item **Seasonality (Friedman p-value)**: p-value from the Friedman test for seasonality in revisions.
+#'   \item **"News joint test (p-value)"**: p-value for the joint news test.
+#'   \item **News test Intercept**: The estimated intercept from the news test regression.
+#'   \item **News test Intercept (std.err)**: The standard error of the intercept in the news test regression.
+#'   \item **News test Intercept (p-value)**: p-value for the intercept in the news test regression.
+#'   \item **News test Coefficient**: The estimated coefficient for the `value` in the news test regression.
+#'   \item **News test Coefficient (std.err)**: The standard error of the coefficient in the news test regression.
+#'   \item **News test Coefficient (p-value)**: p-value for the coefficient in the news test regression.
+#'   \item **Noise joint test (p-value)**: p-value for the joint noise test.
+#'   \item **Noise test Intercept**: The estimated intercept from the noise test regression.
+#'   \item **Noise test Intercept (std.err)**: The standard error of the intercept in the noise test regression.
+#'   \item **Noise test Intercept (p-value)**: p-value for the intercept in the noise test regression.
+#'   \item **Noise test Coefficient**: The estimated coefficient for the `final_value` in the noise test regression.
+#'   \item **Noise test Coefficient (std.err)**: The standard error of the coefficient in the noise test regression.
+#'   \item **Noise test Coefficient (p-value)**: p-value for the coefficient in the noise test regression.
+#'   \item **Fraction of correct sign**: The fraction of correct sign changes in revisions.
+#'   \item **Fraction of correct growth rate change**: The fraction of correct sign changes of growth rates in revisions.
+#' }
 #'
 #' @return A data frame with one row per grouping (if applicable) and columns for summary statistics and test results.
 #' The resulting data frame is of class `revision_summary`.
