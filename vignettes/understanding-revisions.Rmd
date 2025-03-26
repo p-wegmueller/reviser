@@ -246,12 +246,19 @@ plot_vintages(
 )
 ```
 
-This is useful for assessing how much initial estimates deviate from later, more refined estimates.
+### Example 4: How does the growth rate of GDP change over time?
+```{r}
 
-These visualizations can help detect bias in revisions, identify persistent trends, and inform decision-making.
+growthrates_q405 <- get_releases_by_date(tsbox::ts_pc(gdp), as.Date("2005-10-01"))
+  
 
-The `get_revisions()` function in the `reviser` package provides a flexible way to analyze time series data revisions. By allowing users to compute revisions using different methods, it helps assess the reliability of early estimates and understand the dynamics of data revisions over time.
-
-For further analysis, users can integrate `get_revisions()` with other functions in the `reviser` package, such as summary statistics and revision diagnostics (`get_revision_analysis()`), to gain deeper insights into the revision process.
-
-
+# Preview results
+plot_vintages(
+  growthrates_q405,
+  dim_col = "id",
+  time_col = "pub_date",
+  title = "Evolution of growth rates for GDP Q4 2005",
+  subtitle = "For several countries",
+  type="line"
+)
+```
