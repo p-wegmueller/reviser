@@ -789,7 +789,22 @@ get_revision_analysis <- function(
     mean_p_value <- summary(mean_test_model)$coefficients[1, 4]
 
     # Newey-West HAC standard errors t test:
-    mean_test_se <- sqrt(sandwich::NeweyWest(mean_test_model))
+    # Throws an error if all revisions are 0, return NA in that case
+    mean_test_se <- tryCatch(
+      {
+        nw <- sandwich::NeweyWest(mean_test_model)
+
+        # Check if the result is numeric and finite before taking sqrt
+        if (is.numeric(nw) && all(is.finite(nw))) {
+          sqrt(nw)
+        } else {
+          NA_real_
+        }
+      },
+      error = function(e) NA_real_, # Return NA if an error occurs
+      warning = function(w) NA_real_ # Also handle warnings safely
+    )
+
     mean_nw_t_stat <- stats::coef(mean_test_model)[1] / mean_test_se
     mean_nw_p_value <- 2 * (1 - stats::pt(abs(mean_nw_t_stat), df = N - 1)) # Two-sided p-value
 
@@ -839,37 +854,123 @@ get_revision_analysis <- function(
       friedman_p_value <- NA
     }
 
-    # Noise test
-    noise_test <- stats::lm(revision ~ final_value, data = data)
-    hac_se <- sandwich::vcovHAC(noise_test)
-    test <- car::linearHypothesis(
-      noise_test,
-      c("(Intercept) = 0", "final_value = 0"),
-      vcov = hac_se
-    )
-    noise_wald_p_value <- test[2, 'Pr(>F)']
-    noise_intercept <- stats::coef(noise_test)[1]
-    noise_intercept_stderr <- sqrt(diag(hac_se))[1]
-    noise_intercept_p_value <- summary(noise_test)$coefficients[1, 4]
-    noise_coeff <- stats::coef(noise_test)[2]
-    noise_coeff_stderr <- sqrt(diag(hac_se))[2]
-    noise_coeff_p_value <- summary(noise_test)$coefficients[2, 4]
+    # Noise test with error handling (ensures no break if all revisions are 0)
+    noise_test_results <- tryCatch(
+      {
+        # Run the regression
+        noise_test <- stats::lm(revision ~ final_value, data = data)
 
-    # News test
-    news_test <- stats::lm(revision ~ value, data = data)
-    hac_se <- sandwich::vcovHAC(news_test)
-    test <- car::linearHypothesis(
-      news_test,
-      c("(Intercept) = 0", "value = 0"),
-      vcov = hac_se
+        # Compute HAC standard errors
+        hac_se <- sandwich::vcovHAC(noise_test)
+
+        # Wald test
+        test <- car::linearHypothesis(
+          noise_test,
+          c("(Intercept) = 0", "final_value = 0"),
+          vcov = hac_se
+        )
+
+        # Extract values safely
+        noise_wald_p_value <- test[2, 'Pr(>F)']
+        noise_intercept <- stats::coef(noise_test)[1]
+        noise_intercept_stderr <- sqrt(diag(hac_se))[1]
+        noise_intercept_p_value <- summary(noise_test)$coefficients[1, 4]
+        noise_coeff <- stats::coef(noise_test)[2]
+        noise_coeff_stderr <- sqrt(diag(hac_se))[2]
+        noise_coeff_p_value <- summary(noise_test)$coefficients[2, 4]
+
+        # Return results as a named list
+        list(
+          noise_wald_p_value = noise_wald_p_value,
+          noise_intercept = noise_intercept,
+          noise_intercept_stderr = noise_intercept_stderr,
+          noise_intercept_p_value = noise_intercept_p_value,
+          noise_coeff = noise_coeff,
+          noise_coeff_stderr = noise_coeff_stderr,
+          noise_coeff_p_value = noise_coeff_p_value
+        )
+      },
+      error = function(e) {
+        # Return a list with NA values if an error occurs
+        list(
+          noise_wald_p_value = NA,
+          noise_intercept = NA,
+          noise_intercept_stderr = NA,
+          noise_intercept_p_value = NA,
+          noise_coeff = NA,
+          noise_coeff_stderr = NA,
+          noise_coeff_p_value = NA
+        )
+      }
     )
-    news_wald_p_value <- test[2, 'Pr(>F)']
-    news_intercept <- stats::coef(news_test)[1]
-    news_intercept_stderr <- sqrt(diag(hac_se))[1]
-    news_intercept_p_value <- summary(news_test)$coefficients[1, 4]
-    news_coeff <- stats::coef(news_test)[2]
-    news_coeff_stderr <- sqrt(diag(hac_se))[2]
-    news_coeff_p_value <- summary(news_test)$coefficients[2, 4]
+
+    # Extract individual variables
+    noise_wald_p_value <- noise_test_results$noise_wald_p_value
+    noise_intercept <- noise_test_results$noise_intercept
+    noise_intercept_stderr <- noise_test_results$noise_intercept_stderr
+    noise_intercept_p_value <- noise_test_results$noise_intercept_p_value
+    noise_coeff <- noise_test_results$noise_coeff
+    noise_coeff_stderr <- noise_test_results$noise_coeff_stderr
+    noise_coeff_p_value <- noise_test_results$noise_coeff_p_value
+
+    # News test with error handling
+    news_test_results <- tryCatch(
+      {
+        # Run the regression
+        news_test <- stats::lm(revision ~ value, data = data)
+
+        # Compute HAC standard errors
+        hac_se <- sandwich::vcovHAC(news_test)
+
+        # Wald test
+        test <- car::linearHypothesis(
+          news_test,
+          c("(Intercept) = 0", "value = 0"),
+          vcov = hac_se
+        )
+
+        # Extract values safely
+        news_wald_p_value <- test[2, 'Pr(>F)']
+        news_intercept <- stats::coef(news_test)[1]
+        news_intercept_stderr <- sqrt(diag(hac_se))[1]
+        news_intercept_p_value <- summary(news_test)$coefficients[1, 4]
+        news_coeff <- stats::coef(news_test)[2]
+        news_coeff_stderr <- sqrt(diag(hac_se))[2]
+        news_coeff_p_value <- summary(news_test)$coefficients[2, 4]
+
+        # Return results as a named list
+        list(
+          news_wald_p_value = news_wald_p_value,
+          news_intercept = news_intercept,
+          news_intercept_stderr = news_intercept_stderr,
+          news_intercept_p_value = news_intercept_p_value,
+          news_coeff = news_coeff,
+          news_coeff_stderr = news_coeff_stderr,
+          news_coeff_p_value = news_coeff_p_value
+        )
+      },
+      error = function(e) {
+        # Return a list with NA values if an error occurs
+        list(
+          news_wald_p_value = NA,
+          news_intercept = NA,
+          news_intercept_stderr = NA,
+          news_intercept_p_value = NA,
+          news_coeff = NA,
+          news_coeff_stderr = NA,
+          news_coeff_p_value = NA
+        )
+      }
+    )
+
+    # Extract individual variables
+    news_wald_p_value <- news_test_results$news_wald_p_value
+    news_intercept <- news_test_results$news_intercept
+    news_intercept_stderr <- news_test_results$news_intercept_stderr
+    news_intercept_p_value <- news_test_results$news_intercept_p_value
+    news_coeff <- news_test_results$news_coeff
+    news_coeff_stderr <- news_test_results$news_coeff_stderr
+    news_coeff_p_value <- news_test_results$news_coeff_p_value
 
     # Computes the fraction of sign changes
     correct_sign <- data %>%
