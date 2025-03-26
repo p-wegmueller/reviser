@@ -1,6 +1,9 @@
 ---
 title: "Identifying an Efficient Release in Data Subject to Revisions"
 output: rmarkdown::html_vignette
+bibliography: references.bib
+biblio-style: apalike
+link-citations: true
 vignette: >
   %\VignetteIndexEntry{efficient-release}
   %\VignetteEngine{knitr::rmarkdown}
