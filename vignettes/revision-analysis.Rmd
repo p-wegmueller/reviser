@@ -171,10 +171,10 @@ head(results)
 Sign switches in data revisions can occur when the direction of an economic indicator changes between its initial release and later revisions. We define two key metrics to assess the stability of these directional signals:
 
 #### 1. **Fraction of sign changes**  
-   This metric (`"Fraction of correct sign"`) evaluates how often the sign of the initially reported value \( Y_t^0 \) differs from the final revised value \( Y_t^f \). Mathematically, we compute:  
+   This metric (`"Fraction of correct sign"`) evaluates how often the sign of the initially reported value \( Y_t^h \) differs from the final revised value \( Y_t^f \). Mathematically, we compute:  
 
    \[
-   \text{Fraction of sign consistency} = \frac{\sum_{t=1}^{T} \mathbb{1}(\text{sign}(Y_t^0) = \text{sign}(Y_t^f))}{T}
+   \text{Fraction of sign consistency} = \frac{\sum_{t=1}^{T} \mathbb{1}(\text{sign}(Y_t^h) = \text{sign}(Y_t^f))}{T}
    \]
 
    where \( \mathbb{1}(\cdot) \) is an indicator function that equals 1 if the signs match and 0 otherwise.
@@ -183,10 +183,10 @@ Sign switches in data revisions can occur when the direction of an economic indi
    This metric (` "Fraction of correct growth rate change"`) assesses whether the direction of change in the variable remains consistent after revisions. Specifically, we compare the sign of the period-over-period differences:
 
    \[
-   \text{Fraction of sign consistency in growth} = \frac{\sum_{t=2}^{T} \mathbb{1}(\text{sign}(\Delta Y_t^0) = \text{sign}(\Delta Y_t^f))}{T-1}
+   \text{Fraction of sign consistency in growth} = \frac{\sum_{t=2}^{T} \mathbb{1}(\text{sign}(\Delta Y_t^h) = \text{sign}(\Delta Y_t^f))}{T-1}
    \]
 
-   where \( \Delta Y_t^0 = Y_t^0 - Y_{t-1}^0 \) and \( \Delta Y_t^f = Y_t^f - Y_{t-1}^f \) represent the first differences of the initially reported and final values, respectively.
+   where \( \Delta Y_t^h = Y_t^h - Y_{t-1}^h \) and \( \Delta Y_t^f = Y_t^f - Y_{t-1}^f \) represent the first differences of the initially reported and final values, respectively.
 
 A high fraction of incorrect signs in either metric suggests that early estimates may be unreliable in capturing the true direction of the variable.
 
