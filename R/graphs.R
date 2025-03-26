@@ -82,6 +82,7 @@ plot_vintages <- function(
   df,
   type = "line",
   dim_col = "pub_date",
+  time_col = "time",
   title = "",
   subtitle = "",
   ylab = ""
@@ -104,6 +105,24 @@ plot_vintages <- function(
     )
   }
 
+  # Check 'time_col' is column name of 'df'
+  if (!time_col %in% colnames(df)) {
+    rlang::abort(
+      paste0(
+        "The column ",
+        time_col,
+        " is not found in 'df'."
+      )
+    )
+  }
+
+  # Check that 'time_col' is of date format
+  if (!inherits(df[[time_col]], "Date")) {
+    rlang::abort(
+      "The 'time_col' argument must be of class 'Date'."
+    )
+  }
+
   # Check title and subtitle are character strings
   if (!is.character(title) || !is.character(subtitle) || !is.character(ylab)) {
     rlang::abort(
@@ -112,6 +131,7 @@ plot_vintages <- function(
   }
 
   dim_col <- as.name(dim_col)
+  time_col <- as.name(time_col)
 
   check <- vintages_check(df)
   if (check == "wide") {
@@ -148,16 +168,19 @@ plot_vintages <- function(
   if (n == 1L) {
     if (type == "line") {
       p <- p +
-        ggplot2::geom_line(ggplot2::aes(x = time, y = value), data = df) +
+        ggplot2::geom_line(ggplot2::aes(x = !!time_col, y = value), data = df) +
         scale_color_reviser()
     } else if (type == "point") {
       p <- p +
-        ggplot2::geom_point(ggplot2::aes(x = time, y = value), data = df) +
+        ggplot2::geom_point(
+          ggplot2::aes(x = !!time_col, y = value),
+          data = df
+        ) +
         scale_color_reviser()
     } else if (type == "bar") {
       p <- p +
         ggplot2::geom_bar(
-          ggplot2::aes(x = time, y = value),
+          ggplot2::aes(x = !!time_col, y = value),
           data = df,
           position = "identity",
           stat = "identity"
@@ -175,14 +198,14 @@ plot_vintages <- function(
     if (type == "line") {
       p <- p +
         ggplot2::geom_line(
-          ggplot2::aes(x = time, y = value, color = !!dim_col),
+          ggplot2::aes(x = !!time_col, y = value, color = !!dim_col),
           data = df
         ) +
         scale_color_reviser()
     } else if (type == "point") {
       p <- p +
         ggplot2::geom_point(
-          ggplot2::aes(x = time, y = value, color = !!dim_col),
+          ggplot2::aes(x = !!time_col, y = value, color = !!dim_col),
           data = df
         ) +
         scale_color_reviser()
@@ -190,7 +213,7 @@ plot_vintages <- function(
       p <- p +
         ggplot2::geom_bar(
           ggplot2::aes(
-            x = time,
+            x = !!time_col,
             y = value,
             color = !!dim_col,
             fill = !!dim_col
@@ -204,7 +227,7 @@ plot_vintages <- function(
     } else if (type == "boxplot") {
       p <- p +
         ggplot2::geom_boxplot(
-          ggplot2::aes(x = time, y = value, fill = factor(time)),
+          ggplot2::aes(x = !!time_col, y = value, fill = factor(!!time_col)),
           data = df
         ) +
         scale_fill_reviser() +
