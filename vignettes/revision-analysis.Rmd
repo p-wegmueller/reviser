@@ -26,6 +26,11 @@ Let's define some notation to facilitate the discussion of the statistics and hy
 - \( R_t^f = Y_t^f - Y_t^h \) be the final revision compared to the $h$th release for time \( t \)
 - \( N \) is the number of observations
 
+The function takes two mandatory arguments:
+
+ 1. A data frame containing the preliminary data releases.
+ 2. A data frame containing the final release data against which the revisions are calculated and preliminary data will be compared.
+
 The function argument `degree` allows users to specify which statistics and hypothesis tests to include in the output:
 
  - `degree = 1` includes information about revision size (default)
@@ -34,11 +39,6 @@ The function argument `degree` allows users to specify which statistics and hypo
  - `degree = 4` includes sign switches, seasonality analysis and Theil's U
  - `degree = 5` includes all the statistics and hypothesis tests
  
-```{r setup, message=FALSE, warning=FALSE}
-library(reviser)
-library(dplyr)
-library(tsbox)
-```
 
 ## Summary Statistics
 
@@ -91,7 +91,11 @@ Revisions provide insights into the reliability of initial data releases. Variou
 
    where \( \sigma_Y \) is the standard deviation of the final value \( Y_t^f \). A high noise-to-signal ratio suggests that revisions are large relative to the underlying variability in the final data, indicating high uncertainty in initial estimates.
 
-```{r, warning=FALSE}
+```{r, warning=FALSE, message=FALSE}
+library(reviser)
+library(dplyr)
+library(tsbox)
+
 gdp <- reviser::gdp %>%
   ts_pc() %>%
   na.omit()
@@ -312,7 +316,9 @@ results <- get_revision_analysis(
 head(results)
 ```
 
-In the above examples, we compare the final release of GDP with the first and second release (diagonal of the real-time data matrix). However, it is also possible to compare revisions between given publication dates. In the example below, we compare revisions between GDP releases in April and July 2024 and the final release from October 2024. The grouping of the statistics takes place over the `pub_date` or `release` column.
+In the above examples, we analyze GDP revisions by comparing the final release with the first and second releases, which correspond to the diagonal elements of the real-time data matrix. This approach provides insight into how initial estimates evolve over time.
+
+Alternatively, we can compare GDP revisions between specific publication dates. In the example below, we analyze revisions from the GDP releases from April and July 2024, using the final release from October 2024 as the benchmark. The grouping of statistics is determined by the `pub_date` or `release` column.
 
 
 ```{r, warning=FALSE}
@@ -325,6 +331,31 @@ results <- get_revision_analysis(
   final_release,
   degree = 5
   )
+
+head(results)
+```
+
+
+The `get_revision_analysis()` function requires a single time series in `final_release` and compares it to multiple time series in `df` for the same `id`. To always compare two consecutive publication dates, it is necessary to structure the analysis sequentially. The code below iterates over consecutive publication dates in the gdp dataset, comparing revisions between each pair. For each pair of consecutive dates, it extracts the corresponding data, runs get_revision_analysis() to analyze revisions, and then combines the results into a single dataframe. 
+
+```{r, warning=FALSE}
+# Get unique sorted publication dates
+pub_dates <- gdp %>%
+  distinct(pub_date) %>%
+  arrange(pub_date) %>%
+  pull(pub_date)
+
+# Run the function for each pair of consecutive publication dates
+results <- purrr::map_dfr(seq_along(pub_dates[-length(pub_dates)]), function(i) {
+  
+  df <- gdp %>%
+    filter(pub_date %in% pub_dates[i])
+  
+  final_release <- gdp %>%
+    filter(pub_date %in% pub_dates[i + 1])
+  
+  get_revision_analysis(df, final_release, degree = 5)
+})
 
 head(results)
 ```
