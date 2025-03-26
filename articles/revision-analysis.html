@@ -44,7 +44,7 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/understanding-revisions.html">Understanding Data Revisions</a></li>
     <li><a class="dropdown-item" href="../articles/revision-analysis.html">Revision Patterns and Statistics</a></li>
-    <li><a class="dropdown-item" href="../articles/efficient-release.html">Efficient Release Identification</a></li>
+    <li><a class="dropdown-item" href="../articles/efficient-release.html">Identifying an Efficient Release in Data Subject to Revisions</a></li>
     <li><a class="dropdown-item" href="../articles/nowcasting-revisions.html">Nowcasting Revisions</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
@@ -709,8 +709,10 @@ provides insight into how initial estimates evolve over time.</p>
 <p>Alternatively, we can compare GDP revisions between specific
 publication dates. In the example below, we analyze revisions from the
 GDP releases from April and July 2024, using the final release from
-October 2024 as the benchmark. The grouping of statistics is determined
-by the <code>pub_date</code> or <code>release</code> column.</p>
+October 2024 as the benchmark. The grouping of statistics is by default
+determined by the <code>pub_date</code> or <code>release</code> column.
+Alternatively, it can be specified via the optional function argument
+<code>grouping_var</code>.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">gdp</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">pub_date</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2024-04-01"</span>, <span class="st">"2024-07-01"</span><span class="op">)</span><span class="op">)</span></span>

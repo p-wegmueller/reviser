@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Efficient Release Identification • reviser</title>
+<title>Identifying an Efficient Release in Data Subject to Revisions • reviser</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
 <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
@@ -16,7 +16,7 @@
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Efficient Release Identification">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Identifying an Efficient Release in Data Subject to Revisions">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
 </head>
@@ -44,7 +44,7 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/understanding-revisions.html">Understanding Data Revisions</a></li>
     <li><a class="dropdown-item" href="../articles/revision-analysis.html">Revision Patterns and Statistics</a></li>
-    <li><a class="dropdown-item" href="../articles/efficient-release.html">Efficient Release Identification</a></li>
+    <li><a class="dropdown-item" href="../articles/efficient-release.html">Identifying an Efficient Release in Data Subject to Revisions</a></li>
     <li><a class="dropdown-item" href="../articles/nowcasting-revisions.html">Nowcasting Revisions</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
@@ -75,7 +75,7 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../logo.png" class="logo" alt=""><h1>Efficient Release Identification</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>Identifying an Efficient Release in Data Subject to Revisions</h1>
             
       
 
@@ -84,10 +84,415 @@
 
     
     
+<p>Macroeconomic data are often subject to revisions, reflecting the
+integration of new information, methodological improvements, and
+statistical adjustments. Understanding the optimal properties of a
+revision process is essential to ensure that early data releases provide
+a reliable foundation for policy decisions and economic forecasting.
+This vignette discusses the characteristics of optimal revisions,
+formalizes initial estimates as truth measured with noise, and presents
+an iterative approach to identify the point at which revisions become
+unpredictable also known as the efficient release. Further, examples are
+provided to illustrate the application of these concepts to real-world
+data.</p>
+<div class="section level3">
+<h3 id="optimal-properties-of-revisions">Optimal Properties of Revisions<a class="anchor" aria-label="anchor" href="#optimal-properties-of-revisions"></a>
+</h3>
+<p>Data revisions can be classified into two main types: ongoing
+revisions, which incorporate new information as it becomes available,
+and benchmark revisions, which reflect changes in definitions,
+classifications, or methodologies. Optimally, revisions should satisfy
+the following properties:</p>
+<ul>
+<li><p><strong>Unbiasedness</strong>: Revisions should not
+systematically push estimates in one direction. Mathematically, for a
+revision series
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>R</mi><mi>t</mi><mi>f</mi></msubsup><mo>=</mo><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup><mo>−</mo><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup></mrow><annotation encoding="application/x-tex">R_t^f = Y_t^f - Y_t^h</annotation></semantics></math>
+where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>h</mi><annotation encoding="application/x-tex">h</annotation></semantics></math>
+denotes the release number
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup><annotation encoding="application/x-tex">Y_t^f</annotation></semantics></math>
+represents the final release and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><annotation encoding="application/x-tex">Y_t^h</annotation></semantics></math>
+represents the series released at time
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>h</mi><annotation encoding="application/x-tex">h</annotation></semantics></math>
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">h=0</annotation></semantics></math>
+is the initial release), unbiasedness requires:
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mrow><mo stretchy="true" form="prefix">[</mo><msubsup><mi>R</mi><mi>t</mi><mi>f</mi></msubsup><mo stretchy="true" form="postfix">]</mo></mrow><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">
+E[R_t^f] = 0 
+</annotation></semantics></math></p></li>
+<li><p><strong>Efficiency</strong>: An efficient release incorporates
+all available information optimally, ensuring that subsequent revisions
+are unpredictable. This can be tested using the Mincer-Zarnowitz
+regression:
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup><mo>=</mo><mi>α</mi><mo>+</mo><mi>β</mi><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><mo>+</mo><msub><mi>ε</mi><mi>t</mi></msub><mo>,</mo></mrow><annotation encoding="application/x-tex">
+Y_t^f = \alpha + \beta Y_t^h + \varepsilon_t,
+</annotation></semantics></math> where an efficient release satisfies
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\alpha = 0</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>β</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\beta = 1</annotation></semantics></math>.</p></li>
+<li><p><strong>Minimal Variance</strong>: Revisions should be as small
+as possible while still improving accuracy. The variance of revisions,
+defined as
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">Var</mtext><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>R</mi><mi>t</mi><mi>f</mi></msubsup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\text{Var}(R_t^f)</annotation></semantics></math>,
+should decrease over successive releases.</p></li>
+</ul>
+</div>
+<div class="section level3">
+<h3 id="initial-estimates-as-truth-measured-with-noise">Initial Estimates as Truth Measured with Noise<a class="anchor" aria-label="anchor" href="#initial-estimates-as-truth-measured-with-noise"></a>
+</h3>
+<p>A fundamental assumption in many revision models is that the first
+release of a data point is an imperfect measure of the true value due to
+measurement errors. This can be expressed as:
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><mo>=</mo><msubsup><mi>Y</mi><mi>t</mi><mo>*</mo></msubsup><mo>+</mo><msubsup><mi>ε</mi><mi>t</mi><mi>h</mi></msubsup><mo>,</mo></mrow><annotation encoding="application/x-tex">
+Y_t^h = Y_t^* + \varepsilon_t^h,
+</annotation></semantics></math> where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>Y</mi><mi>t</mi><mo>*</mo></msubsup><annotation encoding="application/x-tex">Y_t^*</annotation></semantics></math>
+is the true value and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>ε</mi><mi>t</mi><mi>h</mi></msubsup><annotation encoding="application/x-tex">\varepsilon_t^h</annotation></semantics></math>
+is an error term that diminishes as
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>h</mi><annotation encoding="application/x-tex">h</annotation></semantics></math>
+increases. The properties of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>R</mi><mi>t</mi><mi>h</mi></msubsup><annotation encoding="application/x-tex">R_t^h</annotation></semantics></math>
+determine whether the preliminary release
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>h</mi><annotation encoding="application/x-tex">h</annotation></semantics></math>
+is an efficient estimator of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>Y</mi><mi>t</mi><mo>*</mo></msubsup><annotation encoding="application/x-tex">Y_t^*</annotation></semantics></math>.
+If
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>R</mi><mi>t</mi><mi>h</mi></msubsup><annotation encoding="application/x-tex">R_t^h</annotation></semantics></math>
+is predictable, the revision process is inefficient, indicating room for
+improvement in the initial estimates. Vice-versa if
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>R</mi><mi>t</mi><mi>h</mi></msubsup><annotation encoding="application/x-tex">R_t^h</annotation></semantics></math>
+is unpredictable, the preliminary release is efficient (i.e
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><mo>=</mo><msubsup><mi>Y</mi><mi>t</mi><mi>e</mi></msubsup></mrow><annotation encoding="application/x-tex">Y_t^h = Y_t^e</annotation></semantics></math>).</p>
+</div>
+<div class="section level3">
+<h3 id="the-challenge-of-defining-a-final-release">The Challenge of Defining a Final Release<a class="anchor" aria-label="anchor" href="#the-challenge-of-defining-a-final-release"></a>
+</h3>
+<p>One major challenge in identifying an efficient release using
+Mincer-Zarnowitz regressions is that it is often unclear which data
+release should be considered final. While some revisions occur due to
+the incorporation of new information, others result from methodological
+changes that redefine past values. Consequently, statistical agencies
+may continue revising data for years, making it difficult to pinpoint a
+definitive final release. For instance in Germany the final release of
+national accounts data is typically published four years after the
+initial release. In Switzerland, GDP figures are never finalized. So,
+defining a final release is a non-trivial task that requires knowledge
+of the revision process.</p>
+</div>
+<div class="section level3">
+<h3 id="iterative-approach-for-identifying-e">Iterative Approach for Identifying
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>e</mi><annotation encoding="application/x-tex">e</annotation></semantics></math><a class="anchor" aria-label="anchor" href="#iterative-approach-for-identifying-e"></a>
+</h3>
+<p>An iterative approach is proposed to determine the optimal number of
+revisions,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>e</mi><annotation encoding="application/x-tex">e</annotation></semantics></math>,
+beyond which further revisions are negligible. This approach is based on
+running Mincer-Zarnowitz-style regressions to assess which release
+provides an optimal estimate of the final value. The procedure follows
+these steps:</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Regression Analysis</strong>: Regress the final release
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup><annotation encoding="application/x-tex">Y_t^f</annotation></semantics></math>
+on the initial releases
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><annotation encoding="application/x-tex">Y_t^h</annotation></semantics></math>
+for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi><mo>=</mo><mn>1</mn><mo>,</mo><mn>2</mn><mo>,</mo><mi>…</mi><mo>,</mo><mi>e</mi></mrow><annotation encoding="application/x-tex">h = 1,2,\dots,e</annotation></semantics></math>:
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup><mo>=</mo><mi>α</mi><mo>+</mo><mi>β</mi><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><mo>+</mo><msub><mi>ε</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">
+Y_t^f = \alpha + \beta Y_t^h + \varepsilon_t
+</annotation></semantics></math> where the null hypothesis is that
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\alpha = 0</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>β</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\beta = 1</annotation></semantics></math>,
+indicating that
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><annotation encoding="application/x-tex">Y_t^h</annotation></semantics></math>
+is an efficient estimate of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup><annotation encoding="application/x-tex">Y_t^f</annotation></semantics></math>.</p></li>
+<li><p><strong>Determine the Optimal
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>e</mi><annotation encoding="application/x-tex">e</annotation></semantics></math></strong>:
+Increase
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>h</mi><annotation encoding="application/x-tex">h</annotation></semantics></math>
+iteratively and test whether the efficiency conditions hold. The
+smallest
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>e</mi><annotation encoding="application/x-tex">e</annotation></semantics></math>
+for which the hypothesis is not rejected is considered the final
+efficient release.</p></li>
+</ol>
+</div>
+<div class="section level3">
+<h3 id="importance-of-an-efficient-release">Importance of an Efficient Release<a class="anchor" aria-label="anchor" href="#importance-of-an-efficient-release"></a>
+</h3>
+<p>An efficient release is essential for various economic
+applications:</p>
+<ul>
+<li>
+<strong>Macroeconomic Policy Decisions</strong>: Monetary and fiscal
+policies depend on timely and reliable data. If initial releases are
+biased or predictable, policymakers may react inappropriately, leading
+to suboptimal policy outcomes.</li>
+<li>
+<strong>Nowcasting and Forecasting</strong>: Reliable early
+estimates improve the accuracy of nowcasting models, which are used for
+real-time assessment of economic conditions.</li>
+<li>
+<strong>Financial Market Stability</strong>: Investors base
+decisions on official economic data. If initial releases are misleading,
+market volatility may increase due to unexpected revisions.</li>
+<li>
+<strong>International Comparisons</strong>: Cross-country analyses
+require consistent data. If national statistical agencies release
+inefficient estimates, international comparisons become distorted.</li>
+</ul>
+<p>An optimal revision process is one that leads to unbiased, efficient,
+and minimally variant data revisions. Initial estimates represent the
+truth measured with noise, and identifying the efficient release allows
+analysts to determine the earliest point at which data can be used
+reliably without concern for systematic revisions. The iterative
+approach based on Mincer-Zarnowitz regressions provides a robust
+framework for achieving this goal, improving the reliability of
+macroeconomic data for forecasting and policy analysis.</p>
+</div>
+<div class="section level3">
+<h3 id="example-identifying-an-efficient-release-in-gdp-data-with-reviser">Example: Identifying an Efficient Release in GDP Data with
+<code>reviser</code><a class="anchor" aria-label="anchor" href="#example-identifying-an-efficient-release-in-gdp-data-with-reviser"></a>
+</h3>
+<p>In the following example, we use the <code>reviser</code> package to
+identify the efficient release in quarterly GDP data for Switzerland,
+the Euro Area, Japan, and the United States. We test the first 20 data
+releases, and we aim to determine the point at which further revisions
+become negligible. As the final release, we use the same release for all
+countries, namely the data released 5 years after the first release. The
+tests shows that the first efficient release occurs at different points
+for each country, ranging from the 1st (Japan, US) to the 13th
+(Switzerland) release.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://p-wegmueller.github.io/reviser/">reviser</a></span><span class="op">)</span></span></code></pre></div>
-<p>IN PROGRESS</p>
-  </main>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://p-wegmueller.github.io/reviser/">reviser</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">gdp</span> <span class="op">&lt;-</span> <span class="fu">reviser</span><span class="fu">::</span><span class="va"><a href="../reference/gdp.html">gdp</a></span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu">tsbox</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/tsbox/reference/ts_pc.html" class="external-link">ts_pc</a></span><span class="op">(</span><span class="op">)</span> </span>
+<span></span>
+<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_nth_release.html">get_nth_release</a></span><span class="op">(</span><span class="va">gdp</span>, n <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">19</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">final_release</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_nth_release.html">get_nth_release</a></span><span class="op">(</span><span class="va">gdp</span>, n <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">efficient</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_first_efficient_release.html">get_first_efficient_release</a></span><span class="op">(</span></span>
+<span>  <span class="va">df</span>,</span>
+<span>  <span class="va">final_release</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">res</span><span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">efficient</span><span class="op">)</span></span>
+<span><span class="co">#&gt; id:  CHE </span></span>
+<span><span class="co">#&gt; Efficient release:  13 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Model summary: </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt; stats::lm(formula = formula, data = df_wide)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Residuals:</span></span>
+<span><span class="co">#&gt;      Min       1Q   Median       3Q      Max </span></span>
+<span><span class="co">#&gt; -0.83040 -0.13561 -0.00657  0.15531  0.76670 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt;             Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
+<span><span class="co">#&gt; (Intercept)  0.05979    0.02526   2.367   0.0192 *  </span></span>
+<span><span class="co">#&gt; release_13   0.87766    0.03326  26.384   &lt;2e-16 ***</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Residual standard error: 0.2631 on 155 degrees of freedom</span></span>
+<span><span class="co">#&gt;   (21 observations deleted due to missingness)</span></span>
+<span><span class="co">#&gt; Multiple R-squared:  0.8179, Adjusted R-squared:  0.8167 </span></span>
+<span><span class="co">#&gt; F-statistic: 696.1 on 1 and 155 DF,  p-value: &lt; 2.2e-16</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Test summary: </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Linear hypothesis test:</span></span>
+<span><span class="co">#&gt; (Intercept) = 0</span></span>
+<span><span class="co">#&gt; release_13 = 1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Model 1: restricted model</span></span>
+<span><span class="co">#&gt; Model 2: final ~ release_13</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Note: Coefficient covariance matrix supplied.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Res.Df Df      F  Pr(&gt;F)  </span></span>
+<span><span class="co">#&gt; 1    157                    </span></span>
+<span><span class="co">#&gt; 2    155  2 2.9999 0.05269 .</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; id:  EA </span></span>
+<span><span class="co">#&gt; Efficient release:  7 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Model summary: </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt; stats::lm(formula = formula, data = df_wide)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Residuals:</span></span>
+<span><span class="co">#&gt;      Min       1Q   Median       3Q      Max </span></span>
+<span><span class="co">#&gt; -0.39144 -0.06507  0.00536  0.07090  0.25743 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt;             Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
+<span><span class="co">#&gt; (Intercept)  0.01982    0.01113   1.781   0.0768 .  </span></span>
+<span><span class="co">#&gt; release_7    1.00311    0.01646  60.934   &lt;2e-16 ***</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Residual standard error: 0.1111 on 156 degrees of freedom</span></span>
+<span><span class="co">#&gt;   (20 observations deleted due to missingness)</span></span>
+<span><span class="co">#&gt; Multiple R-squared:  0.9597, Adjusted R-squared:  0.9594 </span></span>
+<span><span class="co">#&gt; F-statistic:  3713 on 1 and 156 DF,  p-value: &lt; 2.2e-16</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Test summary: </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Linear hypothesis test:</span></span>
+<span><span class="co">#&gt; (Intercept) = 0</span></span>
+<span><span class="co">#&gt; release_7 = 1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Model 1: restricted model</span></span>
+<span><span class="co">#&gt; Model 2: final ~ release_7</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Note: Coefficient covariance matrix supplied.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Res.Df Df      F  Pr(&gt;F)  </span></span>
+<span><span class="co">#&gt; 1    158                    </span></span>
+<span><span class="co">#&gt; 2    156  2 3.0071 0.05231 .</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; id:  JP </span></span>
+<span><span class="co">#&gt; Efficient release:  0 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Model summary: </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt; stats::lm(formula = formula, data = df_wide)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Residuals:</span></span>
+<span><span class="co">#&gt;      Min       1Q   Median       3Q      Max </span></span>
+<span><span class="co">#&gt; -1.76370 -0.36739 -0.01023  0.38499  1.72906 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt;             Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
+<span><span class="co">#&gt; (Intercept)  0.05437    0.05116   1.063     0.29    </span></span>
+<span><span class="co">#&gt; release_0    0.83179    0.04878  17.051   &lt;2e-16 ***</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Residual standard error: 0.5765 on 156 degrees of freedom</span></span>
+<span><span class="co">#&gt;   (20 observations deleted due to missingness)</span></span>
+<span><span class="co">#&gt; Multiple R-squared:  0.6508, Adjusted R-squared:  0.6486 </span></span>
+<span><span class="co">#&gt; F-statistic: 290.7 on 1 and 156 DF,  p-value: &lt; 2.2e-16</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Test summary: </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Linear hypothesis test:</span></span>
+<span><span class="co">#&gt; (Intercept) = 0</span></span>
+<span><span class="co">#&gt; release_0 = 1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Model 1: restricted model</span></span>
+<span><span class="co">#&gt; Model 2: final ~ release_0</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Note: Coefficient covariance matrix supplied.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Res.Df Df      F Pr(&gt;F)</span></span>
+<span><span class="co">#&gt; 1    158                 </span></span>
+<span><span class="co">#&gt; 2    156  2 1.8585 0.1593</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; id:  US </span></span>
+<span><span class="co">#&gt; Efficient release:  0 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Model summary: </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt; stats::lm(formula = formula, data = df_wide)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Residuals:</span></span>
+<span><span class="co">#&gt;      Min       1Q   Median       3Q      Max </span></span>
+<span><span class="co">#&gt; -0.82880 -0.13760  0.03239  0.12910  0.95887 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt;             Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
+<span><span class="co">#&gt; (Intercept) 0.005432   0.028360   0.192    0.848    </span></span>
+<span><span class="co">#&gt; release_0   0.955730   0.029993  31.865   &lt;2e-16 ***</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Residual standard error: 0.2564 on 156 degrees of freedom</span></span>
+<span><span class="co">#&gt;   (20 observations deleted due to missingness)</span></span>
+<span><span class="co">#&gt; Multiple R-squared:  0.8668, Adjusted R-squared:  0.866 </span></span>
+<span><span class="co">#&gt; F-statistic:  1015 on 1 and 156 DF,  p-value: &lt; 2.2e-16</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Test summary: </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Linear hypothesis test:</span></span>
+<span><span class="co">#&gt; (Intercept) = 0</span></span>
+<span><span class="co">#&gt; release_0 = 1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Model 1: restricted model</span></span>
+<span><span class="co">#&gt; Model 2: final ~ release_0</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Note: Coefficient covariance matrix supplied.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Res.Df Df      F Pr(&gt;F)</span></span>
+<span><span class="co">#&gt; 1    158                 </span></span>
+<span><span class="co">#&gt; 2    156  2 2.2919 0.1045</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 4 × 6</span></span></span>
+<span><span class="co">#&gt;   id        e   alpha  beta p_value n_tested</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> CHE      13 0.059<span style="text-decoration: underline;">8</span>  0.878  0.052<span style="text-decoration: underline;">7</span>       14</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> EA        7 0.019<span style="text-decoration: underline;">8</span>  1.00   0.052<span style="text-decoration: underline;">3</span>        8</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> JP        0 0.054<span style="text-decoration: underline;">4</span>  0.832  0.159         1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> US        0 0.005<span style="text-decoration: underline;">43</span> 0.956  0.104         1</span></span></code></pre></div>
+<p>Note: The identification of the first efficient release is related to
+the news hypothesis testing. Hence, the same conclusion could be reached
+by using the function <code><a href="../reference/get_revision_analysis.html">get_revision_analysis()</a></code> (setting
+<code>degree=3</code>, providing results for news and noise tests) as
+shown below. An advantage of using the
+<code><a href="../reference/get_first_efficient_release.html">get_first_efficient_release()</a></code> function is that it organizes
+the data to be subsequently used in <code><a href="../reference/kk_nowcast.html">kk_nowcast()</a></code> to improve
+nowcasts of preliminary releases (See vignette <a href="nowcasting-revisions.html">Nowcasting Revisions</a> for more
+details).</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">analysis</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_revision_analysis.html">get_revision_analysis</a></span><span class="op">(</span></span>
+<span>  <span class="va">df</span>, </span>
+<span>  <span class="va">final_release</span>,</span>
+<span>  degree<span class="op">=</span><span class="fl">3</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">analysis</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 17</span></span></span>
+<span><span class="co">#&gt;   id    release        N `News test Intercept` `News test Intercept (std.err)`</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>                           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> CHE   release_0    158                0.180                           0.054<span style="text-decoration: underline;">0</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> CHE   release_1    158                0.163                           0.054<span style="text-decoration: underline;">4</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> CHE   release_10   157                0.128                           0.047<span style="text-decoration: underline;">5</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> CHE   release_11   158                0.126                           0.046<span style="text-decoration: underline;">9</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> CHE   release_12   157                0.092<span style="text-decoration: underline;">0</span>                          0.040<span style="text-decoration: underline;">6</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> CHE   release_13   157                0.059<span style="text-decoration: underline;">8</span>                          0.029<span style="text-decoration: underline;">2</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 12 more variables: `News test Intercept (p-value)` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `News test Coefficient` &lt;dbl&gt;, `News test Coefficient (std.err)` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `News test Coefficient (p-value)` &lt;dbl&gt;, `News joint test (p-value)` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `Noise test Intercept` &lt;dbl&gt;, `Noise test Intercept (std.err)` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `Noise test Intercept (p-value)` &lt;dbl&gt;, `Noise test Coefficient` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `Noise test Coefficient (std.err)` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `Noise test Coefficient (p-value)` &lt;dbl&gt;, …</span></span></span></code></pre></div>
+</div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 
