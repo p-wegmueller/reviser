@@ -471,7 +471,7 @@ summary.lst_efficient <- function(object, ...) {
     for (iidd in names(object)) {
       cat("id: ", iidd, "\n")
       if (is.na(object[[iidd]]$e)) {
-        cat("No efficient release found!")
+        cat("No efficient release found! \n")
       } else {
         cat("Efficient release: ", object[[iidd]]$e, "\n\n")
         cat("Model summary: \n")
@@ -519,7 +519,7 @@ summary.lst_efficient <- function(object, ...) {
     }
   } else {
     if (is.na(object$e)) {
-      cat("No efficient release found!")
+      cat("No efficient release found! \n")
     } else {
       cat("Efficient release: ", object$e, "\n\n")
       cat("Model summary: \n")

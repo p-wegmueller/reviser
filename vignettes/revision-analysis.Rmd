@@ -318,7 +318,7 @@ head(results)
 
 In the above examples, we analyze GDP revisions by comparing the final release with the first and second releases, which correspond to the diagonal elements of the real-time data matrix. This approach provides insight into how initial estimates evolve over time.
 
-Alternatively, we can compare GDP revisions between specific publication dates. In the example below, we analyze revisions from the GDP releases from April and July 2024, using the final release from October 2024 as the benchmark. The grouping of statistics is determined by the `pub_date` or `release` column.
+Alternatively, we can compare GDP revisions between specific publication dates. In the example below, we analyze revisions from the GDP releases from April and July 2024, using the final release from October 2024 as the benchmark. The grouping of statistics is by default determined by the `pub_date` or `release` column. Alternatively, it can be specified via the optional function argument `grouping_var`.
 
 
 ```{r, warning=FALSE}

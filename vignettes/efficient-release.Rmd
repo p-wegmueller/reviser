@@ -1,5 +1,5 @@
 ---
-title: "Efficient Release Identification"
+title: "Identifying an Efficient Release in Data Subject to Revisions"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{efficient-release}
@@ -14,8 +14,103 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
+Macroeconomic data are often subject to revisions, reflecting the integration of new information, methodological improvements, and statistical adjustments. Understanding the optimal properties of a revision process is essential to ensure that early data releases provide a reliable foundation for policy decisions and economic forecasting. This vignette discusses the characteristics of optimal revisions, formalizes initial estimates as truth measured with noise, and presents an iterative approach to identify the point at which revisions become unpredictable also known as the efficient release. Further, examples are provided to illustrate the application of these concepts to real-world data.
+
+### Optimal Properties of Revisions
+
+Data revisions can be classified into two main types: ongoing revisions, which incorporate new information as it becomes available, and benchmark revisions, which reflect changes in definitions, classifications, or methodologies. Optimally, revisions should satisfy the following properties:
+
+- **Unbiasedness**: Revisions should not systematically push estimates in one direction. Mathematically, for a revision series \( R_t^f = Y_t^f - Y_t^h \) where \( h \) denotes the release number \( Y_t^f \) represents the final release and \( Y_t^h \) represents the series released at time \( h \) (\( h=0 \) is the initial release), unbiasedness requires:
+  \[
+  E[R_t^f] = 0 
+  \]
+
+- **Efficiency**: An efficient release incorporates all available information optimally, ensuring that subsequent revisions are unpredictable. This can be tested using the Mincer-Zarnowitz regression:
+  \[
+  Y_t^f = \alpha + \beta Y_t^h + \varepsilon_t,
+  \]
+  where an efficient release satisfies \( \alpha = 0 \) and \( \beta = 1 \).
+
+- **Minimal Variance**: Revisions should be as small as possible while still improving accuracy. The variance of revisions, defined as \( \text{Var}(R_t^f) \), should decrease over successive releases.
+
+
+
+### Initial Estimates as Truth Measured with Noise
+
+A fundamental assumption in many revision models is that the first release of a data point is an imperfect measure of the true value due to measurement errors. This can be expressed as:
+\[
+Y_t^h = Y_t^* + \varepsilon_t^h,
+\]
+where \( Y_t^* \) is the true value and \( \varepsilon_t^h \) is an error term that diminishes as \( h \) increases. The properties of \( R_t^h \) determine whether the preliminary release \( h \) is an efficient estimator of \( Y_t^* \). If \( R_t^h \) is predictable, the revision process is inefficient, indicating room for improvement in the initial estimates. Vice-versa if \( R_t^h \) is unpredictable, the preliminary release is efficient (i.e \(Y_t^h = Y_t^e\)). 
+
+
+### The Challenge of Defining a Final Release
+One major challenge in identifying an efficient release using Mincer-Zarnowitz regressions is that it is often unclear which data release should be considered final. While some revisions occur due to the incorporation of new information, others result from methodological changes that redefine past values. Consequently, statistical agencies may continue revising data for years, making it difficult to pinpoint a definitive final release. For instance in Germany the final release of national accounts data is typically published four years after the initial release. In Switzerland, GDP figures are never finalized. So, defining a final release is a non-trivial task that requires knowledge of the revision process.
+
+### Iterative Approach for Identifying \( e \)
+
+An iterative approach is proposed to determine the optimal number of revisions, \( e \), beyond which further revisions are negligible. This approach is based on running Mincer-Zarnowitz-style regressions to assess which release provides an optimal estimate of the final value. The procedure follows these steps:
+
+1. **Regression Analysis**: Regress the final release \( Y_t^f \) on the initial releases \( Y_t^h \) for \( h = 1,2,\dots,e \):
+   \[
+   Y_t^f = \alpha + \beta Y_t^h + \varepsilon_t
+   \]
+   where the null hypothesis is that \( \alpha = 0 \) and \( \beta = 1 \), indicating that \( Y_t^h \) is an efficient estimate of \( Y_t^f \).
+   
+2. **Determine the Optimal \( e \)**: Increase \( h \) iteratively and test whether the efficiency conditions hold. The smallest \( e \) for which the hypothesis is not rejected is considered the final efficient release.
+   
+
+
+### Importance of an Efficient Release
+
+An efficient release is essential for various economic applications:
+
+- **Macroeconomic Policy Decisions**: Monetary and fiscal policies depend on timely and reliable data. If initial releases are biased or predictable, policymakers may react inappropriately, leading to suboptimal policy outcomes.
+- **Nowcasting and Forecasting**: Reliable early estimates improve the accuracy of nowcasting models, which are used for real-time assessment of economic conditions.
+- **Financial Market Stability**: Investors base decisions on official economic data. If initial releases are misleading, market volatility may increase due to unexpected revisions.
+- **International Comparisons**: Cross-country analyses require consistent data. If national statistical agencies release inefficient estimates, international comparisons become distorted.
+
+
+An optimal revision process is one that leads to unbiased, efficient, and minimally variant data revisions. Initial estimates represent the truth measured with noise, and identifying the efficient release allows analysts to determine the earliest point at which data can be used reliably without concern for systematic revisions. The iterative approach based on Mincer-Zarnowitz regressions provides a robust framework for achieving this goal, improving the reliability of macroeconomic data for forecasting and policy analysis.
+
+
+### Example: Identifying an Efficient Release in GDP Data with `reviser`
+
+In the following example, we use the `reviser` package to identify the efficient release in quarterly GDP data for Switzerland, the Euro Area, Japan, and the United States. We test the first 20 data releases, and we aim to determine the point at which further revisions become negligible. As the final release, we use the same release for all countries, namely the data released 5 years after the first release. The tests shows that the first efficient release occurs at different points for each country, ranging from the 1st (Japan, US) to the 13th (Switzerland) release. 
+
+
+```{r setup, warning=FALSE, message=FALSE}
 library(reviser)
+library(dplyr)
+
+gdp <- reviser::gdp %>%
+  tsbox::ts_pc() 
+
+df <- get_nth_release(gdp, n = 0:19)
+
+final_release <- get_nth_release(gdp, n = 20)
+
+efficient <- get_first_efficient_release(
+  df,
+  final_release
+)
+
+res<- summary(efficient)
+
+head(res)
+
 ```
 
-IN PROGRESS
+
+Note: The identification of the first efficient release is related to the news hypothesis testing. Hence, the same conclusion could be reached by using the function `get_revision_analysis()` (setting `degree=3`, providing results for news and noise tests) as shown below. An advantage of using the `get_first_efficient_release()` function is that it organizes the data to be subsequently used in `kk_nowcast()` to improve nowcasts of preliminary releases (See vignette [Nowcasting Revisions](nowcasting-revisions.html) for more details). 
+
+
+```{r, warning=FALSE, message=FALSE}
+analysis <- get_revision_analysis(
+  df, 
+  final_release,
+  degree=3
+  )
+head(analysis)
+```
+
