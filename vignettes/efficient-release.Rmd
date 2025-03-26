@@ -18,7 +18,7 @@ Macroeconomic data are often subject to revisions, reflecting the integration of
 
 ### Optimal Properties of Revisions
 
-Data revisions can be classified into two main types: ongoing revisions, which incorporate new information as it becomes available, and benchmark revisions, which reflect changes in definitions, classifications, or methodologies. Optimally, revisions should satisfy the following properties:
+Data revisions can be classified into two main types: ongoing revisions, which incorporate new information as it becomes available, and benchmark revisions, which reflect changes in definitions, classifications, or methodologies. Optimally, revisions should satisfy the following properties [@aruobaDataRevisionsAre2008]:
 
 - **Unbiasedness**: Revisions should not systematically push estimates in one direction. Mathematically, for a revision series \( R_t^f = Y_t^f - Y_t^h \) where \( h \) denotes the release number \( Y_t^f \) represents the final release and \( Y_t^h \) represents the series released at time \( h \) (\( h=0 \) is the initial release), unbiasedness requires:
   \[
@@ -49,7 +49,8 @@ One major challenge in identifying an efficient release using Mincer-Zarnowitz r
 
 ### Iterative Approach for Identifying \( e \)
 
-An iterative approach is proposed to determine the optimal number of revisions, \( e \), beyond which further revisions are negligible. This approach is based on running Mincer-Zarnowitz-style regressions to assess which release provides an optimal estimate of the final value. The procedure follows these steps:
+An iterative approach is proposed to determine the optimal number of revisions, \( e \), beyond which further revisions are negligible. This approach is based on running Mincer-Zarnowitz-style regressions to assess which release provides an optimal estimate of the final value. The procedure follows these steps [@kishorVAREstimationForecasting2012; @strohsalDataRevisionsGerman2020]:
+
 
 1. **Regression Analysis**: Regress the final release \( Y_t^f \) on the initial releases \( Y_t^h \) for \( h = 1,2,\dots,e \):
    \[
@@ -114,3 +115,4 @@ analysis <- get_revision_analysis(
 head(analysis)
 ```
 
+### References
