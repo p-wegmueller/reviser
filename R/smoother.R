@@ -105,17 +105,6 @@ kk_nowcast <- function(
     )
   )
 
-  if (length(startvals) != n_param_mat) {
-    rlang::abort(paste0(
-      "The length of 'startvals' must be ",
-      n_param_mat,
-      " if 'model' = ",
-      model,
-      " and e =",
-      e
-    ))
-  }
-
   # KK cov matrices
   n_param_cov <- e + 1
 
@@ -130,18 +119,18 @@ kk_nowcast <- function(
   }
 
   if (!is.null(startvals)) {
-    start_mat <- startvals
-  }
-
-  if (length(startvals) != n_param_mat) {
-    rlang::abort(paste0(
-      "The length of 'startvals' must be ",
-      n_param_mat,
-      " if 'model' = ",
-      model,
-      " and e =",
-      e
-    ))
+    if (length(startvals) != n_param_mat) {
+      rlang::abort(paste0(
+        "The length of 'startvals' must be ",
+        n_param_mat,
+        " if 'model' = ",
+        model,
+        " and e = ",
+        e
+      ))
+    } else {
+      start_mat <- startvals
+    }
   }
 
   if (length(c(start_mat, start_cov)) != n_param) {
@@ -155,7 +144,7 @@ kk_nowcast <- function(
     ))
   }
 
-  # Check start values forthe expected value of the pre-sample state vector m0
+  # Check start values for the expected value of the pre-sample state vector m0
   # and the covariance matrix C0
 
   # Both must be numeric
