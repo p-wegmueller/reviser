@@ -129,22 +129,41 @@ state-space models, specifically for the Kishor-Koenig (KK), Howrey, or Classica
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Example 1: Kishor-Koenig model with e = 2</span></span></span>
 <span class="r-in"><span><span class="va">matrices</span> <span class="op">&lt;-</span> <span class="fu">kk_matrices</span><span class="op">(</span>e <span class="op">=</span> <span class="fl">2</span>, model <span class="op">=</span> <span class="st">"KK"</span>, type <span class="op">=</span> <span class="st">"numeric"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in kk_matrices(e = 2, model = "KK", type = "numeric"):</span> could not find function "kk_matrices"</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">matrices</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'matrices' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> List of 6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ II    : num [1:3, 1:3] 1 0 0 0 1 0 0 0 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ FF    : num [1:3, 1:3] 0 0 0 1 0 0 0 1 0.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ GG    : num [1:3, 1:3] 1 0.1 0.1 0 0.1 0.1 0 0.1 0.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ R     : num [1:3, 1:3] 0 0 0 0 0 0 0 0 0.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ H     : num [1:3, 1:3] 0 0 0 0 0.1 0 0 0 0.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ params: Named num [1:10] 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "names")= chr [1:10] "F0" "G1_2" "G1_1" "G1_0" ...</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 2: Howrey model with custom parameters</span></span></span>
 <span class="r-in"><span><span class="va">custom_params</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.3</span>, <span class="fl">0.2</span>, <span class="fl">0.1</span>, <span class="fl">0.05</span>, <span class="fl">0.01</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">matrices</span> <span class="op">&lt;-</span> <span class="fu">kk_matrices</span><span class="op">(</span>e <span class="op">=</span> <span class="fl">2</span>, model <span class="op">=</span> <span class="st">"Howrey"</span>, params <span class="op">=</span> <span class="va">custom_params</span>, type <span class="op">=</span> <span class="st">"numeric"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in kk_matrices(e = 2, model = "Howrey", params = custom_params,     type = "numeric"):</span> could not find function "kk_matrices"</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in kk_matrices(e = 2, model = "Howrey", params = custom_params,     type = "numeric"):</span> 'params' must have length 8, not 6</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">matrices</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'matrices' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> List of 6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ II    : num [1:3, 1:3] 1 0 0 0 1 0 0 0 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ FF    : num [1:3, 1:3] 0 0 0 1 0 0 0 1 0.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ GG    : num [1:3, 1:3] 1 0.1 0.1 0 0.1 0.1 0 0.1 0.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ R     : num [1:3, 1:3] 0 0 0 0 0 0 0 0 0.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ H     : num [1:3, 1:3] 0 0 0 0 0.1 0 0 0 0.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ params: Named num [1:10] 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "names")= chr [1:10] "F0" "G1_2" "G1_1" "G1_0" ...</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 3: Classical model with character matrices</span></span></span>
 <span class="r-in"><span><span class="va">matrices</span> <span class="op">&lt;-</span> <span class="fu">kk_matrices</span><span class="op">(</span>e <span class="op">=</span> <span class="fl">3</span>, model <span class="op">=</span> <span class="st">"Classical"</span>, type <span class="op">=</span> <span class="st">"character"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in kk_matrices(e = 3, model = "Classical", type = "character"):</span> could not find function "kk_matrices"</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">matrices</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'matrices' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> List of 6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ II    : chr [1:4, 1:4] "1" "0" "0" "0" ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ FF    : chr [1:4, 1:4] "0" "0" "0" "0" ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ GG    : chr [1:4, 1:4] "1" "0" "0" "0" ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ R     : chr [1:4, 1:4] "0" "0" "0" "0" ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ H     : chr [1:4, 1:4] "0" "0" "0" "0" ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ params: Named num [1:5] NA NA NA NA NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "names")= chr [1:5] "F0" "v0" "eps2" "eps1" ...</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
