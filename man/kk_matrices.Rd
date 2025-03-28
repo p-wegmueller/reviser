@@ -50,7 +50,7 @@ matrices <- kk_matrices(e = 2, model = "KK", type = "numeric")
 str(matrices)
 
 # Example 2: Howrey model with custom parameters
-custom_params <- c(0.5, 0.3, 0.2, 0.1, 0.05, 0.01)
+custom_params <- c(0.5, 0.3, 0.2, 0.1, 0.2, 0.25, 0.05, 0.01)
 matrices <- kk_matrices(e = 2, model = "Howrey", params = custom_params, type = "numeric")
 str(matrices)
 
