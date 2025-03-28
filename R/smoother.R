@@ -11,9 +11,11 @@
 #' @param h An integer specifying the forecast horizon. Default is 0, which implies no forecasts.
 #'          Must be greater than or equal to 0.
 #' @param model A string specifying the type of model to use. Options are:
+#'
 #'              - "Kishor-Koenig" or "KK" (default): Full Kishor-Koenig model.
 #'              - "Howrey": Howrey's simplified framework.
 #'              - "Classical": Classical model without vintage effects.
+#'
 #' @param trace An integer controlling the level of output for the optimization procedure.
 #'              Default is 0 (minimal output).
 #'
@@ -63,7 +65,8 @@ kk_nowcast <- function(
   e,
   h = 0,
   model = "Kishor-Koenig",
-  trace = 0
+  trace = 0,
+  maxiter = 1000
 ) {
   start_mat <- 0.4
   start_cov <- 0.4
@@ -237,7 +240,8 @@ kk_nowcast <- function(
     method = "SUR",
     data = sur_data,
     startvals = start_mat,
-    print.level = trace
+    print.level = trace,
+    maxiter = maxiter
   )
 
   params <- c(fit$b, (diag(fit$rcov)))
@@ -364,7 +368,7 @@ kk_nowcast <- function(
   # Remove the parameters from the model
   kk_mat_hat$params <- NULL
 
-  return(list(
+  results <- list(
     forecast_states = forecast_states,
     filtered_states = filtered_states,
     observations = observations,
@@ -373,8 +377,12 @@ kk_nowcast <- function(
     kk_model_mat = kk_mat_hat,
     ss_model_mat = sur_ss_mat,
     params = params,
-    fit = fit
-  ))
+    fit = fit,
+    e = e
+  )
+  class(results) <- c("kk_model", class(results))
+
+  return(results)
 }
 
 
@@ -426,7 +434,7 @@ kk_nowcast <- function(
 #' matrices <- kk_matrices(e = 3, model = "Classical", type = "character")
 #' str(matrices)
 #'
-#' @noRd
+#' @export
 kk_matrices <- function(e, model, params = NULL, type = "numeric") {
   # Start param count
   ii <- 1
@@ -505,9 +513,9 @@ kk_matrices <- function(e, model, params = NULL, type = "numeric") {
         GG[i + 1, j] <- ifelse(
           type == "numeric",
           params[ii],
-          paste0("G", e - i, e - j + 1)
+          paste0("G", e - i, "_", e - j + 1)
         )
-        names(params)[ii] <- c(paste0("G", e - i, e - j + 1))
+        names(params)[ii] <- c(paste0("G", e - i, "_", e - j + 1))
         ii <- ii + 1
       }
     }
@@ -518,9 +526,9 @@ kk_matrices <- function(e, model, params = NULL, type = "numeric") {
         GG[i + 1, j] <- ifelse(
           type == "numeric",
           params[ii],
-          paste0("G", e - i, e - j + 1)
+          paste0("G", e - i, "_", e - j + 1)
         )
-        names(params)[ii] <- c(paste0("G", e - i, e - j + 1))
+        names(params)[ii] <- c(paste0("G", e - i, "_", e - j + 1))
         ii <- ii + 1
       }
     }
