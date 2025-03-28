@@ -4,7 +4,15 @@
 \alias{kk_nowcast}
 \title{Generalized Kishor-Koenig Model for Nowcasting}
 \usage{
-kk_nowcast(df, e, h = 0, model = "Kishor-Koenig", trace = 0)
+kk_nowcast(
+  df,
+  e,
+  h = 0,
+  model = "Kishor-Koenig",
+  trace = 0,
+  maxiter = 1000,
+  startvals = NULL
+)
 }
 \arguments{
 \item{df}{A data frame containing the time series data in either "long" or "wide" format.
@@ -17,12 +25,18 @@ Must be greater than 0.}
 Must be greater than or equal to 0.}
 
 \item{model}{A string specifying the type of model to use. Options are:
-- "Kishor-Koenig" or "KK" (default): Full Kishor-Koenig model.
-- "Howrey": Howrey's simplified framework.
-- "Classical": Classical model without vintage effects.}
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{         - "Kishor-Koenig" or "KK" (default): Full Kishor-Koenig model.
+         - "Howrey": Howrey's simplified framework.
+         - "Classical": Classical model without vintage effects.
+}\if{html}{\out{</div>}}}
 
 \item{trace}{An integer controlling the level of output for the optimization procedure.
 Default is 0 (minimal output).}
+
+\item{maxiter}{An integer specifying the maximum number of iterations for the optimization procedure.}
+
+\item{startvals}{A list of starting values for the optimization procedure.}
 }
 \value{
 A list with the following components:

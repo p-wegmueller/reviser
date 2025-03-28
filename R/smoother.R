@@ -18,6 +18,8 @@
 #'
 #' @param trace An integer controlling the level of output for the optimization procedure.
 #'              Default is 0 (minimal output).
+#' @param maxiter An integer specifying the maximum number of iterations for the optimization procedure.
+#' @param startvals A list of starting values for the optimization procedure.
 #'
 #' @return A list with the following components:
 #' \describe{
@@ -66,7 +68,8 @@ kk_nowcast <- function(
   h = 0,
   model = "Kishor-Koenig",
   trace = 0,
-  maxiter = 1000
+  maxiter = 1000,
+  startvals = NULL
 ) {
   start_mat <- 0.4
   start_cov <- 0.4
@@ -102,6 +105,17 @@ kk_nowcast <- function(
     )
   )
 
+  if (length(startvals) != n_param_mat) {
+    rlang::abort(paste0(
+      "The length of 'startvals' must be ",
+      n_param_mat,
+      " if 'model' = ",
+      model,
+      " and e =",
+      e
+    ))
+  }
+
   # KK cov matrices
   n_param_cov <- e + 1
 
@@ -113,6 +127,21 @@ kk_nowcast <- function(
 
   if (length(start_cov) == 1 && is.numeric(start_cov)) {
     start_cov <- rep(start_cov, n_param_cov)
+  }
+
+  if (!is.null(startvals)) {
+    start_mat <- startvals
+  }
+
+  if (length(startvals) != n_param_mat) {
+    rlang::abort(paste0(
+      "The length of 'startvals' must be ",
+      n_param_mat,
+      " if 'model' = ",
+      model,
+      " and e =",
+      e
+    ))
   }
 
   if (length(c(start_mat, start_cov)) != n_param) {
