@@ -78,6 +78,7 @@ kk_nowcast <- function(
   e,
   h = 0,
   model = "Kishor-Koenig",
+  method = "SUR",
   solver_options = list()
 ) {
   # Default solver options
@@ -268,19 +269,100 @@ kk_nowcast <- function(
 
   names(start_mat) <- names(kk_mat_sur$params)[1:n_param_mat]
 
-  fit <- systemfit::nlsystemfit(
-    equations,
-    method = "SUR",
-    data = sur_data,
-    startvals = start_mat,
-    print.level = default_solver_options$trace,
-    maxiter = default_solver_options$maxiter,
-    solvtol = default_solver_options$solvtol,
-    steptol = default_solver_options$steptol,
-    gradtol = default_solver_options$gradtol
-  )
+  if (method == "SUR") {
+    fit <- systemfit::nlsystemfit(
+      equations,
+      method = "SUR",
+      data = sur_data,
+      startvals = start_mat,
+      print.level = default_solver_options$trace,
+      maxiter = default_solver_options$maxiter,
+      solvtol = default_solver_options$solvtol,
+      steptol = default_solver_options$steptol,
+      gradtol = default_solver_options$gradtol
+    )
 
-  params <- c(fit$b, (diag(fit$rcov)))
+    params <- c(fit$b, (diag(fit$rcov)))
+    names(params) <- names(kk_mat_sur$params)
+  } else if (method == "OLS") {
+    F0_mod <- stats::lm(
+      as.formula(paste0(z_names, " ~ ", z_lag_names[e + 1], "-1")),
+      data = sur_data
+    )
+
+    F0 <- stats::coef(F0_mod)
+    var_v <- summary(F0_mod)$sigma^2
+
+    ols_coeffs <- c("F0" = as.numeric(F0))
+    ols_vars <- c("v0" = as.numeric(var_v))
+
+    for (ii in 2:(e + 1)) {
+      # Step 1: Extract the signs
+      sign_matches <- gregexpr("(?<=[^\\w])[-+]", rhs2[ii], perl = TRUE)
+      signs <- regmatches(rhs2[ii], sign_matches)[[1]]
+
+      # Step 2: Extract the variable names
+      var_matches <- gregexpr("release_\\d+_lag_\\d+", rhs2[ii], perl = TRUE)
+      variables <- regmatches(rhs2[ii], var_matches)[[1]]
+
+      # Step 3: Extract the Gs
+      g_matches <- gregexpr("G\\d+_\\d+", rhs2[ii], perl = TRUE)
+      gs <- regmatches(rhs2[ii], g_matches)[[1]]
+
+      # Step 4: Combine signs and variable names
+      # Handle cases where the first term might not have an explicit sign
+      if (length(signs) < length(variables)) {
+        signs <- c("+", signs) # Assume first term has implicit '+'
+      }
+
+      # Unique coefficients to estimate
+      unique_gs <- unique(gs)
+
+      # Create transformed regressors based on gs mapping
+      regressors <- setNames(vector("list", length(unique_gs)), unique_gs)
+
+      for (i in seq_along(gs)) {
+        g <- gs[i]
+        var <- variables[i]
+        sign <- ifelse(signs[i] == "+", 1, -1)
+
+        if (is.null(regressors[[g]])) {
+          regressors[[g]] <- sign * sur_data[[var]]
+        } else {
+          if (ii == e + 1) {
+            regressors[[g]] <- ols_coeffs["F0"] *
+              regressors[[g]] +
+              sign * sur_data[[var]]
+          } else {
+            regressors[[g]] <- regressors[[g]] + sign * sur_data[[var]]
+          }
+        }
+      }
+
+      # Convert to data frame
+      df_regressors <- as.data.frame(regressors)
+      df_regressors[[lhs2[ii]]] <- sur_data[[lhs2[ii]]] # Add dependent variable
+
+      # Construct formula
+      formula <- as.formula(paste(
+        lhs2[ii],
+        "~",
+        paste0(
+          paste(names(df_regressors)[-length(df_regressors)], collapse = " + "),
+          " -1"
+        )
+      ))
+
+      # Estimate model
+      modeli <- stats::lm(formula, data = df_regressors)
+      ols_coeffs <- c(ols_coeffs, modeli$coefficients)
+      sig2 <- summary(modeli)$sigma^2
+      names(sig2) <- paste0("eps", e - ii + 1)
+      ols_vars <- c(ols_vars, sig2)
+    }
+    params <- c(ols_coeffs, ols_vars)
+    fit <- NULL
+  }
 
   kk_mat_hat <- kk_matrices(
     e = e,
@@ -557,8 +639,12 @@ kk_matrices <- function(e, model, params = NULL, type = "numeric") {
   # Define F matrix
   FF <- array(0, c(e + 1, e + 1))
   FF[1:(e), 2:(e + 1)] <- diag(e)
-  FF[e + 1, e + 1] <- ifelse(type == "numeric", params[ii], "F0")
-  names(params) <- c("F0")
+  if (type == "numeric") {
+    FF[e + 1, e + 1] <- params[[paste0("F0")]]
+  } else if (type == "character") {
+    FF[e + 1, e + 1] <- "F0"
+    names(params) <- c("F0")
+  }
   ii <- ii + 1
 
   # Define G matrix
@@ -568,12 +654,12 @@ kk_matrices <- function(e, model, params = NULL, type = "numeric") {
     # e * e+1 params for G
     for (i in 1:e) {
       for (j in 1:(e + 1)) {
-        GG[i + 1, j] <- ifelse(
-          type == "numeric",
-          params[ii],
-          paste0("G", e - i, "_", e - j + 1)
-        )
-        names(params)[ii] <- c(paste0("G", e - i, "_", e - j + 1))
+        if (type == "numeric") {
+          GG[i + 1, j] <- params[[paste0("G", e - i, "_", e - j + 1)]]
+        } else if (type == "character") {
+          GG[i + 1, j] <- paste0("G", e - i, "_", e - j + 1)
+          names(params)[ii] <- c(paste0("G", e - i, "_", e - j + 1))
+        }
         ii <- ii + 1
       }
     }
@@ -581,12 +667,13 @@ kk_matrices <- function(e, model, params = NULL, type = "numeric") {
     # e * e params for G
     for (i in 1:e) {
       for (j in 1:e) {
-        GG[i + 1, j] <- ifelse(
-          type == "numeric",
-          params[ii],
-          paste0("G", e - i, "_", e - j + 1)
-        )
-        names(params)[ii] <- c(paste0("G", e - i, "_", e - j + 1))
+        if (type == "numeric") {
+          GG[i + 1, j] <- params[[paste0("G", e - i, "_", e - j + 1)]]
+        } else if (type == "character") {
+          GG[i + 1, j] <- paste0("G", e - i, "_", e - j + 1)
+          names(params)[ii] <- c(paste0("G", e - i, "_", e - j + 1))
+        }
+
         ii <- ii + 1
       }
     }
@@ -599,19 +686,24 @@ kk_matrices <- function(e, model, params = NULL, type = "numeric") {
   # Get Variance-covariance matrices
   # State noise covariance
   R <- array(0, c(e + 1, e + 1))
-  R[e + 1, e + 1] <- ifelse(type == "numeric", (params[ii]), "v0")
-  names(params)[ii] <- c(paste0("v0"))
+  if (type == "numeric") {
+    R[e + 1, e + 1] <- params[[paste0("v0")]]
+  } else if (type == "character") {
+    R[e + 1, e + 1] <- "v0"
+    names(params)[ii] <- c(paste0("v0"))
+  }
   ii <- ii + 1
 
   # Observation noise covariance
   H <- array(0, c(e + 1, e + 1))
   for (jj in 2:(e + 1)) {
-    H[jj, jj] <- ifelse(
-      type == "numeric",
-      (params[ii]),
-      paste0("eps", e + 1 - jj)
-    )
-    names(params)[ii] <- c(paste0("eps", e + 1 - jj))
+    if (type == "numeric") {
+      H[jj, jj] <- params[[paste0("eps", e + 1 - jj)]]
+    } else if (type == "character") {
+      H[jj, jj] <- paste0("eps", e + 1 - jj)
+      names(params)[ii] <- c(paste0("eps", e + 1 - jj))
+    }
+
     ii <- ii + 1
   }
 
