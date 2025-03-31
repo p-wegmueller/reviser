@@ -12,26 +12,36 @@
 #'          Must be greater than or equal to 0.
 #' @param model A string specifying the type of model to use. Options are:
 #'
-#'              - "Kishor-Koenig" or "KK" (default): Full Kishor-Koenig model.
-#'              - "Howrey": Howrey's simplified framework.
-#'              - "Classical": Classical model without vintage effects.
+#'  - "Kishor-Koenig" or "KK" (default): Full Kishor-Koenig model.
+#'  - "Howrey": Howrey's simplified framework.
+#'  - "Classical": Classical model without vintage effects.
 #'
-#' @param trace An integer controlling the level of output for the optimization procedure.
+#' @param solver_options An optional list to control the behaviour of the
+#' underlying [systemfit::nlsystemfit()] and [stats::nlm()] solvers:
+
+#' - **trace**: An integer controlling the level of output for the optimization procedure.
 #'              Default is 0 (minimal output).
-#' @param maxiter An integer specifying the maximum number of iterations for the optimization procedure.
-#' @param startvals A list of starting values for the optimization procedure.
+#' - **maxiter**: An integer specifying the maximum number of iterations for the optimization procedure. Default is 1000.
+#' - **startvals** A list of starting values for the optimization procedure (must match the number of parameters of the model).
+#' - **solvtol**: Tolerance for detecting linear dependencies in the columns of
+#'    X in the qr function calls (See [systemfit::nlsystemfit()]). Default is .Machine$double.eps.
+#' - **gradtol**: A a positive scalar giving the tolerance at which the scaled
+#'    gradient is considered close enough to zero to terminate the algorithm (See [stats::nlm()]). Default is 1e-6.
+#' -  **steptol**: A positive scalar providing the minimum allowable relative step length (See [stats::nlm()]). Default is 1e-6.
 #'
 #' @return A list with the following components:
 #' \describe{
-#'   \item{forecast_states}{A tibble of forecasted state variables, including the forecast dates. Returned only if \code{h > 0}.}
-#'   \item{filtered_states}{A tibble of filtered state variables based on the Kalman filter.}
-#'   \item{observations}{A tibble of the observed variables used in the model.}
-#'   \item{forecast_observation}{A tibble of forecasted observations. Returned only if \code{h > 0}.}
-#'   \item{smoothed_states}{A tibble of smoothed state variables based on the Kalman smoother.}
-#'   \item{kk_model_mat}{A list of KK model matrices (e.g., transition and observation matrices).}
+#'   \item{filtered_z}{A tibble of filtered latent state variables based on the Kalman filter.}
+#'   \item{filtered_y}{A tibble of filtered observed variables based on the Kalman filter.}
+#'   \item{smoothed_z}{A tibble of smoothed latent state variables obtained using the Kalman smoother.}
+#'   \item{smoothed_y}{A tibble of smoothed observed variables obtained using the Kalman smoother.}
+#'   \item{forecast_z}{A tibble of forecasted latent state variables. Returned only if \code{h > 0}.}
+#'   \item{forecast_y}{A tibble of forecasted observed variables. Returned only if \code{h > 0}.}
+#'   \item{kk_model_mat}{A list of KK model matrices, such as transition and observation matrices.}
 #'   \item{ss_model_mat}{A list of state-space model matrices derived from the KK model.}
 #'   \item{params}{Estimated model parameters, including covariance terms.}
 #'   \item{fit}{The fitted model object from the SUR estimation procedure.}
+#'   \item{e}{The number of the efficient release (0-indexed).}
 #' }
 #'
 #' @examples
@@ -61,20 +71,46 @@
 #' The function requires well-structured input data with multiple vintages. The time series must
 #' be regular, and the function automatically checks and transforms the data if needed.
 #' @import dplyr
+#' @importFrom KFAS SSModel SSMcustom
 #' @export
 kk_nowcast <- function(
   df,
   e,
   h = 0,
   model = "Kishor-Koenig",
-  trace = 0,
-  maxiter = 1000,
-  startvals = NULL
+  solver_options = list()
 ) {
-  start_mat <- 0.4
-  start_cov <- 0.4
-  m0 <- 0
-  C0 <- 1e-6
+  # Default solver options
+  default_solver_options <- list(
+    trace = 0,
+    maxiter = 1000,
+    startvals = NULL,
+    solvtol = .Machine$double.eps,
+    gradtol = 1e-6,
+    steptol = 1e-6
+  )
+
+  # Check solver options input is list
+  if (!is.list(solver_options)) {
+    rlang::abort("'solver_options' must be a list!")
+  }
+
+  # Check solver options input names are valid
+  if (
+    length(setdiff(names(solver_options), names(default_solver_options))) > 0
+  ) {
+    rlang::abort(
+      "Invalid solver options provided. Valid options are: ",
+      paste(names(default_solver_options), collapse = ", ")
+    )
+  }
+
+  # Update default options with user-provided options
+  if (length(solver_options) > 0) {
+    for (name in names(solver_options)) {
+      default_solver_options[[name]] <- solver_options[[name]]
+    }
+  }
 
   # Check input e
   if (e == 0) {
@@ -110,16 +146,8 @@ kk_nowcast <- function(
 
   n_param <- n_param_mat + n_param_cov
 
-  if (length(start_mat) == 1 && is.numeric(start_mat)) {
-    start_mat <- rep(start_mat, n_param_mat)
-  }
-
-  if (length(start_cov) == 1 && is.numeric(start_cov)) {
-    start_cov <- rep(start_cov, n_param_cov)
-  }
-
-  if (!is.null(startvals)) {
-    if (length(startvals) != n_param_mat) {
+  if (!is.null(default_solver_options$startvals)) {
+    if (length(default_solver_options$startvals) != n_param_mat) {
       rlang::abort(paste0(
         "The length of 'startvals' must be ",
         n_param_mat,
@@ -129,29 +157,21 @@ kk_nowcast <- function(
         e
       ))
     } else {
-      start_mat <- startvals
+      start_mat <- default_solver_options$startvals
     }
-  }
-
-  if (length(c(start_mat, start_cov)) != n_param) {
-    rlang::abort(paste0(
-      "The length of 'start_mat' must be 1 or ",
-      n_param_mat,
-      " and the length of 'start_cov' must be 1 or ",
-      n_param_cov,
-      " if 'e' = ",
-      e
-    ))
+  } else {
+    start_mat <- rep(0.4, n_param_mat)
   }
 
   # Check start values for the expected value of the pre-sample state vector m0
   # and the covariance matrix C0
+  m0 <- 0
+  C0 <- 1e-6
 
   # Both must be numeric
   if (!is.numeric(m0) || !is.numeric(C0)) {
     rlang::abort("Both 'm0' and 'C0' must be numeric!")
   }
-
   if (length(m0) == 1) {
     m0 <- rep(m0, (e + 1) * 2)
   } else if (length(m0) != (e + 1) * 2) {
@@ -187,27 +207,22 @@ kk_nowcast <- function(
     df <- vintages_wide(df, names_from = "release")
   }
 
-  state_names <- c(paste0("release_", e, "_lag_", (e):0))
-  state_lag_names <- c(paste0("release_", e, "_lag_", (e + 1):1))
-  observable_names <- c(paste0("release_", e:0, "_lag_", e:0))
-  observable_lag_names <- c(paste0("release_", e:0, "_lag_", (e + 1):1))
+  z_names <- c(paste0("release_", e, "_lag_", (e):0))
+  z_lag_names <- c(paste0("release_", e, "_lag_", (e + 1):1))
+  y_names <- c(paste0("release_", e:0, "_lag_", e:0))
+  y_lag_names <- c(paste0("release_", e:0, "_lag_", (e + 1):1))
 
   # Define matrices
   kk_mat_sur <- kk_matrices(e = e, model = model, type = "character")
 
-  X_names <- state_names
-  X_lag_names <- state_lag_names
-  Y_names <- observable_names
-  Y_lag_names <- observable_lag_names
-
   # Define equations
-  lhs1 <- X_names
-  rhs1 <- kk_mat_sur$FF %mx% X_lag_names
+  lhs1 <- z_names
+  rhs1 <- kk_mat_sur$FF %mx% z_lag_names
 
-  lhs2 <- Y_names
-  rhs2 <- ((kk_mat_sur$II %diff% kk_mat_sur$GG) %prod% kk_mat_sur$FF) %mx%
-    Y_lag_names %sum%
-    (kk_mat_sur$GG %mx% X_names)
+  lhs2 <- (y_names)
+  rhs2 <- (((kk_mat_sur$II %diff% kk_mat_sur$GG) %prod% kk_mat_sur$FF) %mx%
+    (y_lag_names)) %sum%
+    (kk_mat_sur$GG %mx% z_names)
 
   equations <- list()
   formula <- stats::as.formula(paste0(lhs1[e + 1], " ~ ", rhs1[e + 1]))
@@ -220,36 +235,36 @@ kk_nowcast <- function(
   }
 
   # Arrange data
-  X <- array(NA, c(nrow(df), e + 1))
-  X_lag <- array(NA, c(nrow(df), e + 1))
+  z <- array(NA, c(nrow(df), e + 1))
+  z_lag <- array(NA, c(nrow(df), e + 1))
   for (j in (e):0) {
-    X[, (e + 1) - j] <- dplyr::lag(dplyr::pull(df[paste0("release_", e)]), j)
-    X_lag[, (e + 1) - j] <- dplyr::lag(
+    z[, (e + 1) - j] <- dplyr::lag(dplyr::pull(df[paste0("release_", e)]), j)
+    z_lag[, (e + 1) - j] <- dplyr::lag(
       dplyr::pull(df[paste0("release_", e)]),
       j + 1
     )
   }
-  X <- tibble::tibble(as.data.frame(X))
-  colnames(X) <- state_names
-  X_lag <- tibble::tibble(as.data.frame(X_lag))
-  colnames(X_lag) <- state_lag_names
+  z <- tibble::tibble(as.data.frame(z))
+  colnames(z) <- z_names
+  z_lag <- tibble::tibble(as.data.frame(z_lag))
+  colnames(z_lag) <- z_lag_names
 
-  Y <- array(NA, c(nrow(df), e))
-  Y_lag <- array(NA, c(nrow(df), e))
+  y <- array(NA, c(nrow(df), e))
+  y_lag <- array(NA, c(nrow(df), e))
   for (j in (e - 1):0) {
-    Y[, (e) - j] <- dplyr::lag(dplyr::pull(df[paste0("release_", j)]), j)
-    Y_lag[, (e) - j] <- dplyr::lag(
+    y[, (e) - j] <- dplyr::lag(dplyr::pull(df[paste0("release_", j)]), j)
+    y_lag[, (e) - j] <- dplyr::lag(
       dplyr::pull(df[paste0("release_", j)]),
       j + 1
     )
   }
 
-  Y <- tibble::tibble(as.data.frame(Y))
-  Y_lag <- tibble::tibble(as.data.frame(Y_lag))
-  colnames(Y) <- c(paste0("release_", (e - 1):0, "_lag_", (e - 1):0))
-  colnames(Y_lag) <- c(paste0("release_", (e - 1):0, "_lag_", e:1))
+  y <- tibble::tibble(as.data.frame(y))
+  y_lag <- tibble::tibble(as.data.frame(y_lag))
+  colnames(y) <- c(paste0("release_", (e - 1):0, "_lag_", (e - 1):0))
+  colnames(y_lag) <- c(paste0("release_", (e - 1):0, "_lag_", e:1))
 
-  sur_data <- cbind(X, Y, Y_lag) %>% stats::na.omit()
+  sur_data <- cbind(z, y, y_lag) %>% stats::na.omit()
 
   names(start_mat) <- names(kk_mat_sur$params)[1:n_param_mat]
 
@@ -258,8 +273,11 @@ kk_nowcast <- function(
     method = "SUR",
     data = sur_data,
     startvals = start_mat,
-    print.level = trace,
-    maxiter = maxiter
+    print.level = default_solver_options$trace,
+    maxiter = default_solver_options$maxiter,
+    solvtol = default_solver_options$solvtol,
+    steptol = default_solver_options$steptol,
+    gradtol = default_solver_options$gradtol
   )
 
   params <- c(fit$b, (diag(fit$rcov)))
@@ -285,40 +303,52 @@ kk_nowcast <- function(
     Y[, (e + 1) - j] <- dplyr::lag(dplyr::pull(df[paste0("release_", j)]), j)
   }
   Y <- stats::na.omit(tibble::tibble(as.data.frame(Y)))
-  colnames(Y) <- observable_names
+  colnames(Y) <- y_names
   Ymat <- as.matrix(Y)
 
-  kalman <- kalman_filter_smoother(
-    Y,
-    FF = sur_ss_mat$Z,
-    V = sur_ss_mat$V,
-    GG = sur_ss_mat$Tmat,
-    W = sur_ss_mat$W,
-    m0 = m0,
-    C0 = C0
+  # Create the SSM object
+  model_kfas <- SSModel(
+    Ymat ~
+      -1 +
+        SSMcustom(
+          Z = sur_ss_mat$Z,
+          T = sur_ss_mat$Tmat,
+          R = diag(1, nrow = nrow(sur_ss_mat$W)),
+          Q = sur_ss_mat$W,
+          a1 = m0,
+          P1 = C0,
+          index = c(1:ncol(Ymat))
+        ),
+    H = sur_ss_mat$V
   )
 
+  # Run the Kalman filter
+  kalman <- KFAS::KFS(model_kfas)
+
   # Filtered states
-  filtered_states <- tibble::tibble(as.data.frame(kalman$filtered_states[
-    1:nrow(kalman$filtered_states),
+  filtered_z <- tibble::tibble(as.data.frame(kalman$att[,
     1:((e + 1))
   ])) %>%
     dplyr::mutate(time = df$time[(e + 1):(nrow(df))]) %>%
-    dplyr::select(time, !!!stats::setNames(seq_along(state_names), state_names))
+    dplyr::select(time, !!!stats::setNames(seq_along(z_names), z_names))
+
+  filtered_y <- (kalman$att[, 1:(e + 1)] +
+    kalman$att[, (e + 2):(2 * (e + 1))]) %>%
+    dplyr::as_tibble() %>%
+    dplyr::select(!!!stats::setNames(seq_along(y_names), y_names))
 
   # Smoothed states
-  smoothed_states <- tibble::tibble(as.data.frame(kalman$smoothed_states[
-    1:nrow(kalman$smoothed_states),
+  smoothed_z <- tibble::tibble(as.data.frame(kalman$alphahat[
+    1:nrow(kalman$alphahat),
     1:((e + 1))
   ])) %>%
     dplyr::mutate(time = df$time[(e + 1):(nrow(df))]) %>%
-    dplyr::select(time, !!!stats::setNames(seq_along(state_names), state_names))
+    dplyr::select(time, !!!stats::setNames(seq_along(z_names), z_names))
 
-  # Observations
-  observations <- Y %>%
-    dplyr::mutate(time = df$time[(e + 1):(nrow(df))]) %>%
-    # select time and up to release_e
-    dplyr::select(time, dplyr::everything())
+  smoothed_y <- (kalman$alphahat[, 1:(e + 1)] +
+    kalman$alphahat[, (e + 2):(2 * (e + 1))]) %>%
+    dplyr::as_tibble() %>%
+    dplyr::select(!!!stats::setNames(seq_along(y_names), y_names))
 
   if (h > 0) {
     frequency <- unique((round(as.numeric(diff(df$time)) / 30)))
@@ -337,7 +367,7 @@ kk_nowcast <- function(
     # Forecast
     forecast <- array(NA, c(h + 1, (2 * (e + 1))))
     forecast[2, ] <- sur_ss_mat$Tmat %*%
-      kalman$filtered_states[nrow(kalman$filtered_states), ]
+      kalman$att[nrow(kalman$att), ]
     if (h > 1) {
       for (hh in 2:(h)) {
         forecast[hh + 1, ] <- sur_ss_mat$Tmat %*% forecast[hh, ]
@@ -345,7 +375,7 @@ kk_nowcast <- function(
     }
 
     # Forecasted states
-    forecast_states <- tibble::tibble(as.data.frame(forecast[
+    forecast_z <- tibble::tibble(as.data.frame(forecast[
       1:(h + 1),
       1:(e + 1)
     ])) %>%
@@ -353,20 +383,20 @@ kk_nowcast <- function(
       dplyr::mutate(time = forecast_dates) %>%
       dplyr::select(
         time,
-        !!!stats::setNames(seq_along(state_names), state_names)
+        !!!stats::setNames(seq_along(z_names), z_names)
       )
 
     # Forecasted observations
-    forecast_observation <- tibble::tibble(as.data.frame(forecast[
+    forecast_y <- tibble::tibble(as.data.frame(forecast[
       1:(h + 1),
     ])) %>%
       stats::na.omit()
-    forecast_observation <- forecast_observation %>%
+    forecast_y <- forecast_y %>%
       dplyr::mutate(dplyr::across(
-        .cols = 1:(ncol(forecast_observation) - (e + 1)), # Columns to sum (e.g., 1 to n-e)
+        .cols = 1:(ncol(forecast_y) - (e + 1)), # Columns to sum (e.g., 1 to n-e)
         .fns = ~ . +
-          forecast_observation[[
-            which(names(forecast_observation) == dplyr::cur_column()) + e
+          forecast_y[[
+            which(names(forecast_y) == dplyr::cur_column()) + e
           ]],
         .names = "obs_{col}" # Name of the new column
       )) %>%
@@ -374,11 +404,10 @@ kk_nowcast <- function(
       dplyr::select(dplyr::contains("obs_"), time) %>%
       dplyr::select(
         time,
-        !!!stats::setNames(seq_along(observable_names), observable_names)
+        !!!stats::setNames(seq_along(y_names), y_names)
       )
   } else {
-    forecast_states <- NULL
-    forecast_observation <- NULL
+    forecast_z <- forecast_y <- NULL
   }
 
   params <- kk_mat_hat$params
@@ -387,11 +416,12 @@ kk_nowcast <- function(
   kk_mat_hat$params <- NULL
 
   results <- list(
-    forecast_states = forecast_states,
-    filtered_states = filtered_states,
-    observations = observations,
-    forecast_observation = forecast_observation,
-    smoothed_states = smoothed_states,
+    filtered_z = filtered_z,
+    filtered_y = filtered_y,
+    smoothed_z = smoothed_z,
+    smoothed_y = smoothed_y,
+    forecast_z = forecast_z,
+    forecast_y = forecast_y,
     kk_model_mat = kk_mat_hat,
     ss_model_mat = sur_ss_mat,
     params = params,
@@ -401,6 +431,16 @@ kk_nowcast <- function(
   class(results) <- c("kk_model", class(results))
 
   return(results)
+}
+
+
+#' Jacobs van Norde State Space Model for Nowcasting
+#'
+#' Coming Soon!
+#' @export
+jvn_nowcast <- function() {
+  # Create a function to nowcast the JVN model
+  print("Coming soon!")
 }
 
 
@@ -624,42 +664,21 @@ kk_matrices <- function(e, model, params = NULL, type = "numeric") {
 #' ss_matrices <- kk_to_ss(II, FF, GG, R, H)
 #' str(ss_matrices)
 #'
-#' @seealso \code{\link{kalman_filter_smoother}}
-#' @noRd
+#' @export
 kk_to_ss <- function(II, FF, GG, R, H, epsilon = 1e-6) {
   # Get efficient release, e
   e <- nrow(FF) - 1
 
   # Observation matrix Z
-  # Z <- cbind(GG, (II - GG) %*% FF)
   Z <- cbind(II, II)
 
-  # State transition matrix T
-  # Tmat <- rbind(
-  #   cbind(FF, matrix(0, e+1, e+1)),
-  #   Z
-  # )
-
+  # State transition matrix
   Tmat <- rbind(
     cbind(FF, array(0, c(e + 1, e + 1))),
     cbind(array(0, c(e + 1, e + 1)), (II - GG) %*% FF)
   )
 
   # Covariance matrices
-  # V <- array(0,c(e+1, e+1))
-  #
-  # State noise covariance (x_t and y_t-1)
-  # W <- array(0,c(2*(e+1), 2*(e+1)))
-  #
-  # for (jj in 2:(e+1)) {
-  #   V[jj,jj] <- H[jj,jj]  # e param for V0
-  #   W[jj+e+1,jj+e+1] <- H[jj,jj]  # same e param for W0
-  # }
-  #
-  # V[1,1] <- epsilon
-  #
-  # W[e+1,e+1] <- R[e+1,e+1]  # 1 param for W0
-
   V <- array(0, c(e + 1, e + 1))
   W <- array(0, c(2 * (e + 1), 2 * (e + 1)))
   v_t_2 <- R[1:(e + 1), 1:(e + 1)]
@@ -677,97 +696,4 @@ kk_to_ss <- function(II, FF, GG, R, H, epsilon = 1e-6) {
   }
 
   return(list(Z = Z, Tmat = Tmat, V = V, W = W))
-}
-
-
-#' Kalman Filter and Smoother for State-Space Models
-#'
-#' Implements the Kalman filter and smoother for a given state-space model. It estimates the state variables over time and provides both filtered and smoothed estimates.
-#'
-#' @param Y Matrix. The observed data, where each row corresponds to an observation and each column to a variable.
-#' @param FF Matrix. The observation matrix (\eqn{F}) that maps states to observations.
-#' @param V Matrix. The observation noise covariance matrix.
-#' @param GG Matrix. The state transition matrix (\eqn{G}).
-#' @param W Matrix. The state noise covariance matrix.
-#' @param m0 Numeric vector. The initial state mean vector.
-#' @param C0 Matrix. The initial state covariance matrix.
-#'
-#' @return A list containing:
-#'   \describe{
-#'     \item{\code{filtered_states}}{Matrix of filtered state estimates at each time point.}
-#'     \item{\code{filtered_covariances}}{Array of filtered state covariance matrices.}
-#'     \item{\code{smoothed_states}}{Matrix of smoothed state estimates.}
-#'     \item{\code{smoothed_covariances}}{Array of smoothed state covariance matrices.}
-#'   }
-#'
-#' @examples
-#' # Simulate observations and state-space model parameters
-#' Y <- matrix(rnorm(100), ncol = 2)
-#' FF <- diag(2)
-#' V <- diag(2) * 0.1
-#' GG <- diag(2) * 0.9
-#' W <- diag(2) * 0.05
-#' m0 <- c(0, 0)
-#' C0 <- diag(2) * 0.1
-#'
-#' # Apply Kalman filter and smoother
-#' results <- kalman_filter_smoother(Y, FF, V, GG, W, m0, C0)
-#' str(results)
-#'
-#' @noRd
-kalman_filter_smoother <- function(Y, FF, V, GG, W, m0, C0) {
-  # Dimensions
-  n <- nrow(Y) # Number of observations (time points)
-  p <- ncol(Y) # Dimension of observations
-  m <- nrow(GG) # Dimension of the state vector
-
-  # Storage for results
-  a <- matrix(0, nrow = n + 1, ncol = m) # Filtered state estimates
-  P <- array(0, dim = c(m, m, n + 1)) # Filtered state covariances
-  a[1, ] <- m0 # Initial state mean
-  P[,, 1] <- C0 # Initial state covariance
-
-  at <- matrix(0, nrow = n, ncol = m) # Predicted states
-  Pt <- array(0, dim = c(m, m, n)) # Predicted covariances
-
-  # Filtering
-  for (t in 1:n) {
-    # Predict
-    at[t, ] <- GG %*% a[t, ]
-    Pt[,, t] <- GG %*% P[,, t] %*% t(GG) + W
-
-    # Update
-    vt <- Y[t, ] - FF %*% at[t, ] # Prediction error
-    Ft <- FF %*% Pt[,, t] %*% t(FF) + V # Prediction covariance
-    Kt <- Pt[,, t] %*% t(FF) %*% solve(Ft) # Kalman gain
-
-    a[t + 1, ] <- at[t, ] + Kt %*% t(vt) # Updated state estimate
-    P[,, t + 1] <- Pt[,, t] - Kt %*% FF %*% Pt[,, t] # Updated covariance
-  }
-
-  # Remove the initial state estimate
-  a_filtered <- a[-1, ]
-  P_filtered <- P[,, -1]
-
-  # Smoothing
-  a_smooth <- matrix(0, nrow = n, ncol = m) # Smoothed state estimates
-  P_smooth <- array(0, dim = c(m, m, n)) # Smoothed state covariances
-
-  a_smooth[n, ] <- a_filtered[n, ]
-  P_smooth[,, n] <- P_filtered[,, n]
-
-  for (t in (n - 1):1) {
-    Jt <- P_filtered[,, t] %*% t(GG) %*% solve(Pt[,, t + 1]) # Smoothing gain
-    a_smooth[t, ] <- a_filtered[t, ] + Jt %*% (a_smooth[t + 1, ] - at[t + 1, ])
-    P_smooth[,, t] <- P_filtered[,, t] +
-      Jt %*% (P_smooth[,, t + 1] - Pt[,, t + 1]) %*% t(Jt)
-  }
-
-  # Results
-  list(
-    filtered_states = a_filtered,
-    filtered_covariances = P_filtered,
-    smoothed_states = a_smooth,
-    smoothed_covariances = P_smooth
-  )
 }

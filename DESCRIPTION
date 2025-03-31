@@ -37,7 +37,8 @@ Imports:
     glue,
     lubridate,
     alfred, 
-    purrr
+    purrr,
+    KFAS
 Suggests: 
     tsbox,
     testthat (>= 3.0.0),

@@ -4,15 +4,7 @@
 \alias{kk_nowcast}
 \title{Generalized Kishor-Koenig Model for Nowcasting}
 \usage{
-kk_nowcast(
-  df,
-  e,
-  h = 0,
-  model = "Kishor-Koenig",
-  trace = 0,
-  maxiter = 1000,
-  startvals = NULL
-)
+kk_nowcast(df, e, h = 0, model = "Kishor-Koenig", solver_options = list())
 }
 \arguments{
 \item{df}{A data frame containing the time series data in either "long" or "wide" format.
@@ -25,31 +17,40 @@ Must be greater than 0.}
 Must be greater than or equal to 0.}
 
 \item{model}{A string specifying the type of model to use. Options are:
+\itemize{
+\item "Kishor-Koenig" or "KK" (default): Full Kishor-Koenig model.
+\item "Howrey": Howrey's simplified framework.
+\item "Classical": Classical model without vintage effects.
+}}
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{         - "Kishor-Koenig" or "KK" (default): Full Kishor-Koenig model.
-         - "Howrey": Howrey's simplified framework.
-         - "Classical": Classical model without vintage effects.
-}\if{html}{\out{</div>}}}
-
-\item{trace}{An integer controlling the level of output for the optimization procedure.
-Default is 0 (minimal output).}
-
-\item{maxiter}{An integer specifying the maximum number of iterations for the optimization procedure.}
-
-\item{startvals}{A list of starting values for the optimization procedure.}
+\item{solver_options}{An optional list to control the behaviour of the
+underlying \code{\link[systemfit:nlsystemfit]{systemfit::nlsystemfit()}} and \code{\link[stats:nlm]{stats::nlm()}} solvers:
+\itemize{
+\item \strong{trace}: An integer controlling the level of output for the optimization procedure.
+Default is 0 (minimal output).
+\item \strong{maxiter}: An integer specifying the maximum number of iterations for the optimization procedure. Default is 1000.
+\item \strong{startvals} A list of starting values for the optimization procedure (must match the number of parameters of the model).
+\item \strong{solvtol}: Tolerance for detecting linear dependencies in the columns of
+X in the qr function calls (See \code{\link[systemfit:nlsystemfit]{systemfit::nlsystemfit()}}). Default is .Machine$double.eps.
+\item \strong{gradtol}: A a positive scalar giving the tolerance at which the scaled
+gradient is considered close enough to zero to terminate the algorithm (See \code{\link[stats:nlm]{stats::nlm()}}). Default is 1e-6.
+\item \strong{steptol}: A positive scalar providing the minimum allowable relative step length (See \code{\link[stats:nlm]{stats::nlm()}}). Default is 1e-6.
+}}
 }
 \value{
 A list with the following components:
 \describe{
-\item{forecast_states}{A tibble of forecasted state variables, including the forecast dates. Returned only if \code{h > 0}.}
-\item{filtered_states}{A tibble of filtered state variables based on the Kalman filter.}
-\item{observations}{A tibble of the observed variables used in the model.}
-\item{forecast_observation}{A tibble of forecasted observations. Returned only if \code{h > 0}.}
-\item{smoothed_states}{A tibble of smoothed state variables based on the Kalman smoother.}
-\item{kk_model_mat}{A list of KK model matrices (e.g., transition and observation matrices).}
+\item{filtered_z}{A tibble of filtered latent state variables based on the Kalman filter.}
+\item{filtered_y}{A tibble of filtered observed variables based on the Kalman filter.}
+\item{smoothed_z}{A tibble of smoothed latent state variables obtained using the Kalman smoother.}
+\item{smoothed_y}{A tibble of smoothed observed variables obtained using the Kalman smoother.}
+\item{forecast_z}{A tibble of forecasted latent state variables. Returned only if \code{h > 0}.}
+\item{forecast_y}{A tibble of forecasted observed variables. Returned only if \code{h > 0}.}
+\item{kk_model_mat}{A list of KK model matrices, such as transition and observation matrices.}
 \item{ss_model_mat}{A list of state-space model matrices derived from the KK model.}
 \item{params}{Estimated model parameters, including covariance terms.}
 \item{fit}{The fitted model object from the SUR estimation procedure.}
+\item{e}{The number of the efficient release (0-indexed).}
 }
 }
 \description{
