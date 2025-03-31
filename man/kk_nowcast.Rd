@@ -4,7 +4,14 @@
 \alias{kk_nowcast}
 \title{Generalized Kishor-Koenig Model for Nowcasting}
 \usage{
-kk_nowcast(df, e, h = 0, model = "Kishor-Koenig", solver_options = list())
+kk_nowcast(
+  df,
+  e,
+  h = 0,
+  model = "Kishor-Koenig",
+  method = "SUR",
+  solver_options = list()
+)
 }
 \arguments{
 \item{df}{A data frame containing the time series data in either "long" or "wide" format.
@@ -21,9 +28,11 @@ Must be greater than or equal to 0.}
 \item "Kishor-Koenig" or "KK" (default): Full Kishor-Koenig model.
 \item "Howrey": Howrey's simplified framework.
 \item "Classical": Classical model without vintage effects.
-}}
+}
 
-\item{solver_options}{An optional list to control the behaviour of the
+@param method A string specifying the estimation method to use. Options are "SUR" (default) and "OLS".
+
+@param solver_options An optional list to control the behaviour of the
 underlying \code{\link[systemfit:nlsystemfit]{systemfit::nlsystemfit()}} and \code{\link[stats:nlm]{stats::nlm()}} solvers:
 \itemize{
 \item \strong{trace}: An integer controlling the level of output for the optimization procedure.

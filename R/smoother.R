@@ -16,9 +16,11 @@
 #'  - "Howrey": Howrey's simplified framework.
 #'  - "Classical": Classical model without vintage effects.
 #'
-#' @param solver_options An optional list to control the behaviour of the
-#' underlying [systemfit::nlsystemfit()] and [stats::nlm()] solvers:
-
+#'  @param method A string specifying the estimation method to use. Options are "SUR" (default) and "OLS".
+#'
+#'  @param solver_options An optional list to control the behaviour of the
+#'  underlying [systemfit::nlsystemfit()] and [stats::nlm()] solvers:
+#'
 #' - **trace**: An integer controlling the level of output for the optimization procedure.
 #'              Default is 0 (minimal output).
 #' - **maxiter**: An integer specifying the maximum number of iterations for the optimization procedure. Default is 1000.
