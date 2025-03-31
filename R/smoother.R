@@ -286,7 +286,7 @@ kk_nowcast <- function(
     names(params) <- names(kk_mat_sur$params)
   } else if (method == "OLS") {
     F0_mod <- stats::lm(
-      as.formula(paste0(z_names, " ~ ", z_lag_names[e + 1], "-1")),
+      stats::as.formula(paste0(z_names, " ~ ", z_lag_names[e + 1], "-1")),
       data = sur_data
     )
 
@@ -319,7 +319,10 @@ kk_nowcast <- function(
       unique_gs <- unique(gs)
 
       # Create transformed regressors based on gs mapping
-      regressors <- setNames(vector("list", length(unique_gs)), unique_gs)
+      regressors <- stats::setNames(
+        vector("list", length(unique_gs)),
+        unique_gs
+      )
 
       for (i in seq_along(gs)) {
         g <- gs[i]
@@ -344,7 +347,7 @@ kk_nowcast <- function(
       df_regressors[[lhs2[ii]]] <- sur_data[[lhs2[ii]]] # Add dependent variable
 
       # Construct formula
-      formula <- as.formula(paste(
+      formula <- stats::as.formula(paste(
         lhs2[ii],
         "~",
         paste0(
