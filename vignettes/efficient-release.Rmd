@@ -99,7 +99,7 @@ efficient <- get_first_efficient_release(
   final_release
 )
 
-res<- summary(efficient)
+res <- summary(efficient)
 
 head(res)
 
@@ -118,4 +118,4 @@ analysis <- get_revision_analysis(
 head(analysis)
 ```
 
-### References
+## References
