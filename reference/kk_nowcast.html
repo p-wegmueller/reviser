@@ -58,15 +58,7 @@ and Kalman filtering and smoothing.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">kk_nowcast</span><span class="op">(</span></span>
-<span>  <span class="va">df</span>,</span>
-<span>  <span class="va">e</span>,</span>
-<span>  h <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  model <span class="op">=</span> <span class="st">"Kishor-Koenig"</span>,</span>
-<span>  trace <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  maxiter <span class="op">=</span> <span class="fl">1000</span>,</span>
-<span>  startvals <span class="op">=</span> <span class="cn">NULL</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">kk_nowcast</span><span class="op">(</span><span class="va">df</span>, <span class="va">e</span>, h <span class="op">=</span> <span class="fl">0</span>, model <span class="op">=</span> <span class="st">"Kishor-Koenig"</span>, solver_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -89,44 +81,48 @@ Must be greater than or equal to 0.</p></dd>
 
 
 <dt id="arg-model">model<a class="anchor" aria-label="anchor" href="#arg-model"></a></dt>
-<dd><p>A string specifying the type of model to use. Options are:</p>
-<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>         <span class="sc">-</span> <span class="st">"Kishor-Koenig"</span> or <span class="st">"KK"</span> (default)<span class="sc">:</span> Full Kishor<span class="sc">-</span>Koenig model.</span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>         <span class="sc">-</span> <span class="st">"Howrey"</span><span class="sc">:</span> Howrey<span class="st">'s simplified framework.</span></span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="st">         - "Classical": Classical model without vintage effects.</span></span></code></pre><p></p></div></dd>
+<dd><p>A string specifying the type of model to use. Options are:</p><ul><li><p>"Kishor-Koenig" or "KK" (default): Full Kishor-Koenig model.</p></li>
+<li><p>"Howrey": Howrey's simplified framework.</p></li>
+<li><p>"Classical": Classical model without vintage effects.</p></li>
+</ul></dd>
 
 
-<dt id="arg-trace">trace<a class="anchor" aria-label="anchor" href="#arg-trace"></a></dt>
-<dd><p>An integer controlling the level of output for the optimization procedure.
-Default is 0 (minimal output).</p></dd>
-
-
-<dt id="arg-maxiter">maxiter<a class="anchor" aria-label="anchor" href="#arg-maxiter"></a></dt>
-<dd><p>An integer specifying the maximum number of iterations for the optimization procedure.</p></dd>
-
-
-<dt id="arg-startvals">startvals<a class="anchor" aria-label="anchor" href="#arg-startvals"></a></dt>
-<dd><p>A list of starting values for the optimization procedure.</p></dd>
+<dt id="arg-solver-options">solver_options<a class="anchor" aria-label="anchor" href="#arg-solver-options"></a></dt>
+<dd><p>An optional list to control the behaviour of the
+underlying <code><a href="https://rdrr.io/pkg/systemfit/man/nlsystemfit.html" class="external-link">systemfit::nlsystemfit()</a></code> and <code><a href="https://rdrr.io/r/stats/nlm.html" class="external-link">stats::nlm()</a></code> solvers:</p><ul><li><p><strong>trace</strong>: An integer controlling the level of output for the optimization procedure.
+Default is 0 (minimal output).</p></li>
+<li><p><strong>maxiter</strong>: An integer specifying the maximum number of iterations for the optimization procedure. Default is 1000.</p></li>
+<li><p><strong>startvals</strong> A list of starting values for the optimization procedure (must match the number of parameters of the model).</p></li>
+<li><p><strong>solvtol</strong>: Tolerance for detecting linear dependencies in the columns of
+X in the qr function calls (See <code><a href="https://rdrr.io/pkg/systemfit/man/nlsystemfit.html" class="external-link">systemfit::nlsystemfit()</a></code>). Default is .Machine$double.eps.</p></li>
+<li><p><strong>gradtol</strong>: A a positive scalar giving the tolerance at which the scaled
+gradient is considered close enough to zero to terminate the algorithm (See <code><a href="https://rdrr.io/r/stats/nlm.html" class="external-link">stats::nlm()</a></code>). Default is 1e-6.</p></li>
+<li><p><strong>steptol</strong>: A positive scalar providing the minimum allowable relative step length (See <code><a href="https://rdrr.io/r/stats/nlm.html" class="external-link">stats::nlm()</a></code>). Default is 1e-6.</p></li>
+</ul></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A list with the following components:</p><dl><dt>forecast_states</dt>
-<dd><p>A tibble of forecasted state variables, including the forecast dates. Returned only if <code>h &gt; 0</code>.</p></dd>
+    <p>A list with the following components:</p><dl><dt>filtered_z</dt>
+<dd><p>A tibble of filtered latent state variables based on the Kalman filter.</p></dd>
 
-<dt>filtered_states</dt>
-<dd><p>A tibble of filtered state variables based on the Kalman filter.</p></dd>
+<dt>filtered_y</dt>
+<dd><p>A tibble of filtered observed variables based on the Kalman filter.</p></dd>
 
-<dt>observations</dt>
-<dd><p>A tibble of the observed variables used in the model.</p></dd>
+<dt>smoothed_z</dt>
+<dd><p>A tibble of smoothed latent state variables obtained using the Kalman smoother.</p></dd>
 
-<dt>forecast_observation</dt>
-<dd><p>A tibble of forecasted observations. Returned only if <code>h &gt; 0</code>.</p></dd>
+<dt>smoothed_y</dt>
+<dd><p>A tibble of smoothed observed variables obtained using the Kalman smoother.</p></dd>
 
-<dt>smoothed_states</dt>
-<dd><p>A tibble of smoothed state variables based on the Kalman smoother.</p></dd>
+<dt>forecast_z</dt>
+<dd><p>A tibble of forecasted latent state variables. Returned only if <code>h &gt; 0</code>.</p></dd>
+
+<dt>forecast_y</dt>
+<dd><p>A tibble of forecasted observed variables. Returned only if <code>h &gt; 0</code>.</p></dd>
 
 <dt>kk_model_mat</dt>
-<dd><p>A list of KK model matrices (e.g., transition and observation matrices).</p></dd>
+<dd><p>A list of KK model matrices, such as transition and observation matrices.</p></dd>
 
 <dt>ss_model_mat</dt>
 <dd><p>A list of state-space model matrices derived from the KK model.</p></dd>
@@ -136,6 +132,9 @@ Default is 0 (minimal output).</p></dd>
 
 <dt>fit</dt>
 <dd><p>The fitted model object from the SUR estimation procedure.</p></dd>
+
+<dt>e</dt>
+<dd><p>The number of the efficient release (0-indexed).</p></dd>
 
 
 </dl></div>
