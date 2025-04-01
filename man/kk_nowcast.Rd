@@ -28,17 +28,17 @@ Must be greater than or equal to 0.}
 \item "Kishor-Koenig" or "KK" (default): Full Kishor-Koenig model.
 \item "Howrey": Howrey's simplified framework.
 \item "Classical": Classical model without vintage effects.
-}
+}}
 
-@param method A string specifying the estimation method to use. Options are "SUR" (default) and "OLS".
+\item{method}{A string specifying the estimation method to use. Options are "SUR" (default) and "OLS".}
 
-@param solver_options An optional list to control the behaviour of the
+\item{solver_options}{An optional list to control the behaviour of the
 underlying \code{\link[systemfit:nlsystemfit]{systemfit::nlsystemfit()}} and \code{\link[stats:nlm]{stats::nlm()}} solvers:
 \itemize{
 \item \strong{trace}: An integer controlling the level of output for the optimization procedure.
 Default is 0 (minimal output).
 \item \strong{maxiter}: An integer specifying the maximum number of iterations for the optimization procedure. Default is 1000.
-\item \strong{startvals} A list of starting values for the optimization procedure (must match the number of parameters of the model).
+\item \strong{startvals}: A list of starting values for the optimization procedure (must match the number of parameters of the model).
 \item \strong{solvtol}: Tolerance for detecting linear dependencies in the columns of
 X in the qr function calls (See \code{\link[systemfit:nlsystemfit]{systemfit::nlsystemfit()}}). Default is .Machine$double.eps.
 \item \strong{gradtol}: A a positive scalar giving the tolerance at which the scaled

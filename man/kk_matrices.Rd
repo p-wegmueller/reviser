@@ -18,8 +18,8 @@ kk_matrices(e, model, params = NULL, type = "numeric")
 
 \item{params}{Numeric vector (optional). A vector of parameters to initialize the matrices. If \code{NULL}, default values are used:
 \describe{
-\item{\code{type = "numeric"}}{Initializes parameters to \code{1e-1}.}
-\item{\code{type = "character"}}{Initializes parameters as \code{NA_real_}.}
+\item{\code{type = "numeric"}}{A vector of params must be supplied.}
+\item{\code{type = "character"}}{Initializes named parameters as \code{NA_real_}.}
 }
 If provided, the length of \code{params} must match the number of parameters required by the specified model.}
 
@@ -45,17 +45,14 @@ Constructs the matrices \eqn{I}, \eqn{F}, \eqn{G}, \eqn{R}, and \eqn{H} used in
 state-space models, specifically for the Kishor-Koenig (KK), Howrey, or Classical frameworks.
 }
 \examples{
-# Example 1: Kishor-Koenig model with e = 2
-matrices <- kk_matrices(e = 2, model = "KK", type = "numeric")
+# Example 1: Kishor-Koenig model with character matrices
+matrices <- kk_matrices(e = 3, model = "KK", type = "character")
 str(matrices)
 
-# Example 2: Howrey model with custom parameters
-custom_params <- c(0.5, 0.3, 0.2, 0.1, 0.2, 0.25, 0.05, 0.01)
-matrices <- kk_matrices(e = 2, model = "Howrey", params = custom_params, type = "numeric")
-str(matrices)
-
-# Example 3: Classical model with character matrices
-matrices <- kk_matrices(e = 3, model = "Classical", type = "character")
+# Example 2: Kishor-Koenig model with e = 2
+params <- rep(0.1, 17)
+names(params) <- names(matrices$params)
+matrices <- kk_matrices(e = 3, params = params,  model = "KK", type = "numeric")
 str(matrices)
 
 }

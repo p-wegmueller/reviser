@@ -15,16 +15,14 @@
 #'  - "Kishor-Koenig" or "KK" (default): Full Kishor-Koenig model.
 #'  - "Howrey": Howrey's simplified framework.
 #'  - "Classical": Classical model without vintage effects.
-#'
-#'  @param method A string specifying the estimation method to use. Options are "SUR" (default) and "OLS".
-#'
-#'  @param solver_options An optional list to control the behaviour of the
+#' @param method A string specifying the estimation method to use. Options are "SUR" (default) and "OLS".
+#' @param solver_options An optional list to control the behaviour of the
 #'  underlying [systemfit::nlsystemfit()] and [stats::nlm()] solvers:
 #'
 #' - **trace**: An integer controlling the level of output for the optimization procedure.
 #'              Default is 0 (minimal output).
 #' - **maxiter**: An integer specifying the maximum number of iterations for the optimization procedure. Default is 1000.
-#' - **startvals** A list of starting values for the optimization procedure (must match the number of parameters of the model).
+#' - **startvals**: A list of starting values for the optimization procedure (must match the number of parameters of the model).
 #' - **solvtol**: Tolerance for detecting linear dependencies in the columns of
 #'    X in the qr function calls (See [systemfit::nlsystemfit()]). Default is .Machine$double.eps.
 #' - **gradtol**: A a positive scalar giving the tolerance at which the scaled
@@ -545,8 +543,8 @@ jvn_nowcast <- function() {
 #'   }
 #' @param params Numeric vector (optional). A vector of parameters to initialize the matrices. If \code{NULL}, default values are used:
 #'   \describe{
-#'     \item{\code{type = "numeric"}}{Initializes parameters to \code{1e-1}.}
-#'     \item{\code{type = "character"}}{Initializes parameters as \code{NA_real_}.}
+#'     \item{\code{type = "numeric"}}{A vector of params must be supplied.}
+#'     \item{\code{type = "character"}}{Initializes named parameters as \code{NA_real_}.}
 #'   }
 #'   If provided, the length of \code{params} must match the number of parameters required by the specified model.
 #' @param type Character. Specifies the type of matrices returned. Options are:
@@ -566,17 +564,14 @@ jvn_nowcast <- function() {
 #'   }
 #'
 #' @examples
-#' # Example 1: Kishor-Koenig model with e = 2
-#' matrices <- kk_matrices(e = 2, model = "KK", type = "numeric")
+#' # Example 1: Kishor-Koenig model with character matrices
+#' matrices <- kk_matrices(e = 3, model = "KK", type = "character")
 #' str(matrices)
 #'
-#' # Example 2: Howrey model with custom parameters
-#' custom_params <- c(0.5, 0.3, 0.2, 0.1, 0.2, 0.25, 0.05, 0.01)
-#' matrices <- kk_matrices(e = 2, model = "Howrey", params = custom_params, type = "numeric")
-#' str(matrices)
-#'
-#' # Example 3: Classical model with character matrices
-#' matrices <- kk_matrices(e = 3, model = "Classical", type = "character")
+#' # Example 2: Kishor-Koenig model with e = 2
+#' params <- rep(0.1, 17)
+#' names(params) <- names(matrices$params)
+#' matrices <- kk_matrices(e = 3, params = params,  model = "KK", type = "numeric")
 #' str(matrices)
 #'
 #' @export
@@ -606,6 +601,17 @@ kk_matrices <- function(e, model, params = NULL, type = "numeric") {
     rlang::warn(
       "If argument 'type' is 'character', argument 'params' is ignored!"
     )
+  }
+
+  if (is.null(params) && type == "numeric") {
+    rlang::abort(
+      "If argument 'type' is 'numeric', argument 'params' must be provided!"
+    )
+  }
+
+  # Check params are named
+  if (!is.null(params) && !all(!is.na(names(params)))) {
+    rlang::abort("All parameters must be named!")
   }
 
   # Check params input
