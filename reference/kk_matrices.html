@@ -82,10 +82,10 @@ state-space models, specifically for the Kishor-Koenig (KK), Howrey, or Classica
 
 <dt id="arg-params">params<a class="anchor" aria-label="anchor" href="#arg-params"></a></dt>
 <dd><p>Numeric vector (optional). A vector of parameters to initialize the matrices. If <code>NULL</code>, default values are used:</p><dl><dt><code>type = "numeric"</code></dt>
-<dd><p>Initializes parameters to <code>1e-1</code>.</p></dd>
+<dd><p>A vector of params must be supplied.</p></dd>
 
 <dt><code>type = "character"</code></dt>
-<dd><p>Initializes parameters as <code>NA_real_</code>.</p></dd>
+<dd><p>Initializes named parameters as <code>NA_real_</code>.</p></dd>
 
 
 </dl><p>If provided, the length of <code>params</code> must match the number of parameters required by the specified model.</p></dd>
@@ -127,30 +127,31 @@ state-space models, specifically for the Kishor-Koenig (KK), Howrey, or Classica
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Example 1: Kishor-Koenig model with e = 2</span></span></span>
-<span class="r-in"><span><span class="va">matrices</span> <span class="op">&lt;-</span> <span class="fu">kk_matrices</span><span class="op">(</span>e <span class="op">=</span> <span class="fl">2</span>, model <span class="op">=</span> <span class="st">"KK"</span>, type <span class="op">=</span> <span class="st">"numeric"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in params[[paste0("F0")]]:</span> subscript out of bounds</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">matrices</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'matrices' not found</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 2: Howrey model with custom parameters</span></span></span>
-<span class="r-in"><span><span class="va">custom_params</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.3</span>, <span class="fl">0.2</span>, <span class="fl">0.1</span>, <span class="fl">0.2</span>, <span class="fl">0.25</span>, <span class="fl">0.05</span>, <span class="fl">0.01</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">matrices</span> <span class="op">&lt;-</span> <span class="fu">kk_matrices</span><span class="op">(</span>e <span class="op">=</span> <span class="fl">2</span>, model <span class="op">=</span> <span class="st">"Howrey"</span>, params <span class="op">=</span> <span class="va">custom_params</span>, type <span class="op">=</span> <span class="st">"numeric"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in params[[paste0("F0")]]:</span> subscript out of bounds</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">matrices</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'matrices' not found</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 3: Classical model with character matrices</span></span></span>
-<span class="r-in"><span><span class="va">matrices</span> <span class="op">&lt;-</span> <span class="fu">kk_matrices</span><span class="op">(</span>e <span class="op">=</span> <span class="fl">3</span>, model <span class="op">=</span> <span class="st">"Classical"</span>, type <span class="op">=</span> <span class="st">"character"</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Example 1: Kishor-Koenig model with character matrices</span></span></span>
+<span class="r-in"><span><span class="va">matrices</span> <span class="op">&lt;-</span> <span class="fu">kk_matrices</span><span class="op">(</span>e <span class="op">=</span> <span class="fl">3</span>, model <span class="op">=</span> <span class="st">"KK"</span>, type <span class="op">=</span> <span class="st">"character"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">matrices</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> List of 6</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ II    : chr [1:4, 1:4] "1" "0" "0" "0" ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ FF    : chr [1:4, 1:4] "0" "0" "0" "0" ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ GG    : chr [1:4, 1:4] "1" "0" "0" "0" ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ GG    : chr [1:4, 1:4] "1" "G2_3" "G1_3" "G0_3" ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ R     : chr [1:4, 1:4] "0" "0" "0" "0" ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ H     : chr [1:4, 1:4] "0" "0" "0" "0" ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ params: Named num [1:5] NA NA NA NA NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "names")= chr [1:5] "F0" "v0" "eps2" "eps1" ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ params: Named num [1:17] NA NA NA NA NA NA NA NA NA NA ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "names")= chr [1:17] "F0" "G2_3" "G2_2" "G2_1" ...</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Example 2: Kishor-Koenig model with e = 2</span></span></span>
+<span class="r-in"><span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">17</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">matrices</span><span class="op">$</span><span class="va">params</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">matrices</span> <span class="op">&lt;-</span> <span class="fu">kk_matrices</span><span class="op">(</span>e <span class="op">=</span> <span class="fl">3</span>, params <span class="op">=</span> <span class="va">params</span>,  model <span class="op">=</span> <span class="st">"KK"</span>, type <span class="op">=</span> <span class="st">"numeric"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">matrices</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> List of 6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ II    : num [1:4, 1:4] 1 0 0 0 0 1 0 0 0 0 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ FF    : num [1:4, 1:4] 0 0 0 0 1 0 0 0 0 1 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ GG    : num [1:4, 1:4] 1 0.1 0.1 0.1 0 0.1 0.1 0.1 0 0.1 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ R     : num [1:4, 1:4] 0 0 0 0 0 0 0 0 0 0 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ H     : num [1:4, 1:4] 0 0 0 0 0 0.1 0 0 0 0 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ params: Named num [1:17] 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "names")= chr [1:17] "F0" "G2_3" "G2_2" "G2_1" ...</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

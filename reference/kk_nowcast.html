@@ -91,12 +91,19 @@ Must be greater than or equal to 0.</p></dd>
 <dd><p>A string specifying the type of model to use. Options are:</p><ul><li><p>"Kishor-Koenig" or "KK" (default): Full Kishor-Koenig model.</p></li>
 <li><p>"Howrey": Howrey's simplified framework.</p></li>
 <li><p>"Classical": Classical model without vintage effects.</p></li>
-</ul><p>@param method A string specifying the estimation method to use. Options are "SUR" (default) and "OLS".</p>
-<p>@param solver_options An optional list to control the behaviour of the
+</ul></dd>
+
+
+<dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
+<dd><p>A string specifying the estimation method to use. Options are "SUR" (default) and "OLS".</p></dd>
+
+
+<dt id="arg-solver-options">solver_options<a class="anchor" aria-label="anchor" href="#arg-solver-options"></a></dt>
+<dd><p>An optional list to control the behaviour of the
 underlying <code><a href="https://rdrr.io/pkg/systemfit/man/nlsystemfit.html" class="external-link">systemfit::nlsystemfit()</a></code> and <code><a href="https://rdrr.io/r/stats/nlm.html" class="external-link">stats::nlm()</a></code> solvers:</p><ul><li><p><strong>trace</strong>: An integer controlling the level of output for the optimization procedure.
 Default is 0 (minimal output).</p></li>
 <li><p><strong>maxiter</strong>: An integer specifying the maximum number of iterations for the optimization procedure. Default is 1000.</p></li>
-<li><p><strong>startvals</strong> A list of starting values for the optimization procedure (must match the number of parameters of the model).</p></li>
+<li><p><strong>startvals</strong>: A list of starting values for the optimization procedure (must match the number of parameters of the model).</p></li>
 <li><p><strong>solvtol</strong>: Tolerance for detecting linear dependencies in the columns of
 X in the qr function calls (See <code><a href="https://rdrr.io/pkg/systemfit/man/nlsystemfit.html" class="external-link">systemfit::nlsystemfit()</a></code>). Default is .Machine$double.eps.</p></li>
 <li><p><strong>gradtol</strong>: A a positive scalar giving the tolerance at which the scaled
