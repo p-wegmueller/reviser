@@ -1328,6 +1328,24 @@ get_nth_release <- function(df, n = 0, diagonal = FALSE) {
       # Get the first release
       nth_release <- get_first_release(df)
     }
+    if (diagonal) {
+      min_pub_date <- df %>%
+        dplyr::group_by(id) %>%
+        dplyr::summarize(min_pub_date = min(pub_date)) %>%
+        dplyr::pull(min_pub_date, id) %>%
+        as.Date()
+
+      max_time <- df %>%
+        dplyr::filter(pub_date == min_pub_date) %>%
+        dplyr::group_by(id) %>%
+        dplyr::summarize(max_time = max(time)) %>%
+        dplyr::pull(max_time, id) %>%
+        as.Date()
+
+      # Filter using direct vectorized lookup
+      df <- df %>%
+        filter(time >= max_time[id])
+    }
   } else {
     # Ensure data is sorted by pub_date and time
     df <- df %>%
@@ -1348,13 +1366,14 @@ get_nth_release <- function(df, n = 0, diagonal = FALSE) {
       # Get the first release
       nth_release <- get_first_release(df)
     }
-  }
-
-  if (diagonal) {
-    df <- df %>%
-      dplyr::filter(
-        !dplyr::lead(pub_date) == (pub_date)
-      )
+    if (diagonal) {
+      min_pub_date <- min(df$pub_date)
+      max_time <- max(df$time[df$pub_date == min_pub_date])
+      df <- df %>%
+        dplyr::filter(
+          time >= max_time
+        )
+    }
   }
 
   # Add the class only if it is not already present
