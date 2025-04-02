@@ -109,7 +109,7 @@ pt_provence <- reviser::plot_vintages(
   theme_transparent() +
   theme(legend.position = "none")
 
-p4 <- hexSticker::sticker(
+hexSticker::sticker(
   pt_provence,
   package = "reviser",
   p_size = 22,
@@ -129,7 +129,7 @@ p4 <- hexSticker::sticker(
   u_color = "#5A3E2B"
 )
 
-p4
+# p4
 # 
 # library(gridExtra)
 # grid.arrange(p1, p3, p4, ncol = 3, respect = TRUE)
