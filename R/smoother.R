@@ -131,6 +131,23 @@ kk_nowcast <- function(
   }
 
   # Check start values
+  # if provided startvalues must be numeric vector
+  if (!is.null(default_solver_options$startvals)) {
+    if (!is.numeric(default_solver_options$startvals)) {
+      rlang::abort(
+        "'startvals' must be a named, numeric vector! E.g. c(F0 = 0.2)."
+      )
+    }
+  }
+  # check vector is named
+  if (!is.null(default_solver_options$startvals)) {
+    if (is.null(names(default_solver_options$startvals))) {
+      rlang::abort(
+        "'startvals' must be a named, numeric vector! E.g. c(F0 = 0.2)."
+      )
+    }
+  }
+
   # KK input matrices
   n_param_mat <- dplyr::if_else(
     model %in% c("Kishor-Koenig", "KK"),
@@ -142,26 +159,35 @@ kk_nowcast <- function(
     )
   )
 
+  # Define model matrices
+  kk_mat_sur <- kk_matrices(e = e, model = model, type = "character")
+
   # KK cov matrices
   n_param_cov <- e + 1
 
   n_param <- n_param_mat + n_param_cov
 
   if (!is.null(default_solver_options$startvals)) {
-    if (length(default_solver_options$startvals) != n_param_mat) {
+    if (length(default_solver_options$startvals) != n_param) {
       rlang::abort(paste0(
         "The length of 'startvals' must be ",
-        n_param_mat,
+        n_param,
         " if 'model' = ",
         model,
         " and e = ",
         e
       ))
     } else {
-      start_mat <- default_solver_options$startvals
+      start_mat <- kk_matrices(
+        e = e,
+        model = model,
+        params = default_solver_options$startvals,
+        type = "numeric"
+      )$params[1:n_param_mat]
     }
   } else {
     start_mat <- rep(0.4, n_param_mat)
+    names(start_mat) <- names(kk_mat_sur$params)[1:n_param_mat]
   }
 
   # Check start values for the expected value of the pre-sample state vector m0
@@ -208,66 +234,20 @@ kk_nowcast <- function(
     df <- vintages_wide(df, names_from = "release")
   }
 
+  # Define state and observable variable names
   z_names <- c(paste0("release_", e, "_lag_", (e):0))
   z_lag_names <- c(paste0("release_", e, "_lag_", (e + 1):1))
   y_names <- c(paste0("release_", e:0, "_lag_", e:0))
   y_lag_names <- c(paste0("release_", e:0, "_lag_", (e + 1):1))
 
-  # Define matrices
-  kk_mat_sur <- kk_matrices(e = e, model = model, type = "character")
+  equations <- kk_equations(
+    kk_mat_sur = kk_mat_sur
+  )
 
-  # Define equations
-  lhs1 <- z_names
-  rhs1 <- kk_mat_sur$FF %mx% z_lag_names
-
-  lhs2 <- (y_names)
-  rhs2 <- (((kk_mat_sur$II %diff% kk_mat_sur$GG) %prod% kk_mat_sur$FF) %mx%
-    (y_lag_names)) %sum%
-    (kk_mat_sur$GG %mx% z_names)
-
-  equations <- list()
-  formula <- stats::as.formula(paste0(lhs1[e + 1], " ~ ", rhs1[e + 1]))
-  equations[[paste0("eq", 1)]] <- formula
-  eq <- 2
-  for (i in 2:(e + 1)) {
-    formula <- stats::as.formula(paste0(lhs2[i], " ~ ", rhs2[i]))
-    equations[[paste0("eq", eq)]] <- formula
-    eq <- eq + 1
-  }
-
-  # Arrange data
-  z <- array(NA, c(nrow(df), e + 1))
-  z_lag <- array(NA, c(nrow(df), e + 1))
-  for (j in (e):0) {
-    z[, (e + 1) - j] <- dplyr::lag(dplyr::pull(df[paste0("release_", e)]), j)
-    z_lag[, (e + 1) - j] <- dplyr::lag(
-      dplyr::pull(df[paste0("release_", e)]),
-      j + 1
-    )
-  }
-  z <- tibble::tibble(as.data.frame(z))
-  colnames(z) <- z_names
-  z_lag <- tibble::tibble(as.data.frame(z_lag))
-  colnames(z_lag) <- z_lag_names
-
-  y <- array(NA, c(nrow(df), e))
-  y_lag <- array(NA, c(nrow(df), e))
-  for (j in (e - 1):0) {
-    y[, (e) - j] <- dplyr::lag(dplyr::pull(df[paste0("release_", j)]), j)
-    y_lag[, (e) - j] <- dplyr::lag(
-      dplyr::pull(df[paste0("release_", j)]),
-      j + 1
-    )
-  }
-
-  y <- tibble::tibble(as.data.frame(y))
-  y_lag <- tibble::tibble(as.data.frame(y_lag))
-  colnames(y) <- c(paste0("release_", (e - 1):0, "_lag_", (e - 1):0))
-  colnames(y_lag) <- c(paste0("release_", (e - 1):0, "_lag_", e:1))
-
-  sur_data <- cbind(z, y, y_lag) %>% stats::na.omit()
-
-  names(start_mat) <- names(kk_mat_sur$params)[1:n_param_mat]
+  sur_data <- kk_arrange_data(
+    df = df,
+    e = e
+  )
 
   if (method == "SUR") {
     fit <- systemfit::nlsystemfit(
@@ -281,90 +261,34 @@ kk_nowcast <- function(
       steptol = default_solver_options$steptol,
       gradtol = default_solver_options$gradtol
     )
+    parm_cov <- (diag(fit$rcov))
+    names(parm_cov) <- c("v0", paste0("eps", (e - 1):0))
+    params <- c(fit$b, parm_cov)
 
-    params <- c(fit$b, (diag(fit$rcov)))
-    names(params) <- names(kk_mat_sur$params)
+    # bring params in the right order
+    params <- kk_matrices(
+      e = e,
+      model = model,
+      params = params,
+      type = "numeric"
+    )$params
   } else if (method == "OLS") {
-    F0_mod <- stats::lm(
-      stats::as.formula(paste0(z_names, " ~ ", z_lag_names[e + 1], "-1")),
+    ols_estim <- kk_ols_estim(
+      equations = equations,
+      model = model,
       data = sur_data
     )
 
-    F0 <- stats::coef(F0_mod)
-    var_v <- summary(F0_mod)$sigma^2
+    fit <- ols_estim$fit
 
-    ols_coeffs <- c("F0" = as.numeric(F0))
-    ols_vars <- c("v0" = as.numeric(var_v))
-
-    for (ii in 2:(e + 1)) {
-      # Step 1: Extract the signs
-      sign_matches <- gregexpr("(?<=[^\\w])[-+]", rhs2[ii], perl = TRUE)
-      signs <- regmatches(rhs2[ii], sign_matches)[[1]]
-
-      # Step 2: Extract the variable names
-      var_matches <- gregexpr("release_\\d+_lag_\\d+", rhs2[ii], perl = TRUE)
-      variables <- regmatches(rhs2[ii], var_matches)[[1]]
-
-      # Step 3: Extract the Gs
-      g_matches <- gregexpr("G\\d+_\\d+", rhs2[ii], perl = TRUE)
-      gs <- regmatches(rhs2[ii], g_matches)[[1]]
-
-      # Step 4: Combine signs and variable names
-      # Handle cases where the first term might not have an explicit sign
-      if (length(signs) < length(variables)) {
-        signs <- c("+", signs) # Assume first term has implicit '+'
-      }
-
-      # Unique coefficients to estimate
-      unique_gs <- unique(gs)
-
-      # Create transformed regressors based on gs mapping
-      regressors <- stats::setNames(
-        vector("list", length(unique_gs)),
-        unique_gs
-      )
-
-      for (i in seq_along(gs)) {
-        g <- gs[i]
-        var <- variables[i]
-        sign <- ifelse(signs[i] == "+", 1, -1)
-
-        if (is.null(regressors[[g]])) {
-          regressors[[g]] <- sign * sur_data[[var]]
-        } else {
-          if (ii == e + 1) {
-            regressors[[g]] <- ols_coeffs["F0"] *
-              regressors[[g]] +
-              sign * sur_data[[var]]
-          } else {
-            regressors[[g]] <- regressors[[g]] + sign * sur_data[[var]]
-          }
-        }
-      }
-
-      # Convert to data frame
-      df_regressors <- as.data.frame(regressors)
-      df_regressors[[lhs2[ii]]] <- sur_data[[lhs2[ii]]] # Add dependent variable
-
-      # Construct formula
-      formula <- stats::as.formula(paste(
-        lhs2[ii],
-        "~",
-        paste0(
-          paste(names(df_regressors)[-length(df_regressors)], collapse = " + "),
-          " -1"
-        )
-      ))
-
-      # Estimate model
-      modeli <- stats::lm(formula, data = df_regressors)
-      ols_coeffs <- c(ols_coeffs, modeli$coefficients)
-      sig2 <- summary(modeli)$sigma^2
-      names(sig2) <- paste0("eps", e - ii + 1)
-      ols_vars <- c(ols_vars, sig2)
-    }
-    params <- c(ols_coeffs, ols_vars)
-    fit <- NULL
+    params <- ols_estim$params
+    # bring params in the right order
+    params <- kk_matrices(
+      e = e,
+      model = model,
+      params = params,
+      type = "numeric"
+    )$params
   }
 
   kk_mat_hat <- kk_matrices(
@@ -495,9 +419,7 @@ kk_nowcast <- function(
     forecast_z <- forecast_y <- NULL
   }
 
-  params <- kk_mat_hat$params
-
-  # Remove the parameters from the model
+  # Remove the parameters from the model matrices
   kk_mat_hat$params <- NULL
 
   results <- list(
@@ -518,18 +440,325 @@ kk_nowcast <- function(
   return(results)
 }
 
-
-#' Jacobs van Norde State Space Model for Nowcasting
+#' @title Create Equations for Kishor-Koenig (KK) Models
 #'
-#' Coming Soon!
-#' @export
-jvn_nowcast <- function() {
-  # Create a function to nowcast the JVN model
-  print("Coming soon!")
+#' @description
+#' This function generates a list of formula objects representing the equations
+#' for the Kishor-Koenig (KK) models based on the provided KK matrix structure.
+#'
+#' @param kk_mat_sur A list containing the KK matrix structure, including matrices
+#'   `FF`, `II`, and `GG`.
+#'
+#' @return A list of formula objects representing the equations of the KK model.
+#'
+#' @details
+#' The function constructs the equations based on the dimensions of the input
+#' matrices and generates formulas for each equation. It utilizes lagged variables
+#' and matrix operations to form the relationships.
+#'
+#' @keywords internal
+#' @noRd
+kk_equations <- function(kk_mat_sur) {
+  e <- dim(kk_mat_sur$II)[1] - 1
+
+  z_names <- c(paste0("release_", e, "_lag_", (e):0))
+  z_lag_names <- c(paste0("release_", e, "_lag_", (e + 1):1))
+  y_names <- c(paste0("release_", e:0, "_lag_", e:0))
+  y_lag_names <- c(paste0("release_", e:0, "_lag_", (e + 1):1))
+
+  lhs1 <- z_names
+  rhs1 <- kk_mat_sur$FF %mx% z_lag_names
+
+  lhs2 <- (y_names)
+  rhs2 <- (((kk_mat_sur$II %diff% kk_mat_sur$GG) %prod% kk_mat_sur$FF) %mx%
+    (y_lag_names)) %sum%
+    (kk_mat_sur$GG %mx% z_names)
+
+  equations <- list()
+  formula <- stats::as.formula(paste0(lhs1[e + 1], " ~ ", rhs1[e + 1]))
+  equations[[paste0("eq", 1)]] <- formula
+  eq <- 2
+  for (i in 2:(e + 1)) {
+    formula <- stats::as.formula(paste0(lhs2[i], " ~ ", rhs2[i]))
+    equations[[paste0("eq", eq)]] <- formula
+    eq <- eq + 1
+  }
+  return(equations)
 }
 
+#' @title Arrange Data for Kishor-Koenig (KK) Models
+#'
+#' @description
+#' This function arranges the input data frame into a format suitable for estimating
+#' Kishor-Koenig (KK) models. It generates lagged variables and combines them
+#' into a data frame.
+#'
+#' @param df A data frame containing the original data.
+#' @param e An integer indicating the efficient release.
+#'
+#' @return A data frame with lagged variables, prepared for KK model estimation.
+#'
+#' @details
+#' The function creates lagged versions of the release variables up to the specified
+#' lag `e`. It constructs variables named `release_e_lag_e:0`, `release_e_lag_(e+1):1`,
+#' `release_e:0_lag_e:0`, and `release_e:0_lag_(e+1):1`. The function then combines
+#' these variables into a single data frame, removing rows with missing values.
+#'
+#' @keywords internal
+#' @noRd
+kk_arrange_data <- function(df, e) {
+  z_names <- c(paste0("release_", e, "_lag_", (e):0))
+  z_lag_names <- c(paste0("release_", e, "_lag_", (e + 1):1))
+  y_names <- c(paste0("release_", e:0, "_lag_", e:0))
+  y_lag_names <- c(paste0("release_", e:0, "_lag_", (e + 1):1))
 
-#' Create Matrices for the Kishor-Koenig (KK) or Related Models
+  # Arrange data
+  z <- array(NA, c(nrow(df), e + 1))
+  z_lag <- array(NA, c(nrow(df), e + 1))
+  for (j in (e):0) {
+    z[, (e + 1) - j] <- dplyr::lag(dplyr::pull(df[paste0("release_", e)]), j)
+    z_lag[, (e + 1) - j] <- dplyr::lag(
+      dplyr::pull(df[paste0("release_", e)]),
+      j + 1
+    )
+  }
+  z <- tibble::tibble(as.data.frame(z))
+  colnames(z) <- z_names
+  z_lag <- tibble::tibble(as.data.frame(z_lag))
+  colnames(z_lag) <- z_lag_names
+
+  y <- array(NA, c(nrow(df), e))
+  y_lag <- array(NA, c(nrow(df), e))
+  for (j in (e - 1):0) {
+    y[, (e) - j] <- dplyr::lag(dplyr::pull(df[paste0("release_", j)]), j)
+    y_lag[, (e) - j] <- dplyr::lag(
+      dplyr::pull(df[paste0("release_", j)]),
+      j + 1
+    )
+  }
+
+  y <- tibble::tibble(as.data.frame(y))
+  y_lag <- tibble::tibble(as.data.frame(y_lag))
+  colnames(y) <- c(paste0("release_", (e - 1):0, "_lag_", (e - 1):0))
+  colnames(y_lag) <- c(paste0("release_", (e - 1):0, "_lag_", e:1))
+
+  data <- cbind(z, y, y_lag) %>% stats::na.omit()
+
+  return(data)
+}
+
+#' @title Estimate Generalized Kishor-Koenig (KK) Models via OLS
+#'
+#' @description
+#' This function estimates the parameters of generalized Kishor-Koenig (KK) models
+#' using ordinary least squares (OLS). It processes a set of equations, extracts
+#' necessary information, and fits linear models. This function is intended for
+#' internal use within the package.
+#'
+#' @param equations A list of formula objects representing the equations of the
+#'   KK model.
+#' @param data A data frame containing the variables used in the equations.
+#' @param model A character string specifying the model type. Must be one of
+#'   "KK", "Kishor-Koenig", "Howrey", or "Classical". Defaults to "KK".
+#'
+#' @return A list containing two elements:
+#'   \itemize{
+#'     \item{\code{params}: A named numeric vector containing the estimated
+#'           parameters (coefficients and variances).}
+#'     \item{\code{fit}: A list of fitted \code{lm} model objects.}
+#'   }
+#'
+#' @details
+#' This function is designed to handle different variations of the KK model, including
+#' "Classical", "Howrey", and the standard "KK" or "Kishor-Koenig" models.
+#' It extracts coefficients and variances based on the specified model type.
+#'
+#' @keywords internal
+#' @noRd
+kk_ols_estim <- function(equations, data, model = "KK") {
+  n_eq <- length(equations)
+  e <- n_eq - 1
+
+  # Remove all brackets and the term "F0" from eq 1
+  eq1 <- gsub("\\(|\\)", "", deparse(equations[[1]]))
+  eq1 <- gsub("F0", "", eq1)
+  eq1 <- gsub("\\*", "", eq1)
+  formula <- paste0(eq1, " -1")
+
+  F0_mod <- stats::lm(
+    stats::as.formula(formula),
+    data = data
+  )
+
+  fit <- list()
+
+  fit[[1]] <- F0_mod
+
+  F0 <- stats::coef(F0_mod)
+  var_v <- summary(F0_mod)$sigma^2
+
+  ols_coeffs <- c("F0" = as.numeric(F0))
+  ols_vars <- c("v0" = as.numeric(var_v))
+
+  for (ii in 2:n_eq) {
+    eq <- deparse(equations[[ii]])
+    # Step 1: Extract the signs
+    signs <- unlist(regmatches(
+      eq,
+      gregexpr("(?<=[^\\w])[-+]", eq, perl = TRUE)
+    ))
+
+    # Step 2: Extract the variable names
+    variables <- unlist(regmatches(
+      eq,
+      gregexpr("release_[^ )]+", eq)
+    ))
+
+    # Step 3: Extract the parameters
+    pars <- unlist(regmatches(
+      eq,
+      gregexpr("G\\d+_\\d+", eq, perl = TRUE)
+    ))
+
+    # Step 4: Combine signs and variable names
+    # Handle cases where the first term might not have an explicit sign
+    if (length(signs) < (length(variables) - 1)) {
+      signs <- c("+", signs) # Assume first term has implicit '+'
+    }
+
+    if (model == "Classical") {
+      sig2 <- var(data[[variables[1]]] - data[[variables[2]]])
+      names(sig2) <- paste0("eps", e - ii + 1)
+      ols_vars <- c(ols_vars, sig2)
+    } else if (model == "Howrey") {
+      # Check length of extracted elements (always same in Howrey) except last equation
+      if (
+        length(signs) != (length(variables) - 1) ||
+          length(signs) != length(pars) && !ii == n_eq
+      ) {
+        rlang::abort(
+          "Error: Incorrect number of elements extracted from equation"
+        )
+      }
+
+      uniq_pars <- unique(pars)
+
+      # Create transformed regressors based on gs mapping
+      regressors <- stats::setNames(
+        vector("list", length(uniq_pars)),
+        uniq_pars
+      )
+
+      for (i in seq_along(pars)) {
+        g <- pars[i]
+        var <- variables[i + 1]
+        sign <- ifelse(signs[i] == "+", 1, -1)
+
+        if (is.null(regressors[[g]])) {
+          regressors[[g]] <- sign * data[[var]]
+        } else {
+          regressors[[g]] <- regressors[[g]] + sign * data[[var]]
+        }
+      }
+
+      # Convert to data frame
+      df_regressors <- as.data.frame(regressors)
+
+      # Add dependent variable
+      if (ii == n_eq) {
+        df_regressors[[variables[1]]] <- data[[variables[1]]] -
+          data[[variables[length(variables)]]]
+      } else {
+        df_regressors[[variables[1]]] <- data[[variables[1]]]
+      }
+
+      # Construct formula
+      formula <- stats::as.formula(paste(
+        variables[1],
+        "~",
+        paste0(
+          paste(names(df_regressors)[-ncol(df_regressors)], collapse = " + "),
+          " -1"
+        )
+      ))
+
+      # Estimate model
+      modeli <- stats::lm(formula, data = df_regressors)
+      ols_coeffs <- c(ols_coeffs, modeli$coefficients)
+      sig2 <- summary(modeli)$sigma^2
+      names(sig2) <- paste0("eps", e - ii + 1)
+      ols_vars <- c(ols_vars, sig2)
+      fit[[ii]] <- modeli
+    } else if (model %in% c("KK", "Kishor-Koenig")) {
+      # Check length of extracted elements (always same in KK) except last equation
+      if (
+        length(signs) != (length(variables) - 1) ||
+          length(signs) != length(pars) && !ii == n_eq
+      ) {
+        rlang::abort(
+          "Error: Incorrect number of elements extracted from equation"
+        )
+      }
+
+      # Unique coefficients to estimate
+      uniq_pars <- unique(pars)
+
+      # Create transformed regressors based on gs mapping
+      regressors <- stats::setNames(
+        vector("list", length(uniq_pars)),
+        uniq_pars
+      )
+
+      for (i in seq_along(pars)) {
+        g <- pars[i]
+        var <- variables[i + 1]
+        sign <- ifelse(signs[i] == "+", 1, -1)
+
+        if (is.null(regressors[[g]])) {
+          if (i == 1 & ii == n_eq) {
+            regressors[[g]] <- sign * data[[var]] * ols_coeffs["F0"]
+          } else {
+            regressors[[g]] <- sign * data[[var]]
+          }
+        } else {
+          regressors[[g]] <- regressors[[g]] + sign * data[[var]]
+        }
+      }
+
+      # Convert to data frame
+      df_regressors <- as.data.frame(regressors)
+      # Add dependent variable
+      if (ii == n_eq) {
+        df_regressors[[variables[1]]] <- data[[variables[1]]] -
+          data[[variables[2]]] * ols_coeffs["F0"]
+      } else {
+        df_regressors[[variables[1]]] <- data[[variables[1]]]
+      }
+
+      # Construct formula
+      formula <- stats::as.formula(paste(
+        variables[1],
+        "~",
+        paste0(
+          paste(names(df_regressors)[-length(df_regressors)], collapse = " + "),
+          " -1"
+        )
+      ))
+
+      # Estimate model
+      modeli <- stats::lm(formula, data = df_regressors)
+      ols_coeffs <- c(ols_coeffs, modeli$coefficients)
+      sig2 <- summary(modeli)$sigma^2
+      names(sig2) <- paste0("eps", e - ii + 1)
+      ols_vars <- c(ols_vars, sig2)
+      fit[[ii]] <- modeli
+    }
+  }
+  params <- c(ols_coeffs, ols_vars)
+  return(list(params = params, fit = fit))
+}
+
+#' Create Matrices for the generalized Kishor-Koenig (KK) model
 #'
 #' Constructs the matrices \eqn{I}, \eqn{F}, \eqn{G}, \eqn{R}, and \eqn{H} used in
 #' state-space models, specifically for the Kishor-Koenig (KK), Howrey, or Classical frameworks.
@@ -732,6 +961,20 @@ kk_matrices <- function(e, model, params = NULL, type = "numeric") {
     H <- apply(H, c(1, 2), as.numeric)
   }
 
+  # Sort params to ensure consistency
+  params <- c(
+    params["F0"],
+    params[grep("G", names(params))][order(names(params[grep(
+      "G",
+      names(params)
+    )]))],
+    params["v0"],
+    params[grep("eps", names(params))][order(names(params[grep(
+      "eps",
+      names(params)
+    )]))]
+  )
+
   return(list(II = II, FF = FF, GG = GG, R = R, H = H, params = params))
 }
 
@@ -800,3 +1043,189 @@ kk_to_ss <- function(II, FF, GG, R, H, epsilon = 1e-6) {
 
   return(list(Z = Z, Tmat = Tmat, V = V, W = W))
 }
+
+#' Jacobs van Norde State Space Model for Nowcasting
+#'
+#' Coming Soon!
+#'
+# jvn_nowcast <- function() {
+#   # Create a function to nowcast the JVN model
+#   print("Coming soon!")
+#   # R port of the Matlab code for State Space Model estimation using Kalman Filter
+#
+#   # Model specifications
+#   uni <- 1 # Univariate model
+#   crossCorrNoise <- 1
+#   crossCorrNews <- 1
+#   spill <- 0
+#   stat <- 1 # Stationarity check
+#   const <- 1 # Constant in state equation
+#   dum <- 0 # Dummies for comprehensive revisions
+#   nVAR <- 1 # Number of variables in VAR
+#   q <- 1 # Lag length
+#
+#   # Data Loading and Preparation
+#   data_gdp_i <- read_csv("DataDiagonals-GRRGDI.csv")
+#   data_gdp_e <- read_csv("DataDiagonals-GRRGDP.csv")
+#
+#   # Ensure data_gdp_i and data_gdp_e are available and have the same structure as in Matlab
+#   ydata <- cbind(
+#     data_gdp_i[1:58, 2], # Adjusted index for R (1-based)
+#     data_gdp_i[1:58, 13],
+#     data_gdp_i[1:58, 25],
+#     data_gdp_e[1:58, 2],
+#     data_gdp_e[1:58, 4],
+#     data_gdp_e[1:58, 13],
+#     data_gdp_e[1:58, 25]
+#   ) %>%
+#     as.matrix() # Convert to matrix
+#   # Define State Space Model Matrices
+#   n1 <- 3
+#   n2 <- 4
+#   n <- n1 + n2 # Number of observables
+#   Ks <- 2 * n # Number of shocks
+#
+#   # Z matrix
+#   Z <- matrix(0, nrow = n, ncol = n + n + nVAR)
+#   Z[, 1:nVAR] <- kronecker(matrix(1, 1, nVAR), matrix(1, n, 1))
+#   Z[, nVAR + 1:n] <- diag(n)
+#   Z[, nVAR + n + 1:n] <- diag(n)
+#   Z <- Z[, -c(n1 + 1, n1 + n2 + 1 + nVAR)] # Remove columns
+#
+#   # R matrix
+#   R1 <- matrix(1, 1, n1)
+#   R2 <- matrix(1, 1, n2)
+#
+#   Vl1 <- matrix(0, n1, n1)
+#   Vl2 <- matrix(0, n2, n2)
+#
+#   for (ix in 1:n1) {
+#     for (jx in 1:n1) {
+#       if (jx > ix) {
+#         Vl1[ix, jx] <- 1
+#       }
+#     }
+#   }
+#
+#   for (ix in 1:n2) {
+#     for (jx in 1:n2) {
+#       if (jx > ix) {
+#         Vl2[ix, jx] <- 1
+#       }
+#     }
+#   }
+#
+#   R <- rbind(
+#     cbind(R1, R2, matrix(0, 1, Ks - n)),
+#     cbind(-Vl1 %*% diag(c(R1)), matrix(0, n1, n2 + n)),
+#     cbind(matrix(0, n2, n1), -Vl2 %*% diag(c(R2)), matrix(0, n2, n)),
+#     cbind(matrix(0, n, n), diag(n))
+#   )
+#   R <- R[-c(n1 + 1, n1 + n2 + 1), ]
+#   R <- R[, -c(n1 + 1)]
+#
+#   Ks <- ncol(R)
+#
+#   # Model Building
+#
+#   build_model <- function(ydata, Z, R, q, const, nVAR) {
+#     T <- nrow(ydata)
+#     K <- ncol(R)
+#     M <- K * q
+#
+#     # Transition matrix (Tea) - simplified for clarity, needs proper VAR estimation
+#     Tea <- matrix(0, nrow = M, ncol = M)
+#     if (const == 1) {
+#       Tea[1, 1] <- 0 # Placeholder for constant
+#     }
+#     if (q >= 1) {
+#       Tea[const + 1:K, const + 1:K] <- diag(K) # Placeholder for AR coefficients
+#     }
+#
+#     # State equation
+#     state_equation <- SSModel(
+#       y = ydata,
+#       Z = Z,
+#       H = matrix(0, nrow = n, ncol = n), # H is 0
+#       T = Tea,
+#       R = R,
+#       Q = diag(Ks), # Placeholder for Q, estimated later
+#       a1 = matrix(0, M, 1),
+#       P1 = diag(M)
+#     )
+#
+#     return(state_equation)
+#   }
+#
+#   # Create the model
+#   model <- build_model(ydata, Z, R, q, const, nVAR)
+#
+#   # Kalman Filter Estimation
+#   # In KFAS, parameters to be estimated are in the 'params' argument
+#   # We need to map our Q and Tea (VAR coefficients) into 'params'
+#
+#   # Define a function to update the model with new parameters
+#   update_model_params <- function(model, params, K, q, const, Ks) {
+#     # Update Tea (transition matrix) - this is a simplified version
+#     if (const == 1) {
+#       model$T[1, 1] <- params[1] # Placeholder for constant
+#     }
+#     if (q >= 1) {
+#       model$T[const + 1:K, const + 1:K] <- diag(K) # Placeholder for AR coefficients
+#     }
+#
+#     # Update Q (covariance matrix)
+#     Q_params_count <- Ks # Number of parameters in Q (diagonal elements)
+#     Q_params <- params[seq_len(Q_params_count) + max(1, const)]
+#     diag(model$Q) <- Q_params
+#
+#     return(model)
+#   }
+#
+#   # Define the number of parameters to estimate
+#   n_params <- Ks + const # For Q (diagonal) and constant in Tea
+#
+#   # Initial parameter values
+#   initial_params <- c(rep(0.1, max(1, const)), rep(0.1, Ks)) # Initial values for Tea and Q
+#
+#   # Log-likelihood function for optimization
+#   loglik_ssm <- function(params, model, K, q, const, Ks) {
+#     model <- update_model_params(model, params, K, q, const, Ks)
+#     -logLik(model)
+#   }
+#
+#   # Optimization using optim (Nelder-Mead is a robust choice)
+#   fit <- optim(
+#     initial_params,
+#     loglik_ssm,
+#     model = model,
+#     K = Ks,
+#     q = q,
+#     const = const,
+#     Ks = Ks,
+#     control = list(maxit = 1000)
+#   )
+#
+#   # Estimated parameters
+#   estimated_params <- fit$par
+#
+#   # Update the model with estimated parameters
+#   model <- update_model_params(model, estimated_params, Ks, q, const, Ks)
+#
+#   # Kalman Filtering and Smoothing
+#   # Use KFAS functions for filtering and smoothing
+#   filtered_states <- KFS(model)
+#
+#   # Results
+#   print("Estimated Parameters:")
+#   print(estimated_params)
+#
+#   # Extract smoothed states
+#   smoothed_states <- KFS(
+#     model,
+#     filtering = FALSE,
+#     smoothing = c("state", "mean", "variance", "disturbance")
+#   )
+#   alpha_hat <- smoothed_states$a
+#   # Further analysis (e.g., plotting, inference) can be done with the filtered/smoothed states
+# }
