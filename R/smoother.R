@@ -130,8 +130,6 @@ kk_nowcast <- function(
     )
   }
 
-  if(model == "Classical"){method <- "SUR"}
-  
   # Check start values
   # if provided startvalues must be numeric vector
   if (!is.null(default_solver_options$startvals)) {
