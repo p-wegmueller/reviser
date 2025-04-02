@@ -240,15 +240,18 @@ kk_nowcast <- function(
   y_names <- c(paste0("release_", e:0, "_lag_", e:0))
   y_lag_names <- c(paste0("release_", e:0, "_lag_", (e + 1):1))
 
+  # Define equations
   equations <- kk_equations(
     kk_mat_sur = kk_mat_sur
   )
 
+  # Arrange data
   sur_data <- kk_arrange_data(
     df = df,
     e = e
   )
 
+  # Estimation of parameters with SUR or OLS
   if (method == "SUR") {
     fit <- systemfit::nlsystemfit(
       equations,
@@ -291,6 +294,7 @@ kk_nowcast <- function(
     )$params
   }
 
+  # Create model matrices with estimated parameters
   kk_mat_hat <- kk_matrices(
     e = e,
     model = model,
@@ -298,6 +302,7 @@ kk_nowcast <- function(
     type = "numeric"
   )
 
+  # Cast model matrices to state space form
   sur_ss_mat <- kk_to_ss(
     II = kk_mat_hat$II,
     FF = kk_mat_hat$FF,
@@ -307,17 +312,14 @@ kk_nowcast <- function(
     epsilon = 1e-6
   )
 
-  Y <- array(NA, c(nrow(df), e + 1))
-  for (j in (e):0) {
-    Y[, (e + 1) - j] <- dplyr::lag(dplyr::pull(df[paste0("release_", j)]), j)
-  }
-  Y <- stats::na.omit(tibble::tibble(as.data.frame(Y)))
-  colnames(Y) <- y_names
-  Ymat <- as.matrix(Y)
+  # Create observable variable matrix
+  Ymat <- sur_data %>%
+    dplyr::select(dplyr::all_of(y_names)) %>%
+    as.matrix()
 
   # Create the SSM object
   model_kfas <- SSModel(
-    Ymat ~
+    Ymat2 ~
       -1 +
         SSMcustom(
           Z = sur_ss_mat$Z,
@@ -544,7 +546,7 @@ kk_arrange_data <- function(df, e) {
   colnames(y) <- c(paste0("release_", (e - 1):0, "_lag_", (e - 1):0))
   colnames(y_lag) <- c(paste0("release_", (e - 1):0, "_lag_", e:1))
 
-  data <- cbind(z, y, y_lag) %>% stats::na.omit()
+  data <- cbind(z, y, y_lag) %>% tidyr::drop_na()
 
   return(data)
 }

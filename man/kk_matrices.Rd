@@ -2,7 +2,7 @@
 % Please edit documentation in R/smoother.R
 \name{kk_matrices}
 \alias{kk_matrices}
-\title{Create Matrices for the Kishor-Koenig (KK) or Related Models}
+\title{Create Matrices for the generalized Kishor-Koenig (KK) model}
 \usage{
 kk_matrices(e, model, params = NULL, type = "numeric")
 }
