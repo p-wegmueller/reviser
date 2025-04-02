@@ -130,6 +130,8 @@ kk_nowcast <- function(
     )
   }
 
+  if(model == "Classical"){method <- "SUR"}
+  
   # Check start values
   # if provided startvalues must be numeric vector
   if (!is.null(default_solver_options$startvals)) {
@@ -344,7 +346,8 @@ kk_nowcast <- function(
   filtered_y <- (kalman$att[, 1:(e + 1)] +
     kalman$att[, (e + 2):(2 * (e + 1))]) %>%
     dplyr::as_tibble() %>%
-    dplyr::select(!!!stats::setNames(seq_along(y_names), y_names))
+    dplyr::mutate(time = df$time[(e + 1):(nrow(df))]) %>%
+    dplyr::select(time, !!!stats::setNames(seq_along(y_names), y_names))
 
   # Smoothed states
   smoothed_z <- tibble::tibble(as.data.frame(kalman$alphahat[
@@ -357,7 +360,8 @@ kk_nowcast <- function(
   smoothed_y <- (kalman$alphahat[, 1:(e + 1)] +
     kalman$alphahat[, (e + 2):(2 * (e + 1))]) %>%
     dplyr::as_tibble() %>%
-    dplyr::select(!!!stats::setNames(seq_along(y_names), y_names))
+    dplyr::mutate(time = df$time[(e + 1):(nrow(df))]) %>%
+    dplyr::select(time, !!!stats::setNames(seq_along(y_names), y_names))
 
   if (h > 0) {
     frequency <- unique((round(as.numeric(diff(df$time)) / 30)))
