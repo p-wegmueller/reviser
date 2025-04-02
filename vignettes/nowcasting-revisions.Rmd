@@ -23,7 +23,7 @@ Having some evidence that the revisions are predictable, we can now move to the 
 
 The KK model extends the traditional Vector Autoregression (VAR) framework to account for data revisions explicitly. Unlike conventional models that treat data as final and accurate, the KK model recognizes that initial releases are subject to revisions, leading to biased and inefficient forecasts. By incorporating the revision process into a state-space framework, the KK model provides a reliable approach to nowcasting economic variables. Moreover, it nests several nowcasting models, such as the classical textbook measurement error model or the @howreyUsePreliminaryData1978 model.
 
-The procedure is based on the assumption that there exists an efficient estimate $y_t^e$ of the final release that becomes available $e$ periods after the initial release $y_t^0$. We follow @strohsalDataRevisionsGerman2020 and assume that $e$th revision data follows an autoregressive model of order one (AR(1)). The state-space representation of the KK model is given by:
+The procedure is based on the assumption that there exists an efficient estimate $y_t^e$ of the final release that becomes available $e$ periods after the initial release $y_t^0$. We show in vignette [Efficient Release Identification](efficient-release.html) how the number of the efficient release can be empirically tested. We follow @strohsalDataRevisionsGerman2020 and assume that $e$th revision data follows an autoregressive model of order one (AR(1)). The KK model is represented by the following equations:
 
 **1. The State Equation**
 \[ z_t = F z_{t-1} + \nu_t \]
@@ -52,135 +52,137 @@ G = \begin{bmatrix} 1 & 0 & \dots & 0 \\
 \]
 \( G \) is a gain matrix capturing the weight placed on new information, \( F \) determines the AR coefficient, and \( \nu_t \) and \( \epsilon_t \) are error vectors. The state-equation and observation-equation error vectors are assumed to be uncorrelated with one another at all leads and lags, and to be serially uncorrelated.
 
-It is recommended to estimate this system using seemingly unrelated regression (SUR) to account for the correlation between the error terms in the state and observation equations. The SUR estimation is implemented in the `seem` package, which provides a convenient interface to estimate state-space models in R.
+Because \( \nu_t \) and \( \epsilon_t \) are serially uncorrelated, and uncorrelated with one another at all leads and lags, estimation of the model equations is unproblematic apart from the crossequation restrictions on \( F \).
+Therefore, it is recommended to estimate this system using seemingly unrelated regression (SUR). The SUR estimation is based on the [systemfit::nlsystemfit()] function. The parameter space of the KK model increases exponentially with the number of the efficient release. This leads to long computation times and potential convergence issues. As a fast, but potentially biased alternative, the package also allows to estimate the models parameters equation by equation using ordinary least squares (OLS). 
 
 
-### 2.2 State-Space Representation
-The KK model is formulated as a state-space system, consisting of a state equation describing the evolution of the true economic variable and an observation equation relating observed releases to the true value.
+### Howrey and Classical Measurement Error Model
+It is easy to see that the KK model nests the classical measurement error model and the @howreyUsePreliminaryData1978 model. 
+measurement error model treats published data ($y_t$) as a noisy measure of the true economic variable ($z_t$), where $y_t = z_t + \eta_t$. It addresses uncertainty in interpreting recent data by optimally updating forecasts, considering both potential economic shocks and measurement errors. This model is obtained by setting \( G = I \).
 
-#### State Equation
-The true value follows an autoregressive process:
-\[
-x_t = F x_{t-1} + \nu_t,
-\]
-where \( F \) is a coefficient matrix and \( \nu_t \) is a white noise error term.
+As an extension to the classical measurement error mode, @howreyUsePreliminaryData1978 proposed a model that allows the revisions to be autocorrelated. Setting the entries $G_{e-i,0} = 0$ for $i = 1,...,e-1$ and $G_{0,0} = 1$ results in the Howrey model.
 
-#### Observation Equation
-Observed releases are linked to the true value through:
-\[
-y_t^i = (I - G) F y_{t-1}^i + G x_t + \epsilon_t^i,
-\]
-where \( G \) is a gain matrix capturing the weight placed on new information, and \( \epsilon_t^i \) is a measurement error.
 
-The matrices governing the revision process, \( F \) and \( G \), are structured as:
-\[
-F = \begin{bmatrix} 0 & 1 & 0 & \dots & 0 \\
-                      0 & 0 & 1 & \dots & 0 \\
-                      \vdots & \vdots & \vdots & \ddots & \vdots \\
-                      0 & 0 & 0 & \dots & 1 \\
-                      0 & 0 & 0 & \dots & F_0 \end{bmatrix},
-\]
-\[
-G = \begin{bmatrix} 1 & 0 & \dots & 0 \\
-                      G_{e-1,e} & G_{e-1,e-1} & \dots & G_{e-1,0} \\
-                      G_{e-2,e} & G_{e-2,e-1} & \dots & G_{e-2,0} \\
-                      \vdots & \vdots & \ddots & \vdots \\
-                      G_{0,e} & G_{0,e-1} & \dots & G_{0,0} \end{bmatrix}.
-\]
+### State Space Representation
+Then, armed with estimates of F and K, one can apply the Kalman filter to the following state-space model (notation following @durbinTimeSeriesAnalysis2012)
 
-These matrices determine how revisions evolve over time and how efficiently new information is incorporated into data releases.
+**1. The Observation Equation**
+\[ y_t = Z \alpha_{t} + \varepsilon_t \]
 
-### 2.3 Model Estimation
-The KK model is estimated using the Seemingly Unrelated Regression (SUR) method, allowing for correlations between measurement errors and the underlying economic variable. The Kalman filter is then applied to extract the best estimate of \( x_t \) from the observed data series \( y_t^i \). The Kalman update step is given by:
-\[
-\hat{x}_t = \hat{F} \hat{x}_{t-1} + K (y_t - H \hat{x}_t),
-\]
-where \( K \) is the Kalman gain matrix, and \( H \) is the observation mapping matrix.
+@durbinTimeSeriesAnalysis2012 assumed that both error terms are iid and orthogonal to one another. However, we write the model in the form where \( \varepsilon_t \) is equal to zero and may be omitted, so this equation is
 
-**3. Conclusion**
+\[ y_t = Z \alpha_{t} \]
 
-The Kishor-Koenig model provides a robust framework for handling data revisions in macroeconomic forecasting. The autoregressive term in the revision process plays a crucial role by capturing the persistence of revisions, which helps refine early estimates by incorporating information from past revisions. If revisions are predictable, they should be accounted for in real-time estimates to enhance forecast accuracy. By explicitly modeling the revision process, the KK model offers a significant improvement over traditional VAR models, making it a valuable tool for policymakers and economists seeking to generate more accurate real-time estimates. The use of the state-space approach, combined with Kalman filtering, ensures that forecasts are dynamically updated as new information becomes available.
+**2. The State Equation**
+\[ \alpha_{t+1} = T \alpha_{t} + \eta_{t+1} \]
+
+where
+\[ \alpha_t = \begin{bmatrix} z_t \\ y_t - z_t  \end{bmatrix} \]
+\[ Z = \begin{bmatrix} I & I \end{bmatrix} \]
+\[ T = \begin{bmatrix} F & 0 \\ 0 & (I − G)F \end{bmatrix} \]
+\[ \eta_t = \begin{bmatrix} \nu_t \\ \epsilon_t − (I − G) \nu_t \end{bmatrix} \]
+\[ \eta_t \sim N(0, Q) \]
+ 
+The analyst sees truth and the revisions. Both truth and revisions are included in the state vector. Importantly, when calculating the gain matrix, the model requires that one allow for the possibility that the off-diagonal matrix elements of \( Q \equiv E[\eta_t \eta'_t] \) are nonzero. In particular, our model implies that 
+ \[ Q = \begin{bmatrix} \nu_t \nu'_t & -\nu_t \nu'_t (I-G)'\\ -(I-G) \nu_t \nu'_t & \varepsilon_t \varepsilon'_t + (I-G) \nu_t \nu'_t (I-G)' \end{bmatrix} \]
 
 
 
+### Forecasting
+Kalman filter forecasts are generated by projecting the estimated state vector forward in time using the model's estimated transition equation $\langle T \rangle$. Given the Kalman filter's state estimate $\langle \alpha_t \rangle_T$ at time $T$, forecasts for future periods $T+i$ are calculated as:
 
-```{r warning = FALSE, message=FALSE, eval=FALSE}
+$$\langle \alpha_{T+i} \rangle_T = \langle T \rangle_T^i \langle \alpha_T \rangle_T$$
+
+
+### Nowcasting using the `reviser` package
+As a demonstration, we nowcast the Euro Area GDP using the KK model. We use the `reviser::gdp` dataset, which contains the Euro Area GDP data. As a first step we test which release (among the first 15) is efficient. As final release, we use the value published 4 years after the initial value, allowing for a 4-year revision period. It turns out that $e=3$ meaning that the fourth release is an efficient estimate of the final release.
+
+
+```{r warning = FALSE, message=FALSE}
 library(reviser)
 library(dplyr)
 library(lubridate)
 
 gdp <- reviser::gdp %>%
   tsbox::ts_pc() %>%
-  filter(id == "US",
-         time > min(pub_date),
+  filter(id == "EA",
+         time >= min(pub_date),
          time <= as.Date("2020-01-01")
          ) %>%
   na.omit()
 
-xx<-df %>% group_by(pub_date, release) %>%
-  mutate(n=n())
-
-df <- gdp
-min_pub_date <- min(df$pub_date)
-      max_time <- max(df$time[df$pub_date == min_pub_date])
-      df <- df %>%
-        dplyr::filter(
-          time >= max_time
-        )
-      
-xx<-vintages_wide(df)$CHE
-
-df <- get_nth_release(gdp, n = 0:14, diagonal = F)
+df <- get_nth_release(gdp, n = 0:14)
 
 final_release <- get_nth_release(gdp, n = 15)
-final_release <- get_nth_release(gdp, n = "latest")
 
 efficient_release <- get_first_efficient_release(
     df,
     final_release
   )
 
+data <- efficient_release$data
+e <- efficient_release$e
+
 summary(efficient_release)
+```
 
 
+We then use the `kk_nowcast()` function to nowcast the Euro Area GDP using the KK model. The function requires a `df` with columns `time`, `value`, `release#` and `final`. The function `get_first_efficient_release()` returns a dataset in this format. 
+
+
+```{r warning = FALSE, message=FALSE}
 nowcast <- kk_nowcast(
-    efficient_release$data, 
-    e = efficient_release$e,
+    df = data, 
+    e = e,
     model = "KK",
-    method = "SUR"#,
-    #solver_options = list(startvals = kk_nowcast(efficient_release$data, e = efficient_release$e, model = "KK", method = "OLS")$params)
+    method = "SUR"
   )
 
-
+# Estimated parameters
 nowcast$params
-summary(nowcast$fit[[1]])
-xxx<-nowcast$filtered_z
 
-eff_rel_pred_full <- (nowcast$filtered_states[,c(1,2+nowcast$e)])
+# Filtered states
+filt_states <- nowcast$filtered_z
+head(filt_states)
+```
 
+Now we can compare the nowcasts with the final values and the first release (which serves as a naive forecast). We calculate the root mean squared error (RMSE) of the models and naive nowcasts. The gain is not very high, but it is still better than the naive forecast. The relative RMSE is 0.99.
+
+```{r warning = FALSE, message=FALSE}
+# Compare nowcasts
+
+# Filtered efficient release
+filt_eff_release <- filt_states[,c(1,2+e)]
+
+# First and final values
 final_vals <- vintages_wide(efficient_release$data, names_from = "release")[,c("time", "final")]
-
 first_vals <- vintages_wide(efficient_release$data, names_from = "release")[,c(1,2)]
 
 
-data <- full_join(
+eval_data <- full_join(
   first_vals,
-  eff_rel_pred_full,
+  filt_eff_release,
   by = "time"
 ) %>% full_join(
   final_vals,
   by = "time"
 ) %>% rename(
-  "nowcast_full" = 3,
+  "nowcast" = 3,
   "final" = 4,
   "first" = 2
 ) %>% arrange(time)
 
-data1 <- na.omit(data) %>%
-  filter(!year(time) %in% c(2020, 2021)) %>%
-  mutate(
-    mse_full = mean((nowcast_full - final)^2),
-    mse_first = mean((first - final)^2)
+rmse <- na.omit(eval_data) %>%
+  summarize(
+    rmse_nc = sqrt(mean((nowcast - final)^2)),
+    rmse_first = sqrt(mean((first - final)^2))
   )
 
+# Relative RMSE
+print(rmse$rmse_nc / rmse$rmse_first)
+
 ```
+
+
+
+### References

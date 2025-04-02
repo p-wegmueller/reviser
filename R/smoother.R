@@ -341,13 +341,13 @@ kk_nowcast <- function(
   filtered_z <- tibble::tibble(as.data.frame(kalman$att[,
     1:((e + 1))
   ])) %>%
-    dplyr::mutate(time = df$time[(e + 1):(nrow(df))]) %>%
+    dplyr::mutate(time = df$time[(e + 1):(nrow(kalman$att) + e)]) %>%
     dplyr::select(time, !!!stats::setNames(seq_along(z_names), z_names))
 
   filtered_y <- (kalman$att[, 1:(e + 1)] +
     kalman$att[, (e + 2):(2 * (e + 1))]) %>%
     dplyr::as_tibble() %>%
-    dplyr::mutate(time = df$time[(e + 1):(nrow(df))]) %>%
+    dplyr::mutate(time = df$time[(e + 1):(nrow(kalman$att) + e)]) %>%
     dplyr::select(time, !!!stats::setNames(seq_along(y_names), y_names))
 
   # Smoothed states
@@ -355,13 +355,13 @@ kk_nowcast <- function(
     1:nrow(kalman$alphahat),
     1:((e + 1))
   ])) %>%
-    dplyr::mutate(time = df$time[(e + 1):(nrow(df))]) %>%
+    dplyr::mutate(time = df$time[(e + 1):(nrow(kalman$att) + e)]) %>%
     dplyr::select(time, !!!stats::setNames(seq_along(z_names), z_names))
 
   smoothed_y <- (kalman$alphahat[, 1:(e + 1)] +
     kalman$alphahat[, (e + 2):(2 * (e + 1))]) %>%
     dplyr::as_tibble() %>%
-    dplyr::mutate(time = df$time[(e + 1):(nrow(df))]) %>%
+    dplyr::mutate(time = df$time[(e + 1):(nrow(kalman$att) + e)]) %>%
     dplyr::select(time, !!!stats::setNames(seq_along(y_names), y_names))
 
   # Calculate forecasts if h > 0
