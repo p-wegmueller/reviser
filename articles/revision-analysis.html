@@ -98,7 +98,7 @@ column name in brackets to assess it.</p>
 statistics and hypothesis tests used in the function:</p>
 <ul>
 <li>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><annotation encoding="application/x-tex">Y_t^h</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>y</mi><mi>t</mi><mi>h</mi></msubsup><annotation encoding="application/x-tex">y_t^h</annotation></semantics></math>
 denote the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>h</mi><annotation encoding="application/x-tex">h</annotation></semantics></math>th
 released value for time
@@ -107,12 +107,12 @@ with
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">h=0</annotation></semantics></math>
 being the preliminary release</li>
 <li>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup><annotation encoding="application/x-tex">Y_t^f</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>y</mi><mi>t</mi><mi>f</mi></msubsup><annotation encoding="application/x-tex">y_t^f</annotation></semantics></math>
 denote the final revised value for time
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>
 </li>
 <li>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>R</mi><mi>t</mi><mi>f</mi></msubsup><mo>=</mo><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup><mo>−</mo><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup></mrow><annotation encoding="application/x-tex">R_t^f = Y_t^f - Y_t^h</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>r</mi><mi>t</mi><mi>f</mi></msubsup><mo>=</mo><msubsup><mi>y</mi><mi>t</mi><mi>f</mi></msubsup><mo>−</mo><msubsup><mi>y</mi><mi>t</mi><mi>h</mi></msubsup></mrow><annotation encoding="application/x-tex">r_t^f = y_t^f - y_t^h</annotation></semantics></math>
 be the final revision compared to the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>h</mi><annotation encoding="application/x-tex">h</annotation></semantics></math>th
 release for time
@@ -158,14 +158,14 @@ releases. Various metrics assess their magnitude and distribution:</p>
 <h4 id="mean-revision-bias-mean">1. <strong>Mean Revision</strong> (<code>"Bias (mean)"</code>)<a class="anchor" aria-label="anchor" href="#mean-revision-bias-mean"></a>
 </h4>
 <p>The mean revision quantifies systematic bias in the revisions:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">Bias</mtext><mo>=</mo><mover><mi>R</mi><mo accent="true">‾</mo></mover><mo>=</mo><mfrac><mn>1</mn><mi>N</mi></mfrac><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><msubsup><mi>R</mi><mi>t</mi><mi>f</mi></msubsup></mrow><annotation encoding="application/x-tex">
-   \text{Bias} = \bar{R} = \frac{1}{N} \sum_{t=1}^{N} R_t^{f}
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">Bias</mtext><mo>=</mo><mover><mi>r</mi><mo accent="true">‾</mo></mover><mo>=</mo><mfrac><mn>1</mn><mi>N</mi></mfrac><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><msubsup><mi>r</mi><mi>t</mi><mi>f</mi></msubsup></mrow><annotation encoding="application/x-tex">
+   \text{Bias} = \bar{r} = \frac{1}{N} \sum_{t=1}^{N} r_t^{f}
    </annotation></semantics></math></p>
 <p>If the mean revision is significantly different from zero, it
 indicates a tendency for initial releases to be systematically over- or
 under-estimated. A <strong>t-test</strong> is conducted to test the null
 hypothesis
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>H</mi><mn>0</mn></msub><mo>:</mo><mover><mi>R</mi><mo accent="true">‾</mo></mover><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">H_0: \bar{R} = 0</annotation></semantics></math>.</p>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>H</mi><mn>0</mn></msub><mo>:</mo><mover><mi>r</mi><mo accent="true">‾</mo></mover><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">H_0: \bar{r} = 0</annotation></semantics></math>.</p>
 <ul>
 <li>
 <code>"Bias (p-value)"</code> reports the standard t-test
@@ -181,8 +181,8 @@ heteroskedasticity-robust alternative.</li>
 </h4>
 <p>The mean absolute revision measures the average size of revisions,
 regardless of direction:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">MAR</mtext><mo>=</mo><mfrac><mn>1</mn><mi>N</mi></mfrac><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><mrow><mo stretchy="true" form="prefix">|</mo><msubsup><mi>R</mi><mi>t</mi><mi>f</mi></msubsup><mo stretchy="true" form="postfix">|</mo></mrow></mrow><annotation encoding="application/x-tex">
-   \text{MAR} = \frac{1}{N} \sum_{t=1}^{N} |R_t^{f}|
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">MAR</mtext><mo>=</mo><mfrac><mn>1</mn><mi>N</mi></mfrac><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><mrow><mo stretchy="true" form="prefix">|</mo><msubsup><mi>r</mi><mi>t</mi><mi>f</mi></msubsup><mo stretchy="true" form="postfix">|</mo></mrow></mrow><annotation encoding="application/x-tex">
+   \text{MAR} = \frac{1}{N} \sum_{t=1}^{N} |r_t^{f}|
    </annotation></semantics></math></p>
 <p>This metric is useful when evaluating the magnitude of revisions
 rather than their direction.</p>
@@ -207,8 +207,8 @@ behavior in revisions.</p>
 (<code>"Std. Dev."</code>)<a class="anchor" aria-label="anchor" href="#standard-deviation-of-revisions-std--dev-"></a>
 </h4>
 <p>The standard deviation quantifies the dispersion of revisions:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>σ</mi><mi>R</mi></msub><mo>=</mo><msqrt><mrow><mfrac><mn>1</mn><mrow><mi>N</mi><mo>−</mo><mn>1</mn></mrow></mfrac><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><msup><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>R</mi><mi>t</mi><mi>f</mi></msubsup><mo>−</mo><mover><mi>R</mi><mo accent="true">‾</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></msqrt></mrow><annotation encoding="application/x-tex">
-   \sigma_R = \sqrt{ \frac{1}{N-1} \sum_{t=1}^{N} (R_t^{f} - \bar{R})^2 }
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>σ</mi><mi>r</mi></msub><mo>=</mo><msqrt><mrow><mfrac><mn>1</mn><mrow><mi>N</mi><mo>−</mo><mn>1</mn></mrow></mfrac><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><msup><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>r</mi><mi>t</mi><mi>f</mi></msubsup><mo>−</mo><mover><mi>r</mi><mo accent="true">‾</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></msqrt></mrow><annotation encoding="application/x-tex">
+   \sigma_r = \sqrt{ \frac{1}{N-1} \sum_{t=1}^{N} (r_t^{f} - \bar{r})^2 }
    </annotation></semantics></math></p>
 <p>A higher standard deviation indicates greater variability in the
 revision process.</p>
@@ -219,13 +219,13 @@ revision process.</p>
 </h4>
 <p>This metric measures the relative size of revisions compared to the
 total variance in the final data:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mfrac><msub><mi>σ</mi><mi>R</mi></msub><msub><mi>σ</mi><mi>Y</mi></msub></mfrac><annotation encoding="application/x-tex">
-   \frac{\sigma_R}{\sigma_Y}
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mfrac><msub><mi>σ</mi><mi>r</mi></msub><msub><mi>σ</mi><mi>y</mi></msub></mfrac><annotation encoding="application/x-tex">
+   \frac{\sigma_r}{\sigma_y}
    </annotation></semantics></math></p>
 <p>where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>σ</mi><mi>Y</mi></msub><annotation encoding="application/x-tex">\sigma_Y</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>σ</mi><mi>y</mi></msub><annotation encoding="application/x-tex">\sigma_y</annotation></semantics></math>
 is the standard deviation of the final value
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup><annotation encoding="application/x-tex">Y_t^f</annotation></semantics></math>.
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>y</mi><mi>t</mi><mi>f</mi></msubsup><annotation encoding="application/x-tex">y_t^f</annotation></semantics></math>.
 A high noise-to-signal ratio suggests that revisions are large relative
 to the underlying variability in the final data, indicating high
 uncertainty in initial estimates.</p>
@@ -272,11 +272,11 @@ Releases</strong> (<code>"Correlation"</code>)<a class="anchor" aria-label="anch
 </h4>
 <p>This measures whether revisions are systematically related to the
 initial release
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><annotation encoding="application/x-tex">Y_t^h</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>y</mi><mi>t</mi><mi>h</mi></msubsup><annotation encoding="application/x-tex">y_t^h</annotation></semantics></math>,
 which serves as a proxy for available information at the time of
 release:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ρ</mi><mo>=</mo><mfrac><mrow><mo>∑</mo><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><mo>−</mo><msup><mover><mi>Y</mi><mo accent="true">‾</mo></mover><mi>h</mi></msup><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>R</mi><mi>t</mi><mi>f</mi></msubsup><mo>−</mo><mover><mi>R</mi><mo accent="true">‾</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><msqrt><mrow><mo>∑</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><mo>−</mo><msup><mover><mi>Y</mi><mo accent="true">‾</mo></mover><mi>h</mi></msup><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></msqrt><msqrt><mrow><mo>∑</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>R</mi><mi>t</mi><mi>f</mi></msubsup><mo>−</mo><mover><mi>R</mi><mo accent="true">‾</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></msqrt></mrow></mfrac></mrow><annotation encoding="application/x-tex">
-   \rho = \frac{\sum (Y_t^h - \bar{Y}^h) (R_t^f - \bar{R})}{\sqrt{\sum (Y_t^h - \bar{Y}^h)^2}  \sqrt{\sum (R_t^f - \bar{R})^2}}
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ρ</mi><mo>=</mo><mfrac><mrow><mo>∑</mo><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>y</mi><mi>t</mi><mi>h</mi></msubsup><mo>−</mo><msup><mover><mi>y</mi><mo accent="true">‾</mo></mover><mi>h</mi></msup><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>R</mi><msubsup><mi>r</mi><mi>t</mi><mi>f</mi></msubsup><mo>−</mo><mover><mi>r</mi><mo accent="true">‾</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><msqrt><mrow><mo>∑</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>y</mi><mi>t</mi><mi>h</mi></msubsup><mo>−</mo><msup><mover><mi>y</mi><mo accent="true">‾</mo></mover><mi>h</mi></msup><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></msqrt><msqrt><mrow><mo>∑</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>r</mi><mi>t</mi><mi>f</mi></msubsup><mo>−</mo><mover><mi>r</mi><mo accent="true">‾</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></msqrt></mrow></mfrac></mrow><annotation encoding="application/x-tex">
+   \rho = \frac{\sum (y_t^h - \bar{y}^h) (Rr_t^f - \bar{r})}{\sqrt{\sum (y_t^h - \bar{y}^h)^2}  \sqrt{\sum (r_t^f - \bar{r})^2}}
    </annotation></semantics></math></p>
 <p>A significant correlation suggests that initial estimates contain
 information that predicts later revisions. A <strong>t-test</strong>
@@ -291,8 +291,8 @@ is significantly different from zero.</p>
 <p>The <strong>first-order autocorrelation</strong> measures the
 persistence in the revision process by examining whether past revisions
 predict future revisions:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ρ</mi><mn>1</mn></msub><mo>=</mo><mfrac><mrow><mo>∑</mo><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>R</mi><mi>t</mi><mi>f</mi></msubsup><mo>−</mo><mover><mi>R</mi><mo accent="true">‾</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>R</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow><mi>f</mi></msubsup><mo>−</mo><mover><mi>R</mi><mo accent="true">‾</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><msqrt><mrow><mo>∑</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>R</mi><mi>t</mi><mi>f</mi></msubsup><mo>−</mo><mover><mi>R</mi><mo accent="true">‾</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></msqrt><msqrt><mrow><mo>∑</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>R</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow><mi>f</mi></msubsup><mo>−</mo><mover><mi>R</mi><mo accent="true">‾</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></msqrt></mrow></mfrac></mrow><annotation encoding="application/x-tex">
-   \rho_1 = \frac{\sum (R_t^f - \bar{R}) (R_{t-1}^f - \bar{R})}{\sqrt{\sum (R_t^f - \bar{R})^2 } \sqrt{\sum (R_{t-1}^f - \bar{R})^2}}
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ρ</mi><mn>1</mn></msub><mo>=</mo><mfrac><mrow><mo>∑</mo><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>r</mi><mi>t</mi><mi>f</mi></msubsup><mo>−</mo><mover><mi>r</mi><mo accent="true">‾</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>r</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow><mi>f</mi></msubsup><mo>−</mo><mover><mi>r</mi><mo accent="true">‾</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><msqrt><mrow><mo>∑</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>r</mi><mi>t</mi><mi>f</mi></msubsup><mo>−</mo><mover><mi>r</mi><mo accent="true">‾</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></msqrt><msqrt><mrow><mo>∑</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>r</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow><mi>f</mi></msubsup><mo>−</mo><mover><mi>r</mi><mo accent="true">‾</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></msqrt></mrow></mfrac></mrow><annotation encoding="application/x-tex">
+   \rho_1 = \frac{\sum (r_t^f - \bar{r}) (r_{t-1}^f - \bar{r})}{\sqrt{\sum (r_t^f - \bar{r})^2 } \sqrt{\sum (r_{t-1}^f - \bar{r})^2}}
    </annotation></semantics></math></p>
 <p>If revisions exhibit strong autocorrelation, it may indicate a
 systematic pattern in the revision process rather than purely random
@@ -389,12 +389,12 @@ directional signals:</p>
 </h4>
 <p>This metric (<code>"Fraction of correct sign"</code>) evaluates how
 often the sign of the initially reported value
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><annotation encoding="application/x-tex">Y_t^h</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>y</mi><mi>t</mi><mi>h</mi></msubsup><annotation encoding="application/x-tex">y_t^h</annotation></semantics></math>
 differs from the final revised value
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup><annotation encoding="application/x-tex">Y_t^f</annotation></semantics></math>.
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>y</mi><mi>t</mi><mi>f</mi></msubsup><annotation encoding="application/x-tex">y_t^f</annotation></semantics></math>.
 Mathematically, we compute:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">Fraction of sign consistency</mtext><mo>=</mo><mfrac><mrow><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>T</mi></munderover><mn>𝟙</mn><mrow><mo stretchy="true" form="prefix">(</mo><mtext mathvariant="normal">sign</mtext><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mtext mathvariant="normal">sign</mtext><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mi>T</mi></mfrac></mrow><annotation encoding="application/x-tex">
-   \text{Fraction of sign consistency} = \frac{\sum_{t=1}^{T} \mathbb{1}(\text{sign}(Y_t^h) = \text{sign}(Y_t^f))}{T}
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">Fraction of sign consistency</mtext><mo>=</mo><mfrac><mrow><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>T</mi></munderover><mn>𝟙</mn><mrow><mo stretchy="true" form="prefix">(</mo><mtext mathvariant="normal">sign</mtext><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>y</mi><mi>t</mi><mi>h</mi></msubsup><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mtext mathvariant="normal">sign</mtext><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>y</mi><mi>t</mi><mi>f</mi></msubsup><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mi>T</mi></mfrac></mrow><annotation encoding="application/x-tex">
+   \text{Fraction of sign consistency} = \frac{\sum_{t=1}^{T} \mathbb{1}(\text{sign}(y_t^h) = \text{sign}(y_t^f))}{T}
    </annotation></semantics></math></p>
 <p>where
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>𝟙</mn><mrow><mo stretchy="true" form="prefix">(</mo><mo>⋅</mo><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathbb{1}(\cdot)</annotation></semantics></math>
@@ -408,13 +408,13 @@ otherwise.</p>
 assesses whether the direction of change in the variable remains
 consistent after revisions. Specifically, we compare the sign of the
 period-over-period differences:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">Fraction of sign consistency in growth</mtext><mo>=</mo><mfrac><mrow><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>2</mn></mrow><mi>T</mi></munderover><mn>𝟙</mn><mrow><mo stretchy="true" form="prefix">(</mo><mtext mathvariant="normal">sign</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mi>Δ</mi><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mtext mathvariant="normal">sign</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mi>Δ</mi><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mi>T</mi><mo>−</mo><mn>1</mn></mrow></mfrac></mrow><annotation encoding="application/x-tex">
-   \text{Fraction of sign consistency in growth} = \frac{\sum_{t=2}^{T} \mathbb{1}(\text{sign}(\Delta Y_t^h) = \text{sign}(\Delta Y_t^f))}{T-1}
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">Fraction of sign consistency in growth</mtext><mo>=</mo><mfrac><mrow><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>2</mn></mrow><mi>T</mi></munderover><mn>𝟙</mn><mrow><mo stretchy="true" form="prefix">(</mo><mtext mathvariant="normal">sign</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mi>Δ</mi><msubsup><mi>y</mi><mi>t</mi><mi>h</mi></msubsup><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mtext mathvariant="normal">sign</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mi>Δ</mi><msubsup><mi>y</mi><mi>t</mi><mi>f</mi></msubsup><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mi>T</mi><mo>−</mo><mn>1</mn></mrow></mfrac></mrow><annotation encoding="application/x-tex">
+   \text{Fraction of sign consistency in growth} = \frac{\sum_{t=2}^{T} \mathbb{1}(\text{sign}(\Delta y_t^h) = \text{sign}(\Delta y_t^f))}{T-1}
    </annotation></semantics></math></p>
 <p>where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Δ</mi><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><mo>=</mo><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><mo>−</mo><msubsup><mi>Y</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow><mi>h</mi></msubsup></mrow><annotation encoding="application/x-tex">\Delta Y_t^h = Y_t^h - Y_{t-1}^h</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Δ</mi><msubsup><mi>y</mi><mi>t</mi><mi>h</mi></msubsup><mo>=</mo><msubsup><mi>y</mi><mi>t</mi><mi>h</mi></msubsup><mo>−</mo><msubsup><mi>y</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow><mi>h</mi></msubsup></mrow><annotation encoding="application/x-tex">\Delta y_t^h = y_t^h - y_{t-1}^h</annotation></semantics></math>
 and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Δ</mi><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup><mo>=</mo><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup><mo>−</mo><msubsup><mi>Y</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow><mi>f</mi></msubsup></mrow><annotation encoding="application/x-tex">\Delta Y_t^f = Y_t^f - Y_{t-1}^f</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Δ</mi><msubsup><mi>y</mi><mi>t</mi><mi>f</mi></msubsup><mo>=</mo><msubsup><mi>y</mi><mi>t</mi><mi>f</mi></msubsup><mo>−</mo><msubsup><mi>y</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow><mi>f</mi></msubsup></mrow><annotation encoding="application/x-tex">\Delta y_t^f = y_t^f - y_{t-1}^f</annotation></semantics></math>
 represent the first differences of the initially reported and final
 values, respectively.</p>
 <p>A high fraction of incorrect signs in either metric suggests that
@@ -455,8 +455,8 @@ tests:</strong></p>
 </h4>
 <p>The <strong>noise test</strong> examines whether the
 <strong>revision</strong> can be predicted by the final value:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>R</mi><mi>t</mi><mi>f</mi></msubsup><mo>=</mo><mi>α</mi><mo>+</mo><mi>β</mi><mo>⋅</mo><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup><mo>+</mo><msub><mi>ϵ</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">
-  {R}_t^f = \alpha + \beta \cdot {Y_t^f} + \epsilon_t
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>r</mi><mi>t</mi><mi>f</mi></msubsup><mo>=</mo><mi>α</mi><mo>+</mo><mi>β</mi><mo>⋅</mo><msubsup><mi>y</mi><mi>t</mi><mi>f</mi></msubsup><mo>+</mo><msub><mi>ϵ</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">
+  {r}_t^f = \alpha + \beta \cdot {y_t^f} + \epsilon_t
   </annotation></semantics></math></p>
 <p>If the preliminary value were an <strong>efficient and unbiased
 estimate</strong> of the final value (i.e incorporating all relevant
@@ -489,8 +489,8 @@ inefficiency.</li>
 </h4>
 <p>The <strong>news test</strong> examines whether the revision is
 predictable using the preliminary release:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>R</mi><mi>t</mi><mi>f</mi></msubsup><mo>=</mo><mi>α</mi><mo>+</mo><mi>β</mi><mo>⋅</mo><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><mo>+</mo><msub><mi>ϵ</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">
-{R}_t^f = \alpha + \beta \cdot {Y}_t^h + \epsilon_t
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>r</mi><mi>t</mi><mi>f</mi></msubsup><mo>=</mo><mi>α</mi><mo>+</mo><mi>β</mi><mo>⋅</mo><msubsup><mi>y</mi><mi>t</mi><mi>h</mi></msubsup><mo>+</mo><msub><mi>ϵ</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">
+{r}_t^f = \alpha + \beta \cdot {y}_t^h + \epsilon_t
 </annotation></semantics></math></p>
 <p>Here, we test whether revisions are <strong>systematically
 related</strong> to the initial value. The null hypothesis is:</p>
@@ -516,15 +516,15 @@ revisions are correlated with the initial value, indicating
 inefficiency.</li>
 </ul>
 <p>Note: Instead of regressing
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>R</mi><mi>t</mi><mi>f</mi></msubsup><annotation encoding="application/x-tex">R_t^f</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>r</mi><mi>t</mi><mi>f</mi></msubsup><annotation encoding="application/x-tex">r_t^f</annotation></semantics></math>
 on
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup><annotation encoding="application/x-tex">Y_t^f</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>y</mi><mi>t</mi><mi>f</mi></msubsup><annotation encoding="application/x-tex">y_t^f</annotation></semantics></math>
 or
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><annotation encoding="application/x-tex">Y_t^h</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>y</mi><mi>t</mi><mi>h</mi></msubsup><annotation encoding="application/x-tex">y_t^h</annotation></semantics></math>,
 one can similarly regress <span class="math display">$$
-  \text{Noise: } \quad Y_t^h = \alpha + \beta \cdot Y_t^f + \epsilon_t
+  \text{Noise: } \quad y_t^h = \alpha + \beta \cdot y_t^f + \epsilon_t
 \\
-  \text{News: } \quad Y_t^f = \alpha + \beta \cdot Y_t^h + \epsilon_t
+  \text{News: } \quad y_t^f = \alpha + \beta \cdot y_t^h + \epsilon_t
 $$</span> and test
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\alpha = 0</annotation></semantics></math>
 and
@@ -601,9 +601,9 @@ is the same, indicating no seasonality in the revisions.</p>
 <p>In the context of revision analysis, <strong>Theil’s inequality
 coefficient</strong>, or <strong>Theil’s U</strong>, provides a measure
 of the accuracy of a initial estimates
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><annotation encoding="application/x-tex">Y_t^h</annotation></semantics></math>)
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>y</mi><mi>t</mi><mi>h</mi></msubsup><annotation encoding="application/x-tex">y_t^h</annotation></semantics></math>)
 relative to final or more refined values
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup><annotation encoding="application/x-tex">Y_t^f</annotation></semantics></math>).
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>y</mi><mi>t</mi><mi>f</mi></msubsup><annotation encoding="application/x-tex">y_t^f</annotation></semantics></math>).
 Various definitions of Theil’s statistics exist, leading to different
 interpretations. This package considers two widely used variants:
 <strong>U1</strong> and <strong>U2</strong>.</p>
@@ -612,13 +612,13 @@ interpretations. This package considers two widely used variants:
 (<code>"Theil's U1"</code>)<a class="anchor" aria-label="anchor" href="#theils-u1-statistic-theils-u1"></a>
 </h4>
 <p>The first measure, <strong>U1</strong>, is given by:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>U</mi><mn>1</mn></msub><mo>=</mo><mfrac><msqrt><mrow><mfrac><mn>1</mn><mi>n</mi></mfrac><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><msup><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup><mo>−</mo><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></msqrt><mrow><msqrt><mrow><mfrac><mn>1</mn><mi>n</mi></mfrac><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><msup><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup><mn>2</mn></msup></mrow></msqrt><mo>+</mo><msqrt><mrow><mfrac><mn>1</mn><mi>n</mi></mfrac><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><msup><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><mn>2</mn></msup></mrow></msqrt></mrow></mfrac></mrow><annotation encoding="application/x-tex">
-U_1 = \frac{\sqrt{\frac{1}{n}\sum^n_{t=1}(Y_t^f-Y_t^h)^2}}{\sqrt{\frac{1}{n}\sum^n_{t=1}{Y_t^f}^2}+\sqrt{\frac{1}{n}\sum^n_{t=1}{Y_t^h}^2}}
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>U</mi><mn>1</mn></msub><mo>=</mo><mfrac><msqrt><mrow><mfrac><mn>1</mn><mi>n</mi></mfrac><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><msup><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>y</mi><mi>t</mi><mi>f</mi></msubsup><mo>−</mo><msubsup><mi>y</mi><mi>t</mi><mi>h</mi></msubsup><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></msqrt><mrow><msqrt><mrow><mfrac><mn>1</mn><mi>n</mi></mfrac><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><msup><msubsup><mi>y</mi><mi>t</mi><mi>f</mi></msubsup><mn>2</mn></msup></mrow></msqrt><mo>+</mo><msqrt><mrow><mfrac><mn>1</mn><mi>n</mi></mfrac><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><msup><msubsup><mi>y</mi><mi>t</mi><mi>h</mi></msubsup><mn>2</mn></msup></mrow></msqrt></mrow></mfrac></mrow><annotation encoding="application/x-tex">
+U_1 = \frac{\sqrt{\frac{1}{n}\sum^n_{t=1}(y_t^f-y_t^h)^2}}{\sqrt{\frac{1}{n}\sum^n_{t=1}{y_t^f}^2}+\sqrt{\frac{1}{n}\sum^n_{t=1}{y_t^h}^2}}
 </annotation></semantics></math></p>
 <p>The <strong>U1 statistic is bounded between 0 and 1</strong>:</p>
 <ul>
 <li>A value of <strong>0</strong> implies perfect forecasting
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><mo>=</mo><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup></mrow><annotation encoding="application/x-tex">Y_t^h = Y_t^f</annotation></semantics></math>
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>y</mi><mi>t</mi><mi>h</mi></msubsup><mo>=</mo><msubsup><mi>y</mi><mi>t</mi><mi>f</mi></msubsup></mrow><annotation encoding="application/x-tex">y_t^h = y_t^f</annotation></semantics></math>
 for all
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>).<br>
 </li>
@@ -627,9 +627,9 @@ for all
 <p>However, U1 suffers from <strong>several limitations</strong>, as
 highlighted by <span class="citation">Granger and Newbold (<a href="#ref-Granger01031973">1973</a>)</span>. A critical issue arises
 when <strong>one of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><annotation encoding="application/x-tex">Y_t^h</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>y</mi><mi>t</mi><mi>h</mi></msubsup><annotation encoding="application/x-tex">y_t^h</annotation></semantics></math>
 or
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup><annotation encoding="application/x-tex">Y_t^f</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>y</mi><mi>t</mi><mi>f</mi></msubsup><annotation encoding="application/x-tex">y_t^f</annotation></semantics></math>
 equals zero in all periods</strong>. In such cases, the denominator and
 numerator become equal, leading to <strong>U1 = 1</strong> even when
 preliminary estimates are close to the final values.</p>
@@ -641,8 +641,8 @@ preliminary estimates are close to the final values.</p>
 <p>To address these shortcomings, <span class="citation">Theil et al.
 (<a href="#ref-theil1966applied">1966</a>)</span> proposed an
 alternative measure, <strong>U2</strong>, which is defined as:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>U</mi><mn>2</mn></msub><mo>=</mo><mfrac><msqrt><mrow><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><msup><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><msubsup><mi>Y</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow><mi>h</mi></msubsup><mo>−</mo><msubsup><mi>Y</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow><mi>f</mi></msubsup></mrow><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></msqrt><msqrt><mrow><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><msup><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><msubsup><mi>Y</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow><mi>f</mi></msubsup><mo>−</mo><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup></mrow><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></msqrt></mfrac></mrow><annotation encoding="application/x-tex">
-U_2 = \frac{\sqrt{\sum_{t=1}^{n} \left( \frac{Y_{t+1}^h- Y_{t+1}^f}{Y_t^f} \right)^2}}{\sqrt{\sum_{t=1}^{n} \left( \frac{Y_{t+1}^f - Y_t^f}{Y_t^f} \right)^2}}
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>U</mi><mn>2</mn></msub><mo>=</mo><mfrac><msqrt><mrow><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><msup><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><msubsup><mi>y</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow><mi>h</mi></msubsup><mo>−</mo><msubsup><mi>y</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow><mi>f</mi></msubsup></mrow><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></msqrt><msqrt><mrow><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><msup><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><msubsup><mi>y</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow><mi>f</mi></msubsup><mo>−</mo><msubsup><mi>y</mi><mi>t</mi><mi>f</mi></msubsup></mrow><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></msqrt></mfrac></mrow><annotation encoding="application/x-tex">
+U_2 = \frac{\sqrt{\sum_{t=1}^{n} \left( \frac{y_{t+1}^h- y_{t+1}^f}{Y_t^f} \right)^2}}{\sqrt{\sum_{t=1}^{n} \left( \frac{y_{t+1}^f - y_t^f}{Y_t^f} \right)^2}}
 </annotation></semantics></math></p>
 <p>where:</p>
 <ul>
@@ -656,7 +656,7 @@ in the final values over time.</li>
 Instead:</p>
 <ul>
 <li>A value of <strong>0</strong> implies perfect accuracy
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><mo>=</mo><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup></mrow><annotation encoding="application/x-tex">Y_{t}^h = Y_{t}^f</annotation></semantics></math>
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>y</mi><mi>t</mi><mi>h</mi></msubsup><mo>=</mo><msubsup><mi>y</mi><mi>t</mi><mi>f</mi></msubsup></mrow><annotation encoding="application/x-tex">y_{t}^h = y_{t}^f</annotation></semantics></math>
 for all
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>).<br>
 </li>
@@ -676,7 +676,7 @@ indicates the preliminary estimates are <strong>more accurate</strong>
 than the naïve method.</li>
 </ul>
 <p>Whenever possible (<strong>if
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup><mo>≠</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">Y_{t}^f \neq 0</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>y</mi><mi>t</mi><mi>f</mi></msubsup><mo>≠</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">y_{t}^f \neq 0</annotation></semantics></math>
 for all
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math></strong>),
 <strong>U2 is the preferred metric</strong> for evaluating preliminary

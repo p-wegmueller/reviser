@@ -107,26 +107,26 @@ the following properties <span class="citation">(<a href="#ref-aruobaDataRevisio
 <li><p><strong>Unbiasedness</strong>: Revisions should not
 systematically push estimates in one direction. Mathematically, for a
 revision series
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>R</mi><mi>t</mi><mi>f</mi></msubsup><mo>=</mo><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup><mo>−</mo><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup></mrow><annotation encoding="application/x-tex">R_t^f = Y_t^f - Y_t^h</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>r</mi><mi>t</mi><mi>f</mi></msubsup><mo>=</mo><msubsup><mi>y</mi><mi>t</mi><mi>f</mi></msubsup><mo>−</mo><msubsup><mi>y</mi><mi>t</mi><mi>h</mi></msubsup></mrow><annotation encoding="application/x-tex">r_t^f = y_t^f - y_t^h</annotation></semantics></math>
 where
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>h</mi><annotation encoding="application/x-tex">h</annotation></semantics></math>
 denotes the release number
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup><annotation encoding="application/x-tex">Y_t^f</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>y</mi><mi>t</mi><mi>f</mi></msubsup><annotation encoding="application/x-tex">y_t^f</annotation></semantics></math>
 represents the final release and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><annotation encoding="application/x-tex">Y_t^h</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>y</mi><mi>t</mi><mi>h</mi></msubsup><annotation encoding="application/x-tex">y_t^h</annotation></semantics></math>
 represents the series released at time
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>h</mi><annotation encoding="application/x-tex">h</annotation></semantics></math>
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">h=0</annotation></semantics></math>
 is the initial release), unbiasedness requires:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mrow><mo stretchy="true" form="prefix">[</mo><msubsup><mi>R</mi><mi>t</mi><mi>f</mi></msubsup><mo stretchy="true" form="postfix">]</mo></mrow><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">
-E[R_t^f] = 0 
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mrow><mo stretchy="true" form="prefix">[</mo><msubsup><mi>r</mi><mi>t</mi><mi>f</mi></msubsup><mo stretchy="true" form="postfix">]</mo></mrow><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">
+E[r_t^f] = 0 
 </annotation></semantics></math></p></li>
 <li><p><strong>Efficiency</strong>: An efficient release incorporates
 all available information optimally, ensuring that subsequent revisions
 are unpredictable. This can be tested using the Mincer-Zarnowitz
 regression:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup><mo>=</mo><mi>α</mi><mo>+</mo><mi>β</mi><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><mo>+</mo><msub><mi>ε</mi><mi>t</mi></msub><mo>,</mo></mrow><annotation encoding="application/x-tex">
-Y_t^f = \alpha + \beta Y_t^h + \varepsilon_t,
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>y</mi><mi>t</mi><mi>f</mi></msubsup><mo>=</mo><mi>α</mi><mo>+</mo><mi>β</mi><msubsup><mi>y</mi><mi>t</mi><mi>h</mi></msubsup><mo>+</mo><msub><mi>ε</mi><mi>t</mi></msub><mo>,</mo></mrow><annotation encoding="application/x-tex">
+y_t^f = \alpha + \beta y_t^h + \varepsilon_t,
 </annotation></semantics></math> where an efficient release satisfies
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\alpha = 0</annotation></semantics></math>
 and
@@ -134,7 +134,7 @@ and
 <li><p><strong>Minimal Variance</strong>: Revisions should be as small
 as possible while still improving accuracy. The variance of revisions,
 defined as
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">Var</mtext><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>R</mi><mi>t</mi><mi>f</mi></msubsup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\text{Var}(R_t^f)</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">Var</mtext><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>r</mi><mi>t</mi><mi>f</mi></msubsup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\text{Var}(r_t^f)</annotation></semantics></math>,
 should decrease over successive releases.</p></li>
 </ul>
 </div>
@@ -144,27 +144,27 @@ should decrease over successive releases.</p></li>
 <p>A fundamental assumption in many revision models is that the first
 release of a data point is an imperfect measure of the true value due to
 measurement errors. This can be expressed as:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><mo>=</mo><msubsup><mi>Y</mi><mi>t</mi><mo>*</mo></msubsup><mo>+</mo><msubsup><mi>ε</mi><mi>t</mi><mi>h</mi></msubsup><mo>,</mo></mrow><annotation encoding="application/x-tex">
-Y_t^h = Y_t^* + \varepsilon_t^h,
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>y</mi><mi>t</mi><mi>h</mi></msubsup><mo>=</mo><msubsup><mi>y</mi><mi>t</mi><mo>*</mo></msubsup><mo>+</mo><msubsup><mi>ε</mi><mi>t</mi><mi>h</mi></msubsup><mo>,</mo></mrow><annotation encoding="application/x-tex">
+y_t^h = y_t^* + \varepsilon_t^h,
 </annotation></semantics></math> where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>Y</mi><mi>t</mi><mo>*</mo></msubsup><annotation encoding="application/x-tex">Y_t^*</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>y</mi><mi>t</mi><mo>*</mo></msubsup><annotation encoding="application/x-tex">y_t^*</annotation></semantics></math>
 is the true value and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>ε</mi><mi>t</mi><mi>h</mi></msubsup><annotation encoding="application/x-tex">\varepsilon_t^h</annotation></semantics></math>
 is an error term that diminishes as
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>h</mi><annotation encoding="application/x-tex">h</annotation></semantics></math>
 increases. The properties of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>R</mi><mi>t</mi><mi>h</mi></msubsup><annotation encoding="application/x-tex">R_t^h</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>r</mi><mi>t</mi><mi>h</mi></msubsup><annotation encoding="application/x-tex">r_t^h</annotation></semantics></math>
 determine whether the preliminary release
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>h</mi><annotation encoding="application/x-tex">h</annotation></semantics></math>
 is an efficient estimator of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>Y</mi><mi>t</mi><mo>*</mo></msubsup><annotation encoding="application/x-tex">Y_t^*</annotation></semantics></math>.
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>y</mi><mi>t</mi><mo>*</mo></msubsup><annotation encoding="application/x-tex">y_t^*</annotation></semantics></math>.
 If
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>R</mi><mi>t</mi><mi>h</mi></msubsup><annotation encoding="application/x-tex">R_t^h</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>r</mi><mi>t</mi><mi>h</mi></msubsup><annotation encoding="application/x-tex">r_t^h</annotation></semantics></math>
 is predictable, the revision process is inefficient, indicating room for
 improvement in the initial estimates. Vice-versa if
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>R</mi><mi>t</mi><mi>h</mi></msubsup><annotation encoding="application/x-tex">R_t^h</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>r</mi><mi>t</mi><mi>h</mi></msubsup><annotation encoding="application/x-tex">r_t^h</annotation></semantics></math>
 is unpredictable, the preliminary release is efficient (i.e
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><mo>=</mo><msubsup><mi>Y</mi><mi>t</mi><mi>e</mi></msubsup></mrow><annotation encoding="application/x-tex">Y_t^h = Y_t^e</annotation></semantics></math>).</p>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>y</mi><mi>t</mi><mi>h</mi></msubsup><mo>=</mo><msubsup><mi>y</mi><mi>t</mi><mi>e</mi></msubsup></mrow><annotation encoding="application/x-tex">y_t^h = y_t^e</annotation></semantics></math>).</p>
 </div>
 <div class="section level3">
 <h3 id="the-challenge-of-defining-a-final-release">The Challenge of Defining a Final Release<a class="anchor" aria-label="anchor" href="#the-challenge-of-defining-a-final-release"></a>
@@ -196,21 +196,21 @@ these steps <span class="citation">(<a href="#ref-kishorVAREstimationForecasting
 Wolf 2020</a>)</span>:</p>
 <ol style="list-style-type: decimal">
 <li><p><strong>Regression Analysis</strong>: Regress the final release
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup><annotation encoding="application/x-tex">Y_t^f</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>y</mi><mi>t</mi><mi>f</mi></msubsup><annotation encoding="application/x-tex">y_t^f</annotation></semantics></math>
 on the initial releases
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><annotation encoding="application/x-tex">Y_t^h</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>y</mi><mi>t</mi><mi>h</mi></msubsup><annotation encoding="application/x-tex">y_t^h</annotation></semantics></math>
 for
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi><mo>=</mo><mn>1</mn><mo>,</mo><mn>2</mn><mo>,</mo><mi>…</mi><mo>,</mo><mi>e</mi></mrow><annotation encoding="application/x-tex">h = 1,2,\dots,e</annotation></semantics></math>:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup><mo>=</mo><mi>α</mi><mo>+</mo><mi>β</mi><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><mo>+</mo><msub><mi>ε</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">
-Y_t^f = \alpha + \beta Y_t^h + \varepsilon_t
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>y</mi><mi>t</mi><mi>f</mi></msubsup><mo>=</mo><mi>α</mi><mo>+</mo><mi>β</mi><msubsup><mi>y</mi><mi>t</mi><mi>h</mi></msubsup><mo>+</mo><msub><mi>ε</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">
+y_t^f = \alpha + \beta y_t^h + \varepsilon_t
 </annotation></semantics></math> where the null hypothesis is that
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\alpha = 0</annotation></semantics></math>
 and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>β</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\beta = 1</annotation></semantics></math>,
 indicating that
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>Y</mi><mi>t</mi><mi>h</mi></msubsup><annotation encoding="application/x-tex">Y_t^h</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>y</mi><mi>t</mi><mi>h</mi></msubsup><annotation encoding="application/x-tex">y_t^h</annotation></semantics></math>
 is an efficient estimate of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>Y</mi><mi>t</mi><mi>f</mi></msubsup><annotation encoding="application/x-tex">Y_t^f</annotation></semantics></math>.</p></li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>y</mi><mi>t</mi><mi>f</mi></msubsup><annotation encoding="application/x-tex">y_t^f</annotation></semantics></math>.</p></li>
 <li><p><strong>Determine the Optimal
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>e</mi><annotation encoding="application/x-tex">e</annotation></semantics></math></strong>:
 Increase
