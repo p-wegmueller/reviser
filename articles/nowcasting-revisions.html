@@ -112,11 +112,14 @@ of the final release that becomes available
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>e</mi><annotation encoding="application/x-tex">e</annotation></semantics></math>
 periods after the initial release
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>y</mi><mi>t</mi><mn>0</mn></msubsup><annotation encoding="application/x-tex">y_t^0</annotation></semantics></math>.
-We follow <span class="citation">Strohsal and Wolf (<a href="#ref-strohsalDataRevisionsGerman2020">2020</a>)</span> and assume
-that
+We show in vignette <a href="efficient-release.html">Efficient Release
+Identification</a> how the number of the efficient release can be
+empirically tested. We follow <span class="citation">Strohsal and Wolf
+(<a href="#ref-strohsalDataRevisionsGerman2020">2020</a>)</span> and
+assume that
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>e</mi><annotation encoding="application/x-tex">e</annotation></semantics></math>th
 revision data follows an autoregressive model of order one (AR(1)). The
-state-space representation of the KK model is given by:</p>
+KK model is represented by the following equations:</p>
 <p><strong>1. The State Equation</strong>
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>z</mi><mi>t</mi></msub><mo>=</mo><mi>F</mi><msub><mi>z</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>+</mo><msub><mi>ν</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex"> z_t = F z_{t-1} + \nu_t </annotation></semantics></math></p>
 <p><strong>2. The Observation Equation</strong>
@@ -144,94 +147,100 @@ and
 are error vectors. The state-equation and observation-equation error
 vectors are assumed to be uncorrelated with one another at all leads and
 lags, and to be serially uncorrelated.</p>
-<p>It is recommended to estimate this system using seemingly unrelated
-regression (SUR) to account for the correlation between the error terms
-in the state and observation equations. The SUR estimation is
-implemented in the <code>seem</code> package, which provides a
-convenient interface to estimate state-space models in R.</p>
-<div class="section level3">
-<h3 id="state-space-representation">2.2 State-Space Representation<a class="anchor" aria-label="anchor" href="#state-space-representation"></a>
-</h3>
-<p>The KK model is formulated as a state-space system, consisting of a
-state equation describing the evolution of the true economic variable
-and an observation equation relating observed releases to the true
-value.</p>
-<div class="section level4">
-<h4 id="state-equation">State Equation<a class="anchor" aria-label="anchor" href="#state-equation"></a>
-</h4>
-<p>The true value follows an autoregressive process:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mi>t</mi></msub><mo>=</mo><mi>F</mi><msub><mi>x</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>+</mo><msub><mi>ν</mi><mi>t</mi></msub><mo>,</mo></mrow><annotation encoding="application/x-tex">
-x_t = F x_{t-1} + \nu_t,
-</annotation></semantics></math> where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>F</mi><annotation encoding="application/x-tex">F</annotation></semantics></math>
-is a coefficient matrix and
+<p>Because
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>ν</mi><mi>t</mi></msub><annotation encoding="application/x-tex">\nu_t</annotation></semantics></math>
-is a white noise error term.</p>
-</div>
-<div class="section level4">
-<h4 id="observation-equation">Observation Equation<a class="anchor" aria-label="anchor" href="#observation-equation"></a>
-</h4>
-<p>Observed releases are linked to the true value through:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>y</mi><mi>t</mi><mi>i</mi></msubsup><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>I</mi><mo>−</mo><mi>G</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>F</mi><msubsup><mi>y</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow><mi>i</mi></msubsup><mo>+</mo><mi>G</mi><msub><mi>x</mi><mi>t</mi></msub><mo>+</mo><msubsup><mi>ϵ</mi><mi>t</mi><mi>i</mi></msubsup><mo>,</mo></mrow><annotation encoding="application/x-tex">
-y_t^i = (I - G) F y_{t-1}^i + G x_t + \epsilon_t^i,
-</annotation></semantics></math> where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>G</mi><annotation encoding="application/x-tex">G</annotation></semantics></math>
-is a gain matrix capturing the weight placed on new information, and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>ϵ</mi><mi>t</mi><mi>i</mi></msubsup><annotation encoding="application/x-tex">\epsilon_t^i</annotation></semantics></math>
-is a measurement error.</p>
-<p>The matrices governing the revision process,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>F</mi><annotation encoding="application/x-tex">F</annotation></semantics></math>
 and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>G</mi><annotation encoding="application/x-tex">G</annotation></semantics></math>,
-are structured as:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mi>…</mi></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mi>…</mi></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mi>⋮</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>⋮</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>⋮</mi></mtd><mtd columnalign="center" style="text-align: center"><mo>⋱</mo></mtd><mtd columnalign="center" style="text-align: center"><mi>⋮</mi></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mi>…</mi></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mi>…</mi></mtd><mtd columnalign="center" style="text-align: center"><msub><mi>F</mi><mn>0</mn></msub></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">
-F = \begin{bmatrix} 0 &amp; 1 &amp; 0 &amp; \dots &amp; 0 \\
-                      0 &amp; 0 &amp; 1 &amp; \dots &amp; 0 \\
-                      \vdots &amp; \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
-                      0 &amp; 0 &amp; 0 &amp; \dots &amp; 1 \\
-                      0 &amp; 0 &amp; 0 &amp; \dots &amp; F_0 \end{bmatrix},
-</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>G</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mi>…</mi></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>G</mi><mrow><mi>e</mi><mo>−</mo><mn>1</mn><mo>,</mo><mi>e</mi></mrow></msub></mtd><mtd columnalign="center" style="text-align: center"><msub><mi>G</mi><mrow><mi>e</mi><mo>−</mo><mn>1</mn><mo>,</mo><mi>e</mi><mo>−</mo><mn>1</mn></mrow></msub></mtd><mtd columnalign="center" style="text-align: center"><mi>…</mi></mtd><mtd columnalign="center" style="text-align: center"><msub><mi>G</mi><mrow><mi>e</mi><mo>−</mo><mn>1</mn><mo>,</mo><mn>0</mn></mrow></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>G</mi><mrow><mi>e</mi><mo>−</mo><mn>2</mn><mo>,</mo><mi>e</mi></mrow></msub></mtd><mtd columnalign="center" style="text-align: center"><msub><mi>G</mi><mrow><mi>e</mi><mo>−</mo><mn>2</mn><mo>,</mo><mi>e</mi><mo>−</mo><mn>1</mn></mrow></msub></mtd><mtd columnalign="center" style="text-align: center"><mi>…</mi></mtd><mtd columnalign="center" style="text-align: center"><msub><mi>G</mi><mrow><mi>e</mi><mo>−</mo><mn>2</mn><mo>,</mo><mn>0</mn></mrow></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mi>⋮</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>⋮</mi></mtd><mtd columnalign="center" style="text-align: center"><mo>⋱</mo></mtd><mtd columnalign="center" style="text-align: center"><mi>⋮</mi></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>G</mi><mrow><mn>0</mn><mo>,</mo><mi>e</mi></mrow></msub></mtd><mtd columnalign="center" style="text-align: center"><msub><mi>G</mi><mrow><mn>0</mn><mo>,</mo><mi>e</mi><mo>−</mo><mn>1</mn></mrow></msub></mtd><mtd columnalign="center" style="text-align: center"><mi>…</mi></mtd><mtd columnalign="center" style="text-align: center"><msub><mi>G</mi><mrow><mn>0</mn><mo>,</mo><mn>0</mn></mrow></msub></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow><mi>.</mi></mrow><annotation encoding="application/x-tex">
-G = \begin{bmatrix} 1 &amp; 0 &amp; \dots &amp; 0 \\
-                      G_{e-1,e} &amp; G_{e-1,e-1} &amp; \dots &amp; G_{e-1,0} \\
-                      G_{e-2,e} &amp; G_{e-2,e-1} &amp; \dots &amp; G_{e-2,0} \\
-                      \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
-                      G_{0,e} &amp; G_{0,e-1} &amp; \dots &amp; G_{0,0} \end{bmatrix}.
-</annotation></semantics></math></p>
-<p>These matrices determine how revisions evolve over time and how
-efficiently new information is incorporated into data releases.</p>
-</div>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>ϵ</mi><mi>t</mi></msub><annotation encoding="application/x-tex">\epsilon_t</annotation></semantics></math>
+are serially uncorrelated, and uncorrelated with one another at all
+leads and lags, estimation of the model equations is unproblematic apart
+from the crossequation restrictions on
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>F</mi><annotation encoding="application/x-tex">F</annotation></semantics></math>.
+Therefore, it is recommended to estimate this system using seemingly
+unrelated regression (SUR). The SUR estimation is based on the
+[systemfit::nlsystemfit()] function. The parameter space of the KK model
+increases exponentially with the number of the efficient release. This
+leads to long computation times and potential convergence issues. As a
+fast, but potentially biased alternative, the package also allows to
+estimate the models parameters equation by equation using ordinary least
+squares (OLS).</p>
+<div class="section level3">
+<h3 id="howrey-and-classical-measurement-error-model">Howrey and Classical Measurement Error Model<a class="anchor" aria-label="anchor" href="#howrey-and-classical-measurement-error-model"></a>
+</h3>
+<p>It is easy to see that the KK model nests the classical measurement
+error model and the <span class="citation">Howrey (<a href="#ref-howreyUsePreliminaryData1978">1978</a>)</span> model.
+measurement error model treats published data
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>y</mi><mi>t</mi></msub><annotation encoding="application/x-tex">y_t</annotation></semantics></math>)
+as a noisy measure of the true economic variable
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>z</mi><mi>t</mi></msub><annotation encoding="application/x-tex">z_t</annotation></semantics></math>),
+where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>y</mi><mi>t</mi></msub><mo>=</mo><msub><mi>z</mi><mi>t</mi></msub><mo>+</mo><msub><mi>η</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">y_t = z_t + \eta_t</annotation></semantics></math>.
+It addresses uncertainty in interpreting recent data by optimally
+updating forecasts, considering both potential economic shocks and
+measurement errors. This model is obtained by setting
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>G</mi><mo>=</mo><mi>I</mi></mrow><annotation encoding="application/x-tex">G = I</annotation></semantics></math>.</p>
+<p>As an extension to the classical measurement error mode, <span class="citation">Howrey (<a href="#ref-howreyUsePreliminaryData1978">1978</a>)</span> proposed a
+model that allows the revisions to be autocorrelated. Setting the
+entries
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>G</mi><mrow><mi>e</mi><mo>−</mo><mi>i</mi><mo>,</mo><mn>0</mn></mrow></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">G_{e-i,0} = 0</annotation></semantics></math>
+for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>=</mo><mn>1</mn><mo>,</mo><mi>.</mi><mi>.</mi><mi>.</mi><mo>,</mo><mi>e</mi><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">i = 1,...,e-1</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>G</mi><mrow><mn>0</mn><mo>,</mo><mn>0</mn></mrow></msub><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">G_{0,0} = 1</annotation></semantics></math>
+results in the Howrey model.</p>
 </div>
 <div class="section level3">
-<h3 id="model-estimation">2.3 Model Estimation<a class="anchor" aria-label="anchor" href="#model-estimation"></a>
+<h3 id="state-space-representation">State Space Representation<a class="anchor" aria-label="anchor" href="#state-space-representation"></a>
 </h3>
-<p>The KK model is estimated using the Seemingly Unrelated Regression
-(SUR) method, allowing for correlations between measurement errors and
-the underlying economic variable. The Kalman filter is then applied to
-extract the best estimate of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>x</mi><mi>t</mi></msub><annotation encoding="application/x-tex">x_t</annotation></semantics></math>
-from the observed data series
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>y</mi><mi>t</mi><mi>i</mi></msubsup><annotation encoding="application/x-tex">y_t^i</annotation></semantics></math>.
-The Kalman update step is given by:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mover><mi>x</mi><mo accent="true">̂</mo></mover><mi>t</mi></msub><mo>=</mo><mover><mi>F</mi><mo accent="true">̂</mo></mover><msub><mover><mi>x</mi><mo accent="true">̂</mo></mover><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>+</mo><mi>K</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>t</mi></msub><mo>−</mo><mi>H</mi><msub><mover><mi>x</mi><mo accent="true">̂</mo></mover><mi>t</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">
-\hat{x}_t = \hat{F} \hat{x}_{t-1} + K (y_t - H \hat{x}_t),
-</annotation></semantics></math> where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math>
-is the Kalman gain matrix, and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>H</mi><annotation encoding="application/x-tex">H</annotation></semantics></math>
-is the observation mapping matrix.</p>
-<p><strong>3. Conclusion</strong></p>
-<p>The Kishor-Koenig model provides a robust framework for handling data
-revisions in macroeconomic forecasting. The autoregressive term in the
-revision process plays a crucial role by capturing the persistence of
-revisions, which helps refine early estimates by incorporating
-information from past revisions. If revisions are predictable, they
-should be accounted for in real-time estimates to enhance forecast
-accuracy. By explicitly modeling the revision process, the KK model
-offers a significant improvement over traditional VAR models, making it
-a valuable tool for policymakers and economists seeking to generate more
-accurate real-time estimates. The use of the state-space approach,
-combined with Kalman filtering, ensures that forecasts are dynamically
-updated as new information becomes available.</p>
+<p>Then, armed with estimates of F and K, one can apply the Kalman
+filter to the following state-space model (notation following <span class="citation">Durbin and Koopman (<a href="#ref-durbinTimeSeriesAnalysis2012">2012</a>)</span>)</p>
+<p><strong>1. The Observation Equation</strong>
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>y</mi><mi>t</mi></msub><mo>=</mo><mi>Z</mi><msub><mi>α</mi><mi>t</mi></msub><mo>+</mo><msub><mi>ε</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex"> y_t = Z \alpha_{t} + \varepsilon_t </annotation></semantics></math></p>
+<p><span class="citation">Durbin and Koopman (<a href="#ref-durbinTimeSeriesAnalysis2012">2012</a>)</span> assumed that
+both error terms are iid and orthogonal to one another. However, we
+write the model in the form where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>ε</mi><mi>t</mi></msub><annotation encoding="application/x-tex">\varepsilon_t</annotation></semantics></math>
+is equal to zero and may be omitted, so this equation is</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>y</mi><mi>t</mi></msub><mo>=</mo><mi>Z</mi><msub><mi>α</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex"> y_t = Z \alpha_{t} </annotation></semantics></math></p>
+<p><strong>2. The State Equation</strong>
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>α</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><mi>T</mi><msub><mi>α</mi><mi>t</mi></msub><mo>+</mo><msub><mi>η</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub></mrow><annotation encoding="application/x-tex"> \alpha_{t+1} = T \alpha_{t} + \eta_{t+1} </annotation></semantics></math></p>
+<p>where
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>α</mi><mi>t</mi></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>z</mi><mi>t</mi></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>y</mi><mi>t</mi></msub><mo>−</mo><msub><mi>z</mi><mi>t</mi></msub></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex"> \alpha_t = \begin{bmatrix} z_t \\ y_t - z_t  \end{bmatrix} </annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Z</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mi>I</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>I</mi></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex"> Z = \begin{bmatrix} I &amp; I \end{bmatrix} </annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mi>F</mi></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mrow><mo stretchy="true" form="prefix">(</mo><mi>I</mi><mo>−</mo><mi>G</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>F</mi></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex"> T = \begin{bmatrix} F &amp; 0 \\ 0 &amp; (I − G)F \end{bmatrix} </annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>η</mi><mi>t</mi></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>ν</mi><mi>t</mi></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>ϵ</mi><mi>t</mi></msub><mo>−</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>I</mi><mo>−</mo><mi>G</mi><mo stretchy="true" form="postfix">)</mo></mrow><msub><mi>ν</mi><mi>t</mi></msub></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex"> \eta_t = \begin{bmatrix} \nu_t \\ \epsilon_t − (I − G) \nu_t \end{bmatrix} </annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>η</mi><mi>t</mi></msub><mo>∼</mo><mi>N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><mi>Q</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex"> \eta_t \sim N(0, Q) </annotation></semantics></math></p>
+<p>The analyst sees truth and the revisions. Both truth and revisions
+are included in the state vector. Importantly, when calculating the gain
+matrix, the model requires that one allow for the possibility that the
+off-diagonal matrix elements of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Q</mi><mo>≡</mo><mi>E</mi><mrow><mo stretchy="true" form="prefix">[</mo><msub><mi>η</mi><mi>t</mi></msub><mi>η</mi><msub><mi>′</mi><mi>t</mi></msub><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">Q \equiv E[\eta_t \eta'_t]</annotation></semantics></math>
+are nonzero. In particular, our model implies that
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Q</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>ν</mi><mi>t</mi></msub><mi>ν</mi><msub><mi>′</mi><mi>t</mi></msub></mtd><mtd columnalign="center" style="text-align: center"><mo>−</mo><msub><mi>ν</mi><mi>t</mi></msub><mi>ν</mi><msub><mi>′</mi><mi>t</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>I</mi><mo>−</mo><mi>G</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>′</mi></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mo>−</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>I</mi><mo>−</mo><mi>G</mi><mo stretchy="true" form="postfix">)</mo></mrow><msub><mi>ν</mi><mi>t</mi></msub><mi>ν</mi><msub><mi>′</mi><mi>t</mi></msub></mtd><mtd columnalign="center" style="text-align: center"><msub><mi>ε</mi><mi>t</mi></msub><mi>ε</mi><msub><mi>′</mi><mi>t</mi></msub><mo>+</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>I</mi><mo>−</mo><mi>G</mi><mo stretchy="true" form="postfix">)</mo></mrow><msub><mi>ν</mi><mi>t</mi></msub><mi>ν</mi><msub><mi>′</mi><mi>t</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>I</mi><mo>−</mo><mi>G</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>′</mi></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex"> Q = \begin{bmatrix} \nu_t \nu'_t &amp; -\nu_t \nu'_t (I-G)'\\ -(I-G) \nu_t \nu'_t &amp; \varepsilon_t \varepsilon'_t + (I-G) \nu_t \nu'_t (I-G)' \end{bmatrix} </annotation></semantics></math></p>
+</div>
+<div class="section level3">
+<h3 id="forecasting">Forecasting<a class="anchor" aria-label="anchor" href="#forecasting"></a>
+</h3>
+<p>Kalman filter forecasts are generated by projecting the estimated
+state vector forward in time using the model’s estimated transition
+equation
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">⟨</mo><mi>T</mi><mo stretchy="false" form="postfix">⟩</mo></mrow><annotation encoding="application/x-tex">\langle T \rangle</annotation></semantics></math>.
+Given the Kalman filter’s state estimate
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">⟨</mo><msub><mi>α</mi><mi>t</mi></msub><msub><mo stretchy="false" form="postfix">⟩</mo><mi>T</mi></msub></mrow><annotation encoding="application/x-tex">\langle \alpha_t \rangle_T</annotation></semantics></math>
+at time
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>T</mi><annotation encoding="application/x-tex">T</annotation></semantics></math>,
+forecasts for future periods
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mo>+</mo><mi>i</mi></mrow><annotation encoding="application/x-tex">T+i</annotation></semantics></math>
+are calculated as:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">⟨</mo><msub><mi>α</mi><mrow><mi>T</mi><mo>+</mo><mi>i</mi></mrow></msub><msub><mo stretchy="false" form="postfix">⟩</mo><mi>T</mi></msub><mo>=</mo><mo stretchy="false" form="prefix">⟨</mo><mi>T</mi><msubsup><mo stretchy="false" form="postfix">⟩</mo><mi>T</mi><mi>i</mi></msubsup><mo stretchy="false" form="prefix">⟨</mo><msub><mi>α</mi><mi>T</mi></msub><msub><mo stretchy="false" form="postfix">⟩</mo><mi>T</mi></msub></mrow><annotation encoding="application/x-tex">\langle \alpha_{T+i} \rangle_T = \langle T \rangle_T^i \langle \alpha_T \rangle_T</annotation></semantics></math></p>
+</div>
+<div class="section level3">
+<h3 id="nowcasting-using-the-reviser-package">Nowcasting using the <code>reviser</code> package<a class="anchor" aria-label="anchor" href="#nowcasting-using-the-reviser-package"></a>
+</h3>
+<p>As a demonstration, we nowcast the Euro Area GDP using the KK model.
+We use the <code><a href="../reference/gdp.html">reviser::gdp</a></code> dataset, which contains the Euro
+Area GDP data. As a first step we test which release (among the first
+15) is efficient. As final release, we use the value published 4 years
+after the initial value, allowing for a 4-year revision period. It turns
+out that
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>e</mi><mo>=</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">e=3</annotation></semantics></math>
+meaning that the fourth release is an efficient estimate of the final
+release.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://p-wegmueller.github.io/reviser/">reviser</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
@@ -239,78 +248,145 @@ updated as new information becomes available.</p>
 <span></span>
 <span><span class="va">gdp</span> <span class="op">&lt;-</span> <span class="fu">reviser</span><span class="fu">::</span><span class="va"><a href="../reference/gdp.html">gdp</a></span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu">tsbox</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/tsbox/reference/ts_pc.html" class="external-link">ts_pc</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">id</span> <span class="op">==</span> <span class="st">"US"</span>,</span>
-<span>         <span class="va">time</span> <span class="op">&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">pub_date</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">id</span> <span class="op">==</span> <span class="st">"EA"</span>,</span>
+<span>         <span class="va">time</span> <span class="op">&gt;=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">pub_date</span><span class="op">)</span>,</span>
 <span>         <span class="va">time</span> <span class="op">&lt;=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2020-01-01"</span><span class="op">)</span></span>
 <span>         <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">xx</span><span class="op">&lt;-</span><span class="va">df</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">pub_date</span>, <span class="va">release</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>n<span class="op">=</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">gdp</span></span>
-<span><span class="va">min_pub_date</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">pub_date</span><span class="op">)</span></span>
-<span>      <span class="va">max_time</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">time</span><span class="op">[</span><span class="va">df</span><span class="op">$</span><span class="va">pub_date</span> <span class="op">==</span> <span class="va">min_pub_date</span><span class="op">]</span><span class="op">)</span></span>
-<span>      <span class="va">df</span> <span class="op">&lt;-</span> <span class="va">df</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>        <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span></span>
-<span>          <span class="va">time</span> <span class="op">&gt;=</span> <span class="va">max_time</span></span>
-<span>        <span class="op">)</span></span>
-<span>      </span>
-<span><span class="va">xx</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/vintages_wide.html">vintages_wide</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span><span class="op">$</span><span class="va">CHE</span></span>
-<span></span>
-<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_nth_release.html">get_nth_release</a></span><span class="op">(</span><span class="va">gdp</span>, n <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">14</span>, diagonal <span class="op">=</span> <span class="cn">F</span><span class="op">)</span></span>
+<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_nth_release.html">get_nth_release</a></span><span class="op">(</span><span class="va">gdp</span>, n <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">14</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">final_release</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_nth_release.html">get_nth_release</a></span><span class="op">(</span><span class="va">gdp</span>, n <span class="op">=</span> <span class="fl">15</span><span class="op">)</span></span>
-<span><span class="va">final_release</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_nth_release.html">get_nth_release</a></span><span class="op">(</span><span class="va">gdp</span>, n <span class="op">=</span> <span class="st">"latest"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">efficient_release</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_first_efficient_release.html">get_first_efficient_release</a></span><span class="op">(</span></span>
 <span>    <span class="va">df</span>,</span>
 <span>    <span class="va">final_release</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
+<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="va">efficient_release</span><span class="op">$</span><span class="va">data</span></span>
+<span><span class="va">e</span> <span class="op">&lt;-</span> <span class="va">efficient_release</span><span class="op">$</span><span class="va">e</span></span>
+<span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">efficient_release</span><span class="op">)</span></span>
-<span></span>
-<span></span>
-<span><span class="va">nowcast</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/kk_nowcast.html">kk_nowcast</a></span><span class="op">(</span></span>
-<span>    <span class="va">efficient_release</span><span class="op">$</span><span class="va">data</span>, </span>
-<span>    e <span class="op">=</span> <span class="va">efficient_release</span><span class="op">$</span><span class="va">e</span>,</span>
+<span><span class="co">#&gt; Efficient release:  2 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Model summary: </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt; stats::lm(formula = formula, data = df_wide)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Residuals:</span></span>
+<span><span class="co">#&gt;      Min       1Q   Median       3Q      Max </span></span>
+<span><span class="co">#&gt; -0.34873 -0.08185 -0.00706  0.10475  0.31533 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt;             Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
+<span><span class="co">#&gt; (Intercept)  0.03276    0.01775   1.846   0.0692 .  </span></span>
+<span><span class="co">#&gt; release_2    1.01446    0.02440  41.577   &lt;2e-16 ***</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Residual standard error: 0.1428 on 68 degrees of freedom</span></span>
+<span><span class="co">#&gt; Multiple R-squared:  0.9622, Adjusted R-squared:  0.9616 </span></span>
+<span><span class="co">#&gt; F-statistic:  1729 on 1 and 68 DF,  p-value: &lt; 2.2e-16</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Test summary: </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Linear hypothesis test:</span></span>
+<span><span class="co">#&gt; (Intercept) = 0</span></span>
+<span><span class="co">#&gt; release_2 = 1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Model 1: restricted model</span></span>
+<span><span class="co">#&gt; Model 2: final ~ release_2</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Note: Coefficient covariance matrix supplied.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Res.Df Df     F  Pr(&gt;F)  </span></span>
+<span><span class="co">#&gt; 1     70                   </span></span>
+<span><span class="co">#&gt; 2     68  2 2.743 0.07151 .</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre></div>
+<p>We then use the <code><a href="../reference/kk_nowcast.html">kk_nowcast()</a></code> function to nowcast the
+Euro Area GDP using the KK model. The function requires a
+<code>df</code> with columns <code>time</code>, <code>value</code>,
+<code>release#</code> and <code>final</code>. The function
+<code><a href="../reference/get_first_efficient_release.html">get_first_efficient_release()</a></code> returns a dataset in this
+format.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">nowcast</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/kk_nowcast.html">kk_nowcast</a></span><span class="op">(</span></span>
+<span>    df <span class="op">=</span> <span class="va">data</span>, </span>
+<span>    e <span class="op">=</span> <span class="va">e</span>,</span>
 <span>    model <span class="op">=</span> <span class="st">"KK"</span>,</span>
-<span>    method <span class="op">=</span> <span class="st">"SUR"</span><span class="co">#,</span></span>
-<span>    <span class="co">#solver_options = list(startvals = kk_nowcast(efficient_release$data, e = efficient_release$e, model = "KK", method = "OLS")$params)</span></span>
+<span>    method <span class="op">=</span> <span class="st">"SUR"</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
-<span></span>
+<span><span class="co"># Estimated parameters</span></span>
 <span><span class="va">nowcast</span><span class="op">$</span><span class="va">params</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">nowcast</span><span class="op">$</span><span class="va">fit</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="va">xxx</span><span class="op">&lt;-</span><span class="va">nowcast</span><span class="op">$</span><span class="va">filtered_z</span></span>
+<span><span class="co">#&gt;           F0         G0_0         G0_1         G0_2         G1_0         G1_1 </span></span>
+<span><span class="co">#&gt;  0.689513907  0.944522107 -0.038845693  0.002780479 -0.031990705  0.964424950 </span></span>
+<span><span class="co">#&gt;         G1_2           v0         eps0         eps1 </span></span>
+<span><span class="co">#&gt;  0.001287727  0.384934854  0.007567959  0.002374823</span></span>
 <span></span>
-<span><span class="va">eff_rel_pred_full</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">nowcast</span><span class="op">$</span><span class="va">filtered_states</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">+</span><span class="va">nowcast</span><span class="op">$</span><span class="va">e</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co"># Filtered states</span></span>
+<span><span class="va">filt_states</span> <span class="op">&lt;-</span> <span class="va">nowcast</span><span class="op">$</span><span class="va">filtered_z</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">filt_states</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 4</span></span></span>
+<span><span class="co">#&gt;   time       release_2_lag_2 release_2_lag_1 release_2_lag_0</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2003-04-01          0.052<span style="text-decoration: underline;">7</span>        -<span style="color: #BB0000;">0.006</span><span style="color: #BB0000; text-decoration: underline;">67</span>         0.002<span style="text-decoration: underline;">51</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2003-07-01         -<span style="color: #BB0000;">0.036</span><span style="color: #BB0000; text-decoration: underline;">2</span>         0.002<span style="text-decoration: underline;">48</span>         0.403  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2003-10-01         -<span style="color: #BB0000;">0.045</span><span style="color: #BB0000; text-decoration: underline;">1</span>         0.394           0.316  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2004-01-01          0.429          0.359           0.587  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2004-04-01          0.352          0.648           0.495  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 2004-07-01          0.639          0.460           0.301</span></span></code></pre></div>
+<p>Now we can compare the nowcasts with the final values and the first
+release (which serves as a naive forecast). We calculate the root mean
+squared error (RMSE) of the models and naive nowcasts. The gain is not
+very high, but it is still better than the naive forecast. The relative
+RMSE is 0.99.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Compare nowcasts</span></span>
 <span></span>
+<span><span class="co"># Filtered efficient release</span></span>
+<span><span class="va">filt_eff_release</span> <span class="op">&lt;-</span> <span class="va">filt_states</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">+</span><span class="va">e</span><span class="op">)</span><span class="op">]</span></span>
+<span></span>
+<span><span class="co"># First and final values</span></span>
 <span><span class="va">final_vals</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/vintages_wide.html">vintages_wide</a></span><span class="op">(</span><span class="va">efficient_release</span><span class="op">$</span><span class="va">data</span>, names_from <span class="op">=</span> <span class="st">"release"</span><span class="op">)</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"time"</span>, <span class="st">"final"</span><span class="op">)</span><span class="op">]</span></span>
-<span></span>
 <span><span class="va">first_vals</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/vintages_wide.html">vintages_wide</a></span><span class="op">(</span><span class="va">efficient_release</span><span class="op">$</span><span class="va">data</span>, names_from <span class="op">=</span> <span class="st">"release"</span><span class="op">)</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span><span class="op">]</span></span>
 <span></span>
 <span></span>
-<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">full_join</a></span><span class="op">(</span></span>
+<span><span class="va">eval_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">full_join</a></span><span class="op">(</span></span>
 <span>  <span class="va">first_vals</span>,</span>
-<span>  <span class="va">eff_rel_pred_full</span>,</span>
+<span>  <span class="va">filt_eff_release</span>,</span>
 <span>  by <span class="op">=</span> <span class="st">"time"</span></span>
 <span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">full_join</a></span><span class="op">(</span></span>
 <span>  <span class="va">final_vals</span>,</span>
 <span>  by <span class="op">=</span> <span class="st">"time"</span></span>
 <span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span></span>
-<span>  <span class="st">"nowcast_full"</span> <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  <span class="st">"nowcast"</span> <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>  <span class="st">"final"</span> <span class="op">=</span> <span class="fl">4</span>,</span>
 <span>  <span class="st">"first"</span> <span class="op">=</span> <span class="fl">2</span></span>
 <span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">time</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">data1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/year.html" class="external-link">year</a></span><span class="op">(</span><span class="va">time</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2020</span>, <span class="fl">2021</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
-<span>    mse_full <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">nowcast_full</span> <span class="op">-</span> <span class="va">final</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>,</span>
-<span>    mse_first <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">first</span> <span class="op">-</span> <span class="va">final</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span></code></pre></div>
+<span><span class="va">rmse</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="va">eval_data</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span></span>
+<span>    rmse_nc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">nowcast</span> <span class="op">-</span> <span class="va">final</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    rmse_first <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">first</span> <span class="op">-</span> <span class="va">final</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Relative RMSE</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">rmse</span><span class="op">$</span><span class="va">rmse_nc</span> <span class="op">/</span> <span class="va">rmse</span><span class="op">$</span><span class="va">rmse_first</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 0.9960179</span></span></code></pre></div>
+</div>
+<div class="section level3 unnumbered">
+<h3 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h3>
 <div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="ref-durbinTimeSeriesAnalysis2012" class="csl-entry">
+Durbin, James, and Siem Jan Koopman. 2012. <em>Time <span>Series
+Analysis</span> by <span>State Space Methods</span>: <span>Second
+Edition</span></em>. Oxford University Press. <a href="https://doi.org/10.1093/acprof:oso/9780199641178.001.0001" class="external-link">https://doi.org/10.1093/acprof:oso/9780199641178.001.0001</a>.
+</div>
 <div id="ref-howreyUsePreliminaryData1978" class="csl-entry">
 Howrey, E. Philip. 1978. <span>“The <span>Use</span> of
 <span>Preliminary Data</span> in <span>Econometric
