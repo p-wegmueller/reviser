@@ -23,18 +23,18 @@ Macroeconomic data are often subject to revisions, reflecting the integration of
 
 Data revisions can be classified into two main types: ongoing revisions, which incorporate new information as it becomes available, and benchmark revisions, which reflect changes in definitions, classifications, or methodologies. Optimally, revisions should satisfy the following properties [@aruobaDataRevisionsAre2008]:
 
-- **Unbiasedness**: Revisions should not systematically push estimates in one direction. Mathematically, for a revision series \( R_t^f = Y_t^f - Y_t^h \) where \( h \) denotes the release number \( Y_t^f \) represents the final release and \( Y_t^h \) represents the series released at time \( h \) (\( h=0 \) is the initial release), unbiasedness requires:
+- **Unbiasedness**: Revisions should not systematically push estimates in one direction. Mathematically, for a revision series \( r_t^f = y_t^f - y_t^h \) where \( h \) denotes the release number \( y_t^f \) represents the final release and \( y_t^h \) represents the series released at time \( h \) (\( h=0 \) is the initial release), unbiasedness requires:
   \[
-  E[R_t^f] = 0 
+  E[r_t^f] = 0 
   \]
 
 - **Efficiency**: An efficient release incorporates all available information optimally, ensuring that subsequent revisions are unpredictable. This can be tested using the Mincer-Zarnowitz regression:
   \[
-  Y_t^f = \alpha + \beta Y_t^h + \varepsilon_t,
+  y_t^f = \alpha + \beta y_t^h + \varepsilon_t,
   \]
   where an efficient release satisfies \( \alpha = 0 \) and \( \beta = 1 \).
 
-- **Minimal Variance**: Revisions should be as small as possible while still improving accuracy. The variance of revisions, defined as \( \text{Var}(R_t^f) \), should decrease over successive releases.
+- **Minimal Variance**: Revisions should be as small as possible while still improving accuracy. The variance of revisions, defined as \( \text{Var}(r_t^f) \), should decrease over successive releases.
 
 
 
@@ -42,9 +42,9 @@ Data revisions can be classified into two main types: ongoing revisions, which i
 
 A fundamental assumption in many revision models is that the first release of a data point is an imperfect measure of the true value due to measurement errors. This can be expressed as:
 \[
-Y_t^h = Y_t^* + \varepsilon_t^h,
+y_t^h = y_t^* + \varepsilon_t^h,
 \]
-where \( Y_t^* \) is the true value and \( \varepsilon_t^h \) is an error term that diminishes as \( h \) increases. The properties of \( R_t^h \) determine whether the preliminary release \( h \) is an efficient estimator of \( Y_t^* \). If \( R_t^h \) is predictable, the revision process is inefficient, indicating room for improvement in the initial estimates. Vice-versa if \( R_t^h \) is unpredictable, the preliminary release is efficient (i.e \(Y_t^h = Y_t^e\)). 
+where \( y_t^* \) is the true value and \( \varepsilon_t^h \) is an error term that diminishes as \( h \) increases. The properties of \( r_t^h \) determine whether the preliminary release \( h \) is an efficient estimator of \( y_t^* \). If \( r_t^h \) is predictable, the revision process is inefficient, indicating room for improvement in the initial estimates. Vice-versa if \( r_t^h \) is unpredictable, the preliminary release is efficient (i.e \(y_t^h = y_t^e\)). 
 
 
 ### The Challenge of Defining a Final Release
@@ -55,11 +55,11 @@ One major challenge in identifying an efficient release using Mincer-Zarnowitz r
 An iterative approach is proposed to determine the optimal number of revisions, \( e \), beyond which further revisions are negligible. This approach is based on running Mincer-Zarnowitz-style regressions to assess which release provides an optimal estimate of the final value. The procedure follows these steps [@kishorVAREstimationForecasting2012; @strohsalDataRevisionsGerman2020]:
 
 
-1. **Regression Analysis**: Regress the final release \( Y_t^f \) on the initial releases \( Y_t^h \) for \( h = 1,2,\dots,e \):
+1. **Regression Analysis**: Regress the final release \( y_t^f \) on the initial releases \( y_t^h \) for \( h = 1,2,\dots,e \):
    \[
-   Y_t^f = \alpha + \beta Y_t^h + \varepsilon_t
+   y_t^f = \alpha + \beta y_t^h + \varepsilon_t
    \]
-   where the null hypothesis is that \( \alpha = 0 \) and \( \beta = 1 \), indicating that \( Y_t^h \) is an efficient estimate of \( Y_t^f \).
+   where the null hypothesis is that \( \alpha = 0 \) and \( \beta = 1 \), indicating that \( y_t^h \) is an efficient estimate of \( y_t^f \).
    
 2. **Determine the Optimal \( e \)**: Increase \( h \) iteratively and test whether the efficiency conditions hold. The smallest \( e \) for which the hypothesis is not rejected is considered the final efficient release.
    

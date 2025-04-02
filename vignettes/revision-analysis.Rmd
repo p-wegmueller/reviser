@@ -21,9 +21,9 @@ This vignette provides a detailed explanation of the statistical measures and hy
 
 Let's define some notation to facilitate the discussion of the statistics and hypothesis tests used in the function:
 
-- \( Y_t^h \) denote the $h$th released value for time \( t \) with $h=0$ being the preliminary release
-- \( Y_t^f \) denote the final revised value for time \( t \)
-- \( R_t^f = Y_t^f - Y_t^h \) be the final revision compared to the $h$th release for time \( t \)
+- \( y_t^h \) denote the $h$th released value for time \( t \) with $h=0$ being the preliminary release
+- \( y_t^f \) denote the final revised value for time \( t \)
+- \( r_t^f = y_t^f - y_t^h \) be the final revision compared to the $h$th release for time \( t \)
 - \( N \) is the number of observations
 
 The function takes two mandatory arguments:
@@ -50,10 +50,10 @@ Revisions provide insights into the reliability of initial data releases. Variou
    The mean revision quantifies systematic bias in the revisions:  
 
    \[
-   \text{Bias} = \bar{R} = \frac{1}{N} \sum_{t=1}^{N} R_t^{f}
+   \text{Bias} = \bar{r} = \frac{1}{N} \sum_{t=1}^{N} r_t^{f}
    \]
 
-   If the mean revision is significantly different from zero, it indicates a tendency for initial releases to be systematically over- or under-estimated. A **t-test** is conducted to test the null hypothesis \( H_0: \bar{R} = 0 \).
+   If the mean revision is significantly different from zero, it indicates a tendency for initial releases to be systematically over- or under-estimated. A **t-test** is conducted to test the null hypothesis \( H_0: \bar{r} = 0 \).
    
    - `"Bias (p-value)"` reports the standard t-test p-value.  
    - `"Bias (robust p-value)"` provides a heteroskedasticity-robust alternative.
@@ -62,7 +62,7 @@ Revisions provide insights into the reliability of initial data releases. Variou
    The mean absolute revision measures the average size of revisions, regardless of direction:
 
    \[
-   \text{MAR} = \frac{1}{N} \sum_{t=1}^{N} |R_t^{f}|
+   \text{MAR} = \frac{1}{N} \sum_{t=1}^{N} |r_t^{f}|
    \]
 
    This metric is useful when evaluating the magnitude of revisions rather than their direction.
@@ -77,7 +77,7 @@ Revisions provide insights into the reliability of initial data releases. Variou
    The standard deviation quantifies the dispersion of revisions:
 
    \[
-   \sigma_R = \sqrt{ \frac{1}{N-1} \sum_{t=1}^{N} (R_t^{f} - \bar{R})^2 }
+   \sigma_r = \sqrt{ \frac{1}{N-1} \sum_{t=1}^{N} (r_t^{f} - \bar{r})^2 }
    \]
 
    A higher standard deviation indicates greater variability in the revision process.
@@ -86,10 +86,10 @@ Revisions provide insights into the reliability of initial data releases. Variou
    This metric measures the relative size of revisions compared to the total variance in the final data:
 
    \[
-   \frac{\sigma_R}{\sigma_Y}
+   \frac{\sigma_r}{\sigma_y}
    \]
 
-   where \( \sigma_Y \) is the standard deviation of the final value \( Y_t^f \). A high noise-to-signal ratio suggests that revisions are large relative to the underlying variability in the final data, indicating high uncertainty in initial estimates.
+   where \( \sigma_y \) is the standard deviation of the final value \( y_t^f \). A high noise-to-signal ratio suggests that revisions are large relative to the underlying variability in the final data, indicating high uncertainty in initial estimates.
 
 ```{r, warning=FALSE, message=FALSE}
 library(reviser)
@@ -117,10 +117,10 @@ head(results)
 Understanding how revisions relate to initial releases and past revisions can reveal patterns in the revision process:
 
 #### 1. **Correlation Between Revisions and Initial Releases** (`"Correlation"`)  
-   This measures whether revisions are systematically related to the initial release \( Y_t^h \), which serves as a proxy for available information at the time of release:
+   This measures whether revisions are systematically related to the initial release \( y_t^h \), which serves as a proxy for available information at the time of release:
 
    \[
-   \rho = \frac{\sum (Y_t^h - \bar{Y}^h) (R_t^f - \bar{R})}{\sqrt{\sum (Y_t^h - \bar{Y}^h)^2}  \sqrt{\sum (R_t^f - \bar{R})^2}}
+   \rho = \frac{\sum (y_t^h - \bar{y}^h) (Rr_t^f - \bar{r})}{\sqrt{\sum (y_t^h - \bar{y}^h)^2}  \sqrt{\sum (r_t^f - \bar{r})^2}}
    \]
 
    A significant correlation suggests that initial estimates contain information that predicts later revisions. A **t-test** (`"Correlation (p-value)"`) is used to test whether \( \rho \) is significantly different from zero.
@@ -129,7 +129,7 @@ Understanding how revisions relate to initial releases and past revisions can re
    The **first-order autocorrelation** measures the persistence in the revision process by examining whether past revisions predict future revisions:
 
    \[
-   \rho_1 = \frac{\sum (R_t^f - \bar{R}) (R_{t-1}^f - \bar{R})}{\sqrt{\sum (R_t^f - \bar{R})^2 } \sqrt{\sum (R_{t-1}^f - \bar{R})^2}}
+   \rho_1 = \frac{\sum (r_t^f - \bar{r}) (r_{t-1}^f - \bar{r})}{\sqrt{\sum (r_t^f - \bar{r})^2 } \sqrt{\sum (r_{t-1}^f - \bar{r})^2}}
    \]
 
    If revisions exhibit strong autocorrelation, it may indicate a systematic pattern in the revision process rather than purely random adjustments.  
@@ -171,10 +171,10 @@ head(results)
 Sign switches in data revisions can occur when the direction of an economic indicator changes between its initial release and later revisions. We define two key metrics to assess the stability of these directional signals:
 
 #### 1. **Fraction of sign changes**  
-   This metric (`"Fraction of correct sign"`) evaluates how often the sign of the initially reported value \( Y_t^h \) differs from the final revised value \( Y_t^f \). Mathematically, we compute:  
+   This metric (`"Fraction of correct sign"`) evaluates how often the sign of the initially reported value \( y_t^h \) differs from the final revised value \( y_t^f \). Mathematically, we compute:  
 
    \[
-   \text{Fraction of sign consistency} = \frac{\sum_{t=1}^{T} \mathbb{1}(\text{sign}(Y_t^h) = \text{sign}(Y_t^f))}{T}
+   \text{Fraction of sign consistency} = \frac{\sum_{t=1}^{T} \mathbb{1}(\text{sign}(y_t^h) = \text{sign}(y_t^f))}{T}
    \]
 
    where \( \mathbb{1}(\cdot) \) is an indicator function that equals 1 if the signs match and 0 otherwise.
@@ -183,10 +183,10 @@ Sign switches in data revisions can occur when the direction of an economic indi
    This metric (` "Fraction of correct growth rate change"`) assesses whether the direction of change in the variable remains consistent after revisions. Specifically, we compare the sign of the period-over-period differences:
 
    \[
-   \text{Fraction of sign consistency in growth} = \frac{\sum_{t=2}^{T} \mathbb{1}(\text{sign}(\Delta Y_t^h) = \text{sign}(\Delta Y_t^f))}{T-1}
+   \text{Fraction of sign consistency in growth} = \frac{\sum_{t=2}^{T} \mathbb{1}(\text{sign}(\Delta y_t^h) = \text{sign}(\Delta y_t^f))}{T-1}
    \]
 
-   where \( \Delta Y_t^h = Y_t^h - Y_{t-1}^h \) and \( \Delta Y_t^f = Y_t^f - Y_{t-1}^f \) represent the first differences of the initially reported and final values, respectively.
+   where \( \Delta y_t^h = y_t^h - y_{t-1}^h \) and \( \Delta y_t^f = y_t^f - y_{t-1}^f \) represent the first differences of the initially reported and final values, respectively.
 
 A high fraction of incorrect signs in either metric suggests that early estimates may be unreliable in capturing the true direction of the variable.
 
@@ -208,7 +208,7 @@ To test these categories, we run **two regression tests:**
    The **noise test** examines whether the **revision** can be predicted by the final value:
 
   \[
-  {R}_t^f = \alpha + \beta \cdot {Y_t^f} + \epsilon_t
+  {r}_t^f = \alpha + \beta \cdot {y_t^f} + \epsilon_t
   \]  
     
    If the preliminary value were an **efficient and unbiased estimate** of the final value (i.e incorporating all relevant information), revisions should be **uncorrelated** with the final value. The null hypothesis is:
@@ -226,7 +226,7 @@ To test these categories, we run **two regression tests:**
 The **news test** examines whether the revision is predictable using the preliminary release:
 
 \[
-{R}_t^f = \alpha + \beta \cdot {Y}_t^h + \epsilon_t
+{r}_t^f = \alpha + \beta \cdot {y}_t^h + \epsilon_t
 \]
 
 Here, we test whether revisions are **systematically related** to the initial value. The null hypothesis is:
@@ -239,10 +239,10 @@ H_0: \alpha = 0, \quad \beta = 0
   - \( \alpha = 0 \) tests (`"News test Intercept (p-value)"`) whether the revisions have a systematic bias.
   - \( \beta = 0 \) tests (`"News test Coefficient (p-value)"`) whether the revisions are correlated with the initial value, indicating inefficiency.
 
-Note: Instead of regressing $R_t^f$ on $Y_t^f$ or $Y_t^h$, one can similarly regress 
+Note: Instead of regressing $r_t^f$ on $y_t^f$ or $y_t^h$, one can similarly regress 
 \[
-  \text{Noise: } \quad Y_t^h = \alpha + \beta \cdot Y_t^f + \epsilon_t \\
-  \text{News: } \quad Y_t^f = \alpha + \beta \cdot Y_t^h + \epsilon_t
+  \text{Noise: } \quad y_t^h = \alpha + \beta \cdot y_t^f + \epsilon_t \\
+  \text{News: } \quad y_t^f = \alpha + \beta \cdot y_t^h + \epsilon_t
 \]
 and test \( \alpha = 0 \) and \( \beta = 1 \) for the presence of noise and news in the data revisions. 
 
@@ -267,29 +267,29 @@ The Friedman test (`"Seasonality (Friedman p-value)"`) is a non-parametric stati
 
 ### Theil’s U Statistics
 
-In the context of revision analysis, **Theil’s inequality coefficient**, or **Theil’s U**, provides a measure of the accuracy of a initial estimates (\( Y_t^h \)) relative to final or more refined values (\( Y_t^f \)). Various definitions of Theil’s statistics exist, leading to different interpretations. This package considers two widely used variants: **U1** and **U2**.  
+In the context of revision analysis, **Theil’s inequality coefficient**, or **Theil’s U**, provides a measure of the accuracy of a initial estimates (\( y_t^h \)) relative to final or more refined values (\( y_t^f \)). Various definitions of Theil’s statistics exist, leading to different interpretations. This package considers two widely used variants: **U1** and **U2**.  
 
 #### 1. **Theil’s U1 Statistic** (`"Theil's U1"`)
 
 The first measure, **U1**, is given by:  
 
 \[
-U_1 = \frac{\sqrt{\frac{1}{n}\sum^n_{t=1}(Y_t^f-Y_t^h)^2}}{\sqrt{\frac{1}{n}\sum^n_{t=1}{Y_t^f}^2}+\sqrt{\frac{1}{n}\sum^n_{t=1}{Y_t^h}^2}}
+U_1 = \frac{\sqrt{\frac{1}{n}\sum^n_{t=1}(y_t^f-y_t^h)^2}}{\sqrt{\frac{1}{n}\sum^n_{t=1}{y_t^f}^2}+\sqrt{\frac{1}{n}\sum^n_{t=1}{y_t^h}^2}}
 \]
 
 The **U1 statistic is bounded between 0 and 1**:  
 
-- A value of **0** implies perfect forecasting (\( Y_t^h = Y_t^f \) for all \( t \)).  
+- A value of **0** implies perfect forecasting (\( y_t^h = y_t^f \) for all \( t \)).  
 - A value **closer to 1** indicates lower accuracy.  
 
-However, U1 suffers from **several limitations**, as highlighted by @Granger01031973. A critical issue arises when **one of \( Y_t^h \) or \( Y_t^f \) equals zero in all periods**. In such cases, the denominator and numerator become equal, leading to **U1 = 1** even when preliminary estimates are close to the final values.  
+However, U1 suffers from **several limitations**, as highlighted by @Granger01031973. A critical issue arises when **one of \( y_t^h \) or \( y_t^f \) equals zero in all periods**. In such cases, the denominator and numerator become equal, leading to **U1 = 1** even when preliminary estimates are close to the final values.  
 
 #### 2. **Theil’s U2 Statistic** (`"Theil's U2"`)
 
 To address these shortcomings, @theil1966applied proposed an alternative measure, **U2**, which is defined as:  
 
 \[
-U_2 = \frac{\sqrt{\sum_{t=1}^{n} \left( \frac{Y_{t+1}^h- Y_{t+1}^f}{Y_t^f} \right)^2}}{\sqrt{\sum_{t=1}^{n} \left( \frac{Y_{t+1}^f - Y_t^f}{Y_t^f} \right)^2}}
+U_2 = \frac{\sqrt{\sum_{t=1}^{n} \left( \frac{y_{t+1}^h- y_{t+1}^f}{Y_t^f} \right)^2}}{\sqrt{\sum_{t=1}^{n} \left( \frac{y_{t+1}^f - y_t^f}{Y_t^f} \right)^2}}
 \]
 
 where:  
@@ -299,12 +299,12 @@ where:
 
 Unlike U1, **U2 is not bounded between 0 and 1**. Instead: 
 
-- A value of **0** implies perfect accuracy (\( Y_{t}^h = Y_{t}^f \) for all \( t \)).  
+- A value of **0** implies perfect accuracy (\( y_{t}^h = y_{t}^f \) for all \( t \)).  
 - **\( U_2 = 1 \)** means the accuracy of the preliminary estimates is equal to a **naïve forecast**.  
 - **\( U_2 > 1 \)** suggests the preliminary estimates are **less accurate** than the naïve approach.  
 - **\( U_2 < 1 \)** indicates the preliminary estimates are **more accurate** than the naïve method.  
 
-Whenever possible (**if \( Y_{t}^f \neq 0 \) for all \( t \)**), **U2 is the preferred metric** for evaluating preliminary estimates.  
+Whenever possible (**if \( y_{t}^f \neq 0 \) for all \( t \)**), **U2 is the preferred metric** for evaluating preliminary estimates.  
 
 ```{r, warning=FALSE}
 results <- get_revision_analysis(

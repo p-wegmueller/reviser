@@ -17,34 +17,43 @@ knitr::opts_chunk$set(
 )
 ```
 
-IN PROGRESS
+Having some evidence that the revisions are predictable, we can now move to the next step: **nowcasting**. Nowcasting refers to the process of estimating the current state of the economy using timely indicators. In the context of revisions, nowcasting involves predicting the final (or efficient) value of an economic variable before all revisions are available. This vignette demonstrates how to implement a nowcasting model using the generalized Kishor-Koenig (KK) framework [@kishorVAREstimationForecasting2012].
 
-**The Kishor-Koenig Model: A Detailed Explanation**
+## The Generalized Kishor-Koenig Model
 
-**1. Introduction**
+The KK model extends the traditional Vector Autoregression (VAR) framework to account for data revisions explicitly. Unlike conventional models that treat data as final and accurate, the KK model recognizes that initial releases are subject to revisions, leading to biased and inefficient forecasts. By incorporating the revision process into a state-space framework, the KK model provides a reliable approach to nowcasting economic variables. Moreover, it nests several nowcasting models, such as the classical textbook measurement error model or the @howreyUsePreliminaryData1978 model.
 
-The Kishor-Koenig (KK) model extends the traditional Vector Autoregression (VAR) framework to account for data revisions explicitly. Unlike conventional models that treat data as final and accurate, the KK model recognizes that initial releases are subject to revisions, leading to biased and inefficient forecasts. By incorporating the revision process into a state-space framework, the KK model provides a more reliable approach to estimating and forecasting economic variables. This paper provides a detailed explanation of the model, using the notation from Strohsal and Wolf (2020) to ensure consistency with empirical applications.
+The procedure is based on the assumption that there exists an efficient estimate $y_t^e$ of the final release that becomes available $e$ periods after the initial release $y_t^0$. We follow @strohsalDataRevisionsGerman2020 and assume that $e$th revision data follows an autoregressive model of order one (AR(1)). The state-space representation of the KK model is given by:
 
-**2. The Structure of the Kishor-Koenig Model**
+**1. The State Equation**
+\[ z_t = F z_{t-1} + \nu_t \]
 
-### 2.1 Data Revision Process
-Let the true (but unobserved) economic variable be denoted by \( x_t \). The statistical agency releases an initial estimate \( y_t^0 \), which is subject to revisions over time. The final value, \( x_t^f \), is available only after multiple revisions. The relationship between the initial release and the true value can be expressed as:
+**2. The Observation Equation**
+\[y_t = (I - G) F y_{t-1} + G z_t + \epsilon_t,\]
+
+where 
+\[ z'_t = \begin{bmatrix} y_{t-e}^e, y_{t-e +1}^e, ...,  y_t^e \end{bmatrix}' \]
+\[ y'_t = \begin{bmatrix} y_{t-e}^e, y_{t-e +1}^{e-1}, ...,  y_t^0 \end{bmatrix}' \]
+\[ \nu'_t = \begin{bmatrix} 0, 0, ...,  \nu_{0,t} \end{bmatrix}' \]
+\[ \epsilon'_t = \begin{bmatrix} 0, \epsilon_{e-1,t}, ...,  \epsilon_{1,t}, \epsilon_{0,t} \end{bmatrix}' \]
 \[
-y_t^0 = x_t + \eta_t,
+F = \begin{bmatrix} 0 & 1 & 0 & \dots & 0 \\
+                      0 & 0 & 1 & \dots & 0 \\
+                      \vdots & \vdots & \vdots & \ddots & \vdots \\
+                      0 & 0 & 0 & \dots & 1 \\
+                      0 & 0 & 0 & \dots & F_0 \end{bmatrix}
 \]
-where \( \eta_t \) is a measurement error that may be serially correlated.
-
-Subsequent releases \( y_t^i \) incorporate additional information and follow:
 \[
-y_t^i = y_t^{i-1} + r_t^i,
+G = \begin{bmatrix} 1 & 0 & \dots & 0 \\
+                      G_{e-1,e} & G_{e-1,e-1} & \dots & G_{e-1,0} \\
+                      G_{e-2,e} & G_{e-2,e-1} & \dots & G_{e-2,0} \\
+                      \vdots & \vdots & \ddots & \vdots \\
+                      G_{0,e} & G_{0,e-1} & \dots & G_{0,0} \end{bmatrix}
 \]
-where \( r_t^i \) is the revision made at stage \( i \). If revisions follow an autoregressive process, we can write:
-\[
-r_t^i = \phi r_{t-1}^{i-1} + \epsilon_t^i,
-\]
-where \( \phi \) captures the persistence of revisions, and \( \epsilon_t^i \) is an independent noise term.
+\( G \) is a gain matrix capturing the weight placed on new information, \( F \) determines the AR coefficient, and \( \nu_t \) and \( \epsilon_t \) are error vectors. The state-equation and observation-equation error vectors are assumed to be uncorrelated with one another at all leads and lags, and to be serially uncorrelated.
 
-The autoregressive nature of revisions is crucial because it implies that past revisions contain information about future revisions. If \( \phi \) is significantly different from zero, it suggests that revisions are predictable, meaning the initial release does not fully incorporate available information. This is a key insight of the KK model, as it allows for improved real-time estimates by exploiting the systematic behavior of revisions.
+It is recommended to estimate this system using seemingly unrelated regression (SUR) to account for the correlation between the error terms in the state and observation equations. The SUR estimation is implemented in the `seem` package, which provides a convenient interface to estimate state-space models in R.
+
 
 ### 2.2 State-Space Representation
 The KK model is formulated as a state-space system, consisting of a state equation describing the evolution of the true economic variable and an observation equation relating observed releases to the true value.
@@ -95,6 +104,83 @@ The Kishor-Koenig model provides a robust framework for handling data revisions 
 
 
 
-```{r setup}
+```{r warning = FALSE, message=FALSE, eval=FALSE}
 library(reviser)
+library(dplyr)
+library(lubridate)
+
+gdp <- reviser::gdp %>%
+  tsbox::ts_pc() %>%
+  filter(id == "US",
+         time > min(pub_date),
+         time <= as.Date("2020-01-01")
+         ) %>%
+  na.omit()
+
+xx<-df %>% group_by(pub_date, release) %>%
+  mutate(n=n())
+
+df <- gdp
+min_pub_date <- min(df$pub_date)
+      max_time <- max(df$time[df$pub_date == min_pub_date])
+      df <- df %>%
+        dplyr::filter(
+          time >= max_time
+        )
+      
+xx<-vintages_wide(df)$CHE
+
+df <- get_nth_release(gdp, n = 0:14, diagonal = F)
+
+final_release <- get_nth_release(gdp, n = 15)
+final_release <- get_nth_release(gdp, n = "latest")
+
+efficient_release <- get_first_efficient_release(
+    df,
+    final_release
+  )
+
+summary(efficient_release)
+
+
+nowcast <- kk_nowcast(
+    efficient_release$data, 
+    e = efficient_release$e,
+    model = "KK",
+    method = "SUR"#,
+    #solver_options = list(startvals = kk_nowcast(efficient_release$data, e = efficient_release$e, model = "KK", method = "OLS")$params)
+  )
+
+
+nowcast$params
+summary(nowcast$fit[[1]])
+xxx<-nowcast$filtered_z
+
+eff_rel_pred_full <- (nowcast$filtered_states[,c(1,2+nowcast$e)])
+
+final_vals <- vintages_wide(efficient_release$data, names_from = "release")[,c("time", "final")]
+
+first_vals <- vintages_wide(efficient_release$data, names_from = "release")[,c(1,2)]
+
+
+data <- full_join(
+  first_vals,
+  eff_rel_pred_full,
+  by = "time"
+) %>% full_join(
+  final_vals,
+  by = "time"
+) %>% rename(
+  "nowcast_full" = 3,
+  "final" = 4,
+  "first" = 2
+) %>% arrange(time)
+
+data1 <- na.omit(data) %>%
+  filter(!year(time) %in% c(2020, 2021)) %>%
+  mutate(
+    mse_full = mean((nowcast_full - final)^2),
+    mse_first = mean((first - final)^2)
+  )
+
 ```
