@@ -285,6 +285,7 @@ kk_nowcast <- function(
     fit <- ols_estim$fit
 
     params <- ols_estim$params
+
     # bring params in the right order
     params <- kk_matrices(
       e = e,
@@ -319,7 +320,7 @@ kk_nowcast <- function(
 
   # Create the SSM object
   model_kfas <- SSModel(
-    Ymat2 ~
+    Ymat ~
       -1 +
         SSMcustom(
           Z = sur_ss_mat$Z,
@@ -363,6 +364,7 @@ kk_nowcast <- function(
     dplyr::mutate(time = df$time[(e + 1):(nrow(df))]) %>%
     dplyr::select(time, !!!stats::setNames(seq_along(y_names), y_names))
 
+  # Calculate forecasts if h > 0
   if (h > 0) {
     frequency <- unique((round(as.numeric(diff(df$time)) / 30)))
     if (length(frequency) > 1) {
