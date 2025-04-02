@@ -1,6 +1,9 @@
 ---
 title: "Nowcasting Revisions"
 output: rmarkdown::html_vignette
+bibliography: references.bib
+biblio-style: apalike
+link-citations: true
 vignette: >
   %\VignetteIndexEntry{nowcasting-revisions}
   %\VignetteEngine{knitr::rmarkdown}

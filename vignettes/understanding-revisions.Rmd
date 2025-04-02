@@ -1,6 +1,9 @@
 ---
 title: "Understanding Data Revisions"
 output: rmarkdown::html_vignette
+bibliography: references.bib
+biblio-style: apalike
+link-citations: true
 vignette: >
   %\VignetteIndexEntry{understanding-revisions}
   %\VignetteEngine{knitr::rmarkdown}

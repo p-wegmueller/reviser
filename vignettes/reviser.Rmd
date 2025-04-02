@@ -1,6 +1,9 @@
 ---
 title: "Introduction to reviser"
 output: rmarkdown::html_vignette
+bibliography: references.bib
+biblio-style: apalike
+link-citations: true
 vignette: >
   %\VignetteIndexEntry{Introduction to reviser}
   %\VignetteEngine{knitr::rmarkdown}
