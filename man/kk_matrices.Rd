@@ -32,17 +32,35 @@ If provided, the length of \code{params} must match the number of parameters req
 \value{
 A list containing the following components:
 \describe{
-\item{\code{II}}{Identity matrix (\eqn{I}). Size: \eqn{(e+1) \times (e+1)}.}
 \item{\code{FF}}{State transition matrix (\eqn{F}). Size: \eqn{(e+1) \times (e+1)}.}
 \item{\code{GG}}{Control matrix (\eqn{G}). Size depends on the model and \code{e}.}
-\item{\code{R}}{State noise covariance matrix (\eqn{R}). Size: \eqn{(e+1) \times (e+1)}.}
-\item{\code{H}}{Observation noise covariance matrix (\eqn{H}). Size: \eqn{(e+1) \times (e+1)}.}
+\item{\code{V}}{State noise covariance matrix (\eqn{V}). Size: \eqn{(e+1) \times (e+1)}.}
+\item{\code{W}}{Observation noise covariance matrix (\eqn{W}). Size: \eqn{(e+1) \times (e+1)}.}
 \item{\code{params}}{The vector of parameters used to construct the matrices, including their names.}
 }
 }
 \description{
-Constructs the matrices \eqn{I}, \eqn{F}, \eqn{G}, \eqn{R}, and \eqn{H} used in
+Constructs the matrices \eqn{I}, \eqn{F}, \eqn{G}, \eqn{V}, and \eqn{W} used in
 state-space models, specifically for the Kishor-Koenig (KK), Howrey, or Classical frameworks.
+}
+\details{
+The generalized  Kishor-Koenig model consists of the following equations:
+
+\strong{State Equation:}
+\deqn{ z_t = F z_{t-1} + \nu_t, \quad \nu_t \sim N(0, V)}
+
+\strong{Observation Equation:}
+\deqn{y_t = (I - G) F y_{t-1} + G z_t + \epsilon_t, \quad \epsilon_t \sim N(0, W)}
+
+where:
+\itemize{
+\item \eqn{z_t} is the state vector.
+\item \eqn{y_t} is the observed data.
+\item \eqn{F} is the state transition matrix.
+\item \eqn{G} is the control matrix.
+\item \eqn{V} is the state noise covariance matrix.
+\item \eqn{W} is the observation noise covariance matrix.
+}
 }
 \examples{
 # Example 1: Kishor-Koenig model with character matrices

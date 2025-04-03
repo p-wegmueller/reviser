@@ -29,7 +29,7 @@ The procedure is based on the assumption that there exists an efficient estimate
 \[ z_t = F z_{t-1} + \nu_t \]
 
 **2. The Observation Equation**
-\[y_t = (I - G) F y_{t-1} + G z_t + \epsilon_t,\]
+\[y_t = (I - G) F y_{t-1} + G z_t + \epsilon_t\]
 
 where 
 \[ z'_t = \begin{bmatrix} y_{t-e}^e, y_{t-e +1}^e, ...,  y_t^e \end{bmatrix}' \]
@@ -69,17 +69,18 @@ Then, armed with estimates of F and K, one can apply the Kalman filter to the fo
 **1. The Observation Equation**
 \[ y_t = Z \alpha_{t} + \varepsilon_t \]
 
-@durbinTimeSeriesAnalysis2012 assumed that both error terms are iid and orthogonal to one another. However, we write the model in the form where \( \varepsilon_t \) is equal to zero and may be omitted, so this equation is
+where \( \varepsilon_t \dist N(0,H)\). @durbinTimeSeriesAnalysis2012 assumed that both error terms are iid and orthogonal to one another. However, we write the model in the form where \( \varepsilon_t \), and therefore also \( H \) are equal to zero and may be omitted, so this equation becomes
 
 \[ y_t = Z \alpha_{t} \]
 
 **2. The State Equation**
-\[ \alpha_{t+1} = T \alpha_{t} + \eta_{t+1} \]
+\[ \alpha_{t+1} = T \alpha_{t} + R \eta_{t+1} \]
 
 where
 \[ \alpha_t = \begin{bmatrix} z_t \\ y_t - z_t  \end{bmatrix} \]
 \[ Z = \begin{bmatrix} I & I \end{bmatrix} \]
 \[ T = \begin{bmatrix} F & 0 \\ 0 & (I-G)F \end{bmatrix} \]
+\[ R = I \]
 \[ \eta_t = \begin{bmatrix} \nu_t \\ \epsilon_t - (I-G) \nu_t \end{bmatrix} \]
 \[ \eta_t \sim N(0, Q) \]
  

@@ -306,11 +306,10 @@ kk_nowcast <- function(
 
   # Cast model matrices to state space form
   sur_ss_mat <- kk_to_ss(
-    II = kk_mat_hat$II,
     FF = kk_mat_hat$FF,
     GG = kk_mat_hat$GG,
-    R = kk_mat_hat$R,
-    H = kk_mat_hat$H,
+    V = kk_mat_hat$V,
+    W = kk_mat_hat$W,
     epsilon = 1e-6
   )
 
@@ -326,13 +325,13 @@ kk_nowcast <- function(
         SSMcustom(
           Z = sur_ss_mat$Z,
           T = sur_ss_mat$Tmat,
-          R = diag(1, nrow = nrow(sur_ss_mat$W)),
-          Q = sur_ss_mat$W,
+          R = sur_ss_mat$R,
+          Q = sur_ss_mat$Q,
           a1 = m0,
           P1 = C0,
           index = c(1:ncol(Ymat))
         ),
-    H = sur_ss_mat$V
+    H = sur_ss_mat$H
   )
 
   # Run the Kalman filter
@@ -610,7 +609,9 @@ summary.kk_model <- function(object, ...) {
 #' @keywords internal
 #' @noRd
 kk_equations <- function(kk_mat_sur) {
-  e <- dim(kk_mat_sur$II)[1] - 1
+  e <- dim(kk_mat_sur$FF)[1] - 1
+
+  II <- diag(e + 1)
 
   z_names <- c(paste0("release_", e, "_lag_", (e):0))
   z_lag_names <- c(paste0("release_", e, "_lag_", (e + 1):1))
@@ -621,7 +622,7 @@ kk_equations <- function(kk_mat_sur) {
   rhs1 <- kk_mat_sur$FF %mx% z_lag_names
 
   lhs2 <- (y_names)
-  rhs2 <- (((kk_mat_sur$II %diff% kk_mat_sur$GG) %prod% kk_mat_sur$FF) %mx%
+  rhs2 <- (((II %diff% kk_mat_sur$GG) %prod% kk_mat_sur$FF) %mx%
     (y_lag_names)) %sum%
     (kk_mat_sur$GG %mx% z_names)
 
@@ -911,7 +912,7 @@ kk_ols_estim <- function(equations, data, model = "KK") {
 
 #' Create Matrices for the generalized Kishor-Koenig (KK) model
 #'
-#' Constructs the matrices \eqn{I}, \eqn{F}, \eqn{G}, \eqn{R}, and \eqn{H} used in
+#' Constructs the matrices \eqn{I}, \eqn{F}, \eqn{G}, \eqn{V}, and \eqn{W} used in
 #' state-space models, specifically for the Kishor-Koenig (KK), Howrey, or Classical frameworks.
 #'
 #' @param e Integer. The number of efficiency gaps (lags) in the model. Must be greater than 0.
@@ -935,13 +936,28 @@ kk_ols_estim <- function(equations, data, model = "KK") {
 #'
 #' @return A list containing the following components:
 #'   \describe{
-#'     \item{\code{II}}{Identity matrix (\eqn{I}). Size: \eqn{(e+1) \times (e+1)}.}
 #'     \item{\code{FF}}{State transition matrix (\eqn{F}). Size: \eqn{(e+1) \times (e+1)}.}
 #'     \item{\code{GG}}{Control matrix (\eqn{G}). Size depends on the model and \code{e}.}
-#'     \item{\code{R}}{State noise covariance matrix (\eqn{R}). Size: \eqn{(e+1) \times (e+1)}.}
-#'     \item{\code{H}}{Observation noise covariance matrix (\eqn{H}). Size: \eqn{(e+1) \times (e+1)}.}
+#'     \item{\code{V}}{State noise covariance matrix (\eqn{V}). Size: \eqn{(e+1) \times (e+1)}.}
+#'     \item{\code{W}}{Observation noise covariance matrix (\eqn{W}). Size: \eqn{(e+1) \times (e+1)}.}
 #'     \item{\code{params}}{The vector of parameters used to construct the matrices, including their names.}
 #'   }
+#'
+#' @details The generalized  Kishor-Koenig model consists of the following equations:
+#'
+#' **State Equation:**
+#' \deqn{ z_t = F z_{t-1} + \nu_t, \quad \nu_t \sim N(0, V)}
+#'
+#' **Observation Equation:**
+#' \deqn{y_t = (I - G) F y_{t-1} + G z_t + \epsilon_t, \quad \epsilon_t \sim N(0, W)}
+#'
+#' where:
+#' - \eqn{z_t} is the state vector.
+#' - \eqn{y_t} is the observed data.
+#' - \eqn{F} is the state transition matrix.
+#' - \eqn{G} is the control matrix.
+#' - \eqn{V} is the state noise covariance matrix.
+#' - \eqn{W} is the observation noise covariance matrix.
 #'
 #' @examples
 #' # Example 1: Kishor-Koenig model with character matrices
@@ -1076,22 +1092,22 @@ kk_matrices <- function(e, model, params = NULL, type = "numeric") {
 
   # Get Variance-covariance matrices
   # State noise covariance
-  R <- array(0, c(e + 1, e + 1))
+  V <- array(0, c(e + 1, e + 1))
   if (type == "numeric") {
-    R[e + 1, e + 1] <- params[[paste0("v0")]]
+    V[e + 1, e + 1] <- params[[paste0("v0")]]
   } else if (type == "character") {
-    R[e + 1, e + 1] <- "v0"
+    V[e + 1, e + 1] <- "v0"
     names(params)[ii] <- c(paste0("v0"))
   }
   ii <- ii + 1
 
   # Observation noise covariance
-  H <- array(0, c(e + 1, e + 1))
+  W <- array(0, c(e + 1, e + 1))
   for (jj in 2:(e + 1)) {
     if (type == "numeric") {
-      H[jj, jj] <- params[[paste0("eps", e + 1 - jj)]]
+      W[jj, jj] <- params[[paste0("eps", e + 1 - jj)]]
     } else if (type == "character") {
-      H[jj, jj] <- paste0("eps", e + 1 - jj)
+      W[jj, jj] <- paste0("eps", e + 1 - jj)
       names(params)[ii] <- c(paste0("eps", e + 1 - jj))
     }
 
@@ -1099,17 +1115,15 @@ kk_matrices <- function(e, model, params = NULL, type = "numeric") {
   }
 
   if (type == "character") {
-    II <- apply(II, c(1, 2), as.character)
     FF <- apply(FF, c(1, 2), as.character)
     GG <- apply(GG, c(1, 2), as.character)
-    R <- apply(R, c(1, 2), as.character)
-    H <- apply(H, c(1, 2), as.character)
+    V <- apply(V, c(1, 2), as.character)
+    W <- apply(W, c(1, 2), as.character)
   } else if (type == "numeric") {
-    II <- apply(II, c(1, 2), as.numeric)
     FF <- apply(FF, c(1, 2), as.numeric)
     GG <- apply(GG, c(1, 2), as.numeric)
-    R <- apply(R, c(1, 2), as.numeric)
-    H <- apply(H, c(1, 2), as.numeric)
+    V <- apply(V, c(1, 2), as.numeric)
+    W <- apply(W, c(1, 2), as.numeric)
   }
 
   # Sort params to ensure consistency
@@ -1126,7 +1140,7 @@ kk_matrices <- function(e, model, params = NULL, type = "numeric") {
     )]))]
   )
 
-  return(list(II = II, FF = FF, GG = GG, R = R, H = H, params = params))
+  return(list(FF = FF, GG = GG, V = V, W = W, params = params))
 }
 
 
@@ -1134,37 +1148,56 @@ kk_matrices <- function(e, model, params = NULL, type = "numeric") {
 #'
 #' Transforms the generalized Kishor-Koenig (KK) matrices into the state-space representation required for Kalman filtering and smoothing.
 #'
-#' @param II Matrix. The identity matrix used in the observation and state transition matrices.
 #' @param FF Matrix. The state transition matrix defining how the state evolves over time.
 #' @param GG Matrix. The control matrix, representing the influence of the state on observations.
-#' @param R Matrix. The state noise covariance matrix.
-#' @param H Matrix. The observation noise covariance matrix.
+#' @param V Matrix. The state noise covariance matrix.
+#' @param W Matrix. The observation noise covariance matrix.
 #' @param epsilon Numeric. A small positive number to ensure numerical stability in covariance matrices (default: \code{1e-6}).
 #'
 #' @return A list containing the state-space matrices:
 #'   \describe{
 #'     \item{\code{Z}}{The observation matrix.}
 #'     \item{\code{Tmat}}{The state transition matrix for the augmented state-space model.}
-#'     \item{\code{V}}{The observation noise covariance matrix.}
-#'     \item{\code{W}}{The state noise covariance matrix.}
+#'     \item{\code{H}}{The observation noise covariance matrix.}
+#'     \item{\code{Q}}{The state noise covariance matrix.}
+#'     \item{\code{R}}{The control matrix.}
 #'   }
+#'
+#' @details The state space model is represented by the following equations:
+#'
+#' **State Equation:**
+#' \deqn{\alpha_{t+1} = T \alpha_t + R \eta_t, \quad \eta_t \sim N(0, Q)}
+#'
+#' **Observation Equation:**
+#' \deqn{y_t = Z \alpha_t + \epsilon_t, \quad \epsilon_t \sim N(0, H)}
+#'
+#' where:
+#' - \eqn{\alpha_t} is the state vector.
+#' - \eqn{y_t} is the observed data.
+#' - \eqn{T} is the state transition matrix.
+#' - \eqn{R} is the control matrix.
+#' - \eqn{Q} is the covariance matrix of the state disturbances \eqn{\eta_t}.
+#' - \eqn{Z} is the observation matrix.
+#' - \eqn{H} is the covariance matrix of the observation disturbances \eqn{\epsilon_t}.
 #'
 #' @examples
 #' # Define example matrices
 #' II <- diag(3)
 #' FF <- matrix(c(0.9, 0.1, 0, 0.1, 0.8, 0.1, 0, 0.1, 0.9), nrow = 3)
 #' GG <- matrix(c(0.8, 0.2, 0, 0.2, 0.7, 0.1, 0, 0.1, 0.8), nrow = 3)
-#' R <- diag(3) * 0.01
-#' H <- diag(3) * 0.02
+#' V <- diag(3) * 0.01
+#' W <- diag(3) * 0.02
 #'
 #' # Generate state-space matrices
-#' ss_matrices <- kk_to_ss(II, FF, GG, R, H)
+#' ss_matrices <- kk_to_ss(FF, GG, V, W)
 #' str(ss_matrices)
 #'
 #' @export
-kk_to_ss <- function(II, FF, GG, R, H, epsilon = 1e-6) {
+kk_to_ss <- function(FF, GG, V, W, epsilon = 1e-6) {
   # Get efficient release, e
   e <- nrow(FF) - 1
+
+  II <- diag(e + 1)
 
   # Observation matrix Z
   Z <- cbind(II, II)
@@ -1176,23 +1209,24 @@ kk_to_ss <- function(II, FF, GG, R, H, epsilon = 1e-6) {
   )
 
   # Covariance matrices
-  V <- array(0, c(e + 1, e + 1))
-  W <- array(0, c(2 * (e + 1), 2 * (e + 1)))
+  R <- diag(2 * (e + 1))
+  H <- array(0, c(e + 1, e + 1))
+  Q <- array(0, c(2 * (e + 1), 2 * (e + 1)))
   v_t_2 <- R[1:(e + 1), 1:(e + 1)]
-  W[1:(e + 1), 1:(e + 1)] <- v_t_2
-  W[(1:(e + 1)), ((e + 2):(2 * (e + 1)))] <- -v_t_2 %*% t(II - GG)
-  W[((e + 2):(2 * (e + 1))), 1:(e + 1)] <- -(II - GG) %*% v_t_2
-  W[((e + 2):(2 * (e + 1))), ((e + 2):(2 * (e + 1)))] <- H[
+  Q[1:(e + 1), 1:(e + 1)] <- v_t_2
+  Q[(1:(e + 1)), ((e + 2):(2 * (e + 1)))] <- -v_t_2 %*% t(II - GG)
+  Q[((e + 2):(2 * (e + 1))), 1:(e + 1)] <- -(II - GG) %*% v_t_2
+  Q[((e + 2):(2 * (e + 1))), ((e + 2):(2 * (e + 1)))] <- H[
     1:(e + 1),
     1:(e + 1)
   ] +
     (II - GG) %*% v_t_2 %*% t(II - GG)
 
   for (jj in c(1:e, e + 2)) {
-    W[jj, jj] <- epsilon
+    Q[jj, jj] <- epsilon
   }
 
-  return(list(Z = Z, Tmat = Tmat, V = V, W = W))
+  return(list(Z = Z, Tmat = Tmat, H = H, Q = Q, R = R))
 }
 
 #' Jacobs van Norde State Space Model for Nowcasting

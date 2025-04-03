@@ -36,14 +36,13 @@ Imports:
     tibble,
     glue,
     lubridate,
-    alfred, 
-    purrr,
     KFAS
 Suggests: 
     tsbox,
     testthat (>= 3.0.0),
     knitr,
-    rmarkdown
+    rmarkdown,
+    purrr
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 URL: https://p-wegmueller.github.io/reviser/
