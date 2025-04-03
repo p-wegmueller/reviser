@@ -71,7 +71,6 @@
 #'
 #' The function requires well-structured input data with multiple vintages. The time series must
 #' be regular, and the function automatically checks and transforms the data if needed.
-#' @importFrom KFAS SSModel SSMcustom
 #' @export
 kk_nowcast <- function(
   df,
@@ -318,7 +317,7 @@ kk_nowcast <- function(
     as.matrix()
 
   # Create the SSM object
-  model_kfas <- SSModel(
+  model_kfas <- KFAS::SSModel(
     Ymat ~
       -1 +
         SSMcustom(
@@ -328,7 +327,7 @@ kk_nowcast <- function(
           Q = sur_ss_mat$Q,
           a1 = m0,
           P1 = C0,
-          index = c(seq_len(Ymat))
+          index = c(seq_len(dim(Ymat)[2]))
         ),
     H = sur_ss_mat$H
   )
@@ -1233,11 +1232,11 @@ kk_to_ss <- function(FF, GG, V, W, epsilon = 1e-6) {
   R <- diag(2 * (e + 1))
   H <- array(0, c(e + 1, e + 1))
   Q <- array(0, c(2 * (e + 1), 2 * (e + 1)))
-  v_t_2 <- R[1:(e + 1), 1:(e + 1)]
+  v_t_2 <- V[1:(e + 1), 1:(e + 1)]
   Q[1:(e + 1), 1:(e + 1)] <- v_t_2
   Q[(1:(e + 1)), ((e + 2):(2 * (e + 1)))] <- -v_t_2 %*% t(II - GG)
   Q[((e + 2):(2 * (e + 1))), 1:(e + 1)] <- -(II - GG) %*% v_t_2
-  Q[((e + 2):(2 * (e + 1))), ((e + 2):(2 * (e + 1)))] <- H[
+  Q[((e + 2):(2 * (e + 1))), ((e + 2):(2 * (e + 1)))] <- W[
     1:(e + 1),
     1:(e + 1)
   ] +

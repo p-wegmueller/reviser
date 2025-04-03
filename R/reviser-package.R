@@ -5,6 +5,8 @@
 "_PACKAGE"
 utils::globalVariables(c(
   ".",
+  "id",
+  "n",
   "final_value",
   "pub_date",
   "release",
@@ -20,6 +22,8 @@ utils::globalVariables(c(
   "realtime_period"
 ))
 
+# Import from KFAS necessary to overcome a bug when defining the model
+#' @importFrom KFAS SSModel SSMcustom
 #' @importFrom magrittr %>%
 #' @importFrom calculus %mx% %diff% %sum% %prod%
 NULL

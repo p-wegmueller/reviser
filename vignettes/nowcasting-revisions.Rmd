@@ -101,16 +101,17 @@ As a demonstration, we nowcast the Euro Area GDP using the KK model. We use the 
 
 ```{r warning = FALSE, message=FALSE}
 library(reviser)
+library(magrittr)
 library(dplyr)
 library(lubridate)
 
 gdp <- reviser::gdp %>%
   tsbox::ts_pc() %>%
-  filter(id == "EA",
+  dplyr::filter(id == "EA",
          time >= min(pub_date),
          time <= as.Date("2020-01-01")
          ) %>%
-  na.omit()
+  tidyr::drop_na()
 
 df <- get_nth_release(gdp, n = 0:14)
 

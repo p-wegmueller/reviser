@@ -1073,36 +1073,36 @@ get_revision_analysis <- function(
 
     # Computes the fraction of sign changes
     correct_sign <- data %>%
-      mutate(early_sign = sign(value), late_sign = sign(final_value)) %>%
-      summarise(
-        fraction_sign_correct = sum((early_sign - late_sign) == 0) / n(),
+      dplyr::mutate(early_sign = sign(value), late_sign = sign(final_value)) %>%
+      dplyr::summarise(
+        fraction_sign_correct = sum((early_sign - late_sign) == 0) / dplyr::n(),
         fraction_sign_wrong = 1 - fraction_sign_correct,
-        n = n()
+        n = dplyr::n()
       ) %>%
-      ungroup() %>%
-      pull(fraction_sign_correct)
+      dplyr::ungroup() %>%
+      dplyr::pull(fraction_sign_correct)
 
     # Get the fraction of changes in the sign of the change in the growth rate
     correct_change <- data %>%
-      mutate(
-        diff_value = value - lag(value, 1),
-        diff_final_value = final_value - lag(final_value, 1)
+      dplyr::mutate(
+        diff_value = value - dplyr::lag(value, 1),
+        diff_final_value = final_value - dplyr::lag(final_value, 1)
       ) %>%
-      mutate(
+      dplyr::mutate(
         early_sign = sign(diff_value),
         late_sign = sign(diff_final_value)
       ) %>%
-      summarise(
+      dplyr::summarise(
         fraction_sign_correct = sum(
           (early_sign - late_sign) == 0,
           na.rm = TRUE
         ) /
-          n(),
+          dplyr::n(),
         fraction_sign_wrong = 1 - fraction_sign_correct,
-        n = n()
+        n = dplyr::n()
       ) %>%
-      ungroup() %>%
-      pull(fraction_sign_correct)
+      dplyr::ungroup() %>%
+      dplyr::pull(fraction_sign_correct)
 
     tibble::tibble(
       Statistic = c(
@@ -1445,7 +1445,7 @@ get_nth_release <- function(df, n = 0, diagonal = FALSE) {
 
       # Filter using direct vectorized lookup
       df <- df %>%
-        filter(time >= max_time[id])
+        dplyr::filter(time >= max_time[id])
     }
   } else {
     # Ensure data is sorted by pub_date and time
