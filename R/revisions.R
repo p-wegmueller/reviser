@@ -614,7 +614,6 @@ summary.lst_efficient <- function(object, ...) {
 #'   - `value`: The observed values in the final release.
 #' @param degree An integer between 1 and 5 specifying the level of
 #' detail for the output:
-#'
 #'    1: Default, includes information about revision size.
 #'    2: includes correlation statistics of revision.
 #'    3: includes news and noise tests.
@@ -1353,9 +1352,9 @@ friedman_test <- function(series, frequency = 12) {
 #' a specific numbered release.
 #'
 #' @param df A data frame containing data vintages. The data frame must
-#' include the columns
+#' include the columns:
 #'
-#' -`pub_date` (publication date of the release)
+#' - `pub_date` (publication date of the release)
 #' - `time` (thecorresponding time period for the data).
 #' @param n The release number to extract. Accepts:
 #'

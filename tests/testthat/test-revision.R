@@ -103,7 +103,9 @@ rel_by_date <- c(
 
 test_that("interval works", {
   data <- get_revisions(df, interval = 1)
-  expect_equal(as.numeric(na.omit(round(data$value, 2))), round(rev_interval, 2))
+  expect_equal(
+    as.numeric(na.omit(round(data$value, 2))), round(rev_interval, 2)
+    )
 })
 
 test_that("latest works", {

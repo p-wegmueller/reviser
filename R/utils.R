@@ -1,16 +1,20 @@
 #' Convert Vintages Data to Long Format
 #'
-#' Converts a vintages dataset from wide format to long format, optionally adding `id` if the input
-#' is a list of data frames. The long format contains one row per combination of `time` and `names_to`
-#' (e.g., `pub_date` or `release`), with values stored in a single `value` column.
+#' Converts a vintages dataset from wide format to long format, optionally
+#' adding `id` if the input is a list of data frames. The long format contains
+#' one row per combination of `time` and `names_to` (e.g., `pub_date` or
+#' `release`), with values stored in a single `value` column.
 #'
-#' @param df A data frame, tibble, or list of data frames containing vintages data in wide format.
-#' @param names_to The name of the column to create from the wide-format column names. Must be either
-#'        `"pub_date"` (default) or `"release"`.
-#' @param keep_na Logical. If `TRUE`, retains rows with `NA` values in the `value` column. Default is `FALSE`.
+#' @param df A data frame, tibble, or list of data frames containing vintages
+#' data in wide format.
+#' @param names_to The name of the column to create from the wide-format
+#' column names. Must be either `"pub_date"` (default) or `"release"`.
+#' @param keep_na Logical. If `TRUE`, retains rows with `NA` values in the
+#' `value` column. Default is `FALSE`.
 #'
-#' @return A long-format data frame or tibble. If the input is a list of wide-format data frames, the output
-#'         will be a single combined long-format data frame.
+#' @return A long-format data frame or tibble. If the input is a list of
+#' wide-format data frames, the output will be a single combined long-format
+#' data frame.
 #'
 #'
 #' @examples
@@ -86,7 +90,7 @@ vintages_long <- function(df, names_to = "pub_date", keep_na = FALSE) {
     if (names_to == "pub_date") {
       long_df <- long_df %>%
         dplyr::mutate(pub_date = as.Date(pub_date)) %>%
-        dplyr::arrange(pub_date, time) # Ensure data is sorted by pub_date and time
+        dplyr::arrange(pub_date, time) # Ensure data is sorted
     } else if (names_to == "release") {
       long_df <- long_df %>%
         dplyr::arrange(time) # Ensure data is sorted by time
@@ -106,16 +110,19 @@ vintages_long <- function(df, names_to = "pub_date", keep_na = FALSE) {
 
 #' Convert Vintages Data to Wide Format
 #'
-#' Converts a vintages dataset from long format to wide format, optionally grouping by `id` if present.
-#' The wide format uses one column per unique value of the `names_from` parameter, with observation dates
-#' (`time`) as rows and values (`value`) as cell contents.
+#' Converts a vintages dataset from long format to wide format, optionally
+#' grouping by `id` if present. The wide format uses one column per unique
+#' value of the `names_from` parameter, with observation dates (`time`) as
+#' rows and values (`value`) as cell contents.
 #'
 #' @param df A data frame or tibble containing vintages data in long format.
-#' @param names_from The name of the column whose unique values will be used as column names in the wide format.
-#'        Defaults to `"pub_date"`. Other: `"release"`.
+#' @param names_from The name of the column whose unique values will be used
+#' as column names in the wide format. Defaults to `"pub_date"`.
+#' Other: `"release"`.
 #'
-#' @return If an `id` column is present, the function returns a named list of wide-format data frames,
-#'         one for each unique `id`. Otherwise, it returns a single wide-format data frame.
+#' @return If an `id` column is present, the function returns a named list of
+#' wide-format data frames, one for each unique `id`. Otherwise, it returns a
+#' single wide-format data frame.
 #'
 #'
 #' @examples
@@ -207,26 +214,33 @@ vintages_wide <- function(df, names_from = "pub_date") {
 
 #' Rename Columns to Align with Package Standards
 #'
-#' Renames columns in a data frame or tibble to align with the conventions used in this package.
-#' Converts the renamed columns to the appropriate data types.
+#' Renames columns in a data frame or tibble to align with the conventions used
+#'  in this package. Converts the renamed columns to the appropriate data types.
 #'
 #' @param df A data frame or tibble containing the data to be renamed.
 #' @param col_time Optional. The name of the column to be renamed as `time`.
-#'        The `time` column represents observation dates and will be converted to `Date` format.
-#' @param col_pub_date Optional. The name of the column to be renamed as `pub_date`.
-#'        The `pub_date` column represents release dates and will be converted to `Date` format.
+#' The `time` column represents observation dates and will be converted to
+#' `Date` format.
+#' @param col_pub_date Optional. The name of the column to be renamed as
+#' `pub_date`. The `pub_date` column represents release dates and will be
+#' converted to `Date` format.
 #' @param col_value Optional. The name of the column to be renamed as `value`.
-#'        The `value` column represents the observed values and will be converted to numeric.
+#' The `value` column represents the observed values and will be converted
+#' to numeric.
 #' @param col_id Optional. The name of the column to be renamed as `id`.
-#' @param col_release Optional. The name of the column to be renamed as `release`.
-#'        The `id` column is used as an identifier and will be converted to character format.
+#' @param col_release Optional. The name of the column to be renamed as
+#' `release`. The `id` column is used as an identifier and will be converted
+#' to character format.
 #'
-#' @return A data frame or tibble with the renamed columns and their respective data types converted
-#'         (if specified). The original class of the input object is preserved.
+#' @return A data frame or tibble with the renamed columns and their respective
+#'  data types converted (if specified). The original class of the input
+#'  object is preserved.
 #'
 #' @details
-#' The function checks the validity of the input data frame and ensures that at least one column
-#' is specified for renaming. If a column is renamed, it is also converted to the expected data type:
+#' The function checks the validity of the input data frame and ensures that
+#' at least one column is specified for renaming. If a column is renamed, it
+#' is also converted to the expected data type:
+#'
 #' - `time` and `pub_date` are converted to `Date`.
 #' - `value` is converted to numeric.
 #' - `release` and `id` are converted to character.
@@ -234,10 +248,14 @@ vintages_wide <- function(df, names_from = "pub_date") {
 #' @examples
 #' # Example data
 #' data <- tibble::tibble(
-#'   observation_date = seq.Date(as.Date("2020-01-01"), as.Date("2020-06-01"), by = "month"),
-#'   release_date = seq.Date(as.Date("2020-01-15"), as.Date("2020-06-15"), by = "month"),
-#'   observed_value = rnorm(6),
-#'   identifier = rep("A", 6)
+#'   observation_date = seq.Date(
+#'     as.Date("2020-01-01"), as.Date("2020-06-01"), by = "month"
+#'     ),
+#'   release_date = seq.Date(
+#'     as.Date("2020-01-15"), as.Date("2020-06-15"), by = "month"
+#'   ),
+#'    observed_value = rnorm(6),
+#'    identifier = rep("A", 6)
 #' )
 #'
 #' # Rename columns
@@ -295,7 +313,8 @@ vintages_rename <- function(
   missing_cols <- setdiff(provided_cols, colnames(df))
   if (length(missing_cols) > 0) {
     rlang::abort(glue::glue(
-      "The following specified columns are not in 'df': {paste(missing_cols, collapse = ', ')}"
+      "The following specified columns are not 
+      in 'df': {paste(missing_cols, collapse = ', ')}"
     ))
   }
 
@@ -337,11 +356,12 @@ vintages_rename <- function(
 
 #' Check if Data is in Valid Vintages Format
 #'
-#' Validates whether the provided data frame is in a proper format for vintages analysis, determining
-#' whether it is in "long" or "wide" format. Throws an error if the format is invalid.
+#' Validates whether the provided data frame is in a proper format for vintages
+#'  analysis, determining whether it is in "long" or "wide" format. Throws an
+#'  error if the format is invalid.
 #'
-#' @param df A data frame or tibble containing data vintages. The data frame must have specific columns
-#'           depending on whether it is in long or wide format.
+#' @param df A data frame or tibble containing data vintages. The data frame
+#' must have specific columns depending on whether it is in long or wide format.
 #'
 #' @return A string indicating the format of the data:
 #' - `"long"` if the data frame is in long format.
@@ -350,15 +370,21 @@ vintages_rename <- function(
 #' @examples
 #' # Example of long format data
 #' long_data <- tibble::tibble(
-#'   time = seq.Date(as.Date("2020-01-01"), as.Date("2020-06-01"), by = "month"),
-#'   pub_date = seq.Date(as.Date("2020-01-15"), as.Date("2020-06-15"), by = "month"),
+#'   time = seq.Date(
+#'     as.Date("2020-01-01"), as.Date("2020-06-01"), by = "month"
+#'   ),
+#'   pub_date = seq.Date(
+#'     as.Date("2020-01-15"), as.Date("2020-06-15"), by = "month"
+#'   ),
 #'   value = rnorm(6)
 #' )
 #' vintages_check(long_data) # Should return "long"
 #'
 #' # Example of wide format data
 #' wide_data <- tibble::tibble(
-#'   time = seq.Date(as.Date("2020-01-01"), as.Date("2020-06-01"), by = "month"),
+#'   time = seq.Date(
+#'     as.Date("2020-01-01"), as.Date("2020-06-01"), by = "month"
+#'     ),
 #'   `2020-01-15` = rnorm(6),
 #'   `2020-02-15` = rnorm(6)
 #' )
@@ -394,7 +420,8 @@ vintages_check <- function(df) {
       # Check if "pub_date" is in the correct date format
       if (!all(!is.na(as.Date(df$pub_date, format = "%Y-%m-%d")))) {
         rlang::abort(
-          "The 'pub_date' column contains values that are not in '%Y-%m-%d' format."
+          "The 'pub_date' column contains values that are not 
+          in '%Y-%m-%d' format."
         )
       }
     }
@@ -417,7 +444,8 @@ vintages_check <- function(df) {
       return("wide")
     } else {
       rlang::abort(
-        "One or more column names in the 'wide format' are not labeled correctly."
+        "One or more column names in the 'wide format' are not 
+        labeled correctly."
       )
     }
   }
@@ -442,9 +470,9 @@ vintages_assign_class <- function(df) {
   # Loop through the mapping and update classes
   for (col in names(col_class_map)) {
     if (col %in% names(df)) {
-      classes <- union(col_class_map[[col]], classes) # Add class if column exists
+      classes <- union(col_class_map[[col]], classes) # Add class
     } else {
-      classes <- setdiff(classes, col_class_map[[col]]) # Remove class if column is absent
+      classes <- setdiff(classes, col_class_map[[col]]) # Remove class
     }
   }
 

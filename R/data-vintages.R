@@ -17,7 +17,8 @@
 #' **Countries**:
 #' * CHE:
 #'   * Switzerland
-#'   * Source: [SECO](https://www.seco.admin.ch/seco/de/home/wirtschaftslage---wirtschaftspolitik/Wirtschaftslage/bip-quartalsschaetzungen-/daten.html)
+#'   * Source: [SECO](https://www.seco.admin.ch/seco/de/home/wirtschaftslage--
+#'   -wirtschaftspolitik/Wirtschaftslage/bip-quartalsschaetzungen-/daten.html)
 #'
 #' * US:
 #'   * United States

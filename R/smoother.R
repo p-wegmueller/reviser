@@ -1,44 +1,59 @@
 #' Generalized Kishor-Koenig Model for Nowcasting
 #'
-#' Implements a generalized Kishor-Koenig (KK) model for nowcasting and forecasting
-#' with state-space models, allowing for multiple vintages of data, efficient estimation,
-#' and Kalman filtering and smoothing.
+#' Implements a generalized Kishor-Koenig (KK) model for nowcasting and
+#' forecasting with state-space models, allowing for multiple vintages of data,
+#' efficient estimation, and Kalman filtering and smoothing.
 #'
-#' @param df A data frame containing the time series data in either "long" or "wide" format.
-#'           It must include columns for the time index and the different release vintages.
-#' @param e An integer indicating the number of data vintages to include in the model.
-#'          Must be greater than 0.
-#' @param h An integer specifying the forecast horizon. Default is 0, which implies no forecasts.
-#'          Must be greater than or equal to 0.
+#' @param df A data frame containing the time series data in either "long" or
+#' "wide" format.  It must include columns for the time index and the different
+#' release vintages.
+#' @param e An integer indicating the number of data vintages to include in the
+#'  model. Must be greater than 0.
+#' @param h An integer specifying the forecast horizon. Default is 0, which
+#' implies no forecasts. Must be greater than or equal to 0.
 #' @param model A string specifying the type of model to use. Options are:
 #'
 #'  - "Kishor-Koenig" or "KK" (default): Full Kishor-Koenig model.
 #'  - "Howrey": Howrey's simplified framework.
 #'  - "Classical": Classical model without vintage effects.
-#' @param method A string specifying the estimation method to use. Options are "SUR" (default) and "OLS".
+#' @param method A string specifying the estimation method to use. Options are
+#' "SUR" (default) and "OLS".
 #' @param solver_options An optional list to control the behaviour of the
 #'  underlying [systemfit::nlsystemfit()] and [stats::nlm()] solvers:
 #'
-#' - **trace**: An integer controlling the level of output for the optimization procedure.
-#'              Default is 0 (minimal output).
-#' - **maxiter**: An integer specifying the maximum number of iterations for the optimization procedure. Default is 1000.
-#' - **startvals**: A list of starting values for the optimization procedure (must match the number of parameters of the model).
+#' - **trace**: An integer controlling the level of output for the
+#' optimization procedure. Default is 0 (minimal output).
+#' - **maxiter**: An integer specifying the maximum number of iterations for
+#' the optimization procedure. Default is 1000.
+#' - **startvals**: A list of starting values for the optimization
+#' procedure (must match the number of parameters of the model).
 #' - **solvtol**: Tolerance for detecting linear dependencies in the columns of
-#'    X in the qr function calls (See [systemfit::nlsystemfit()]). Default is .Machine$double.eps.
+#'    X in the qr function calls (See [systemfit::nlsystemfit()]).
+#'    Default is .Machine$double.eps.
 #' - **gradtol**: A a positive scalar giving the tolerance at which the scaled
-#'    gradient is considered close enough to zero to terminate the algorithm (See [stats::nlm()]). Default is 1e-6.
-#' -  **steptol**: A positive scalar providing the minimum allowable relative step length (See [stats::nlm()]). Default is 1e-6.
+#'    gradient is considered close enough to zero to terminate the
+#'    algorithm (See [stats::nlm()]). Default is 1e-6.
+#' -  **steptol**: A positive scalar providing the minimum allowable relative
+#' step length (See [stats::nlm()]). Default is 1e-6.
 #'
 #' @return A list with the following components:
 #' \describe{
-#'   \item{filtered_z}{A tibble of filtered latent state variables based on the Kalman filter.}
-#'   \item{filtered_y}{A tibble of filtered observed variables based on the Kalman filter.}
-#'   \item{smoothed_z}{A tibble of smoothed latent state variables obtained using the Kalman smoother.}
-#'   \item{smoothed_y}{A tibble of smoothed observed variables obtained using the Kalman smoother.}
-#'   \item{forecast_z}{A tibble of forecasted latent state variables. Returned only if \code{h > 0}.}
-#'   \item{forecast_y}{A tibble of forecasted observed variables. Returned only if \code{h > 0}.}
-#'   \item{kk_model_mat}{A list of KK model matrices, such as transition and observation matrices.}
-#'   \item{ss_model_mat}{A list of state-space model matrices derived from the KK model.}
+#'   \item{filtered_z}{A tibble of filtered latent state variables based on
+#'   the Kalman filter.}
+#'   \item{filtered_y}{A tibble of filtered observed variables based on the
+#'   Kalman filter.}
+#'   \item{smoothed_z}{A tibble of smoothed latent state variables obtained
+#'   using the Kalman smoother.}
+#'   \item{smoothed_y}{A tibble of smoothed observed variables obtained using
+#'   the Kalman smoother.}
+#'   \item{forecast_z}{A tibble of forecasted latent state variables. Returned
+#'   only if \code{h > 0}.}
+#'   \item{forecast_y}{A tibble of forecasted observed variables. Returned
+#'   only if \code{h > 0}.}
+#'   \item{kk_model_mat}{A list of KK model matrices, such as transition
+#'   and observation matrices.}
+#'   \item{ss_model_mat}{A list of state-space model matrices derived
+#'   from the KK model.}
 #'   \item{params}{Estimated model parameters, including covariance terms.}
 #'   \item{fit}{The fitted model object from the SUR estimation procedure.}
 #'   \item{e}{The number of the efficient release (0-indexed).}
@@ -65,12 +80,14 @@
 #' model_result$params
 #'
 #' @details
-#' The function supports multiple models, including the full Kishor-Koenig framework, Howrey's model,
-#' and a classical approach. It handles data preprocessing, estimation of system equations using
-#' Seemingly Unrelated Regressions (SUR), and application of the Kalman filter and smoother.
+#' The function supports multiple models, including the full Kishor-Koenig
+#' framework, Howrey's model, and a classical approach. It handles data
+#' preprocessing, estimation of system equations using Seemingly Unrelated
+#' Regressions (SUR), and application of the Kalman filter and smoother.
 #'
-#' The function requires well-structured input data with multiple vintages. The time series must
-#' be regular, and the function automatically checks and transforms the data if needed.
+#' The function requires well-structured input data with multiple vintages.
+#' The time series must be regular, and the function automatically checks and
+#' transforms the data if needed.
 #' @export
 kk_nowcast <- function(
   df,
@@ -366,7 +383,8 @@ kk_nowcast <- function(
     frequency <- unique((round(as.numeric(diff(df$time)) / 30)))
     if (length(frequency) > 1) {
       rlang::abort(
-        "The time series seems not to be regular, please provide a regular time series!"
+        "The time series seems not to be regular, 
+        please provide a regular time series!"
       )
     }
 
@@ -405,7 +423,7 @@ kk_nowcast <- function(
       stats::na.omit()
     forecast_y <- forecast_y %>%
       dplyr::mutate(dplyr::across(
-        .cols = 1:(ncol(forecast_y) - (e + 1)), # Columns to sum (e.g., 1 to n-e)
+        .cols = 1:(ncol(forecast_y) - (e + 1)), # Columns to sum (e.g. 1 to n-e)
         .fns = ~ . +
           forecast_y[[
             which(names(forecast_y) == dplyr::cur_column()) + e
@@ -446,16 +464,19 @@ kk_nowcast <- function(
 
 #' Summarize the results of a kk_model object.
 #'
-#' This function calculates and prints the Mean Squared Error (MSE), Root Mean Squared Error (RMSE),
-#' and Mean Absolute Error (MAE) of the filtered state variables against both the final release
-#' and the true efficient release.
+#' This function calculates and prints the Mean Squared Error (MSE), Root Mean
+#' Squared Error (RMSE), and Mean Absolute Error (MAE) of the filtered state
+#' variables against both the final release and the true efficient release.
 #'
-#' @param object A list of class 'kk_model' produced by the \code{\link{kk_nowcast}} function.
+#' @param object A list of class 'kk_model' produced by the
+#' \code{\link{kk_nowcast}} function.
 #' @param ... Additional arguments (not used).
 #'
 #' @return A list containing two data frames:
-#'   \item{final_release_metrics}{A data frame with MSE, RMSE, and MAE against the final release.}
-#'   \item{true_efficient_release_metrics}{A data frame with MSE, RMSE, and MAE against the true efficient release.}
+#'   \item{final_release_metrics}{A data frame with MSE, RMSE, and MAE against
+#'   the final release.}
+#'   \item{true_efficient_release_metrics}{A data frame with MSE, RMSE, and
+#'   MAE against the true efficient release.}
 #'
 #' @examples
 #' # Assuming 'kk_model_obj' is the result of kk_nowcast(your_data, ...)
@@ -493,7 +514,7 @@ summary.kk_model <- function(object, ...) {
     all.x = TRUE
   )
 
-  # Calculate MSE, RMSE, and MAE for each filtered_z variable against final release
+  # Calculate MSE, RMSE, and MAE against final release
   mse_final <- vapply(
     names(filtered_z)[-1],
     function(col) {
@@ -512,7 +533,7 @@ summary.kk_model <- function(object, ...) {
     FUN.VALUE = numeric(1)
   ) # Specify numeric(1) for MAE
 
-  # Calculate MSE, RMSE, and MAE for each filtered_z variable against true efficient release
+  # Calculate MSE, RMSE, and MAE against true efficient release
   mse_true <- vapply(
     names(filtered_z)[-1],
     function(col) {
@@ -616,15 +637,15 @@ summary.kk_model <- function(object, ...) {
 #' This function generates a list of formula objects representing the equations
 #' for the Kishor-Koenig (KK) models based on the provided KK matrix structure.
 #'
-#' @param kk_mat_sur A list containing the KK matrix structure, including matrices
-#'   `FF`, `II`, and `GG`.
+#' @param kk_mat_sur A list containing the KK matrix structure,
+#' including matrices `FF`, `II`, and `GG`.
 #'
 #' @return A list of formula objects representing the equations of the KK model.
 #'
 #' @details
 #' The function constructs the equations based on the dimensions of the input
-#' matrices and generates formulas for each equation. It utilizes lagged variables
-#' and matrix operations to form the relationships.
+#' matrices and generates formulas for each equation. It utilizes lagged
+#' variables and matrix operations to form the relationships.
 #'
 #' @keywords internal
 #' @noRd
@@ -661,9 +682,9 @@ kk_equations <- function(kk_mat_sur) {
 #' @title Arrange Data for Kishor-Koenig (KK) Models
 #'
 #' @description
-#' This function arranges the input data frame into a format suitable for estimating
-#' Kishor-Koenig (KK) models. It generates lagged variables and combines them
-#' into a data frame.
+#' This function arranges the input data frame into a format suitable for
+#' estimating  Kishor-Koenig (KK) models. It generates lagged variables and
+#' combines them into a data frame.
 #'
 #' @param df A data frame containing the original data.
 #' @param e An integer indicating the efficient release.
@@ -671,10 +692,11 @@ kk_equations <- function(kk_mat_sur) {
 #' @return A data frame with lagged variables, prepared for KK model estimation.
 #'
 #' @details
-#' The function creates lagged versions of the release variables up to the specified
-#' lag `e`. It constructs variables named `release_e_lag_e:0`, `release_e_lag_(e+1):1`,
-#' `release_e:0_lag_e:0`, and `release_e:0_lag_(e+1):1`. The function then combines
-#' these variables into a single data frame, removing rows with missing values.
+#' The function creates lagged versions of the release variables up to
+#' the specified lag `e`. It constructs variables named `release_e_lag_e:0`,
+#' `release_e_lag_(e+1):1`, `release_e:0_lag_e:0`, and
+#' `release_e:0_lag_(e+1):1`. The function then combines these variables into
+#' a single data frame, removing rows with missing values.
 #'
 #' @keywords internal
 #' @noRd
@@ -722,7 +744,7 @@ kk_arrange_data <- function(df, e) {
 #' @title Estimate Generalized Kishor-Koenig (KK) Models via OLS
 #'
 #' @description
-#' This function estimates the parameters of generalized Kishor-Koenig (KK) models
+#' This function estimates the parameters of generalized KK models
 #' using ordinary least squares (OLS). It processes a set of equations, extracts
 #' necessary information, and fits linear models. This function is intended for
 #' internal use within the package.
@@ -741,8 +763,8 @@ kk_arrange_data <- function(df, e) {
 #'   }
 #'
 #' @details
-#' This function is designed to handle different variations of the KK model, including
-#' "Classical", "Howrey", and the standard "KK" or "Kishor-Koenig" models.
+#' This function is designed to handle different variations of the KK model,
+#' including "Classical", "Howrey", and the "KK" or "Kishor-Koenig" models.
 #' It extracts coefficients and variances based on the specified model type.
 #'
 #' @keywords internal
@@ -803,7 +825,7 @@ kk_ols_estim <- function(equations, data, model = "KK") {
       names(sig2) <- paste0("eps", e - ii + 1)
       ols_vars <- c(ols_vars, sig2)
     } else if (model == "Howrey") {
-      # Check length of extracted elements (always same in Howrey) except last equation
+      # Check length of extracted elements
       if (
         length(signs) != (length(variables) - 1) ||
           length(signs) != length(pars) && !ii == n_eq
@@ -862,7 +884,7 @@ kk_ols_estim <- function(equations, data, model = "KK") {
       ols_vars <- c(ols_vars, sig2)
       fit[[ii]] <- modeli
     } else if (model %in% c("KK", "Kishor-Koenig")) {
-      # Check length of extracted elements (always same in KK) except last equation
+      # Check length of extracted elements
       if (
         length(signs) != (length(variables) - 1) ||
           length(signs) != length(pars) && !ii == n_eq
@@ -932,44 +954,59 @@ kk_ols_estim <- function(equations, data, model = "KK") {
 
 #' Create Matrices for the generalized Kishor-Koenig (KK) model
 #'
-#' Constructs the matrices \eqn{I}, \eqn{F}, \eqn{G}, \eqn{V}, and \eqn{W} used in
-#' state-space models, specifically for the Kishor-Koenig (KK), Howrey, or Classical frameworks.
+#' Constructs the matrices \eqn{I}, \eqn{F}, \eqn{G}, \eqn{V}, and \eqn{W}
+#' used in state-space models, specifically for the Kishor-Koenig (KK), Howrey,
+#'  or Classical frameworks.
 #'
-#' @param e Integer. The number of efficiency gaps (lags) in the model. Must be greater than 0.
+#' @param e Integer. The number of efficiency gaps (lags) in the model. Must
+#' be greater than 0.
 #' @param model Character. Specifies the type of model to use. Options are:
 #'   \describe{
-#'     \item{"Kishor-Koenig" or "KK"}{Uses the Kishor-Koenig framework with \eqn{e \times (e+1)} parameters for the \eqn{G} matrix.}
-#'     \item{"Howrey"}{Uses the Howrey framework with \eqn{e \times e} parameters for the \eqn{G} matrix.}
+#'     \item{"Kishor-Koenig" or "KK"}{Uses the Kishor-Koenig framework with
+#'     \eqn{e \times (e+1)} parameters for the \eqn{G} matrix.}
+#'     \item{"Howrey"}{Uses the Howrey framework with \eqn{e \times e}
+#'     parameters for the \eqn{G} matrix.}
 #'     \item{"Classical"}{Uses a diagonal identity matrix for \eqn{G}.}
 #'   }
-#' @param params Numeric vector (optional). A vector of parameters to initialize the matrices. If \code{NULL}, default values are used:
+#' @param params Numeric vector (optional). A vector of parameters to
+#' initialize the matrices. If \code{NULL}, default values are used:
 #'   \describe{
 #'     \item{\code{type = "numeric"}}{A vector of params must be supplied.}
-#'     \item{\code{type = "character"}}{Initializes named parameters as \code{NA_real_}.}
+#'     \item{\code{type = "character"}}{Initializes named parameters
+#'     as \code{NA_real_}.}
 #'   }
-#'   If provided, the length of \code{params} must match the number of parameters required by the specified model.
+#'   If provided, the length of \code{params} must match the number of
+#'   parameters required by the specified model.
 #' @param type Character. Specifies the type of matrices returned. Options are:
 #'   \describe{
 #'     \item{"numeric"}{Returns numeric matrices with parameter values.}
-#'     \item{"character"}{Returns character matrices with parameter names. If \code{params} is provided, it is ignored.}
+#'     \item{"character"}{Returns character matrices with parameter names.
+#'     If \code{params} is provided, it is ignored.}
 #'   }
 #'
 #' @return A list containing the following components:
 #'   \describe{
-#'     \item{\code{FF}}{State transition matrix (\eqn{F}). Size: \eqn{(e+1) \times (e+1)}.}
-#'     \item{\code{GG}}{Control matrix (\eqn{G}). Size depends on the model and \code{e}.}
-#'     \item{\code{V}}{State noise covariance matrix (\eqn{V}). Size: \eqn{(e+1) \times (e+1)}.}
-#'     \item{\code{W}}{Observation noise covariance matrix (\eqn{W}). Size: \eqn{(e+1) \times (e+1)}.}
-#'     \item{\code{params}}{The vector of parameters used to construct the matrices, including their names.}
+#'     \item{\code{FF}}{State transition matrix (\eqn{F}). Size: \eqn{(e+1)
+#'      \times (e+1)}.}
+#'     \item{\code{GG}}{Control matrix (\eqn{G}). Size depends on the model
+#'     and \code{e}.}
+#'     \item{\code{V}}{State noise covariance matrix (\eqn{V}).
+#'     Size: \eqn{(e+1) \times (e+1)}.}
+#'     \item{\code{W}}{Observation noise covariance matrix (\eqn{W}).
+#'     Size: \eqn{(e+1) \times (e+1)}.}
+#'     \item{\code{params}}{The vector of parameters used to construct the
+#'     matrices, including their names.}
 #'   }
 #'
-#' @details The generalized  Kishor-Koenig model consists of the following equations:
+#' @details The generalized Kishor-Koenig model consists of the following
+#' equations:
 #'
 #' **State Equation:**
 #' \deqn{ z_t = F z_{t-1} + \nu_t, \quad \nu_t \sim N(0, V)}
 #'
 #' **Observation Equation:**
-#' \deqn{y_t = (I - G) F y_{t-1} + G z_t + \epsilon_t, \quad \epsilon_t \sim N(0, W)}
+#' \deqn{y_t = (I - G) F y_{t-1} + G z_t +
+#'  \epsilon_t, \quad \epsilon_t \sim N(0, W)}
 #'
 #' where:
 #' - \eqn{z_t} is the state vector.
@@ -987,7 +1024,9 @@ kk_ols_estim <- function(equations, data, model = "KK") {
 #' # Example 2: Kishor-Koenig model with e = 2
 #' params <- rep(0.1, 17)
 #' names(params) <- names(matrices$params)
-#' matrices <- kk_matrices(e = 3, params = params,  model = "KK", type = "numeric")
+#' matrices <- kk_matrices(
+#'   e = 3, params = params,  model = "KK", type = "numeric"
+#' )
 #' str(matrices)
 #'
 #' @export
@@ -1166,18 +1205,23 @@ kk_matrices <- function(e, model, params = NULL, type = "numeric") {
 
 #' Cast Generalized Kishor-Koenig Matrices into State-Space Form
 #'
-#' Transforms the generalized Kishor-Koenig (KK) matrices into the state-space representation required for Kalman filtering and smoothing.
+#' Transforms the generalized Kishor-Koenig (KK) matrices into the state-space
+#' representation required for Kalman filtering and smoothing.
 #'
-#' @param FF Matrix. The state transition matrix defining how the state evolves over time.
-#' @param GG Matrix. The control matrix, representing the influence of the state on observations.
+#' @param FF Matrix. The state transition matrix defining how the state
+#' evolves over time.
+#' @param GG Matrix. The control matrix, representing the influence of the
+#' state on observations.
 #' @param V Matrix. The state noise covariance matrix.
 #' @param W Matrix. The observation noise covariance matrix.
-#' @param epsilon Numeric. A small positive number to ensure numerical stability in covariance matrices (default: \code{1e-6}).
+#' @param epsilon Numeric. A small positive number to ensure numerical
+#' stability in covariance matrices (default: \code{1e-6}).
 #'
 #' @return A list containing the state-space matrices:
 #'   \describe{
 #'     \item{\code{Z}}{The observation matrix.}
-#'     \item{\code{Tmat}}{The state transition matrix for the augmented state-space model.}
+#'     \item{\code{Tmat}}{The state transition matrix for the augmented
+#'     state-space model.}
 #'     \item{\code{H}}{The observation noise covariance matrix.}
 #'     \item{\code{Q}}{The state noise covariance matrix.}
 #'     \item{\code{R}}{The control matrix.}
@@ -1198,7 +1242,8 @@ kk_matrices <- function(e, model, params = NULL, type = "numeric") {
 #' - \eqn{R} is the control matrix.
 #' - \eqn{Q} is the covariance matrix of the state disturbances \eqn{\eta_t}.
 #' - \eqn{Z} is the observation matrix.
-#' - \eqn{H} is the covariance matrix of the observation disturbances \eqn{\epsilon_t}.
+#' - \eqn{H} is the covariance matrix of the observation disturbances
+#' \eqn{\epsilon_t}.
 #'
 #' @examples
 #' # Define example matrices
@@ -1256,7 +1301,8 @@ kk_to_ss <- function(FF, GG, V, W, epsilon = 1e-6) {
 # jvn_nowcast <- function() {
 #   # Create a function to nowcast the JVN model
 #   print("Coming soon!")
-#   # R port of the Matlab code for State Space Model estimation using Kalman Filter
+#   # R port of the Matlab code for State Space Model estimation using
+#    Kalman Filter
 #
 #   # Model specifications
 #   uni <- 1 # Univariate model
@@ -1273,7 +1319,8 @@ kk_to_ss <- function(FF, GG, V, W, epsilon = 1e-6) {
 #   data_gdp_i <- read_csv("DataDiagonals-GRRGDI.csv")
 #   data_gdp_e <- read_csv("DataDiagonals-GRRGDP.csv")
 #
-#   # Ensure data_gdp_i and data_gdp_e are available and have the same structure as in Matlab
+#   # Ensure data_gdp_i and data_gdp_e are available and have the same
+#   structure as in Matlab
 #   ydata <- cbind(
 #     data_gdp_i[1:58, 2], # Adjusted index for R (1-based)
 #     data_gdp_i[1:58, 13],
@@ -1338,13 +1385,15 @@ kk_to_ss <- function(FF, GG, V, W, epsilon = 1e-6) {
 #     K <- ncol(R)
 #     M <- K * q
 #
-#     # Transition matrix (Tea) - simplified for clarity, needs proper VAR estimation
+#     # Transition matrix (Tea) - simplified for clarity, needs proper VAR
+#      estimation
 #     Tea <- matrix(0, nrow = M, ncol = M)
 #     if (const == 1) {
 #       Tea[1, 1] <- 0 # Placeholder for constant
 #     }
 #     if (q >= 1) {
-#       Tea[const + 1:K, const + 1:K] <- diag(K) # Placeholder for AR coefficients
+#       Tea[const + 1:K, const + 1:K] <- diag(K) # Placeholder for AR
+#.     coefficients
 #     }
 #
 #     # State equation
@@ -1376,7 +1425,8 @@ kk_to_ss <- function(FF, GG, V, W, epsilon = 1e-6) {
 #       model$T[1, 1] <- params[1] # Placeholder for constant
 #     }
 #     if (q >= 1) {
-#       model$T[const + 1:K, const + 1:K] <- diag(K) # Placeholder for AR coefficients
+#       model$T[const + 1:K, const + 1:K] <- diag(K) # Placeholder for AR
+#.      coefficients
 #     }
 #
 #     # Update Q (covariance matrix)
@@ -1391,7 +1441,8 @@ kk_to_ss <- function(FF, GG, V, W, epsilon = 1e-6) {
 #   n_params <- Ks + const # For Q (diagonal) and constant in Tea
 #
 #   # Initial parameter values
-#   initial_params <- c(rep(0.1, max(1, const)), rep(0.1, Ks)) # Initial values for Tea and Q
+#   initial_params <- c(rep(0.1, max(1, const)), rep(0.1, Ks)) # Initial
+#   values for Tea and Q
 #
 #   # Log-likelihood function for optimization
 #   loglik_ssm <- function(params, model, K, q, const, Ks) {
@@ -1432,5 +1483,6 @@ kk_to_ss <- function(FF, GG, V, W, epsilon = 1e-6) {
 #     smoothing = c("state", "mean", "variance", "disturbance")
 #   )
 #   alpha_hat <- smoothed_states$a
-#   # Further analysis (e.g., plotting, inference) can be done with the filtered/smoothed states
+#   # Further analysis (e.g., plotting, inference) can be done with the
+#    filtered/smoothed states
 # }
