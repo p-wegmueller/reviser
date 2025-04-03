@@ -238,8 +238,8 @@ Area GDP data. As a first step we test which release (among the first
 15) is efficient. As final release, we use the value published 4 years
 after the initial value, allowing for a 4-year revision period. It turns
 out that
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>e</mi><mo>=</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">e=3</annotation></semantics></math>
-meaning that the fourth release is an efficient estimate of the final
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>e</mi><mo>=</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">e=2</annotation></semantics></math>
+meaning that the third release is an efficient estimate of the final
 release.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://p-wegmueller.github.io/reviser/">reviser</a></span><span class="op">)</span></span>
@@ -342,8 +342,7 @@ format.</p>
 <p>Now we can compare the nowcasts with the final values and the first
 release (which serves as a naive forecast). We calculate the root mean
 squared error (RMSE) of the models and naive nowcasts. The gain is not
-very high, but it is still better than the naive forecast. The relative
-RMSE is 0.99.</p>
+very high, but it is still better than the naive forecast.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Compare nowcasts</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">nowcast</span><span class="op">)</span></span>
