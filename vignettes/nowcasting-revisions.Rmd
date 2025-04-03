@@ -79,12 +79,12 @@ Then, armed with estimates of F and K, one can apply the Kalman filter to the fo
 where
 \[ \alpha_t = \begin{bmatrix} z_t \\ y_t - z_t  \end{bmatrix} \]
 \[ Z = \begin{bmatrix} I & I \end{bmatrix} \]
-\[ T = \begin{bmatrix} F & 0 \\ 0 & (I − G)F \end{bmatrix} \]
-\[ \eta_t = \begin{bmatrix} \nu_t \\ \epsilon_t − (I − G) \nu_t \end{bmatrix} \]
+\[ T = \begin{bmatrix} F & 0 \\ 0 & (I-G)F \end{bmatrix} \]
+\[ \eta_t = \begin{bmatrix} \nu_t \\ \epsilon_t - (I-G) \nu_t \end{bmatrix} \]
 \[ \eta_t \sim N(0, Q) \]
  
 The analyst sees truth and the revisions. Both truth and revisions are included in the state vector. Importantly, when calculating the gain matrix, the model requires that one allow for the possibility that the off-diagonal matrix elements of \( Q \equiv E[\eta_t \eta'_t] \) are nonzero. In particular, our model implies that 
- \[ Q = \begin{bmatrix} \nu_t \nu'_t & -\nu_t \nu'_t (I-G)'\\ -(I-G) \nu_t \nu'_t & \varepsilon_t \varepsilon'_t + (I-G) \nu_t \nu'_t (I-G)' \end{bmatrix} \]
+ \[ Q = \begin{bmatrix} \nu_t \nu'_t & -\nu_t \nu'_t (I-G)'\\ - (I-G) \nu_t \nu'_t & \varepsilon_t \varepsilon'_t + (I-G) \nu_t \nu'_t (I-G)' \end{bmatrix} \]
 
 
 
@@ -143,46 +143,15 @@ nowcast$params
 
 # Filtered states
 filt_states <- nowcast$filtered_z
-head(filt_states)
+tail(filt_states)
 ```
 
 Now we can compare the nowcasts with the final values and the first release (which serves as a naive forecast). We calculate the root mean squared error (RMSE) of the models and naive nowcasts. The gain is not very high, but it is still better than the naive forecast. The relative RMSE is 0.99.
 
 ```{r warning = FALSE, message=FALSE}
 # Compare nowcasts
-
-# Filtered efficient release
-filt_eff_release <- filt_states[,c(1,2+e)]
-
-# First and final values
-final_vals <- vintages_wide(efficient_release$data, names_from = "release")[,c("time", "final")]
-first_vals <- vintages_wide(efficient_release$data, names_from = "release")[,c(1,2)]
-
-
-eval_data <- full_join(
-  first_vals,
-  filt_eff_release,
-  by = "time"
-) %>% full_join(
-  final_vals,
-  by = "time"
-) %>% rename(
-  "nowcast" = 3,
-  "final" = 4,
-  "first" = 2
-) %>% arrange(time)
-
-rmse <- na.omit(eval_data) %>%
-  summarize(
-    rmse_nc = sqrt(mean((nowcast - final)^2)),
-    rmse_first = sqrt(mean((first - final)^2))
-  )
-
-# Relative RMSE
-print(rmse$rmse_nc / rmse$rmse_first)
-
+summary(nowcast)
 ```
-
 
 
 ### References

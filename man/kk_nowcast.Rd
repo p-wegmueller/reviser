@@ -60,6 +60,7 @@ A list with the following components:
 \item{params}{Estimated model parameters, including covariance terms.}
 \item{fit}{The fitted model object from the SUR estimation procedure.}
 \item{e}{The number of the efficient release (0-indexed).}
+\item{data}{The input data in wide format.}
 }
 }
 \description{

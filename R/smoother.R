@@ -42,6 +42,7 @@
 #'   \item{params}{Estimated model parameters, including covariance terms.}
 #'   \item{fit}{The fitted model object from the SUR estimation procedure.}
 #'   \item{e}{The number of the efficient release (0-indexed).}
+#'   \item{data}{The input data in wide format.}
 #' }
 #'
 #' @examples
@@ -439,11 +440,155 @@ kk_nowcast <- function(
     ss_model_mat = sur_ss_mat,
     params = params,
     fit = fit,
-    e = e
+    e = e,
+    data = df
   )
   class(results) <- c("kk_model", class(results))
 
   return(results)
+}
+
+#' Summarize the results of a kk_model object.
+#'
+#' This function calculates and prints the Mean Squared Error (MSE), Root Mean Squared Error (RMSE),
+#' and Mean Absolute Error (MAE) of the filtered state variables against both the final release
+#' and the true efficient release.
+#'
+#' @param object A list of class 'kk_model' produced by the \code{\link{kk_nowcast}} function.
+#' @param ... Additional arguments (not used).
+#'
+#' @return A list containing two data frames:
+#'   \item{final_release_metrics}{A data frame with MSE, RMSE, and MAE against the final release.}
+#'   \item{true_efficient_release_metrics}{A data frame with MSE, RMSE, and MAE against the true efficient release.}
+#'
+#' @examples
+#' # Assuming 'kk_model_obj' is the result of kk_nowcast(your_data, ...)
+#' # and 'your_data' is the original data frame.
+#' # results <- summary.kk_model(kk_model_obj, your_data)
+#'
+#' @export
+summary.kk_model <- function(object, ...) {
+  # Check if the input is a kk_model object
+  if (!inherits(object, "kk_model")) {
+    rlang::abort("Input must be a 'kk_model' object.")
+  }
+
+  e <- object$e
+  filtered_z <- object$filtered_z[, c(1, e + 2)]
+  colnames(filtered_z) <- c("time", paste0("release_", e, "_filtered"))
+  df <- object$data
+
+  # Extract final and true efficient releases
+  final_release <- df[, c("time", "final")]
+  true_efficient_release <- df[, c(1, e + 2)]
+
+  # Extract first release (naive nowcast)
+  first_release <- df[, c(1, 2)]
+
+  # Merge filtered_z with naive
+  filtered_z <- merge(filtered_z, first_release, by = "time", all.x = TRUE)
+
+  # Merge filtered_z with final and true efficient releases
+  merged_final <- merge(filtered_z, final_release, by = "time", all.x = TRUE)
+  merged_true <- merge(
+    filtered_z,
+    true_efficient_release,
+    by = "time",
+    all.x = TRUE
+  )
+
+  # Calculate MSE, RMSE, and MAE for each filtered_z variable against final release
+  mse_final <- sapply(names(filtered_z)[-1], function(col) {
+    mean((merged_final[[col]] - merged_final$final)^2, na.rm = TRUE)
+  })
+  rmse_final <- sqrt(mse_final)
+  mae_final <- sapply(names(filtered_z)[-1], function(col) {
+    mean(abs(merged_final[[col]] - merged_final$final), na.rm = TRUE)
+  })
+
+  # Calculate MSE, RMSE, and MAE for each filtered_z variable against true efficient release
+  mse_true <- sapply(names(filtered_z)[-1], function(col) {
+    mean(
+      (merged_true[[col]] - merged_true[[names(true_efficient_release)[2]]])^2,
+      na.rm = TRUE
+    )
+  })
+  rmse_true <- sqrt(mse_true)
+  mae_true <- sapply(names(filtered_z)[-1], function(col) {
+    mean(
+      abs(merged_true[[col]] - merged_true[[names(true_efficient_release)[2]]]),
+      na.rm = TRUE
+    )
+  })
+
+  # Create result list
+  results <- list(
+    final_release_metrics = data.frame(
+      MSE = mse_final,
+      RMSE = rmse_final,
+      MAE = mae_final
+    ),
+    true_efficient_release_metrics = data.frame(
+      MSE = mse_true,
+      RMSE = rmse_true,
+      MAE = mae_true
+    ),
+    final_release_relative_metrics = data.frame(
+      MSE = mse_final / mse_final[length(mse_final)],
+      RMSE = rmse_final / rmse_final[length(rmse_final)],
+      MAE = mae_final / mae_final[length(mae_final)]
+    ),
+    true_efficient_release_relative_metrics = data.frame(
+      MSE = mse_true / mse_true[length(mse_true)],
+      RMSE = rmse_true / rmse_true[length(rmse_true)],
+      MAE = mae_true / mae_true[length(mae_true)]
+    )
+  )
+
+  # Function to print results in a nicely formatted way
+  print_metrics <- function(title, metrics) {
+    cat("\n", strrep("=", 70), "\n", sep = "")
+    cat(title, "\n")
+    cat(strrep("=", 70), "\n", sep = "")
+
+    # Ensure row names are included
+    formatted_metrics <- cbind(
+      Release = rownames(metrics),
+      as.data.frame(lapply(
+        metrics,
+        function(x) formatC(x, format = "f", digits = 4)
+      ))
+    )
+
+    # Print column headers
+    cat(paste(names(formatted_metrics), collapse = " | "), "\n")
+    cat(strrep("-", 70), "\n", sep = "")
+
+    # Print each row with proper spacing
+    apply(
+      formatted_metrics,
+      1,
+      function(row) cat(paste(row, collapse = " | "), "\n")
+    )
+  }
+
+  # Print the metrics
+  print_metrics("Metrics against final release:", results$final_release_metrics)
+  print_metrics(
+    "Metrics against published efficient release:",
+    results$true_efficient_release_metrics
+  )
+  print_metrics(
+    "Metrics against final release relative to naive:",
+    results$final_release_relative_metrics
+  )
+  print_metrics(
+    "Metrics against published efficient release relative to naive:",
+    results$true_efficient_release_relative_metrics
+  )
+  cat("\n")
+
+  return(invisible(results))
 }
 
 #' @title Create Equations for Kishor-Koenig (KK) Models
