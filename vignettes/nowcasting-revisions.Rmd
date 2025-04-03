@@ -95,7 +95,7 @@ $$\langle \alpha_{T+i} \rangle_T = \langle T \rangle_T^i \langle \alpha_T \rangl
 
 
 ### Nowcasting using the `reviser` package
-As a demonstration, we nowcast the Euro Area GDP using the KK model. We use the `reviser::gdp` dataset, which contains the Euro Area GDP data. As a first step we test which release (among the first 15) is efficient. As final release, we use the value published 4 years after the initial value, allowing for a 4-year revision period. It turns out that $e=3$ meaning that the fourth release is an efficient estimate of the final release.
+As a demonstration, we nowcast the Euro Area GDP using the KK model. We use the `reviser::gdp` dataset, which contains the Euro Area GDP data. As a first step we test which release (among the first 15) is efficient. As final release, we use the value published 4 years after the initial value, allowing for a 4-year revision period. It turns out that $e=2$ meaning that the third release is an efficient estimate of the final release.
 
 
 ```{r warning = FALSE, message=FALSE}
@@ -146,7 +146,7 @@ filt_states <- nowcast$filtered_z
 tail(filt_states)
 ```
 
-Now we can compare the nowcasts with the final values and the first release (which serves as a naive forecast). We calculate the root mean squared error (RMSE) of the models and naive nowcasts. The gain is not very high, but it is still better than the naive forecast. The relative RMSE is 0.99.
+Now we can compare the nowcasts with the final values and the first release (which serves as a naive forecast). We calculate the root mean squared error (RMSE) of the models and naive nowcasts. The gain is not very high, but it is still better than the naive forecast.
 
 ```{r warning = FALSE, message=FALSE}
 # Compare nowcasts
