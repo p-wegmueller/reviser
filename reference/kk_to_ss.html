@@ -52,18 +52,14 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">kk_to_ss</span><span class="op">(</span><span class="va">II</span>, <span class="va">FF</span>, <span class="va">GG</span>, <span class="va">R</span>, <span class="va">H</span>, epsilon <span class="op">=</span> <span class="fl">1e-06</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">kk_to_ss</span><span class="op">(</span><span class="va">FF</span>, <span class="va">GG</span>, <span class="va">V</span>, <span class="va">W</span>, epsilon <span class="op">=</span> <span class="fl">1e-06</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
 
-<dl><dt id="arg-ii">II<a class="anchor" aria-label="anchor" href="#arg-ii"></a></dt>
-<dd><p>Matrix. The identity matrix used in the observation and state transition matrices.</p></dd>
-
-
-<dt id="arg-ff">FF<a class="anchor" aria-label="anchor" href="#arg-ff"></a></dt>
+<dl><dt id="arg-ff">FF<a class="anchor" aria-label="anchor" href="#arg-ff"></a></dt>
 <dd><p>Matrix. The state transition matrix defining how the state evolves over time.</p></dd>
 
 
@@ -71,11 +67,11 @@
 <dd><p>Matrix. The control matrix, representing the influence of the state on observations.</p></dd>
 
 
-<dt id="arg-r">R<a class="anchor" aria-label="anchor" href="#arg-r"></a></dt>
+<dt id="arg-v">V<a class="anchor" aria-label="anchor" href="#arg-v"></a></dt>
 <dd><p>Matrix. The state noise covariance matrix.</p></dd>
 
 
-<dt id="arg-h">H<a class="anchor" aria-label="anchor" href="#arg-h"></a></dt>
+<dt id="arg-w">W<a class="anchor" aria-label="anchor" href="#arg-w"></a></dt>
 <dd><p>Matrix. The observation noise covariance matrix.</p></dd>
 
 
@@ -91,14 +87,32 @@
 <dt><code>Tmat</code></dt>
 <dd><p>The state transition matrix for the augmented state-space model.</p></dd>
 
-<dt><code>V</code></dt>
+<dt><code>H</code></dt>
 <dd><p>The observation noise covariance matrix.</p></dd>
 
-<dt><code>W</code></dt>
+<dt><code>Q</code></dt>
 <dd><p>The state noise covariance matrix.</p></dd>
+
+<dt><code>R</code></dt>
+<dd><p>The control matrix.</p></dd>
 
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>The state space model is represented by the following equations:</p>
+<p><strong>State Equation:</strong>
+$$\alpha_{t+1} = T \alpha_t + R \eta_t, \quad \eta_t \sim N(0, Q)$$</p>
+<p><strong>Observation Equation:</strong>
+$$y_t = Z \alpha_t + \epsilon_t, \quad \epsilon_t \sim N(0, H)$$</p>
+<p>where:</p><ul><li><p>\(\alpha_t\) is the state vector.</p></li>
+<li><p>\(y_t\) is the observed data.</p></li>
+<li><p>\(T\) is the state transition matrix.</p></li>
+<li><p>\(R\) is the control matrix.</p></li>
+<li><p>\(Q\) is the covariance matrix of the state disturbances \(\eta_t\).</p></li>
+<li><p>\(Z\) is the observation matrix.</p></li>
+<li><p>\(H\) is the covariance matrix of the observation disturbances \(\epsilon_t\).</p></li>
+</ul></div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
@@ -106,17 +120,18 @@
 <span class="r-in"><span><span class="va">II</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">FF</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.9</span>, <span class="fl">0.1</span>, <span class="fl">0</span>, <span class="fl">0.1</span>, <span class="fl">0.8</span>, <span class="fl">0.1</span>, <span class="fl">0</span>, <span class="fl">0.1</span>, <span class="fl">0.9</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">GG</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.8</span>, <span class="fl">0.2</span>, <span class="fl">0</span>, <span class="fl">0.2</span>, <span class="fl">0.7</span>, <span class="fl">0.1</span>, <span class="fl">0</span>, <span class="fl">0.1</span>, <span class="fl">0.8</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">R</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span> <span class="op">*</span> <span class="fl">0.01</span></span></span>
-<span class="r-in"><span><span class="va">H</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span> <span class="op">*</span> <span class="fl">0.02</span></span></span>
+<span class="r-in"><span><span class="va">V</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span> <span class="op">*</span> <span class="fl">0.01</span></span></span>
+<span class="r-in"><span><span class="va">W</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span> <span class="op">*</span> <span class="fl">0.02</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Generate state-space matrices</span></span></span>
-<span class="r-in"><span><span class="va">ss_matrices</span> <span class="op">&lt;-</span> <span class="fu">kk_to_ss</span><span class="op">(</span><span class="va">II</span>, <span class="va">FF</span>, <span class="va">GG</span>, <span class="va">R</span>, <span class="va">H</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">ss_matrices</span> <span class="op">&lt;-</span> <span class="fu">kk_to_ss</span><span class="op">(</span><span class="va">FF</span>, <span class="va">GG</span>, <span class="va">V</span>, <span class="va">W</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">ss_matrices</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> List of 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> List of 5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ Z   : num [1:3, 1:6] 1 0 0 0 1 0 0 0 1 1 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ Tmat: num [1:6, 1:6] 0.9 0.1 0 0 0 0 0.1 0.8 0.1 0 ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ V   : num [1:3, 1:3] 0 0 0 0 0 0 0 0 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ W   : num [1:6, 1:6] 1e-06 0e+00 0e+00 -2e-03 2e-03 0e+00 0e+00 1e-06 0e+00 2e-03 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ H   : num [1:3, 1:3] 0 0 0 0 0 0 0 0 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Q   : num [1:6, 1:6] 1e-06 0e+00 0e+00 -2e-01 2e-01 0e+00 0e+00 1e-06 0e+00 2e-01 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ R   : num [1:6, 1:6] 1 0 0 0 0 0 0 1 0 0 ...</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
