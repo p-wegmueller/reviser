@@ -7,8 +7,9 @@
 \method{summary}{lst_efficient}(object, ...)
 }
 \arguments{
-\item{object}{An output object from the \code{get_first_efficient_release} function.
-The object must be of class \code{list_eff_rel}.}
+\item{object}{An output object from the
+\code{get_first_efficient_release} function. The object must be of
+class \code{list_eff_rel}.}
 
 \item{...}{Additional arguments (not used).}
 }
@@ -19,21 +20,24 @@ Returns a tibble with the following columns:
 \item \code{e}: The index of the first efficient release.
 \item \code{alpha}: The intercept coefficient of the regression model.
 \item \code{beta}: The coefficient of the slope.
-\item \code{p-value}: The p-value of the joint hypothesis test (alpha = 0 and beta = 1).
+\item \code{p-value}: The p-value for the joint hypothesis (alpha = 0 and beta = 1).
 \item \code{n_tested}: The number of releases tested.
 }
 }
 \description{
-Provides a detailed summary of the regression model and hypothesis test for the first efficient release
-identified by the \code{get_first_efficient_release} function.
+Provides a detailed summary of the regression model and hypothesis test for
+the first efficient release identified by the
+\code{get_first_efficient_release()} function.
 }
 \details{
 This function prints the following information:
 \itemize{
 \item The index of the first efficient release.
-\item A summary of the regression model fitted for the efficient release, which includes coefficients,
+\item A summary of the regression model fitted for the efficient release,
+which includes coefficients,
 R-squared values, and other relevant statistics.
-\item The hypothesis test results for the efficient release, showing the test statistic and p-value
+\item The hypothesis test results for the efficient release, showing the
+test statistic and p-value
 for the null hypothesis of unbiasedness and efficiency.
 }
 
@@ -46,9 +50,15 @@ The function assumes the object includes:
 }
 \examples{
 # Example usage
-df <- get_nth_release(tsbox::ts_pc(dplyr::filter(reviser::gdp , id=="US")), n = 1:4)
+df <- get_nth_release(
+  tsbox::ts_pc(dplyr::filter(reviser::gdp , id=="US")),
+  n = 1:4
+)
 
-final_release <- get_nth_release(tsbox::ts_pc(dplyr::filter(reviser::gdp, id=="US")), n = 10)
+final_release <- get_nth_release(
+  tsbox::ts_pc(dplyr::filter(reviser::gdp, id=="US")),
+  n = 10
+)
 
 # Identify the first efficient release
 result <- get_first_efficient_release(df, final_release, significance = 0.05)

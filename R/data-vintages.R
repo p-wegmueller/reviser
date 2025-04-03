@@ -13,7 +13,7 @@
 #'     * `id`: Country code
 #'
 #' @section Sources:
-#' * All the data is taken from the realtime database of Indergand and Leist (2014).
+#' * All the data is from the realtime database of Indergand and Leist (2014).
 #' **Countries**:
 #' * CHE:
 #'   * Switzerland
@@ -31,7 +31,9 @@
 #'   * Japan
 #'   * Sources: Cabinet Office (Japan), OECD
 #'
-#' @references Indergand, R., Leist, S. A Real-Time Data Set for Switzerland. Swiss J Economics Statistics 150, 331–352 (2014). \url{https://doi.org/10.1007/BF03399410}
+#' @references Indergand, R., Leist, S. A Real-Time Data Set for Switzerland.
+#' Swiss J Economics Statistics 150, 331–352 (2014).
+#'  \url{https://doi.org/10.1007/BF03399410}
 #'
 #' @examples
 #' # Load [gdp] dataset

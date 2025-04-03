@@ -7,22 +7,26 @@
 get_days_to_release(df)
 }
 \arguments{
-\item{df}{A data frame containing data vintages. The data frame must include the columns
-\code{pub_date} (publication date of the release) and \code{time} (the corresponding time period for the data).}
+\item{df}{A data frame containing data vintages. The data frame must
+include the columns \code{pub_date} (publication date of the release) and
+\code{time} (the corresponding time period for the data).}
 }
 \value{
-A data frame with an additional column \code{days_to_release} representing the number of days between
-the publication date (\code{pub_date}) and the time period (\code{time}) for each release.
+A data frame with an additional column \code{days_to_release}
+representing the number of days between the publication date (\code{pub_date})
+and the time period (\code{time}) for each release.
 }
 \description{
-Computes the number of days between the publication date (\code{pub_date}) of a release and the time period
-(\code{time}) end date for each record in the dataset.
+Computes the number of days between the publication date (\code{pub_date}) of a
+release and the time period  (\code{time}) end date for each record in
+the dataset.
 }
 \details{
-The function calculates the difference between \code{pub_date} and \code{time} for each row in the dataset.
-The result is expressed as the number of days between the release publication date and the corresponding
-time period end. If the dataset is in wide format, it will first be transformed into long format using
-\code{vintages_long}.
+The function calculates the difference between \code{pub_date} and \code{time}
+for each row in the dataset. The result is expressed as the number of days
+between the release publication date and the corresponding time period end.
+If the dataset is in wide format, it will first be transformed into long
+format using \code{vintages_long}.
 }
 \examples{
 # Example data

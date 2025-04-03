@@ -7,33 +7,46 @@
 get_nth_release(df, n = 0, diagonal = FALSE)
 }
 \arguments{
-\item{df}{A data frame containing data vintages. The data frame must include the columns
-\code{pub_date} (publication date of the release) and \code{time} (the corresponding time period for the data).}
+\item{df}{A data frame containing data vintages. The data frame must
+include the columns
+
+-\code{pub_date} (publication date of the release)
+\itemize{
+\item \code{time} (thecorresponding time period for the data).
+}}
 
 \item{n}{The release number to extract. Accepts:
-- A positive integer or vector (e.g., 1 for the first release, 2 for the second, etc.).
-- \code{"first"} to extract the first release.
-- \code{"latest"} to extract the most recent release.
-Default is 1 (the first release).}
+\itemize{
+\item Positive integer or vector (e.g., 1 for first release, 2 for  second, etc.)
+\item \code{"first"} to extract the first release.
+\item \code{"latest"} to extract the most recent release.
+Default is 1 (the first release).
+}}
 
-\item{diagonal}{Logical. If \code{TRUE}, the function only returns real first releases.}
+\item{diagonal}{Logical. If \code{TRUE}, the function only returns real
+first releases.}
 }
 \value{
-A filtered data frame containing only the specified release(s). The resulting data frame is
-assigned the class \code{tbl_release} to indicate its structure. If diagonal
-is set to \code{TRUE}, the function only returns the real first releases. That is historic values for which no
-vintages exist are not returned.
+A filtered data frame containing only the specified release(s).
+The resulting data frame is assigned the class \code{tbl_release} to indicate
+its structure. If diagonal is set to \code{TRUE}, the function only returns the
+real first releases. That is historic values for which no vintages exist
+are not returned.
 }
 \description{
-Filters the input dataset to return the Nth release (or vintage) of data for each time period.
-The function supports selecting the first, latest, or a specific numbered release.
+Filters the input dataset to return the Nth release (or vintage) of data
+for each time period. The function supports selecting the first, latest, or
+a specific numbered release.
 }
 \details{
 The behavior depends on the value of \code{n}:
 \itemize{
-\item \strong{Non-negative integer}: The function retrieves the Nth release for each time period (e.g., 0 = first release, 1 = second release, etc.).
-\item \strong{"first"}: Retrieves the first release for each time period (via \code{get_first_release}).
-\item \strong{"latest"}: Retrieves the most recent release for each time period (via \code{get_latest_release}).
+\item \strong{Non-negative integer}: The function retrieves the Nth release for each
+time period (e.g., 0 = first release, 1 = second release, etc.).
+\item \strong{"first"}: Retrieves the first release for each time
+period (via \code{get_first_release}).
+\item \strong{"latest"}: Retrieves the most recent release for each time
+period (via \code{get_latest_release}).
 }
 }
 \examples{

@@ -7,45 +7,57 @@
 get_revisions(df, interval = NULL, nth_release = NULL, ref_date = NULL)
 }
 \arguments{
-\item{df}{A data frame containing vintage data. The data frame must include at least the following columns:
+\item{df}{A data frame containing vintage data. The data frame must
+include at least the following columns:
 \itemize{
 \item \code{pub_date}: The publication date of each vintage.
 \item \code{time}: The reference period (e.g., quarter or month).
 \item \code{value}: The observed value for the given vintage and reference period.
 }}
 
-\item{interval}{A positive integer specifying the lag (in periods) between vintages to compute revisions.
+\item{interval}{A positive integer specifying the lag (in periods) between
+vintages to compute revisions.
 Defaults to \code{1} if no other parameter is specified.}
 
-\item{nth_release}{A positive integer or \code{"latest"}, specifying the release to use as a reference for revisions.
+\item{nth_release}{A positive integer or \code{"latest"}, specifying the release
+to use as a reference for revisions.
 If \code{"latest"}, the most recent vintage is used.}
 
-\item{ref_date}{A date specifying the fixed reference publication date to compare all vintages against.}
+\item{ref_date}{A date specifying the fixed reference publication date to
+compare all vintages against.}
 }
 \value{
-A data frame (tibble) of class \code{tbl_revision}, with the following columns:
+A data frame (tibble) of class \code{tbl_revision}, with the
+following columns:
 \itemize{
 \item \code{pub_date}: The publication date of the vintage.
 \item \code{time}: The reference period (e.g., quarter or month).
-\item \code{value}: The calculated revision, i.e., the difference between the observed value and the reference value.
+\item \code{value}: The calculated revision, i.e., the difference between the
+observed value and the reference value.
 }
 }
 \description{
-Computes revisions in vintage data based on specified reference points: a fixed reference date,
-the nth release, or a specified interval. This function allows users to analyze differences between
-data vintages across time.
+Computes revisions in vintage data based on specified reference points:
+a fixed reference date, the nth release, or a specified interval.
+This function allows users to analyze differences between data vintages
+across time.
 }
 \details{
-The function supports three mutually exclusive methods for calculating revisions:
+The function supports three mutually exclusive methods for
+calculating revisions:
 \itemize{
-\item \strong{Reference date (\code{ref_date})}: Computes revisions relative to a fixed publication date.
-\item \strong{Interval (\code{interval})}: Computes revisions relative to vintages published \code{interval} periods earlier.
-\item \strong{Nth release (\code{nth_release})}: Computes revisions relative to the nth vintage release for each reference period.
+\item \strong{Reference date (\code{ref_date})}: Computes revisions relative to a
+fixed publication date.
+\item \strong{Interval (\code{interval})}: Computes revisions relative to vintages
+published \code{interval} periods earlier.
+\item \strong{Nth release (\code{nth_release})}: Computes revisions relative to the
+nth vintage release for each reference period.
 }
 
 If no method is explicitly specified, \code{interval = 1} is used by default.
 
-Input validation ensures that only one of \code{ref_date}, \code{nth_release}, or \code{interval} is specified.
+Input validation ensures that only one of \code{ref_date}, \code{nth_release}, or
+\code{interval} is specified.
 }
 \examples{
 # Example data

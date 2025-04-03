@@ -1,34 +1,49 @@
 #' Plot Vintages Data
 #'
-#' A flexible function to visualize vintage data using various plot types such as line plots, point plots, bar plots, or boxplots.
-#' The function ensures that input data is validated and appropriately transformed before plotting.
+#' A flexible function to visualize vintage data using various plot types such
+#' as line plots, point plots, bar plots, or boxplots. The function ensures
+#' that input data is validated and appropriately transformed before plotting.
 #'
-#' @param df A data frame containing the vintage data to be plotted. Must include at least two columns:
+#' @param df A data frame containing the vintage data to be plotted. Must
+#' include at least two columns:
 #' one for time (`time`) and one for value (`value`).
-#' @param type A character string specifying the type of plot to create. Options are:
+#' @param type A character string specifying the type of plot to create.
+#' Options are:
 #' \itemize{
 #'   \item{ "line": Line plot (default).}
 #'   \item{ "point": Scatter plot.}
 #'   \item{ "bar": Bar plot.}
 #'   \item{ "boxplot": Boxplot.}
 #'   }
-#' @param dim_col A character string specifying the column name in `df` that represents publication dates or other grouping dimensions (e.g. `"release"`). Defaults to `"pub_date"`.
-#' @param time_col A character string specifying the column name in `df` that represents the time variable. Defaults to `"time"`.
-#' @param title A character string specifying the title of the plot. Defaults to an empty string.
-#' @param subtitle A character string specifying the subtitle of the plot. Defaults to an empty string.
-#' @param ylab A character string specifying the label for the y-axis. Defaults to an empty string.
+#' @param dim_col A character string specifying the column name in `df` that
+#' represents publication dates or other grouping dimensions (e.g. `"release"`).
+#' Defaults to `"pub_date"`.
+#' @param time_col A character string specifying the column name in `df` that
+#' represents the time variable. Defaults to `"time"`.
+#' @param title A character string specifying the title of the plot.
+#' Defaults to an empty string.
+#' @param subtitle A character string specifying the subtitle of the plot.
+#' Defaults to an empty string.
+#' @param ylab A character string specifying the label for the y-axis.
+#' Defaults to an empty string.
 #'
-#' @return A ggplot2 plot object representing the specified vintage data visualization.
+#' @return A ggplot2 plot object representing the specified vintage
+#' data visualization.
 #'
 #' @details
-#' The `plot_vintages` function is designed to handle data frames in both wide and long formats. It ensures
-#' that the provided data frame includes the necessary columns for plotting. If the `dim_col` column contains
-#' more than 30 unique values, only the most recent 30 are plotted. Additionally, the function supports
-#' custom themes and color scales using `scale_color_reviser`, `scale_fill_reviser`, and `theme_reviser`.
+#' The `plot_vintages` function is designed to handle data frames in both
+#' wide and long formats. It ensures
+#' that the provided data frame includes the necessary columns for plotting.
+#' If the `dim_col` column contains
+#' more than 30 unique values, only the most recent 30 are plotted.
+#' Additionally, the function supports
+#' custom themes and color scales using `scale_color_reviser`,
+#' `scale_fill_reviser`, and `theme_reviser`.
 #'
 #' The function raises an error if:
 #' \itemize{
-#'  \item{The `type` argument is not one of `"line"`, `"point"`, `"bar"`, or `"boxplot"`.}
+#'  \item{The `type` argument is not one of `"line"`, `"point"`, `"bar"`,
+#'  or `"boxplot"`.}
 #'  \item{The specified `dim_col` is not a column in `df`.}
 #'  \item{`title`, `subtitle`, or `ylab` are not character strings.}
 #' }
@@ -37,7 +52,8 @@
 #' @examples
 #' # Example data
 #' df <- data.frame(
-#'   time = rep(seq.Date(from = as.Date("2022-01-01"), by = "month", length.out = 12), 3),
+#'   time = rep(seq.Date(from = as.Date("2022-01-01"),
+#'   by = "month", length.out = 12), 3),
 #'   value = runif(36, 50, 100),
 #'   pub_date = rep(c("2022-01-05", "2022-02-07", "2022-03-03"), each = 12)
 #' )
@@ -190,7 +206,7 @@ plot_vintages <- function(
         scale_fill_reviser()
     } else if (type == "boxplot") {
       rlang::abort(
-        "'type' boxplot not supported if 'dim_col' contains only one unique value."
+        "'type' boxplot not supported if 'dim_col' contains one unique value."
       )
     } else {
       rlang::abort("Invalid 'type' argument. Must be either 'line' or 'point'.")
@@ -263,21 +279,29 @@ plot_vintages <- function(
 
 #' Custom Visualization Theme and Color Scales for Reviser
 #'
-#' These functions provide a custom visualization theme and color scales for use with ggplot2, inspired by the `tsbox` package.
+#' These functions provide a custom visualization theme and color scales for
+#' use with ggplot2, inspired by the `tsbox` package.
 #'
 #' @param base_size Numeric. The base font size for the theme. Default is 12.
-#' @param legend.position Character. Position of the legend. Default is "bottom".
-#' @param legend.direction Character. Direction of the legend. Default is "horizontal".
+#' @param legend.position Character. Position of the legend.
+#' Default is "bottom".
+#' @param legend.direction Character. Direction of the legend.
+#' Default is "horizontal".
 #' @param ... Additional arguments passed to the ggplot2 scale functions.
 #'
 #' @return A customized ggplot2 theme, color palette, or scale.
 #'
 #' @details
 #' \itemize{
-#' \item{`theme_reviser`: Defines a minimal theme with custom adjustments for axis titles, plot titles, subtitles, captions, and legend positioning.}
-#' \item{`colors_reviser`: Provides a predefined set of colors, including a soft black, a palette suitable for colorblind readers, and additional colors for extended use.}
-#' \item{`scale_color_reviser`: A ggplot2 color scale that uses the custom `colors_reviser` palette.}
-#' \item{`scale_fill_reviser`: A ggplot2 fill scale that uses the custom `colors_reviser` palette.}
+#' \item{`theme_reviser`: Defines a minimal theme with custom adjustments for
+#' axis titles, plot titles, subtitles, captions, and legend positioning.}
+#' \item{`colors_reviser`: Provides a predefined set of colors, including a
+#' soft black, a palette suitable for colorblind readers, and additional
+#' colors for extended use.}
+#' \item{`scale_color_reviser`: A ggplot2 color scale that uses the custom
+#' `colors_reviser` palette.}
+#' \item{`scale_fill_reviser`: A ggplot2 fill scale that uses the custom
+#' `colors_reviser` palette.}
 #'}
 #'
 #' @examples

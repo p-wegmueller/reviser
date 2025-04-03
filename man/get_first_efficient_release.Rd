@@ -27,46 +27,60 @@ This must include the columns:
 \item \code{value}: The observed final value for the given period.
 }}
 
-\item{significance}{A numeric value specifying the significance level for the hypothesis test (default is \code{0.05}).}
+\item{significance}{A numeric value specifying the significance level for
+the hypothesis test (default is \code{0.05}).}
 
-\item{test_all}{A logical value indicating whether to test all releases, even after finding the first efficient release (default is \code{FALSE}).}
+\item{test_all}{A logical value indicating whether to test all releases,
+even after finding the first efficient release (default is \code{FALSE}).}
 }
 \value{
 A list of class \code{list_eff_rel} with the following elements:
 \itemize{
 \item \code{e}: The index of the first efficient release. (0 indexed)
-\item \code{data}: A long-format data frame containing the vintage data with the final release appended.
+\item \code{data}: A long-format data frame containing the vintage data with the
+final release appended.
 \item \code{models}: A list of linear regression models fitted for each release.
 \item \code{tests}: A list of hypothesis test results for each release.
 }
 }
 \description{
-Identifies the first release in a sequence of vintages that is "efficient" relative to the final release.
-A release is deemed efficient if it satisfies specific conditions of unbiasedness and efficiency,
-tested using a Mincer-Zarnowitz type linear regression and hypothesis testing.
+Identifies the first release in a sequence of vintages that is "efficient"
+relative to the final release. A release is deemed efficient if it
+satisfies specific conditions of unbiasedness and efficiency, tested
+using a Mincer-Zarnowitz type linear regression and hypothesis testing.
 }
 \details{
 The function performs the following steps:
 \enumerate{
-\item Validates inputs and ensures both \code{df} and \code{final_release} are in the correct format.
-\item Iteratively tests each release for efficiency using a linear regression model of the form:
+\item Validates inputs and ensures both \code{df} and \code{final_release} are in the
+correct format.
+\item Iteratively tests each release for efficiency using a linear regression
+model of the form:
 \deqn{final = \beta_0 + \beta_1 \cdot release_i + \epsilon}
 The null hypothesis for efficiency is:
 \itemize{
 \item \eqn{\beta_0 = 0} (no bias)
 \item \eqn{\beta_1 = 1} (efficiency)
-Uses heteroskedasticity and autocorrelation consistent (HAC) standard errors for robust hypothesis testing.
+Uses heteroskedasticity and autocorrelation consistent (HAC) standard
+errors for robust hypothesis testing.
 }
-\item Stops testing when the first efficient release is found (unless \code{test_all = TRUE}).
+\item Stops testing when the first efficient release is found (unless
+\code{test_all = TRUE}).
 }
 
 If no efficient release is found, a warning is issued.
 }
 \examples{
 # Example data
-df <- get_nth_release(tsbox::ts_pc(dplyr::filter(reviser::gdp, id=="US")), n = 0:3)
+df <- get_nth_release(
+  tsbox::ts_pc(dplyr::filter(reviser::gdp, id=="US")),
+  n = 0:3
+  )
 
-final_release <- get_nth_release(tsbox::ts_pc(dplyr::filter(reviser::gdp, id=="US")), n = 10)
+final_release <- get_nth_release(
+tsbox::ts_pc(dplyr::filter(reviser::gdp, id=="US")),
+n = 10
+)
 
 # Identify the first efficient release
 result <- get_first_efficient_release(df, final_release, significance = 0.05)

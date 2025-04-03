@@ -15,10 +15,12 @@ plot_vintages(
 )
 }
 \arguments{
-\item{df}{A data frame containing the vintage data to be plotted. Must include at least two columns:
+\item{df}{A data frame containing the vintage data to be plotted. Must
+include at least two columns:
 one for time (\code{time}) and one for value (\code{value}).}
 
-\item{type}{A character string specifying the type of plot to create. Options are:
+\item{type}{A character string specifying the type of plot to create.
+Options are:
 \itemize{
 \item{ "line": Line plot (default).}
 \item{ "point": Scatter plot.}
@@ -26,32 +28,45 @@ one for time (\code{time}) and one for value (\code{value}).}
 \item{ "boxplot": Boxplot.}
 }}
 
-\item{dim_col}{A character string specifying the column name in \code{df} that represents publication dates or other grouping dimensions (e.g. \code{"release"}). Defaults to \code{"pub_date"}.}
+\item{dim_col}{A character string specifying the column name in \code{df} that
+represents publication dates or other grouping dimensions (e.g. \code{"release"}).
+Defaults to \code{"pub_date"}.}
 
-\item{time_col}{A character string specifying the column name in \code{df} that represents the time variable. Defaults to \code{"time"}.}
+\item{time_col}{A character string specifying the column name in \code{df} that
+represents the time variable. Defaults to \code{"time"}.}
 
-\item{title}{A character string specifying the title of the plot. Defaults to an empty string.}
+\item{title}{A character string specifying the title of the plot.
+Defaults to an empty string.}
 
-\item{subtitle}{A character string specifying the subtitle of the plot. Defaults to an empty string.}
+\item{subtitle}{A character string specifying the subtitle of the plot.
+Defaults to an empty string.}
 
-\item{ylab}{A character string specifying the label for the y-axis. Defaults to an empty string.}
+\item{ylab}{A character string specifying the label for the y-axis.
+Defaults to an empty string.}
 }
 \value{
-A ggplot2 plot object representing the specified vintage data visualization.
+A ggplot2 plot object representing the specified vintage
+data visualization.
 }
 \description{
-A flexible function to visualize vintage data using various plot types such as line plots, point plots, bar plots, or boxplots.
-The function ensures that input data is validated and appropriately transformed before plotting.
+A flexible function to visualize vintage data using various plot types such
+as line plots, point plots, bar plots, or boxplots. The function ensures
+that input data is validated and appropriately transformed before plotting.
 }
 \details{
-The \code{plot_vintages} function is designed to handle data frames in both wide and long formats. It ensures
-that the provided data frame includes the necessary columns for plotting. If the \code{dim_col} column contains
-more than 30 unique values, only the most recent 30 are plotted. Additionally, the function supports
-custom themes and color scales using \code{scale_color_reviser}, \code{scale_fill_reviser}, and \code{theme_reviser}.
+The \code{plot_vintages} function is designed to handle data frames in both
+wide and long formats. It ensures
+that the provided data frame includes the necessary columns for plotting.
+If the \code{dim_col} column contains
+more than 30 unique values, only the most recent 30 are plotted.
+Additionally, the function supports
+custom themes and color scales using \code{scale_color_reviser},
+\code{scale_fill_reviser}, and \code{theme_reviser}.
 
 The function raises an error if:
 \itemize{
-\item{The \code{type} argument is not one of \code{"line"}, \code{"point"}, \code{"bar"}, or \code{"boxplot"}.}
+\item{The \code{type} argument is not one of \code{"line"}, \code{"point"}, \code{"bar"},
+or \code{"boxplot"}.}
 \item{The specified \code{dim_col} is not a column in \code{df}.}
 \item{\code{title}, \code{subtitle}, or \code{ylab} are not character strings.}
 }
@@ -59,7 +74,8 @@ The function raises an error if:
 \examples{
 # Example data
 df <- data.frame(
-  time = rep(seq.Date(from = as.Date("2022-01-01"), by = "month", length.out = 12), 3),
+  time = rep(seq.Date(from = as.Date("2022-01-01"),
+  by = "month", length.out = 12), 3),
   value = runif(36, 50, 100),
   pub_date = rep(c("2022-01-05", "2022-02-07", "2022-03-03"), each = 12)
 )

@@ -28,7 +28,7 @@ A collection of real-time datasets.
 \section{Sources}{
 
 \itemize{
-\item All the data is taken from the realtime database of Indergand and Leist (2014).
+\item All the data is from the realtime database of Indergand and Leist (2014).
 \strong{Countries}:
 \item CHE:
 \itemize{
@@ -58,6 +58,8 @@ A collection of real-time datasets.
 data(gdp)
 }
 \references{
-Indergand, R., Leist, S. A Real-Time Data Set for Switzerland. Swiss J Economics Statistics 150, 331–352 (2014). \url{https://doi.org/10.1007/BF03399410}
+Indergand, R., Leist, S. A Real-Time Data Set for Switzerland.
+Swiss J Economics Statistics 150, 331–352 (2014).
+\url{https://doi.org/10.1007/BF03399410}
 }
 \keyword{datasets}

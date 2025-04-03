@@ -7,16 +7,20 @@
 get_fixed_release(df, years, month = NULL, quarter = NULL)
 }
 \arguments{
-\item{df}{A data frame containing columns \code{pub_date} (publication date) and \code{time} (observation date).}
+\item{df}{A data frame containing columns \code{pub_date} (publication date) and \code{ time} (observation date).}
 
-\item{years}{The number of years after \code{pub_date} for which the values should be extracted.}
+\item{years}{The number of years after \code{pub_date} for which the values
+should be extracted.}
 
-\item{month}{An optional parameter specifying the target month as a name ("July") or an integer (7). Cannot be used with \code{quarter}.}
+\item{month}{An optional parameter specifying the target month as a name
+("July") or an integer (7). Cannot be used with \code{quarter}.}
 
-\item{quarter}{An optional parameter specifying the target quarter (1-4). Cannot be used with \code{month}.}
+\item{quarter}{An optional parameter specifying the target quarter (1-4).
+Cannot be used with \code{month}.}
 }
 \value{
-A filtered data frame containing values matching the specified criteria.
+A filtered data frame containing values matching the
+specified criteria.
 }
 \description{
 Some statistical agencies make a final revision of their data after a certain

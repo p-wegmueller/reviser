@@ -13,6 +13,7 @@ To learn more about reviser, start with the vignettes:
 Useful links:
 \itemize{
   \item \url{https://p-wegmueller.github.io/reviser/}
+  \item Report bugs at \url{https://github.com/p-wegmueller/reviser/issues}
 }
 
 }

@@ -71,7 +71,6 @@
 #'
 #' The function requires well-structured input data with multiple vintages. The time series must
 #' be regular, and the function automatically checks and transforms the data if needed.
-#' @import dplyr
 #' @importFrom KFAS SSModel SSMcustom
 #' @export
 kk_nowcast <- function(
@@ -329,7 +328,7 @@ kk_nowcast <- function(
           Q = sur_ss_mat$Q,
           a1 = m0,
           P1 = C0,
-          index = c(1:ncol(Ymat))
+          index = c(seq_len(Ymat))
         ),
     H = sur_ss_mat$H
   )
@@ -351,8 +350,7 @@ kk_nowcast <- function(
     dplyr::select(time, !!!stats::setNames(seq_along(y_names), y_names))
 
   # Smoothed states
-  smoothed_z <- tibble::tibble(as.data.frame(kalman$alphahat[
-    1:nrow(kalman$alphahat),
+  smoothed_z <- tibble::tibble(as.data.frame(kalman$alphahat[,
     1:((e + 1))
   ])) %>%
     dplyr::mutate(time = df$time[(e + 1):(nrow(kalman$att) + e)]) %>%
@@ -497,28 +495,51 @@ summary.kk_model <- function(object, ...) {
   )
 
   # Calculate MSE, RMSE, and MAE for each filtered_z variable against final release
-  mse_final <- sapply(names(filtered_z)[-1], function(col) {
-    mean((merged_final[[col]] - merged_final$final)^2, na.rm = TRUE)
-  })
+  mse_final <- vapply(
+    names(filtered_z)[-1],
+    function(col) {
+      mean((merged_final[[col]] - merged_final$final)^2, na.rm = TRUE)
+    },
+    FUN.VALUE = numeric(1)
+  ) # Specify numeric(1) for MSE
+
   rmse_final <- sqrt(mse_final)
-  mae_final <- sapply(names(filtered_z)[-1], function(col) {
-    mean(abs(merged_final[[col]] - merged_final$final), na.rm = TRUE)
-  })
+
+  mae_final <- vapply(
+    names(filtered_z)[-1],
+    function(col) {
+      mean(abs(merged_final[[col]] - merged_final$final), na.rm = TRUE)
+    },
+    FUN.VALUE = numeric(1)
+  ) # Specify numeric(1) for MAE
 
   # Calculate MSE, RMSE, and MAE for each filtered_z variable against true efficient release
-  mse_true <- sapply(names(filtered_z)[-1], function(col) {
-    mean(
-      (merged_true[[col]] - merged_true[[names(true_efficient_release)[2]]])^2,
-      na.rm = TRUE
-    )
-  })
+  mse_true <- vapply(
+    names(filtered_z)[-1],
+    function(col) {
+      mean(
+        (merged_true[[col]] -
+          merged_true[[names(true_efficient_release)[2]]])^2,
+        na.rm = TRUE
+      )
+    },
+    FUN.VALUE = numeric(1)
+  ) # Specify numeric(1) for MSE
+
   rmse_true <- sqrt(mse_true)
-  mae_true <- sapply(names(filtered_z)[-1], function(col) {
-    mean(
-      abs(merged_true[[col]] - merged_true[[names(true_efficient_release)[2]]]),
-      na.rm = TRUE
-    )
-  })
+
+  mae_true <- vapply(
+    names(filtered_z)[-1],
+    function(col) {
+      mean(
+        abs(
+          merged_true[[col]] - merged_true[[names(true_efficient_release)[2]]]
+        ),
+        na.rm = TRUE
+      )
+    },
+    FUN.VALUE = numeric(1)
+  ) # Specify numeric(1) for MAE
 
   # Create result list
   results <- list(

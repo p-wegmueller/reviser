@@ -7,19 +7,23 @@
 get_latest_release(df)
 }
 \arguments{
-\item{df}{A data frame containing data vintages. The data frame must include the columns
-\code{pub_date} (publication date of the release) and \code{time} (the corresponding time period for the data).}
+\item{df}{A data frame containing data vintages. The data frame must include
+the columns \code{pub_date} (publication date of the release) and
+\code{time} (the corresponding time period for the data).}
 }
 \value{
-A filtered data frame containing only the most recent release(s). The resulting data frame is
-assigned the class \code{tbl_release} to indicate its structure.
+A filtered data frame containing only the most recent release(s).
+The resulting data frame is assigned the class \code{tbl_release} to indicate
+its structure.
 }
 \description{
-Filters the input dataset to return the most recent release (or vintage) for each time period.
+Filters the input dataset to return the most recent release (or vintage)
+for each time period.
 }
 \details{
-For each time period, the function identifies the release with the latest publication date (\code{pub_date})
-and adds a column \code{release} that labels the release as \code{release_N}, where \code{N} is the release index (zero indexed).
+For each time period, the function identifies the release with the latest
+publication date (\code{pub_date})  and adds a column \code{release} that labels the
+release as \code{release_N}, where \code{N} is the release index (zero indexed).
 }
 \examples{
 # Example data

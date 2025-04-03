@@ -7,23 +7,28 @@
 get_releases_by_date(df, date)
 }
 \arguments{
-\item{df}{A data frame containing data vintages. The data frame must include the columns
-\code{pub_date} (publication date of the release) and \code{time} (the corresponding time period for the data).}
+\item{df}{A data frame containing data vintages. The data frame must
+include the columns \code{pub_date} (publication date of the release) and
+\code{time} (the corresponding time period for the data).}
 
-\item{date}{A Date object specifying the time period (date) for which releases should be retrieved.}
+\item{date}{A Date object specifying the time period (date) for which
+releases should be retrieved.}
 }
 \value{
-A data frame containing the releases for the specified date. The returned data frame will include
-the same structure as the input, filtered to only include rows matching the \code{date} in the \code{time} column.
+A data frame containing the releases for the specified date.
+The returned data frame will include the same structure as the input,
+filtered to only include rows matching the \code{date} in the \code{time} column.
 }
 \description{
-Filters the input dataset to return the releases corresponding to a specific time period (date).
+Filters the input dataset to return the releases corresponding to a specific
+time period (date).
 }
 \details{
-This function filters the input data based on the specified \code{date} in the \code{time} column. The input dataset
-must have the \code{pub_date} and \code{time} columns, with \code{time} being the period to match against the given \code{date}.
-If the dataset is in wide format, it will first be transformed into long format using the helper function
-\code{vintages_long}.
+This function filters the input data based on the specified \code{date} in the
+\code{time} column. The input dataset must have the \code{pub_date} and \code{time} columns,
+with \code{time} being the period to match against the given \code{date}. If the
+dataset is in wide format, it will first be transformed into long format
+using the helper function \code{vintages_long}.
 }
 \examples{
 # Example data
