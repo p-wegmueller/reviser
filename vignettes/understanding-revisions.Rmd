@@ -265,3 +265,5 @@ plot_vintages(
   type="line"
 )
 ```
+
+## References
