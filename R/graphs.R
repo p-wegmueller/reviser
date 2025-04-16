@@ -111,6 +111,11 @@ plot_vintages <- function(
     )
   }
 
+  check <- vintages_check(df)
+  if (check == "wide") {
+    df <- vintages_long(df, keep_na = FALSE)
+  }
+
   # Check 'dim_col' is column name of 'df'
   if (!dim_col %in% colnames(df)) {
     rlang::abort(
@@ -149,11 +154,6 @@ plot_vintages <- function(
 
   dim_col <- as.name(dim_col)
   time_col <- as.name(time_col)
-
-  check <- vintages_check(df)
-  if (check == "wide") {
-    df <- vintages_long(df, keep_na = FALSE)
-  }
 
   if (ncol(df) <= 1L) {
     rlang::abort("'df' must have at least two columns.")
