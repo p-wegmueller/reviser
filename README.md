@@ -9,6 +9,8 @@
 [![pkgcheck](https://github.com/p-wegmueller/reviser/workflows/pkgcheck/badge.svg)](https://github.com/p-wegmueller/reviser/actions?query=workflow%3Apkgcheck)
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![Codecov test
+coverage](https://codecov.io/gh/p-wegmueller/reviser/graph/badge.svg)](https://app.codecov.io/gh/p-wegmueller/reviser)
 <!-- badges: end -->
 
 **reviser** is an R package designed for working with time-series
@@ -33,6 +35,7 @@ devtools::install_github("p-wegmueller/reviser")
 ``` r
 library(reviser)
 suppressMessages(library(dplyr))
+#> Warning: Paket 'dplyr' wurde unter R Version 4.3.3 erstellt
 
 gdp <- gdp %>% 
   filter(id == "US") %>%
@@ -65,9 +68,6 @@ df <- get_nth_release(gdp_long, n = 0:6)
 summary <- get_revision_analysis(df, final_release)
 #> Warning: Both 'release' and 'pub_date' columns are present in 'df. 
 #>       The 'release' column will be used.
-```
-
-``` r
 print(summary)
 #> # A tibble: 7 × 14
 #>   id    release       N `Bias (mean)` `Bias (p-value)` `Bias (robust p-value)`
@@ -81,15 +81,9 @@ print(summary)
 #> 7 US    release_6   162      -0.0208             0.144                   0.191
 #> # ℹ 8 more variables: Minimum <dbl>, Maximum <dbl>, `10Q` <dbl>, Median <dbl>,
 #> #   `90Q` <dbl>, MAR <dbl>, `Std. Dev.` <dbl>, `Noise/Signal` <dbl>
-```
-
-``` r
 
 efficient_release <- get_first_efficient_release(df, final_release)
 #> Warning: No efficient release found. Please provide further releases!
-```
-
-``` r
 summary(efficient_release)
 #> No efficient release found!
 ```

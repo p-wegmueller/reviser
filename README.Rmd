@@ -19,6 +19,7 @@ knitr::opts_chunk$set(
 [![R-CMD-check](https://github.com/p-wegmueller/reviser/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/p-wegmueller/reviser/actions/workflows/R-CMD-check.yaml)
 [![pkgcheck](https://github.com/p-wegmueller/reviser/workflows/pkgcheck/badge.svg)](https://github.com/p-wegmueller/reviser/actions?query=workflow%3Apkgcheck)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![Codecov test coverage](https://codecov.io/gh/p-wegmueller/reviser/graph/badge.svg)](https://app.codecov.io/gh/p-wegmueller/reviser)
 <!-- badges: end -->
 
 **reviser** is an R package designed for working with time-series vintages data. The package provides tools to clean, visualize, and analyze time-series revisions.
