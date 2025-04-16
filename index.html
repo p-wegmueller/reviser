@@ -126,67 +126,29 @@
 <span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_nth_release.html">get_nth_release</a></span><span class="op">(</span><span class="va">gdp_long</span>, n <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">6</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_revision_analysis.html">get_revision_analysis</a></span><span class="op">(</span><span class="va">df</span>, <span class="va">final_release</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: Both 'release' and 'pub_date' columns are present in 'df. The</span></span>
-<span><span class="co">#&gt; 'release' column will be used.</span></span></code></pre></div>
+<span><span class="co">#&gt; Warning: Both 'release' and 'pub_date' columns are present in 'df. </span></span>
+<span><span class="co">#&gt;       The 'release' column will be used.</span></span></code></pre></div>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">summary</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 7 × 12</span></span>
-<span><span class="co">#&gt;   id    release       N `Bias (mean)` `Bias (p-value)` Minimum Maximum    MAR</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;     &lt;dbl&gt;         &lt;dbl&gt;            &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 US    release_0   154       -0.0296          0.162    -0.844   1.01  0.188 </span></span>
-<span><span class="co">#&gt; 2 US    release_1   154       -0.0304          0.133    -0.801   0.706 0.186 </span></span>
-<span><span class="co">#&gt; 3 US    release_2   154       -0.0287          0.161    -0.930   0.706 0.185 </span></span>
-<span><span class="co">#&gt; 4 US    release_3   154       -0.0259          0.118    -0.930   0.662 0.111 </span></span>
-<span><span class="co">#&gt; 5 US    release_4   154       -0.0290          0.0654   -0.930   0.662 0.103 </span></span>
-<span><span class="co">#&gt; 6 US    release_5   154       -0.0363          0.0101   -0.930   0.468 0.0919</span></span>
-<span><span class="co">#&gt; 7 US    release_6   154       -0.0336          0.00369  -0.574   0.359 0.0735</span></span>
-<span><span class="co">#&gt; # ℹ 4 more variables: `Std. Dev.` &lt;dbl&gt;, `Noise/Signal` &lt;dbl&gt;,</span></span>
-<span><span class="co">#&gt; #   Correlation &lt;dbl&gt;, `Correlation (p-value)` &lt;dbl&gt;</span></span></code></pre></div>
+<span><span class="co">#&gt; # A tibble: 7 × 14</span></span>
+<span><span class="co">#&gt;   id    release       N `Bias (mean)` `Bias (p-value)` `Bias (robust p-value)`</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;     &lt;dbl&gt;         &lt;dbl&gt;            &lt;dbl&gt;                   &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 US    release_0   162      -0.0172             0.439                   0.459</span></span>
+<span><span class="co">#&gt; 2 US    release_1   162      -0.0186             0.377                   0.382</span></span>
+<span><span class="co">#&gt; 3 US    release_2   162      -0.0157             0.458                   0.459</span></span>
+<span><span class="co">#&gt; 4 US    release_3   162      -0.00553            0.783                   0.768</span></span>
+<span><span class="co">#&gt; 5 US    release_4   162      -0.0166             0.326                   0.380</span></span>
+<span><span class="co">#&gt; 6 US    release_5   162      -0.0231             0.138                   0.181</span></span>
+<span><span class="co">#&gt; 7 US    release_6   162      -0.0208             0.144                   0.191</span></span>
+<span><span class="co">#&gt; # ℹ 8 more variables: Minimum &lt;dbl&gt;, Maximum &lt;dbl&gt;, `10Q` &lt;dbl&gt;, Median &lt;dbl&gt;,</span></span>
+<span><span class="co">#&gt; #   `90Q` &lt;dbl&gt;, MAR &lt;dbl&gt;, `Std. Dev.` &lt;dbl&gt;, `Noise/Signal` &lt;dbl&gt;</span></span></code></pre></div>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">efficient_release</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_first_efficient_release.html">get_first_efficient_release</a></span><span class="op">(</span><span class="va">df</span>, <span class="va">final_release</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">efficient_release</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Efficient release:  0 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Model summary: </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt; stats::lm(formula = formula, data = df_wide)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Residuals:</span></span>
-<span><span class="co">#&gt;      Min       1Q   Median       3Q      Max </span></span>
-<span><span class="co">#&gt; -0.82139 -0.12266  0.04048  0.13457  1.00888 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Coefficients:</span></span>
-<span><span class="co">#&gt;              Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
-<span><span class="co">#&gt; (Intercept) -0.005314   0.029173  -0.182    0.856    </span></span>
-<span><span class="co">#&gt; release_0    0.963024   0.030626  31.445   &lt;2e-16 ***</span></span>
-<span><span class="co">#&gt; ---</span></span>
-<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Residual standard error: 0.2617 on 152 degrees of freedom</span></span>
-<span><span class="co">#&gt;   (16 observations deleted due to missingness)</span></span>
-<span><span class="co">#&gt; Multiple R-squared:  0.8668, Adjusted R-squared:  0.8659 </span></span>
-<span><span class="co">#&gt; F-statistic: 988.8 on 1 and 152 DF,  p-value: &lt; 2.2e-16</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Test summary: </span></span>
-<span><span class="co">#&gt; Linear hypothesis test</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Hypothesis:</span></span>
-<span><span class="co">#&gt; (Intercept) = 0</span></span>
-<span><span class="co">#&gt; release_0 = 1</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Model 1: restricted model</span></span>
-<span><span class="co">#&gt; Model 2: final ~ release_0</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Note: Coefficient covariance matrix supplied.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;   Res.Df Df      F  Pr(&gt;F)  </span></span>
-<span><span class="co">#&gt; 1    154                    </span></span>
-<span><span class="co">#&gt; 2    152  2 2.4805 0.08708 .</span></span>
-<span><span class="co">#&gt; ---</span></span>
-<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre></div>
+<span><span class="co">#&gt; Warning: No efficient release found. Please provide further releases!</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">efficient_release</span><span class="op">)</span></span>
+<span><span class="co">#&gt; No efficient release found!</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
@@ -233,6 +195,7 @@
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
 <li><a href="https://github.com/p-wegmueller/reviser/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/p-wegmueller/reviser/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://github.com/p-wegmueller/reviser/actions?query=workflow%3Apkgcheck" class="external-link"><img src="https://github.com/p-wegmueller/reviser/workflows/pkgcheck/badge.svg" alt="pkgcheck"></a></li>
 <li><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental" class="external-link"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="Lifecycle: experimental"></a></li>
 </ul>
 </div>
