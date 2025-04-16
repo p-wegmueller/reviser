@@ -99,6 +99,7 @@
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://p-wegmueller.github.io/reviser/">reviser</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: Paket 'dplyr' wurde unter R Version 4.3.3 erstellt</span></span>
 <span></span>
 <span><span class="va">gdp</span> <span class="op">&lt;-</span> <span class="va">gdp</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">id</span> <span class="op">==</span> <span class="st">"US"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -127,9 +128,8 @@
 <span></span>
 <span><span class="va">summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_revision_analysis.html">get_revision_analysis</a></span><span class="op">(</span><span class="va">df</span>, <span class="va">final_release</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Both 'release' and 'pub_date' columns are present in 'df. </span></span>
-<span><span class="co">#&gt;       The 'release' column will be used.</span></span></code></pre></div>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">summary</span><span class="op">)</span></span>
+<span><span class="co">#&gt;       The 'release' column will be used.</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">summary</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 7 × 14</span></span>
 <span><span class="co">#&gt;   id    release       N `Bias (mean)` `Bias (p-value)` `Bias (robust p-value)`</span></span>
 <span><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;     &lt;dbl&gt;         &lt;dbl&gt;            &lt;dbl&gt;                   &lt;dbl&gt;</span></span>
@@ -141,13 +141,11 @@
 <span><span class="co">#&gt; 6 US    release_5   162      -0.0231             0.138                   0.181</span></span>
 <span><span class="co">#&gt; 7 US    release_6   162      -0.0208             0.144                   0.191</span></span>
 <span><span class="co">#&gt; # ℹ 8 more variables: Minimum &lt;dbl&gt;, Maximum &lt;dbl&gt;, `10Q` &lt;dbl&gt;, Median &lt;dbl&gt;,</span></span>
-<span><span class="co">#&gt; #   `90Q` &lt;dbl&gt;, MAR &lt;dbl&gt;, `Std. Dev.` &lt;dbl&gt;, `Noise/Signal` &lt;dbl&gt;</span></span></code></pre></div>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span><span class="co">#&gt; #   `90Q` &lt;dbl&gt;, MAR &lt;dbl&gt;, `Std. Dev.` &lt;dbl&gt;, `Noise/Signal` &lt;dbl&gt;</span></span>
+<span></span>
 <span><span class="va">efficient_release</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_first_efficient_release.html">get_first_efficient_release</a></span><span class="op">(</span><span class="va">df</span>, <span class="va">final_release</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: No efficient release found. Please provide further releases!</span></span></code></pre></div>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">efficient_release</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: No efficient release found. Please provide further releases!</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">efficient_release</span><span class="op">)</span></span>
 <span><span class="co">#&gt; No efficient release found!</span></span></code></pre></div>
 </div>
 </div>
@@ -197,6 +195,7 @@
 <li><a href="https://github.com/p-wegmueller/reviser/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/p-wegmueller/reviser/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
 <li><a href="https://github.com/p-wegmueller/reviser/actions?query=workflow%3Apkgcheck" class="external-link"><img src="https://github.com/p-wegmueller/reviser/workflows/pkgcheck/badge.svg" alt="pkgcheck"></a></li>
 <li><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental" class="external-link"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="Lifecycle: experimental"></a></li>
+<li><a href="https://app.codecov.io/gh/p-wegmueller/reviser" class="external-link"><img src="https://codecov.io/gh/p-wegmueller/reviser/graph/badge.svg" alt="Codecov test coverage"></a></li>
 </ul>
 </div>
 
