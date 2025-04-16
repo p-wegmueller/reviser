@@ -33,7 +33,8 @@ A collection of real-time datasets.
 \item CHE:
 \itemize{
 \item Switzerland
-\item Source: \href{https://www.seco.admin.ch/seco/de/home/wirtschaftslage---wirtschaftspolitik/Wirtschaftslage/bip-quartalsschaetzungen-/daten.html}{SECO}
+\item Source: \link{SECO}(https://www.seco.admin.ch/seco/de/home/wirtschaftslage--
+-wirtschaftspolitik/Wirtschaftslage/bip-quartalsschaetzungen-/daten.html)
 }
 \item US:
 \itemize{

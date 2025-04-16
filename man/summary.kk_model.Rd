@@ -7,19 +7,22 @@
 \method{summary}{kk_model}(object, ...)
 }
 \arguments{
-\item{object}{A list of class 'kk_model' produced by the \code{\link{kk_nowcast}} function.}
+\item{object}{A list of class 'kk_model' produced by the
+\code{\link{kk_nowcast}} function.}
 
 \item{...}{Additional arguments (not used).}
 }
 \value{
 A list containing two data frames:
-\item{final_release_metrics}{A data frame with MSE, RMSE, and MAE against the final release.}
-\item{true_efficient_release_metrics}{A data frame with MSE, RMSE, and MAE against the true efficient release.}
+\item{final_release_metrics}{A data frame with MSE, RMSE, and MAE against
+the final release.}
+\item{true_efficient_release_metrics}{A data frame with MSE, RMSE, and
+MAE against the true efficient release.}
 }
 \description{
-This function calculates and prints the Mean Squared Error (MSE), Root Mean Squared Error (RMSE),
-and Mean Absolute Error (MAE) of the filtered state variables against both the final release
-and the true efficient release.
+This function calculates and prints the Mean Squared Error (MSE), Root Mean
+Squared Error (RMSE), and Mean Absolute Error (MAE) of the filtered state
+variables against both the final release and the true efficient release.
 }
 \examples{
 # Assuming 'kk_model_obj' is the result of kk_nowcast(your_data, ...)

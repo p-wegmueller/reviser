@@ -71,7 +71,8 @@
 #'      ),
 #'      n = 0:1
 #'    )
-#' df <- na.omit(dplyr::select(df, -id))
+#' df <- dplyr::select(df, -id)
+#' df <- na.omit(df)
 #'
 #' e <- 1  # Number of efficient release
 #' h <- 2  # Forecast horizon

@@ -24,7 +24,6 @@ Must include columns:
 
 \item{degree}{An integer between 1 and 5 specifying the level of
 detail for the output:
-
 1: Default, includes information about revision size.
 2: includes correlation statistics of revision.
 3: includes news and noise tests.

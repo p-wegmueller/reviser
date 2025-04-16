@@ -14,14 +14,15 @@ kk_nowcast(
 )
 }
 \arguments{
-\item{df}{A data frame containing the time series data in either "long" or "wide" format.
-It must include columns for the time index and the different release vintages.}
+\item{df}{A data frame containing the time series data in either "long" or
+"wide" format.  It must include columns for the time index and the different
+release vintages.}
 
-\item{e}{An integer indicating the number of data vintages to include in the model.
-Must be greater than 0.}
+\item{e}{An integer indicating the number of data vintages to include in the
+model. Must be greater than 0.}
 
-\item{h}{An integer specifying the forecast horizon. Default is 0, which implies no forecasts.
-Must be greater than or equal to 0.}
+\item{h}{An integer specifying the forecast horizon. Default is 0, which
+implies no forecasts. Must be greater than or equal to 0.}
 
 \item{model}{A string specifying the type of model to use. Options are:
 \itemize{
@@ -30,33 +31,47 @@ Must be greater than or equal to 0.}
 \item "Classical": Classical model without vintage effects.
 }}
 
-\item{method}{A string specifying the estimation method to use. Options are "SUR" (default) and "OLS".}
+\item{method}{A string specifying the estimation method to use. Options are
+"SUR" (default) and "OLS".}
 
 \item{solver_options}{An optional list to control the behaviour of the
 underlying \code{\link[systemfit:nlsystemfit]{systemfit::nlsystemfit()}} and \code{\link[stats:nlm]{stats::nlm()}} solvers:
 \itemize{
-\item \strong{trace}: An integer controlling the level of output for the optimization procedure.
-Default is 0 (minimal output).
-\item \strong{maxiter}: An integer specifying the maximum number of iterations for the optimization procedure. Default is 1000.
-\item \strong{startvals}: A list of starting values for the optimization procedure (must match the number of parameters of the model).
+\item \strong{trace}: An integer controlling the level of output for the
+optimization procedure. Default is 0 (minimal output).
+\item \strong{maxiter}: An integer specifying the maximum number of iterations for
+the optimization procedure. Default is 1000.
+\item \strong{startvals}: A list of starting values for the optimization
+procedure (must match the number of parameters of the model).
 \item \strong{solvtol}: Tolerance for detecting linear dependencies in the columns of
-X in the qr function calls (See \code{\link[systemfit:nlsystemfit]{systemfit::nlsystemfit()}}). Default is .Machine$double.eps.
+X in the qr function calls (See \code{\link[systemfit:nlsystemfit]{systemfit::nlsystemfit()}}).
+Default is .Machine$double.eps.
 \item \strong{gradtol}: A a positive scalar giving the tolerance at which the scaled
-gradient is considered close enough to zero to terminate the algorithm (See \code{\link[stats:nlm]{stats::nlm()}}). Default is 1e-6.
-\item \strong{steptol}: A positive scalar providing the minimum allowable relative step length (See \code{\link[stats:nlm]{stats::nlm()}}). Default is 1e-6.
+gradient is considered close enough to zero to terminate the
+algorithm (See \code{\link[stats:nlm]{stats::nlm()}}). Default is 1e-6.
+\item \strong{steptol}: A positive scalar providing the minimum allowable relative
+step length (See \code{\link[stats:nlm]{stats::nlm()}}). Default is 1e-6.
 }}
 }
 \value{
 A list with the following components:
 \describe{
-\item{filtered_z}{A tibble of filtered latent state variables based on the Kalman filter.}
-\item{filtered_y}{A tibble of filtered observed variables based on the Kalman filter.}
-\item{smoothed_z}{A tibble of smoothed latent state variables obtained using the Kalman smoother.}
-\item{smoothed_y}{A tibble of smoothed observed variables obtained using the Kalman smoother.}
-\item{forecast_z}{A tibble of forecasted latent state variables. Returned only if \code{h > 0}.}
-\item{forecast_y}{A tibble of forecasted observed variables. Returned only if \code{h > 0}.}
-\item{kk_model_mat}{A list of KK model matrices, such as transition and observation matrices.}
-\item{ss_model_mat}{A list of state-space model matrices derived from the KK model.}
+\item{filtered_z}{A tibble of filtered latent state variables based on
+the Kalman filter.}
+\item{filtered_y}{A tibble of filtered observed variables based on the
+Kalman filter.}
+\item{smoothed_z}{A tibble of smoothed latent state variables obtained
+using the Kalman smoother.}
+\item{smoothed_y}{A tibble of smoothed observed variables obtained using
+the Kalman smoother.}
+\item{forecast_z}{A tibble of forecasted latent state variables. Returned
+only if \code{h > 0}.}
+\item{forecast_y}{A tibble of forecasted observed variables. Returned
+only if \code{h > 0}.}
+\item{kk_model_mat}{A list of KK model matrices, such as transition
+and observation matrices.}
+\item{ss_model_mat}{A list of state-space model matrices derived
+from the KK model.}
 \item{params}{Estimated model parameters, including covariance terms.}
 \item{fit}{The fitted model object from the SUR estimation procedure.}
 \item{e}{The number of the efficient release (0-indexed).}
@@ -64,17 +79,19 @@ A list with the following components:
 }
 }
 \description{
-Implements a generalized Kishor-Koenig (KK) model for nowcasting and forecasting
-with state-space models, allowing for multiple vintages of data, efficient estimation,
-and Kalman filtering and smoothing.
+Implements a generalized Kishor-Koenig (KK) model for nowcasting and
+forecasting with state-space models, allowing for multiple vintages of data,
+efficient estimation, and Kalman filtering and smoothing.
 }
 \details{
-The function supports multiple models, including the full Kishor-Koenig framework, Howrey's model,
-and a classical approach. It handles data preprocessing, estimation of system equations using
-Seemingly Unrelated Regressions (SUR), and application of the Kalman filter and smoother.
+The function supports multiple models, including the full Kishor-Koenig
+framework, Howrey's model, and a classical approach. It handles data
+preprocessing, estimation of system equations using Seemingly Unrelated
+Regressions (SUR), and application of the Kalman filter and smoother.
 
-The function requires well-structured input data with multiple vintages. The time series must
-be regular, and the function automatically checks and transforms the data if needed.
+The function requires well-structured input data with multiple vintages.
+The time series must be regular, and the function automatically checks and
+transforms the data if needed.
 }
 \examples{
 # Example usage:
@@ -87,7 +104,8 @@ df <- get_nth_release(
      ),
      n = 0:1
    )
-df <- na.omit(dplyr::select(df, -id))
+df <- dplyr::select(df, -id)
+df <- na.omit(df)
 
 e <- 1  # Number of efficient release
 h <- 2  # Forecast horizon
