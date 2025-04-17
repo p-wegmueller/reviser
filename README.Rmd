@@ -101,7 +101,7 @@ plot_vintages(
   title = "Revisions of GDP during the financial crisis",
   subtitle = "qoq growth rates")
   
-final_release <- get_nth_release(gdp_long, n = 16)
+final_release <- get_nth_release(gdp_long, n = 10)
 
 df <- get_nth_release(gdp_long, n = 0:6)
 
