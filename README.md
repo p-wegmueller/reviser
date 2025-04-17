@@ -103,8 +103,9 @@ Key features include:
   that closely matches the final values, with
   [`get_first_efficient_release()`](https://p-wegmueller.github.io/reviser/reference/get_first_efficient_release.html).
   See the vignette [*Efficient Release
-  Identification*](https://p-wegmueller.github.io/reviser/articles/efficient-release.html). -
-  **Nowcast future data revisions** using
+  Identification*](https://p-wegmueller.github.io/reviser/articles/efficient-release.html).
+
+- **Nowcast future data revisions** using
   [`kk_nowcast()`](https://p-wegmueller.github.io/reviser/reference/kk_nowcast.html),
   a tool to anticipate upcoming changes to early releases. Explore the
   methodology in the vignette [*Nowcasting
@@ -116,11 +117,8 @@ You can install the development version of reviser from
 [GitHub](https://github.com/) with:
 
 ``` r
-# Install devtools if not already installed
-# install.packages("devtools")
-
 # Install the reviser package
-devtools::install_github("p-wegmueller/reviser")
+remotes::install_github("p-wegmueller/reviser")
 ```
 
 ## Usage
@@ -133,7 +131,18 @@ point at which the estimates become stable and reliable.
 
 ``` r
 library(reviser)
-suppressMessages(library(dplyr))
+library(dplyr)
+#> 
+#> Attaching package: 'dplyr'
+#> The following objects are masked from 'package:stats':
+#> 
+#>     filter, lag
+#> The following objects are masked from 'package:base':
+#> 
+#>     intersect, setdiff, setequal, union
+```
+
+``` r
 
 gdp <- gdp %>% 
   filter(id == "US") %>%
@@ -164,11 +173,6 @@ final_release <- get_nth_release(gdp_long, n = 16)
 df <- get_nth_release(gdp_long, n = 0:6)
 
 summary <- get_revision_analysis(df, final_release)
-#> Warning: Both 'release' and 'pub_date' columns are present in 'df. 
-#>       The 'release' column will be used.
-```
-
-``` r
 print(summary)
 #> # A tibble: 7 × 14
 #>   id    release       N `Bias (mean)` `Bias (p-value)` `Bias (robust p-value)`
@@ -187,10 +191,6 @@ print(summary)
 ``` r
 
 efficient_release <- get_first_efficient_release(df, final_release)
-#> Warning: No efficient release found. Please provide further releases!
-```
-
-``` r
 summary(efficient_release)
 #> No efficient release found!
 ```
@@ -204,7 +204,10 @@ avoids external dependencies. In contrast, `rjd3revisions` relies
 heavily on Java via the JDemetra+ platform, which can make setup and
 integration more complex. `reviser` offers a lightweight, R-native
 solution for revision analysis, combining user-friendly tools for data
-wrangling, visualization, and evaluation of release efficiency. \##
-Citation Burri M, Wegmueller P (2025). reviser: Tools for Studying
-Revision Properties in Real-Time Time Series Vintages. R package version
-0.1.0, <https://p-wegmueller.github.io/reviser/>.
+wrangling, visualization, and evaluation of release efficiency.
+
+## Citation
+
+Burri M, Wegmueller P (2025). reviser: Tools for Studying Revision
+Properties in Real-Time Time Series Vintages. R package version 0.1.0,
+<https://p-wegmueller.github.io/reviser/>.

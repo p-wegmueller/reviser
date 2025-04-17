@@ -56,20 +56,17 @@ Key features include:
   - **Analyze revision patterns** and evaluate revision accuracy and bias using [`get_revision_analysis()`](https://p-wegmueller.github.io/reviser/reference/get_revision_analysis.html). For more, read the vignette [*Revision Patterns and Statistics*](https://p-wegmueller.github.io/reviser/articles/revision-analysis.html).
   
   - **Detect the first efficient release**, i.e., the earliest vintage that closely matches the final values, with [`get_first_efficient_release()`](https://p-wegmueller.github.io/reviser/reference/get_first_efficient_release.html). See the vignette [*Efficient Release Identification*](https://p-wegmueller.github.io/reviser/articles/efficient-release.html).
-                                                                                                                                              - **Nowcast future data revisions** using [`kk_nowcast()`](https://p-wegmueller.github.io/reviser/reference/kk_nowcast.html), a tool to anticipate upcoming changes to early releases. Explore the methodology in the vignette [*Nowcasting Revisions*](https://p-wegmueller.github.io/reviser/articles/nowcasting-revisions.html).
+  
+  - **Nowcast future data revisions** using [`kk_nowcast()`](https://p-wegmueller.github.io/reviser/reference/kk_nowcast.html), a tool to anticipate upcoming changes to early releases. Explore the methodology in the vignette [*Nowcasting Revisions*](https://p-wegmueller.github.io/reviser/articles/nowcasting-revisions.html).
                                                                                                                                                                                                                                                      
 
 ## Installation
 
 You can install the development version of reviser from [GitHub](https://github.com/) with:
 
-
 ```{r, eval = FALSE}
-# Install devtools if not already installed
-# install.packages("devtools")
-
 # Install the reviser package
-devtools::install_github("p-wegmueller/reviser")
+remotes::install_github("p-wegmueller/reviser")
 ```
 
 
@@ -79,9 +76,9 @@ transforming the data into a format suitable for vintage analysis, visualizing
 revisions during the financial crisis, and assessing how early estimates compare
 to the final release. It then identifies the point at which the estimates become
 stable and reliable.
-```{r, eval = TRUE}
+```{r, eval = TRUE, warning=FALSE}
 library(reviser)
-suppressMessages(library(dplyr))
+library(dplyr)
 
 gdp <- gdp %>% 
   filter(id == "US") %>%
@@ -115,5 +112,6 @@ summary(efficient_release)
 
 ## Comparison to [`rjd3revisions`](https://rjdverse.github.io/rjd3revisions/)
 The `reviser` package sets itself apart from `rjd3revisions` not only through its focus on advanced analysis of efficient releases and nowcasting performance, but also in its pure R implementation, which avoids external dependencies. In contrast, `rjd3revisions` relies heavily on Java via the JDemetra+ platform, which can make setup and integration more complex. `reviser` offers a lightweight, R-native solution for revision analysis, combining user-friendly tools for data wrangling, visualization, and evaluation of release efficiency.
-                                                                                                                                            ## Citation
+
+## Citation
 Burri M, Wegmueller P (2025). reviser: Tools for Studying Revision Properties in Real-Time Time Series Vintages. R package version 0.1.0, https://p-wegmueller.github.io/reviser/.
