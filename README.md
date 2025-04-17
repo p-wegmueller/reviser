@@ -136,17 +136,6 @@ point at which the estimates become stable and reliable.
 ``` r
 library(reviser)
 library(dplyr)
-#> 
-#> Attaching package: 'dplyr'
-#> The following objects are masked from 'package:stats':
-#> 
-#>     filter, lag
-#> The following objects are masked from 'package:base':
-#> 
-#>     intersect, setdiff, setequal, union
-```
-
-``` r
 
 gdp <- gdp %>% 
   filter(id == "US") %>%

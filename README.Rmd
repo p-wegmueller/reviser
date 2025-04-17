@@ -78,7 +78,7 @@ transforming the data into a format suitable for vintage analysis, visualizing
 revisions during the financial crisis, and assessing how early estimates compare
 to the final release. It then identifies the point at which the estimates become
 stable and reliable.
-```{r, eval = TRUE, warning=FALSE}
+```{r, eval = TRUE, warning=FALSE, message=FALSE}
 library(reviser)
 library(dplyr)
 
