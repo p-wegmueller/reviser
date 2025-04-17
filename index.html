@@ -83,6 +83,25 @@
 
 <p><strong>reviser</strong> is an R package designed for working with time-series vintages data. The package provides tools to clean, visualize, and analyze time-series revisions.</p>
 <div class="section level2">
+<h2 id="why-reviser">Why reviser?<a class="anchor" aria-label="anchor" href="#why-reviser"></a>
+</h2>
+<p>Economic data often arrives in multiple waves—with initial estimates updated or revised as more complete information becomes available. These revisions, while common, can have major implications for how economic conditions are perceived and how decisions are made by policymakers, analysts, and markets. Yet, tools to systematically analyze, visualize, and communicate these revisions are still limited. This is where the R package <strong>reviser</strong> comes in.</p>
+<p><strong>reviser</strong> is built to support transparent, reproducible workflows for tracking and interpreting data revisions. Whether you’re evaluating GDP estimates, inflation statistics, or high-frequency indicators, <strong>reviser</strong> helps quantify how vintages evolve, assess their reliability, and highlight cases where revisions may alter the economic narrative.</p>
+<div class="section level3">
+<h3 id="real-world-relevance">Real-world relevance<a class="anchor" aria-label="anchor" href="#real-world-relevance"></a>
+</h3>
+<p>The importance of revisions isn’t just academic. They shape real-world outcomes:</p>
+<figure><img src="reference/figures/gdp_over_time.jpeg" alt="Revision paths for Euro Area GDP (Sources: BEA, Eurostat)"><figcaption aria-hidden="true">
+Revision paths for Euro Area GDP (Sources: BEA, Eurostat)
+</figcaption></figure><ul>
+<li><p>US GDP 2015-Q1 — Weather or Weakness?: A sharp downward revision from +0.1% to -0.2% sparked fears of a slowdown—until a later benchmark revision lifted it back to +0.8%, highlighting challenges in seasonal adjustment.</p></li>
+<li><p>Euro Area GDP in 2012Q1 — A Recession Delayed?: A flash estimate of 0.0% avoided the recession label—until it was revised to -0.1%, confirming back-to-back contractions and altering the policy discussion at a critical time.</p></li>
+</ul>
+<p>These examples underscore how even small numerical changes can shift narratives, delay responses, and affect credibility.</p>
+<p><strong>reviser</strong> is an R package designed to streamline the analysis and visualization of data revisions—especially in the context of official statistics and macroeconomic indicators. Built with tidy principles and seamless integration in mind, reviser offers intuitive tools to compare data vintages, quantify revision patterns, and produce publication-ready outputs. Whether you’re tracking GDP estimate updates or evaluating forecast accuracy over time, <strong>reviser</strong> provides a robust and flexible framework tailored for economists, data analysts, and statistical agencies alike.</p>
+</div>
+</div>
+<div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <p>You can install the development version of reviser from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
@@ -127,8 +146,8 @@
 <span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_nth_release.html">get_nth_release</a></span><span class="op">(</span><span class="va">gdp_long</span>, n <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">6</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_revision_analysis.html">get_revision_analysis</a></span><span class="op">(</span><span class="va">df</span>, <span class="va">final_release</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: Both 'release' and 'pub_date' columns are present in 'df. </span></span>
-<span><span class="co">#&gt;       The 'release' column will be used.</span></span>
+<span><span class="co">#&gt; Warning: Both 'release' and 'pub_date' columns are present in 'df. The</span></span>
+<span><span class="co">#&gt; 'release' column will be used.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">summary</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 7 × 14</span></span>
 <span><span class="co">#&gt;   id    release       N `Bias (mean)` `Bias (p-value)` `Bias (robust p-value)`</span></span>
