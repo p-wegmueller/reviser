@@ -5,10 +5,15 @@
 
 <!-- badges: start -->
 
+[![Project Status: Active – The project has reached a stable, usable
+state and is being actively
+developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![R-CMD-check](https://github.com/p-wegmueller/reviser/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/p-wegmueller/reviser/actions/workflows/R-CMD-check.yaml)
 [![pkgcheck](https://github.com/p-wegmueller/reviser/workflows/pkgcheck/badge.svg)](https://github.com/p-wegmueller/reviser/actions?query=workflow%3Apkgcheck)
 [![Lifecycle:
-experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+stable](https://img.shields.io/badge/lifecycle-stable-green.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
+[![reviser status
+badge](https://marcburri.r-universe.dev/badges/reviser)](https://marcburri.r-universe.dev/reviser)
 [![Codecov test
 coverage](https://codecov.io/gh/p-wegmueller/reviser/graph/badge.svg)](https://app.codecov.io/gh/p-wegmueller/reviser)
 <!-- badges: end -->
@@ -20,12 +25,14 @@ analyze time-series revisions.
 ## Why reviser?
 
 Economic data often arrives in multiple waves—with initial estimates
-updated or revised as more complete information becomes available. These
-revisions, while common, can have major implications for how economic
-conditions are perceived and how decisions are made by policymakers,
-analysts, and markets. Yet, tools to systematically analyze, visualize,
-and communicate these revisions are still limited. This is where the R
-package **reviser** comes in.
+updated or revised as more complete information becomes available (See
+the vignette [**the role and importance of
+revisions**](https://p-wegmueller.github.io/reviser/articles/literature-review.html)).
+These revisions, while common, can have major implications for how
+economic conditions are perceived and how decisions are made by
+policymakers, analysts, and markets. Yet, tools to systematically
+analyze, visualize, and communicate these revisions are still limited.
+This is where the R package **reviser** comes in.
 
 **reviser** is built to support transparent, reproducible workflows for
 tracking and interpreting data revisions. Whether you’re evaluating GDP
@@ -69,6 +76,37 @@ forecast accuracy over time, **reviser** provides a robust and flexible
 framework tailored for economists, data analysts, and statistical
 agencies alike.
 
+The **reviser** package provides a comprehensive toolkit for analyzing
+data revisions — crucial for anyone working with real-time data. It
+allows users to **visualize**, **analyze**, and **evaluate** the impact
+of data updates across different release vintages, helping to understand
+and analyze revision patterns. Get started: - Structure your data
+according to **reviser conventions**. See the [*get
+started*](https://p-wegmueller.github.io/reviser/articles/reviser.html)
+vignette
+
+Key features include:
+
+- **Calculate revisions** across vintages using
+  [`get_revisions()`](https://p-wegmueller.github.io/reviser/reference/get_revisions.html).
+  See the vignette [*Understanding Data
+  Revisions*](https://p-wegmueller.github.io/reviser/articles/understanding-revisions.html)
+  to learn how to structure and compute revision tables. - **Analyze
+  revision patterns** and evaluate revision accuracy and bias using
+  [`get_revision_analysis()`](https://p-wegmueller.github.io/reviser/reference/get_revision_analysis.html).
+  For more, read the vignette [*Revision Patterns and
+  Statistics*](https://p-wegmueller.github.io/reviser/articles/revision-analysis.html). -
+  **Detect the first efficient release**, i.e., the earliest vintage
+  that closely matches the final values, with
+  [`get_first_efficient_release()`](https://p-wegmueller.github.io/reviser/reference/get_first_efficient_release.html).
+  See the vignette [*Efficient Release
+  Identification*](https://p-wegmueller.github.io/reviser/articles/efficient-release.html). -
+  **Nowcast future data revisions** using
+  [`kk_nowcast()`](https://p-wegmueller.github.io/reviser/reference/kk_nowcast.html),
+  a tool to anticipate upcoming changes to early releases. Explore the
+  methodology in the vignette [*Nowcasting
+  Revisions*](https://p-wegmueller.github.io/reviser/articles/nowcasting-revisions.html).
+
 ## Installation
 
 You can install the development version of reviser from
@@ -84,10 +122,15 @@ devtools::install_github("p-wegmueller/reviser")
 
 ## Usage
 
+The following example analyzes GDP data revisions for the United States
+by transforming the data into a format suitable for vintage analysis,
+visualizing revisions during the financial crisis, and assessing how
+early estimates compare to the final release. It then identifies the
+point at which the estimates become stable and reliable.
+
 ``` r
 library(reviser)
 suppressMessages(library(dplyr))
-#> Warning: Paket 'dplyr' wurde unter R Version 4.3.3 erstellt
 
 gdp <- gdp %>% 
   filter(id == "US") %>%
@@ -118,8 +161,11 @@ final_release <- get_nth_release(gdp_long, n = 16)
 df <- get_nth_release(gdp_long, n = 0:6)
 
 summary <- get_revision_analysis(df, final_release)
-#> Warning: Both 'release' and 'pub_date' columns are present in 'df. The
-#> 'release' column will be used.
+#> Warning: Both 'release' and 'pub_date' columns are present in 'df. 
+#>       The 'release' column will be used.
+```
+
+``` r
 print(summary)
 #> # A tibble: 7 × 14
 #>   id    release       N `Bias (mean)` `Bias (p-value)` `Bias (robust p-value)`
@@ -133,9 +179,29 @@ print(summary)
 #> 7 US    release_6   162      -0.0208             0.144                   0.191
 #> # ℹ 8 more variables: Minimum <dbl>, Maximum <dbl>, `10Q` <dbl>, Median <dbl>,
 #> #   `90Q` <dbl>, MAR <dbl>, `Std. Dev.` <dbl>, `Noise/Signal` <dbl>
+```
+
+``` r
 
 efficient_release <- get_first_efficient_release(df, final_release)
 #> Warning: No efficient release found. Please provide further releases!
+```
+
+``` r
 summary(efficient_release)
 #> No efficient release found!
 ```
+
+## Comparison to [`rjd3revisions`](https://rjdverse.github.io/rjd3revisions/)
+
+The `reviser` package sets itself apart from `rjd3revisions` not only
+through its focus on advanced analysis of efficient releases and
+nowcasting performance, but also in its pure R implementation, which
+avoids external dependencies. In contrast, `rjd3revisions` relies
+heavily on Java via the JDemetra+ platform, which can make setup and
+integration more complex. `reviser` offers a lightweight, R-native
+solution for revision analysis, combining user-friendly tools for data
+wrangling, visualization, and evaluation of release efficiency. \##
+Citation Burri M, Wegmueller P (2025). reviser: Tools for Studying
+Revision Properties in Real-Time Time Series Vintages. R package version
+0.1.0, <https://p-wegmueller.github.io/reviser/>.
