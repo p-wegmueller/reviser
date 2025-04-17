@@ -17,6 +17,58 @@ coverage](https://codecov.io/gh/p-wegmueller/reviser/graph/badge.svg)](https://a
 vintages data. The package provides tools to clean, visualize, and
 analyze time-series revisions.
 
+## Why reviser?
+
+Economic data often arrives in multiple waves—with initial estimates
+updated or revised as more complete information becomes available. These
+revisions, while common, can have major implications for how economic
+conditions are perceived and how decisions are made by policymakers,
+analysts, and markets. Yet, tools to systematically analyze, visualize,
+and communicate these revisions are still limited. This is where the R
+package **reviser** comes in.
+
+**reviser** is built to support transparent, reproducible workflows for
+tracking and interpreting data revisions. Whether you’re evaluating GDP
+estimates, inflation statistics, or high-frequency indicators,
+**reviser** helps quantify how vintages evolve, assess their
+reliability, and highlight cases where revisions may alter the economic
+narrative.
+
+### Real-world relevance
+
+The importance of revisions isn’t just academic. They shape real-world
+outcomes:
+
+<figure>
+<img src="man/figures/gdp_over_time.jpeg"
+alt="Revision paths for Euro Area GDP (Sources: BEA, Eurostat)" />
+<figcaption aria-hidden="true">Revision paths for Euro Area GDP
+(Sources: BEA, Eurostat)</figcaption>
+</figure>
+
+- US GDP 2015-Q1 — Weather or Weakness?: A sharp downward revision from
+  +0.1% to -0.2% sparked fears of a slowdown—until a later benchmark
+  revision lifted it back to +0.8%, highlighting challenges in seasonal
+  adjustment.
+
+- Euro Area GDP in 2012Q1 — A Recession Delayed?: A flash estimate of
+  0.0% avoided the recession label—until it was revised to -0.1%,
+  confirming back-to-back contractions and altering the policy
+  discussion at a critical time.
+
+These examples underscore how even small numerical changes can shift
+narratives, delay responses, and affect credibility.
+
+**reviser** is an R package designed to streamline the analysis and
+visualization of data revisions—especially in the context of official
+statistics and macroeconomic indicators. Built with tidy principles and
+seamless integration in mind, reviser offers intuitive tools to compare
+data vintages, quantify revision patterns, and produce publication-ready
+outputs. Whether you’re tracking GDP estimate updates or evaluating
+forecast accuracy over time, **reviser** provides a robust and flexible
+framework tailored for economists, data analysts, and statistical
+agencies alike.
+
 ## Installation
 
 You can install the development version of reviser from
@@ -66,8 +118,8 @@ final_release <- get_nth_release(gdp_long, n = 16)
 df <- get_nth_release(gdp_long, n = 0:6)
 
 summary <- get_revision_analysis(df, final_release)
-#> Warning: Both 'release' and 'pub_date' columns are present in 'df. 
-#>       The 'release' column will be used.
+#> Warning: Both 'release' and 'pub_date' columns are present in 'df. The
+#> 'release' column will be used.
 print(summary)
 #> # A tibble: 7 × 14
 #>   id    release       N `Bias (mean)` `Bias (p-value)` `Bias (robust p-value)`
