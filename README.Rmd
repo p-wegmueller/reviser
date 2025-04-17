@@ -38,7 +38,7 @@ The importance of revisions isn’t just academic. They shape real-world outcome
 ![Revision paths for Euro Area GDP (Sources: BEA, Eurostat)](man/figures/gdp_over_time.jpeg)
 
  - US GDP 2015-Q1 --- Weather or Weakness?: A sharp downward revision from +0.1% to -0.2% sparked fears of a slowdown—until a later benchmark revision lifted it back to +0.8%, highlighting challenges in seasonal adjustment.
-
+ 
  - Euro Area GDP in 2012Q1 --- A Recession Delayed?: A flash estimate of 0.0% avoided the recession label—until it was revised to -0.1%, confirming back-to-back contractions and altering the policy discussion at a critical time.
 
 These examples underscore how even small numerical changes can shift narratives, delay responses, and affect credibility. 
@@ -51,10 +51,12 @@ The **reviser** package provides a comprehensive toolkit for analyzing data revi
                                                                                                                                             
 Key features include:
 
-- **Calculate revisions** across vintages using [`get_revisions()`](https://p-wegmueller.github.io/reviser/reference/get_revisions.html). See the vignette [*Understanding Data Revisions*](https://p-wegmueller.github.io/reviser/articles/understanding-revisions.html) to learn how to structure and compute revision tables.
-                                                                                                                                            - **Analyze revision patterns** and evaluate revision accuracy and bias using [`get_revision_analysis()`](https://p-wegmueller.github.io/reviser/reference/get_revision_analysis.html). For more, read the vignette [*Revision Patterns and Statistics*](https://p-wegmueller.github.io/reviser/articles/revision-analysis.html).
-                                                                                                                                            - **Detect the first efficient release**, i.e., the earliest vintage that closely matches the final values, with [`get_first_efficient_release()`](https://p-wegmueller.github.io/reviser/reference/get_first_efficient_release.html). See the vignette [*Efficient Release Identification*](https://p-wegmueller.github.io/reviser/articles/efficient-release.html).
-                                                                                                                                            - **Nowcast future data revisions** using [`kk_nowcast()`](https://p-wegmueller.github.io/reviser/reference/kk_nowcast.html), a tool to anticipate upcoming changes to early releases. Explore the methodology in the vignette [*Nowcasting Revisions*](https://p-wegmueller.github.io/reviser/articles/nowcasting-revisions.html).
+  - **Calculate revisions** across vintages using [`get_revisions()`](https://p-wegmueller.github.io/reviser/reference/get_revisions.html). See the vignette [*Understanding Data Revisions*](https://p-wegmueller.github.io/reviser/articles/understanding-revisions.html) to learn how to structure and compute revision tables.
+  
+  - **Analyze revision patterns** and evaluate revision accuracy and bias using [`get_revision_analysis()`](https://p-wegmueller.github.io/reviser/reference/get_revision_analysis.html). For more, read the vignette [*Revision Patterns and Statistics*](https://p-wegmueller.github.io/reviser/articles/revision-analysis.html).
+  
+  - **Detect the first efficient release**, i.e., the earliest vintage that closely matches the final values, with [`get_first_efficient_release()`](https://p-wegmueller.github.io/reviser/reference/get_first_efficient_release.html). See the vignette [*Efficient Release Identification*](https://p-wegmueller.github.io/reviser/articles/efficient-release.html).
+                                                                                                                                              - **Nowcast future data revisions** using [`kk_nowcast()`](https://p-wegmueller.github.io/reviser/reference/kk_nowcast.html), a tool to anticipate upcoming changes to early releases. Explore the methodology in the vignette [*Nowcasting Revisions*](https://p-wegmueller.github.io/reviser/articles/nowcasting-revisions.html).
                                                                                                                                                                                                                                                      
 
 ## Installation

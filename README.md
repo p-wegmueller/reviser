@@ -91,12 +91,15 @@ Key features include:
   [`get_revisions()`](https://p-wegmueller.github.io/reviser/reference/get_revisions.html).
   See the vignette [*Understanding Data
   Revisions*](https://p-wegmueller.github.io/reviser/articles/understanding-revisions.html)
-  to learn how to structure and compute revision tables. - **Analyze
-  revision patterns** and evaluate revision accuracy and bias using
+  to learn how to structure and compute revision tables.
+
+- **Analyze revision patterns** and evaluate revision accuracy and bias
+  using
   [`get_revision_analysis()`](https://p-wegmueller.github.io/reviser/reference/get_revision_analysis.html).
   For more, read the vignette [*Revision Patterns and
-  Statistics*](https://p-wegmueller.github.io/reviser/articles/revision-analysis.html). -
-  **Detect the first efficient release**, i.e., the earliest vintage
+  Statistics*](https://p-wegmueller.github.io/reviser/articles/revision-analysis.html).
+
+- **Detect the first efficient release**, i.e., the earliest vintage
   that closely matches the final values, with
   [`get_first_efficient_release()`](https://p-wegmueller.github.io/reviser/reference/get_first_efficient_release.html).
   See the vignette [*Efficient Release
