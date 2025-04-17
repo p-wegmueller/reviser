@@ -80,10 +80,14 @@ The **reviser** package provides a comprehensive toolkit for analyzing
 data revisions — crucial for anyone working with real-time data. It
 allows users to **visualize**, **analyze**, and **evaluate** the impact
 of data updates across different release vintages, helping to understand
-and analyze revision patterns. Get started: - Structure your data
-according to **reviser conventions**. See the [*get
-started*](https://p-wegmueller.github.io/reviser/articles/reviser.html)
-vignette
+and analyze revision patterns.
+
+Get started:
+
+- Structure your data according to **reviser conventions**. See the
+  [*get
+  started*](https://p-wegmueller.github.io/reviser/articles/reviser.html)
+  vignette
 
 Key features include:
 

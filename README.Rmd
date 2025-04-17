@@ -46,8 +46,10 @@ These examples underscore how even small numerical changes can shift narratives,
 **reviser** is an R package designed to streamline the analysis and visualization of data revisions—especially in the context of official statistics and macroeconomic indicators. Built with tidy principles and seamless integration in mind, reviser offers intuitive tools to compare data vintages, quantify revision patterns, and produce publication-ready outputs. Whether you're tracking GDP estimate updates or evaluating forecast accuracy over time, **reviser** provides a robust and flexible framework tailored for economists, data analysts, and statistical agencies alike.
 
 The **reviser** package provides a comprehensive toolkit for analyzing data revisions — crucial for anyone working with real-time data. It allows users to **visualize**, **analyze**, and **evaluate** the impact of data updates across different release vintages, helping to understand and analyze revision patterns. 
-                                                                                                                                            Get started:
-                                                                                                                                            - Structure your data according to **reviser conventions**. See the [*get started*](https://p-wegmueller.github.io/reviser/articles/reviser.html) vignette
+
+Get started:
+  
+  - Structure your data according to **reviser conventions**. See the [*get started*](https://p-wegmueller.github.io/reviser/articles/reviser.html) vignette
                                                                                                                                             
 Key features include:
 
