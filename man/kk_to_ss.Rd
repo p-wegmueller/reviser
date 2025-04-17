@@ -7,28 +7,33 @@
 kk_to_ss(FF, GG, V, W, epsilon = 1e-06)
 }
 \arguments{
-\item{FF}{Matrix. The state transition matrix defining how the state evolves over time.}
+\item{FF}{Matrix. The state transition matrix defining how the state
+evolves over time.}
 
-\item{GG}{Matrix. The control matrix, representing the influence of the state on observations.}
+\item{GG}{Matrix. The control matrix, representing the influence of the
+state on observations.}
 
 \item{V}{Matrix. The state noise covariance matrix.}
 
 \item{W}{Matrix. The observation noise covariance matrix.}
 
-\item{epsilon}{Numeric. A small positive number to ensure numerical stability in covariance matrices (default: \code{1e-6}).}
+\item{epsilon}{Numeric. A small positive number to ensure numerical
+stability in covariance matrices (default: \code{1e-6}).}
 }
 \value{
 A list containing the state-space matrices:
 \describe{
 \item{\code{Z}}{The observation matrix.}
-\item{\code{Tmat}}{The state transition matrix for the augmented state-space model.}
+\item{\code{Tmat}}{The state transition matrix for the augmented
+state-space model.}
 \item{\code{H}}{The observation noise covariance matrix.}
 \item{\code{Q}}{The state noise covariance matrix.}
 \item{\code{R}}{The control matrix.}
 }
 }
 \description{
-Transforms the generalized Kishor-Koenig (KK) matrices into the state-space representation required for Kalman filtering and smoothing.
+Transforms the generalized Kishor-Koenig (KK) matrices into the state-space
+representation required for Kalman filtering and smoothing.
 }
 \details{
 The state space model is represented by the following equations:
@@ -47,7 +52,8 @@ where:
 \item \eqn{R} is the control matrix.
 \item \eqn{Q} is the covariance matrix of the state disturbances \eqn{\eta_t}.
 \item \eqn{Z} is the observation matrix.
-\item \eqn{H} is the covariance matrix of the observation disturbances \eqn{\epsilon_t}.
+\item \eqn{H} is the covariance matrix of the observation disturbances
+\eqn{\epsilon_t}.
 }
 }
 \examples{

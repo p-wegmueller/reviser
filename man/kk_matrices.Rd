@@ -7,50 +7,65 @@
 kk_matrices(e, model, params = NULL, type = "numeric")
 }
 \arguments{
-\item{e}{Integer. The number of efficiency gaps (lags) in the model. Must be greater than 0.}
+\item{e}{Integer. The number of efficiency gaps (lags) in the model. Must
+be greater than 0.}
 
 \item{model}{Character. Specifies the type of model to use. Options are:
 \describe{
-\item{"Kishor-Koenig" or "KK"}{Uses the Kishor-Koenig framework with \eqn{e \times (e+1)} parameters for the \eqn{G} matrix.}
-\item{"Howrey"}{Uses the Howrey framework with \eqn{e \times e} parameters for the \eqn{G} matrix.}
+\item{"Kishor-Koenig" or "KK"}{Uses the Kishor-Koenig framework with
+\eqn{e \times (e+1)} parameters for the \eqn{G} matrix.}
+\item{"Howrey"}{Uses the Howrey framework with \eqn{e \times e}
+parameters for the \eqn{G} matrix.}
 \item{"Classical"}{Uses a diagonal identity matrix for \eqn{G}.}
 }}
 
-\item{params}{Numeric vector (optional). A vector of parameters to initialize the matrices. If \code{NULL}, default values are used:
+\item{params}{Numeric vector (optional). A vector of parameters to
+initialize the matrices. If \code{NULL}, default values are used:
 \describe{
 \item{\code{type = "numeric"}}{A vector of params must be supplied.}
-\item{\code{type = "character"}}{Initializes named parameters as \code{NA_real_}.}
+\item{\code{type = "character"}}{Initializes named parameters
+as \code{NA_real_}.}
 }
-If provided, the length of \code{params} must match the number of parameters required by the specified model.}
+If provided, the length of \code{params} must match the number of
+parameters required by the specified model.}
 
 \item{type}{Character. Specifies the type of matrices returned. Options are:
 \describe{
 \item{"numeric"}{Returns numeric matrices with parameter values.}
-\item{"character"}{Returns character matrices with parameter names. If \code{params} is provided, it is ignored.}
+\item{"character"}{Returns character matrices with parameter names.
+If \code{params} is provided, it is ignored.}
 }}
 }
 \value{
 A list containing the following components:
 \describe{
-\item{\code{FF}}{State transition matrix (\eqn{F}). Size: \eqn{(e+1) \times (e+1)}.}
-\item{\code{GG}}{Control matrix (\eqn{G}). Size depends on the model and \code{e}.}
-\item{\code{V}}{State noise covariance matrix (\eqn{V}). Size: \eqn{(e+1) \times (e+1)}.}
-\item{\code{W}}{Observation noise covariance matrix (\eqn{W}). Size: \eqn{(e+1) \times (e+1)}.}
-\item{\code{params}}{The vector of parameters used to construct the matrices, including their names.}
+\item{\code{FF}}{State transition matrix (\eqn{F}). Size: \eqn{(e+1)
+     \times (e+1)}.}
+\item{\code{GG}}{Control matrix (\eqn{G}). Size depends on the model
+and \code{e}.}
+\item{\code{V}}{State noise covariance matrix (\eqn{V}).
+Size: \eqn{(e+1) \times (e+1)}.}
+\item{\code{W}}{Observation noise covariance matrix (\eqn{W}).
+Size: \eqn{(e+1) \times (e+1)}.}
+\item{\code{params}}{The vector of parameters used to construct the
+matrices, including their names.}
 }
 }
 \description{
-Constructs the matrices \eqn{I}, \eqn{F}, \eqn{G}, \eqn{V}, and \eqn{W} used in
-state-space models, specifically for the Kishor-Koenig (KK), Howrey, or Classical frameworks.
+Constructs the matrices \eqn{I}, \eqn{F}, \eqn{G}, \eqn{V}, and \eqn{W}
+used in state-space models, specifically for the Kishor-Koenig (KK), Howrey,
+or Classical frameworks.
 }
 \details{
-The generalized  Kishor-Koenig model consists of the following equations:
+The generalized Kishor-Koenig model consists of the following
+equations:
 
 \strong{State Equation:}
 \deqn{ z_t = F z_{t-1} + \nu_t, \quad \nu_t \sim N(0, V)}
 
 \strong{Observation Equation:}
-\deqn{y_t = (I - G) F y_{t-1} + G z_t + \epsilon_t, \quad \epsilon_t \sim N(0, W)}
+\deqn{y_t = (I - G) F y_{t-1} + G z_t +
+ \epsilon_t, \quad \epsilon_t \sim N(0, W)}
 
 where:
 \itemize{
@@ -70,7 +85,9 @@ str(matrices)
 # Example 2: Kishor-Koenig model with e = 2
 params <- rep(0.1, 17)
 names(params) <- names(matrices$params)
-matrices <- kk_matrices(e = 3, params = params,  model = "KK", type = "numeric")
+matrices <- kk_matrices(
+  e = 3, params = params,  model = "KK", type = "numeric"
+)
 str(matrices)
 
 }

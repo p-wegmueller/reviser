@@ -8,10 +8,9 @@ get_nth_release(df, n = 0, diagonal = FALSE)
 }
 \arguments{
 \item{df}{A data frame containing data vintages. The data frame must
-include the columns
-
--\code{pub_date} (publication date of the release)
+include the columns:
 \itemize{
+\item \code{pub_date} (publication date of the release)
 \item \code{time} (thecorresponding time period for the data).
 }}
 

@@ -9,17 +9,20 @@ vintages_wide(df, names_from = "pub_date")
 \arguments{
 \item{df}{A data frame or tibble containing vintages data in long format.}
 
-\item{names_from}{The name of the column whose unique values will be used as column names in the wide format.
-Defaults to \code{"pub_date"}. Other: \code{"release"}.}
+\item{names_from}{The name of the column whose unique values will be used
+as column names in the wide format. Defaults to \code{"pub_date"}.
+Other: \code{"release"}.}
 }
 \value{
-If an \code{id} column is present, the function returns a named list of wide-format data frames,
-one for each unique \code{id}. Otherwise, it returns a single wide-format data frame.
+If an \code{id} column is present, the function returns a named list of
+wide-format data frames, one for each unique \code{id}. Otherwise, it returns a
+single wide-format data frame.
 }
 \description{
-Converts a vintages dataset from long format to wide format, optionally grouping by \code{id} if present.
-The wide format uses one column per unique value of the \code{names_from} parameter, with observation dates
-(\code{time}) as rows and values (\code{value}) as cell contents.
+Converts a vintages dataset from long format to wide format, optionally
+grouping by \code{id} if present. The wide format uses one column per unique
+value of the \code{names_from} parameter, with observation dates (\code{time}) as
+rows and values (\code{value}) as cell contents.
 }
 \examples{
 # Example wide-format data
