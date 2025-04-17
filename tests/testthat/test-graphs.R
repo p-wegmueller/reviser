@@ -24,24 +24,39 @@ test_that("plot_vintages returns a ggplot object", {
 
 test_that("plot_vintages handles 'line' type correctly", {
   p <- plot_vintages(df_plot, type = "line", dim_col = "pub_date")
-  expect_true(any(sapply(p$layers, function(l) inherits(l$geom, "GeomLine"))))
+  expect_true(any(vapply(
+    p$layers,
+    function(l) inherits(l$geom, "GeomLine"),
+    FUN.VALUE = logical(1)
+  )))
 })
 
 test_that("plot_vintages handles 'point' type correctly", {
   p <- plot_vintages(df_plot, type = "point", dim_col = "pub_date")
-  expect_true(any(sapply(p$layers, function(l) inherits(l$geom, "GeomPoint"))))
+  expect_true(any(vapply(
+    p$layers,
+    function(l) inherits(l$geom, "GeomPoint"),
+    FUN.VALUE = logical(1)
+  )))
 })
 
 test_that("plot_vintages handles 'bar' type correctly", {
   p <- plot_vintages(df_plot, type = "bar", dim_col = "pub_date")
-  expect_true(any(sapply(p$layers, function(l) inherits(l$geom, "GeomBar"))))
+  expect_true(any(
+    vapply(
+      p$layers,
+      function(l) inherits(l$geom, "GeomBar"),
+      FUN.VALUE = logical(1)
+    )
+  ))
 })
 
 test_that("plot_vintages handles 'boxplot' type correctly", {
   p <- plot_vintages(df_plot, type = "boxplot", dim_col = "pub_date")
-  expect_true(any(sapply(
+  expect_true(any(vapply(
     p$layers,
-    function(l) inherits(l$geom, "GeomBoxplot")
+    function(l) inherits(l$geom, "GeomBoxplot"),
+    FUN.VALUE = logical(1)
   )))
 })
 
@@ -74,7 +89,7 @@ test_that("plot_vintages throws error if 'time_col' is not Date", {
   )
 })
 
-test_that("plot_vintages throws error if title, subtitle, or ylab are not characters", {
+test_that("plot_vintages errors if title, subtitle, or ylab are not chars", {
   expect_error(
     plot_vintages(df_plot, title = 123),
     "The 'title', 'subtitle', and 'ylab' arguments must be character strings."
@@ -92,10 +107,16 @@ test_that("plot_vintages throws error if title, subtitle, or ylab are not charac
 test_that("plot_vintages handles wide format data", {
   p <- plot_vintages(df_plot_wide)
   expect_s3_class(p, "ggplot")
-  expect_true(any(sapply(p$layers, function(l) inherits(l$geom, "GeomLine"))))
+  expect_true(
+    any(vapply(
+      p$layers,
+      function(l) inherits(l$geom, "GeomLine"),
+      FUN.VALUE = logical(1)
+    ))
+  )
 })
 
-test_that("plot_vintages warns and filters if dim_col has more than 30 unique values", {
+test_that("plot_vintages warns if dim_col has more than 30 unique values", {
   df_many_vintages <- df_plot %>%
     mutate(pub_date = as.Date(pub_date) + rep(1:40, length.out = n()))
   expect_warning(
@@ -116,7 +137,7 @@ test_that("theme_reviser returns a ggplot theme object", {
   expect_s3_class(th, "theme")
 })
 
-test_that("theme_reviser allows customization of legend position and direction", {
+test_that("theme_reviser allows customization legend position and direction", {
   th_bottom_horiz <- theme_reviser(
     legend.position = "bottom",
     legend.direction = "horizontal"
@@ -156,7 +177,7 @@ test_that("scale_fill_reviser returns a discrete fill scale", {
 test_that("scale_color_reviser uses colors_reviser palette", {
   sc <- scale_color_reviser()
   expected_colors <- colors_reviser()
-  # Extract the palette function and test it (implementation detail, might change)
+  # Extract the palette function and test it
   palette_func <- sc$palette(length(expected_colors))
   expect_identical(palette_func, expected_colors)
 })
@@ -164,7 +185,7 @@ test_that("scale_color_reviser uses colors_reviser palette", {
 test_that("scale_fill_reviser uses colors_reviser palette", {
   sf <- scale_fill_reviser()
   expected_colors <- colors_reviser()
-  # Extract the palette function and test it (implementation detail, might change)
+  # Extract the palette function and test it
   palette_func <- sf$palette(length(expected_colors))
   expect_identical(palette_func, expected_colors)
 })

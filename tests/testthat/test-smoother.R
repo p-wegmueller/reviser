@@ -105,7 +105,7 @@ test_that("kk_nowcast handles startvals", {
   ) +
     (1 + 1)
   start_values <- setNames(rep(0.1, n_params), paste0("p", 1:n_params))
-  expect_silent(kkmod <- kk_nowcast(df_kk, e = 1)) # Expecting a named numeric vector
+  expect_silent(kkmod <- kk_nowcast(df_kk, e = 1))
   start_values_vec <- kkmod$params
   expect_silent(kk_nowcast(
     df_kk,

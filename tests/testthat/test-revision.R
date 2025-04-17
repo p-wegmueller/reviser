@@ -223,7 +223,7 @@ test_that("get_revision_analysis requires at least 8 observations per group", {
   )
   expect_error(get_revision_analysis(df_small_group, df_final_small_group, 
                                      grouping_var = "id"),
-               "Need at least 8 observations per group to compute the statistics.")
+        "Need at least 8 observations per group to compute the statistics.")
   
   df_mixed_group_size <- bind_rows(
     df_initial_grouped %>% filter(id == "US"),
@@ -351,7 +351,7 @@ test_that("get_first_efficient_release respects test_all = TRUE", {
   expect_equal(length(result$models), length(unique(df_eff$release)))
 })
 
-test_that("get_first_efficient_release warns if no efficient release is found", {
+test_that("get_first_efficient_release warns if no efficient release found", {
   # Create a scenario where the releases are consistently biased.
   
   df_biased_grouped <- df_eff_grouped %>% mutate(
