@@ -129,7 +129,8 @@ is also converted to the expected data type:</p><ul><li><p><code>time</code> and
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2020-01-15"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2020-06-15"</span><span class="op">)</span>, by <span class="op">=</span> <span class="st">"month"</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span>,</span></span>
 <span class="r-in"><span>   observed_value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">6</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>   identifier <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"A"</span>, <span class="fl">6</span><span class="op">)</span></span></span>
+<span class="r-in"><span>   identifier <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"A"</span>, <span class="fl">6</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>   release <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"release_"</span>, <span class="fl">0</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Rename columns</span></span></span>
@@ -138,7 +139,8 @@ is also converted to the expected data type:</p><ul><li><p><code>time</code> and
 <span class="r-in"><span>  col_time <span class="op">=</span> <span class="va">observation_date</span>,</span></span>
 <span class="r-in"><span>  col_pub_date <span class="op">=</span> <span class="va">release_date</span>,</span></span>
 <span class="r-in"><span>  col_value <span class="op">=</span> <span class="va">observed_value</span>,</span></span>
-<span class="r-in"><span>  col_id <span class="op">=</span> <span class="va">identifier</span></span></span>
+<span class="r-in"><span>  col_id <span class="op">=</span> <span class="va">identifier</span>,</span></span>
+<span class="r-in"><span>  col_release <span class="op">=</span> <span class="va">release</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
