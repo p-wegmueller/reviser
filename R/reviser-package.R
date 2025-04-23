@@ -1,6 +1,10 @@
 #' @description
-#' To learn more about reviser, start with the vignettes:
+#' **reviser** is an R package designed for working with time-series vintages
+#' data. The package provides tools to clean, visualize, and analyze time-series
+#' revisions. To learn more about reviser, start with the vignettes:
 #' `browseVignettes(package = "reviser")`
+#' The package will be actively developed and maintained.
+#' @srrstats {G1.2} Life Cycle Statement
 #' @keywords internal
 "_PACKAGE"
 utils::globalVariables(c(
@@ -26,4 +30,8 @@ utils::globalVariables(c(
 #' @importFrom KFAS SSModel SSMcustom
 #' @importFrom magrittr %>%
 #' @importFrom calculus %mx% %diff% %sum% %prod%
+#' @srrstats {G1.4} Software should use
+#' [`roxygen2`](https://roxygen2.r-lib.org/) to document all functions.
+#'   roxygen2 is used for all documentation.
+#' @srrstats {G1.4a} All internal (non-exported) functions are also documented
 NULL

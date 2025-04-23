@@ -63,7 +63,8 @@ data <- tibble::tibble(
     as.Date("2020-01-15"), as.Date("2020-06-15"), by = "month"
   ),
    observed_value = rnorm(6),
-   identifier = rep("A", 6)
+   identifier = rep("A", 6),
+   release = paste0("release_", 0:5)
 )
 
 # Rename columns
@@ -72,7 +73,8 @@ renamed_data <- vintages_rename(
   col_time = observation_date,
   col_pub_date = release_date,
   col_value = observed_value,
-  col_id = identifier
+  col_id = identifier,
+  col_release = release
 )
 
 }

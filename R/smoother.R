@@ -80,15 +80,19 @@
 #'
 #' model_result$params
 #'
+#' @references Kishor, N. Kundan and Koenig, Evan F., "VAR Estimation and
+#' Forecasting When Data Are Subject to Revision", Journal of Business and
+#' Economic Statistics, 2012.
+#' @srrstats {G1.0} Statistical Software should list at least one primary
+#' reference from published academic literature.
+#'
 #' @details
 #' The function supports multiple models, including the full Kishor-Koenig
 #' framework, Howrey's model, and a classical approach. It handles data
 #' preprocessing, estimation of system equations using Seemingly Unrelated
-#' Regressions (SUR), and application of the Kalman filter and smoother.
-#'
-#' The function requires well-structured input data with multiple vintages.
-#' The time series must be regular, and the function automatically checks and
-#' transforms the data if needed.
+#' Regressions (SUR), and application of the Kalman filter and smoother. This is
+#' the first openly available implementation of the Kishor-Koenig model.
+#' @srrstats {G1.1} The first implementation of a novel algorithm
 #' @export
 kk_nowcast <- function(
   df,

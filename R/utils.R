@@ -255,7 +255,8 @@ vintages_wide <- function(df, names_from = "pub_date") {
 #'     as.Date("2020-01-15"), as.Date("2020-06-15"), by = "month"
 #'   ),
 #'    observed_value = rnorm(6),
-#'    identifier = rep("A", 6)
+#'    identifier = rep("A", 6),
+#'    release = paste0("release_", 0:5)
 #' )
 #'
 #' # Rename columns
@@ -264,7 +265,8 @@ vintages_wide <- function(df, names_from = "pub_date") {
 #'   col_time = observation_date,
 #'   col_pub_date = release_date,
 #'   col_value = observed_value,
-#'   col_id = identifier
+#'   col_id = identifier,
+#'   col_release = release
 #' )
 #'
 #' @export
@@ -371,22 +373,22 @@ vintages_rename <- function(
 #' # Example of long format data
 #' long_data <- tibble::tibble(
 #'   time = seq.Date(
-#'     as.Date("2020-01-01"), as.Date("2020-06-01"), by = "month"
+#'     as.Date("2020-01-01"), as.Date("2020-08-01"), by = "month"
 #'   ),
 #'   pub_date = seq.Date(
-#'     as.Date("2020-01-15"), as.Date("2020-06-15"), by = "month"
+#'     as.Date("2020-01-15"), as.Date("2020-08-15"), by = "month"
 #'   ),
-#'   value = rnorm(6)
+#'   value = rnorm(8)
 #' )
 #' vintages_check(long_data) # Should return "long"
 #'
 #' # Example of wide format data
 #' wide_data <- tibble::tibble(
 #'   time = seq.Date(
-#'     as.Date("2020-01-01"), as.Date("2020-06-01"), by = "month"
+#'     as.Date("2020-01-01"), as.Date("2020-08-01"), by = "month"
 #'     ),
-#'   `2020-01-15` = rnorm(6),
-#'   `2020-02-15` = rnorm(6)
+#'   `2020-01-15` = rnorm(8),
+#'   `2020-02-15` = rnorm(8)
 #' )
 #' vintages_check(wide_data) # Should return "wide"
 #' @keywords internal

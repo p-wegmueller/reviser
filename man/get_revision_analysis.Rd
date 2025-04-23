@@ -31,7 +31,7 @@ detail for the output:
 5: Full set of all statistics and tests.}
 
 \item{grouping_var}{A character string specifying the grouping variable in
-the data frame. Defaults to \code{pub_date} or \code{release} if available.}
+the data frame. Defaults to \code{"pub_date"} or \code{"release"} if available.}
 }
 \value{
 A data frame with one row per grouping (if applicable) and columns
@@ -71,7 +71,8 @@ and systematic adjustments (news).
 The function supports grouped calculations based on the presence
 of \code{id} or \code{release} columns in the input.
 
-The following statistics and tests are calculated:
+The following statistics and tests are calculated (See the vignette
+\code{vignette("revision-analysis")} for more details):
 
 \itemize{
 \item \strong{N}: The number of observations in the group.
@@ -151,7 +152,7 @@ df <- get_nth_release(
             ),
         id=="US"
      ),
-   n = 0:3
+   n = 0:10
  )
 
 final_release <- get_nth_release(
@@ -170,6 +171,10 @@ results <- get_revision_analysis(
   final_release
  )
 
-print(results)
+results <- get_revision_analysis(
+  df,
+  final_release,
+  grouping_var = "pub_date"
+ )
 
 }

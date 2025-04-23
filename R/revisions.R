@@ -257,6 +257,11 @@ get_revisions <- function(
 #' # Access the index of the first efficient release
 #' result$e
 #'
+#' @references Aruoba, S. Borağan, "Revisions Are Not Well Behaved", Journal of
+#' Money, Credit and Banking, 40(2-3), 319-340, 2008.
+#' @srrstats {G1.0} Statistical Software should list at least one primary
+#' reference from published academic literature.
+#'
 #' @export
 get_first_efficient_release <- function(
   df,
@@ -620,7 +625,7 @@ summary.lst_efficient <- function(object, ...) {
 #'    4: includes sign switches, seasonality analysis and Theil’s U.
 #'    5: Full set of all statistics and tests.
 #' @param grouping_var A character string specifying the grouping variable in
-#' the data frame. Defaults to `pub_date` or `release` if available.
+#' the data frame. Defaults to `"pub_date"` or `"release"` if available.
 #'
 #' @details
 #' This function performs a variety of statistical analyses to understand
@@ -648,7 +653,8 @@ summary.lst_efficient <- function(object, ...) {
 #' The function supports grouped calculations based on the presence
 #' of `id` or `release` columns in the input.
 #'
-#' The following statistics and tests are calculated:
+#' The following statistics and tests are calculated (See the vignette
+#' \code{vignette("revision-analysis")} for more details):
 #'
 #' \itemize{
 #'   \item **N**: The number of observations in the group.
@@ -718,6 +724,8 @@ summary.lst_efficient <- function(object, ...) {
 #'   sign changes of growth rates in revisions.
 #' }
 #'
+#' @srrstats {G1.3} All statistical terminology should be clarified and
+#' unambiguously defined
 #' @return A data frame with one row per grouping (if applicable) and columns
 #' for summary statistics and test results. The resulting data frame is of
 #' class `revision_summary`.
@@ -732,7 +740,7 @@ summary.lst_efficient <- function(object, ...) {
 #'             ),
 #'         id=="US"
 #'      ),
-#'    n = 0:3
+#'    n = 0:10
 #'  )
 #'
 #' final_release <- get_nth_release(
@@ -751,7 +759,11 @@ summary.lst_efficient <- function(object, ...) {
 #'   final_release
 #'  )
 #'
-#' print(results)
+#' results <- get_revision_analysis(
+#'   df,
+#'   final_release,
+#'   grouping_var = "pub_date"
+#'  )
 #'
 #' @export
 get_revision_analysis <- function(
@@ -805,7 +817,10 @@ get_revision_analysis <- function(
   }
 
   # If both pub_date and release columns are present in df, use release column
-  if ("release" %in% colnames(df) & "pub_date" %in% colnames(df)) {
+  if (
+    ("release" %in% colnames(df) & "pub_date" %in% colnames(df)) &
+      is.null(grouping_var)
+  ) {
     rlang::warn(
       "Both 'release' and 'pub_date' columns are present in 'df. 
       The 'release' column will be used."

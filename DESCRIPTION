@@ -21,7 +21,7 @@ LazyData: true
 Depends: 
     R (>= 2.10)
 RoxygenNote: 7.3.2
-Roxygen: list(markdown = TRUE)
+Roxygen: list (markdown = TRUE, roclets = c ("namespace", "rd", "srr::srr_stats_roclet"))
 Imports:
     magrittr,
     dplyr,

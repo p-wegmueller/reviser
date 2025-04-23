@@ -89,3 +89,7 @@ result <- get_first_efficient_release(df, final_release, significance = 0.05)
 result$e
 
 }
+\references{
+Aruoba, S. Borağan, "Revisions Are Not Well Behaved", Journal of
+Money, Credit and Banking, 40(2-3), 319-340, 2008.
+}
