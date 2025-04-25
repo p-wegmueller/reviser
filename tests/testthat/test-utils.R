@@ -179,7 +179,7 @@ test_that("vintages_long errors on invalid names_to", {
   )
   expect_error(
     vintages_long(wide_df, names_to = "something_else"),
-    "'names_to' argument must be either 'pub_date' or 'release'"
+    "'names_to' must be one of 'pub_date' or 'release'"
   )
 })
 
@@ -204,70 +204,4 @@ test_that("vintages_long returns early for already long input", {
   expect_s3_class(result, "tbl_pubdate")
   expect_equal(nrow(result), 2)
   expect_equal(colnames(result), c("time", "pub_date", "value"))
-})
-
-
-test_that("vintages_rename renames and converts specified columns correctly", {
-  df <- tibble::tibble(
-    observation_date = as.Date("2020-01-01") + 0:2,
-    release_date = as.Date("2020-01-15") + 0:2,
-    observed_value = c(1.1, 2.2, 3.3),
-    identifier = c("A", "B", "C")
-  )
-
-  result <- vintages_rename(
-    df,
-    col_time = observation_date,
-    col_pub_date = release_date,
-    col_value = observed_value,
-    col_id = identifier
-  )
-
-  expect_true(all(c("time", "pub_date", "value", "id") %in% names(result)))
-  expect_s3_class(result$time, "Date")
-  expect_s3_class(result$pub_date, "Date")
-  expect_type(result$value, "double")
-  expect_type(result$id, "character")
-})
-
-test_that("vintages_rename renames release column correctly", {
-  df <- tibble::tibble(
-    rel = 1:3
-  )
-
-  result <- vintages_rename(df, col_release = rel)
-
-  expect_true("release" %in% names(result))
-  expect_type(result$release, "character")
-  expect_true(all(grepl("^release_", result$release)))
-})
-
-test_that("vintages_rename throws error for missing specified columns", {
-  df <- tibble::tibble(
-    x = 1:3,
-    y = 2:4
-  )
-
-  expect_error(
-    vintages_rename(df, col_value = not_in_df),
-    "The following specified columns are not"
-  )
-})
-
-test_that("vintages_rename throws error if no column specified", {
-  df <- tibble::tibble(
-    x = 1:3
-  )
-
-  expect_error(
-    vintages_rename(df),
-    "At least one column must be specified for renaming."
-  )
-})
-
-test_that("vintages_rename throws error if df is not a data.frame", {
-  expect_error(
-    vintages_rename("not a data frame", col_value = value),
-    "The input 'df' must be a data.frame or tibble."
-  )
 })

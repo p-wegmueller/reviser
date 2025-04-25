@@ -1,3 +1,7 @@
+#' @srrstats {G5.4} statistical algorithms produce expected results
+#' @srrstats {G5.4a} correctness of the implementation, tested against
+#' simple, trivial cases
+
 # Create example data
 df <- get_nth_release(
   tsbox::ts_span(

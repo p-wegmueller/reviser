@@ -30,8 +30,6 @@ utils::globalVariables(c(
 #' @importFrom KFAS SSModel SSMcustom
 #' @importFrom magrittr %>%
 #' @importFrom calculus %mx% %diff% %sum% %prod%
-#' @srrstats {G1.4} Software should use
-#' [`roxygen2`](https://roxygen2.r-lib.org/) to document all functions.
-#'   roxygen2 is used for all documentation.
-#' @srrstats {G1.4a} All internal (non-exported) functions are also documented
+#' @srrstats {G1.4} roxygen2 is used for all documentation.
+#' @srrstats {G1.4a} All internal functions are also documented
 NULL

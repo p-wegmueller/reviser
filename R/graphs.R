@@ -30,6 +30,29 @@
 #' @return A ggplot2 plot object representing the specified vintage
 #' data visualization.
 #'
+#' @srrstats {G1.4} Uses roxygen2 to document the function
+#' @srrstats {G2.0} Implements assertions on input types and parameters
+#' @srrstats {G2.1} Validates data types of inputs through explicit checks
+#' @srrstats {G2.3a} Uses explicit validation to only permit expected values
+#' for 'type' parameter
+#' @srrstats {G2.8} Provides appropriate conversion routines for different data
+#' formats
+#' @srrstats {G2.9} Issues diagnostic messages for data transformations (warns
+#' when limiting to 30 series)
+#' @srrstats {G5.8} Includes edge condition tests (e.g., handling single value
+#' in dim_col for boxplot)
+#' @srrstats {TS1.2} Validates inputs via vintages_check() and explicit column
+#' checks
+#' @srrstats {TS1.3} Pre-processes data through standardization and conversion
+#' from wide to long if needed
+#' @srrstats {TS5.0} Implements plotting methods for time series visualization
+#' @srrstats {TS5.1} Clearly labels time axis with continuous units (ensures
+#' time_col is Date class)
+#' @srrstats {TS5.2} Places time variable on horizontal axis by default
+#' @srrstats {TS5.3} Ensures time units are properly formatted as Date objects
+#' @srrstats {TS5.5} Handles data with missing values by filtering them out
+#' during pre-processing
+#'
 #' @details
 #' The `plot_vintages` function is designed to handle data frames in both
 #' wide and long formats. It ensures

@@ -16,6 +16,19 @@
 #' wide-format data frames, the output will be a single combined long-format
 #' data frame.
 #'
+#' @srrstats {G1.4} Uses roxygen2 to document the function
+#' @srrstats {G2.0} Implements assertions on types of inputs through parameter
+#' validation
+#' @srrstats {G2.3a} Uses parameter validation to restrict `names_to` to
+#' allowed values
+#' @srrstats {G2.8} Provides appropriate conversion routines for tabular data
+#' @srrstats {G2.9} Issues diagnostic messages for data conversion (warning when
+#' already long format)
+#' @srrstats {G2.14} Provides option to specify how to handle missing data via
+#' `keep_na` parameter
+#' @srrstats {TS1.1} Explicitly documents input data types and classes
+#' @srrstats {TS1.2} Validates inputs via `vintages_check()`
+#' @srrstats {TS4.2} Explicitly documents return value types and classes
 #'
 #' @examples
 #' # Example wide-format data
@@ -35,9 +48,16 @@
 #'
 #' @export
 vintages_long <- function(df, names_to = "pub_date", keep_na = FALSE) {
-  # Check names_to argument is either 'pub_date' or ' release'
+  names_to <- tolower(names_to)
+
+  # check names_to one of "pub_date" or "release",
   if (!names_to %in% c("pub_date", "release")) {
-    rlang::abort("'names_to' argument must be either 'pub_date' or 'release'")
+    rlang::abort(
+      paste0(
+        "'names_to' must be one of 'pub_date' or 'release', not ",
+        names_to
+      )
+    )
   }
 
   # Check keep_na is logical
@@ -124,6 +144,19 @@ vintages_long <- function(df, names_to = "pub_date", keep_na = FALSE) {
 #' wide-format data frames, one for each unique `id`. Otherwise, it returns a
 #' single wide-format data frame.
 #'
+#' @srrstats {G1.4} Uses roxygen2 to document the function
+#' @srrstats {G2.0} Implements assertions on types of inputs through required
+#' column checks
+#' @srrstats {G2.8} Provides appropriate conversion routines for tabular data
+#' @srrstats {G2.9} Issues diagnostic messages for data conversion (warnings for
+#' ignored columns)
+#' @srrstats {G2.14} Handles missing data appropriately through pivot operations
+#' @srrstats {TS1.1} Explicitly documents input data types and classes
+#' @srrstats {TS1.2} Validates inputs via `vintages_check()` and column
+#' verification
+#' @srrstats {TS4.0b} Returns data in a consistent class format with specific
+#' class assignment
+#' @srrstats {TS4.2} Explicitly documents return value types and classes
 #'
 #' @examples
 #' # Example wide-format data
@@ -144,6 +177,17 @@ vintages_long <- function(df, names_to = "pub_date", keep_na = FALSE) {
 #'
 #' @export
 vintages_wide <- function(df, names_from = "pub_date") {
+  names_from <- tolower(names_from)
+  # check names_from one of "pub_date" or "release",
+  if (!names_from %in% c("pub_date", "release")) {
+    rlang::abort(
+      paste0(
+        "'names_from' must be one of 'pub_date' or 'release', not ",
+        names_from
+      )
+    )
+  }
+
   df <- standardize_val_col(df)
 
   check <- vintages_check(df)
@@ -189,7 +233,10 @@ vintages_wide <- function(df, names_from = "pub_date") {
       lapply(function(sub_df) {
         sub_df <- sub_df %>%
           dplyr::select(time, dplyr::all_of(names_from), value) %>%
-          tidyr::pivot_wider(names_from = names_from, values_from = value)
+          tidyr::pivot_wider(
+            names_from = dplyr::all_of(names_from),
+            values_from = value
+          )
         if (names_from == "pub_date") {
           class(sub_df) <- c("tbl_pubdate", "tbl_df", "tbl", "data.frame")
         } else if (names_from == "release") {
@@ -201,7 +248,10 @@ vintages_wide <- function(df, names_from = "pub_date") {
   } else {
     # Convert to wide format
     wide_df <- df %>%
-      tidyr::pivot_wider(names_from = names_from, values_from = value)
+      tidyr::pivot_wider(
+        names_from = dplyr::all_of(names_from),
+        values_from = value
+      )
 
     if (names_from == "pub_date") {
       class(wide_df) <- c("tbl_pubdate", "tbl_df", "tbl", "data.frame")
@@ -210,149 +260,6 @@ vintages_wide <- function(df, names_from = "pub_date") {
     }
     return(wide_df)
   }
-}
-
-#' Rename Columns to Align with Package Standards
-#'
-#' Renames columns in a data frame or tibble to align with the conventions used
-#'  in this package. Converts the renamed columns to the appropriate data types.
-#'
-#' @param df A data frame or tibble containing the data to be renamed.
-#' @param col_time Optional. The name of the column to be renamed as `time`.
-#' The `time` column represents observation dates and will be converted to
-#' `Date` format.
-#' @param col_pub_date Optional. The name of the column to be renamed as
-#' `pub_date`. The `pub_date` column represents release dates and will be
-#' converted to `Date` format.
-#' @param col_value Optional. The name of the column to be renamed as `value`.
-#' The `value` column represents the observed values and will be converted
-#' to numeric.
-#' @param col_id Optional. The name of the column to be renamed as `id`.
-#' @param col_release Optional. The name of the column to be renamed as
-#' `release`. The `id` column is used as an identifier and will be converted
-#' to character format.
-#'
-#' @return A data frame or tibble with the renamed columns and their respective
-#'  data types converted (if specified). The original class of the input
-#'  object is preserved.
-#'
-#' @details
-#' The function checks the validity of the input data frame and ensures that
-#' at least one column is specified for renaming. If a column is renamed, it
-#' is also converted to the expected data type:
-#'
-#' - `time` and `pub_date` are converted to `Date`.
-#' - `value` is converted to numeric.
-#' - `release` and `id` are converted to character.
-#'
-#' @examples
-#' # Example data
-#' data <- tibble::tibble(
-#'   observation_date = seq.Date(
-#'     as.Date("2020-01-01"), as.Date("2020-06-01"), by = "month"
-#'     ),
-#'   release_date = seq.Date(
-#'     as.Date("2020-01-15"), as.Date("2020-06-15"), by = "month"
-#'   ),
-#'    observed_value = rnorm(6),
-#'    identifier = rep("A", 6),
-#'    release = paste0("release_", 0:5)
-#' )
-#'
-#' # Rename columns
-#' renamed_data <- vintages_rename(
-#'   data,
-#'   col_time = observation_date,
-#'   col_pub_date = release_date,
-#'   col_value = observed_value,
-#'   col_id = identifier,
-#'   col_release = release
-#' )
-#'
-#' @export
-vintages_rename <- function(
-  df,
-  col_time = NULL,
-  col_pub_date = NULL,
-  col_value = NULL,
-  col_release = NULL,
-  col_id = NULL
-) {
-  # Check if input is a data.frame or tibble
-  if (!is.data.frame(df)) {
-    rlang::abort("The input 'df' must be a data.frame or tibble.")
-  }
-
-  df <- vintages_assign_class(df)
-
-  # Ensure column inputs can handle both quoted and unquoted names
-  col_time <- rlang::enquo(col_time)
-  col_pub_date <- rlang::enquo(col_pub_date)
-  col_value <- rlang::enquo(col_value)
-  col_release <- rlang::enquo(col_release)
-  col_id <- rlang::enquo(col_id)
-
-  # Check that at least one column is provided
-  if (
-    rlang::quo_is_null(col_time) &&
-      rlang::quo_is_null(col_pub_date) &&
-      rlang::quo_is_null(col_value) &&
-      rlang::quo_is_null(col_release) &&
-      rlang::quo_is_null(col_id)
-  ) {
-    rlang::abort("At least one column must be specified for renaming.")
-  }
-
-  # Check that specified columns exist in df
-  provided_cols <- c(
-    if (!rlang::quo_is_null(col_time)) rlang::quo_name(col_time),
-    if (!rlang::quo_is_null(col_pub_date)) rlang::quo_name(col_pub_date),
-    if (!rlang::quo_is_null(col_value)) rlang::quo_name(col_value),
-    if (!rlang::quo_is_null(col_release)) rlang::quo_name(col_release),
-    if (!rlang::quo_is_null(col_id)) rlang::quo_name(col_id)
-  )
-
-  missing_cols <- setdiff(provided_cols, colnames(df))
-  if (length(missing_cols) > 0) {
-    rlang::abort(glue::glue(
-      "The following specified columns are not 
-      in 'df': {paste(missing_cols, collapse = ', ')}"
-    ))
-  }
-
-  # Rename and mutate based on provided inputs
-  if (!rlang::quo_is_null(col_time)) {
-    df <- df %>%
-      dplyr::rename(time = !!col_time) %>%
-      dplyr::mutate(time = as.Date(time))
-  }
-
-  if (!rlang::quo_is_null(col_pub_date)) {
-    df <- df %>%
-      dplyr::rename(pub_date = !!col_pub_date) %>%
-      dplyr::mutate(pub_date = as.Date(pub_date))
-  }
-
-  if (!rlang::quo_is_null(col_value)) {
-    df <- df %>%
-      dplyr::rename(value = !!col_value) %>%
-      dplyr::mutate(value = as.numeric(value))
-  }
-
-  if (!rlang::quo_is_null(col_release)) {
-    df <- df %>%
-      dplyr::rename(release = !!col_release) %>%
-      dplyr::mutate(release = paste0("release_", as.character(release)))
-  }
-
-  if (!rlang::quo_is_null(col_id)) {
-    df <- df %>%
-      dplyr::rename(id = !!col_id) %>%
-      dplyr::mutate(id = as.character(id))
-  }
-
-  df <- vintages_assign_class(df)
-  return(df)
 }
 
 
@@ -368,6 +275,40 @@ vintages_rename <- function(
 #' @return A string indicating the format of the data:
 #' - `"long"` if the data frame is in long format.
 #' - `"wide"` if the data frame is in wide format.
+#'
+#' @srrstats {G1.4} roxygen2 is used for all documentation.
+#' @srrstats {G1.4a} All internal functions are also documented
+#' @srrstats {G2.0} Implements assertions on length of input by checking if the
+#' input data frame contains required columns.
+#' @srrstats {G2.0a} Documentation explicitly states expectations on input
+#' structure through parameter documentation.
+#' @srrstats {G2.1} Implements assertions on types of inputs by checking if
+#' input is a data frame and if columns contain properly formatted dates.
+#' @srrstats {G2.1a} Documentation explicitly states expectations on data types
+#' for all required columns.
+#' @srrstats {G2.2} Appropriately restricts input to a single data frame,
+#' preventing multivariate input where univariate is expected.
+#' @srrstats {G2.8} Software provides appropriate conversion or dispatch
+#' routines as part of initial pre-processing to ensure that all other
+#' sub-functions of a  package receive inputs of a single defined class or type.
+#' @srrstats {G2.9} Software issues diagnostic messages for type conversion in
+#' which information is lost or added.
+#' @srrstats {G2.10} Software ensures that extraction or filtering of single
+#' columns from tabular inputs behaves consistently regardless of the class of
+#' tabular data.
+#' @srrstats {G2.13} Implements appropriate checks for missing data in critical
+#' columns like 'time' and 'pub_date'.
+#' @srrstats {G5.2a} Every error message produced by stop() is unique and
+#' descriptive.
+#' @srrstats {G5.8} Includes edge condition tests to ensure appropriate behavior
+#' with invalid inputs.
+#' @srrstats {TS1.1}  documents the types and classes of input data
+#' @srrstats {TS1.2} implements validation routines that inputs are of
+#' acceptable classes.
+#' @srrstats {TS1.3}  pre-processing routine to validate input data and
+#' transform it to a uniform type.
+#' @srrstats {TS1.4} date column always there
+#' @srrstats {TS4.2} type and class of all return values are documented.
 #'
 #' @examples
 #' # Example of long format data
@@ -458,6 +399,21 @@ vintages_check <- function(df) {
 
 #' Assign class to vintages tibble depending on columns
 #' @param df data.frame
+#'
+#' @srrstats {G2.0} Implements assertions on input by operating on column
+#' presence
+#' @srrstats {G2.1} Implicitly handles input type by preserving the original
+#' class structure
+#' @srrstats {G2.8} Provides appropriate conversion routines to ensure
+#' consistent class structure
+#' @srrstats {TS1.0} Uses and relies on explicit class systems for time series
+#' data
+#' @srrstats {TS1.2} Implements validation routines by checking column presence
+#' @srrstats {TS1.3} Functions as part of a pre-processing routine that
+#' transforms data to uniform type
+#' @srrstats {TS4.0b} Ensures return values have consistent class-defined format
+#' @srrstats {TS4.2} Contributes to documenting type and class of return values
+#'
 #' @keywords internal
 #' @noRd
 vintages_assign_class <- function(df) {
@@ -487,6 +443,20 @@ vintages_assign_class <- function(df) {
 #' Standardize the time series data frame
 #' Value/s column is renamed to `value`
 #' @param df data.frame
+#'
+#' @srrstats {G2.0} Implements assertions on columns by using dplyr::any_of
+#' @srrstats {G2.8} Provides conversion routines to ensure consistent column
+#' naming
+#' @srrstats {G2.9} Performs column name standardization with appropriate
+#' handling
+#' @srrstats {G2.10} Ensures consistent behavior when extracting columns
+#' regardless of input class
+#' @srrstats {TS1.3} Contributes to pre-processing routine by standardizing
+#' column names
+#' @srrstats {TS1.4} Maintains time- and date-based components by standardizing
+#' names without modifying data
+#' @srrstats {TS4.0} Helps ensure return values are in a consistent format
+#'
 #' @keywords internal
 #' @noRd
 standardize_val_col <- function(df) {

@@ -88,7 +88,8 @@ The function supports multiple models, including the full Kishor-Koenig
 framework, Howrey's model, and a classical approach. It handles data
 preprocessing, estimation of system equations using Seemingly Unrelated
 Regressions (SUR), and application of the Kalman filter and smoother. This is
-the first openly available implementation of the Kishor-Koenig model.
+the first openly available implementation of the Kishor-Koenig model (See
+the vignette \code{vignette("nowcasting_revisions")} for more details).
 }
 \examples{
 # Example usage:
@@ -101,7 +102,7 @@ df <- get_nth_release(
      ),
      n = 0:1
    )
-df <- dplyr::select(df, -id)
+df <- dplyr::select(df, -c(id, pub_date))
 df <- na.omit(df)
 
 e <- 1  # Number of efficient release

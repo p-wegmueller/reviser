@@ -42,12 +42,43 @@
 #' Input validation ensures that only one of `ref_date`, `nth_release`, or
 #' `interval` is specified.
 #'
+#' @srrstats {G1.3} Statistical terminology for time series revisions defined
+#' @srrstats {G1.4} Using roxygen2 for function documentation
+#' @srrstats {G2.0} Implements assertions on lengths of inputs through
+#' validation checks
+#' @srrstats {G2.1} Implements assertions on types of inputs (e.g., date,
+#' numeric)
+#' @srrstats {G2.1a} Documents expectations on data types for all inputs
+#' @srrstats {G2.3} Uses validation logic to ensure inputs are exclusive
+#' @srrstats {G2.3a} Uses validation logic to ensure parameters have expected
+#' values
+#' @srrstats {G2.3b} use `tolower()`
+#' @srrstats {G2.4} convert between different data types
+#' @srrstats {G2.4a} Converts input as needed (ref_date converted to Date)
+#' @srrstats {G2.7} Accepts both wide and long format tabular data through
+#' vintages_check
+#' @srrstats {G2.8} Provides conversion routines (vintages_long) to ensure
+#' consistent input format
+#' @srrstats {G5.8} Handles edge conditions with appropriate error messages
+#' @srrstats {TS1.0} Uses explicit class systems for time series data
+#' (tbl_revision)
+#' @srrstats {TS1.1} Explicitly documents required input data structure
+#' @srrstats {TS1.2} Implements validation routines to confirm inputs are
+#' acceptable
+#' @srrstats {TS1.3} Uses a single pre-processing routine (vintages_check,
+#' vintages_long)
+#' @srrstats {TS1.4} Maintains time-based components of input data
+#' @srrstats {TS1.5} Ensures ordering of time through
+#' dplyr::arrange(pub_date, time)
+#' @srrstats {TS4.0a} Returns values in same class as input data
+#' @srrstats {TS4.2} Type and class of return values  documented
+#'
 #' @examples
 #' # Example data
 #' df <- dplyr::filter(reviser::gdp , id=="US")
 #'
 #' # Calculate revisions using an interval of 1
-#' revisions_interval <- get_revisions(df, interval = 1)
+#' revisions_interval <- get_revisions(df, interval = 1L)
 #'
 #' # Calculate revisions using a fixed reference date
 #' revisions_date <- get_revisions(df, ref_date = as.Date("2023-02-01"))
@@ -71,21 +102,33 @@ get_revisions <- function(
 
   # Default interval is 1
   if (specified_count == 0L) {
-    interval <- 1
+    interval <- 1L
   }
 
   if (specified_count > 1L) {
     rlang::abort("Specify only one of 'ref_date', 'nth_release' or 'interval'.")
   }
 
-  if (!is.null(ref_date)) {
+  if (!is.null(interval)) {
+    # check interval is length 1 and integer
+    if (length(interval) != 1) {
+      rlang::abort("'interval' must be of length 1.")
+    }
+
+    if (is.integer(interval)) {
+      # Already valid
+    } else if (is.numeric(interval)) {
+      if (interval %% 1 != 0) {
+        rlang::abort("'interval' must be a whole number.")
+      }
+      interval <- as.integer(interval)
+    } else {
+      rlang::abort("'interval' must be an integer or numeric of length 1.")
+    }
+  } else if (!is.null(ref_date)) {
     ref_date <- tryCatch(as.Date(ref_date), error = function(e) e)
     if (!c("Date") %in% class(ref_date)) {
       rlang::abort("The input 'ref_date' must be a date object.")
-    }
-  } else if (!is.null(interval)) {
-    if (!is.numeric(interval) || interval < 1) {
-      rlang::abort("The input 'interval' must be a positive integer.")
     }
   } else if (!is.null(nth_release)) {
     if (is.numeric(nth_release) && nth_release < 0) {
@@ -106,7 +149,7 @@ get_revisions <- function(
   df <- vintages_assign_class(df)
 
   # Check if id column present
-  if ("id" %in% colnames(df)) {
+  if ("id" %in% colnames(df) & length(unique(df$id)) > 1) {
     # Ensure data is sorted by pub_date and time
     df <- df %>%
       dplyr::arrange(id, pub_date, time)
@@ -239,6 +282,41 @@ get_revisions <- function(
 #'
 #' If no efficient release is found, a warning is issued.
 #'
+#' @srrstats {G1.0} reference from published academic literature (Aruoba, 2008).
+#' @srrstats {G1.3} Statistical terminology is clearly defined, including the
+#' concept of "efficiency" in the context of vintage data releases.
+#' @srrstats {G2.0} Function implements assertions on lengths of inputs by
+#' ensuring that both df and final_release contain necessary columns.
+#' @srrstats {G2.1} Function implements assertions on types of inputs by
+#' checking for the 'tbl_release' class.
+#' @srrstats {G2.7} Function accepts different standard tabular forms and
+#' converts them to a consistent format.
+#' @srrstats {G2.8} Function provides appropriate conversion routines as part
+#' of initial pre-processing to ensure uniform data type.
+#' @srrstats {G2.13} Function implements checks for missing data through
+#' stats::na.omit() before passing data to analytical algorithms.
+#' @srrstats {G5.2a} Function implements explicit error behavior for unexpected
+#' inputs with unique error messages for different validation failures.
+#' @srrstats {G5.8d} Function handles edge cases where no efficient release is
+#' found by issuing an appropriate warning.
+#' @srrstats {TS1.1} Function explicitly documents the types and classes of
+#' input data as 'tbl_release' objects.
+#' @srrstats {TS1.2} Function validates that inputs are of acceptable classes
+#' through the 'vintages_check' function.
+#' @srrstats {TS1.3} Function uses a single pre-processing routine to validate
+#' and transform input data to a uniform type.
+#' @srrstats {TS1.4} Function maintains time-based components of input data
+#' through the transformation process.
+#' @srrstats {TS1.5} Function ensures strict ordering of time through the
+#' dplyr::arrange(time) operation.
+#' @srrstats {TS2.1} Function removes missings before passing data
+#' @srrstats {TS2.1a} Function removes missings before passing data
+#' @srrstats {TS2.1b} Function removes missings before passing data
+#' @srrstats {TS4.0} Return values are in a unique, class-defined format
+#' ('lst_efficient').
+#' @srrstats {TS4.2} The type and class of all return values are explicitly
+#' documented in the @return section.
+#'
 #' @examples
 #' # Example data
 #' df <- get_nth_release(
@@ -259,8 +337,6 @@ get_revisions <- function(
 #'
 #' @references Aruoba, S. Borağan, "Revisions Are Not Well Behaved", Journal of
 #' Money, Credit and Banking, 40(2-3), 319-340, 2008.
-#' @srrstats {G1.0} Statistical Software should list at least one primary
-#' reference from published academic literature.
 #'
 #' @export
 get_first_efficient_release <- function(
@@ -295,6 +371,10 @@ get_first_efficient_release <- function(
     rlang::abort(
       "Both or none of 'df' and 'final_release' must contain an 'id' column."
     )
+  }
+
+  if (!is.logical(test_all)) {
+    rlang::abort("The 'test_all' argument must be a logical value.")
   }
 
   df_output <- NULL
@@ -724,8 +804,15 @@ summary.lst_efficient <- function(object, ...) {
 #'   sign changes of growth rates in revisions.
 #' }
 #'
-#' @srrstats {G1.3} All statistical terminology should be clarified and
-#' unambiguously defined
+#' @srrstats {G1.3} Terminology explained here and in vignette.
+#' @srrstats {G2.14a} Function removes missings before passing data
+#' @srrstats {G2.14b} Function removes missings before passing data
+#' @srrstats {G2.15} Function removes missings before passing data
+#' @srrstats {TS1.6} ordering taken care of
+#' @srrstats {TS2.1} Function removes missings before passing data
+#' @srrstats {TS2.1a}Function removes missings before passing data
+#' @srrstats {TS2.1b} Function removes missings before passing data
+#'
 #' @return A data frame with one row per grouping (if applicable) and columns
 #' for summary statistics and test results. The resulting data frame is of
 #' class `revision_summary`.
@@ -759,11 +846,6 @@ summary.lst_efficient <- function(object, ...) {
 #'   final_release
 #'  )
 #'
-#' results <- get_revision_analysis(
-#'   df,
-#'   final_release,
-#'   grouping_var = "pub_date"
-#'  )
 #'
 #' @export
 get_revision_analysis <- function(
@@ -843,7 +925,12 @@ get_revision_analysis <- function(
     dplyr::rename(final_value = value)
 
   # Check if df has id column:
-  if ("id" %in% colnames(df) & "id" %in% colnames(final_release)) {
+  if (
+    "id" %in%
+      colnames(df) &
+      "id" %in% colnames(final_release) &
+      length(unique(df$id)) > 1
+  ) {
     final_release <- dplyr::select(final_release, time, final_value, id)
 
     df <- df %>%
@@ -857,7 +944,7 @@ get_revision_analysis <- function(
     final_release <- dplyr::select(final_release, time, final_value)
 
     df <- df %>%
-      dplyr::select(time, value, df_var)
+      dplyr::select(time, value, dplyr::all_of(df_var))
 
     df <- df %>%
       dplyr::left_join(final_release, by = c("time" = "time")) %>%
@@ -869,336 +956,6 @@ get_revision_analysis <- function(
     dplyr::mutate(
       revision = final_value - value,
     )
-
-  # Function to compute statistics and tests for each group
-  compute_stats <- function(data) {
-    N <- nrow(data)
-    freq <- round(
-      1 / ((mean(((as.numeric(diff(unique(data$time))) / 360)), na.rm = TRUE)))
-    )
-    mean_revision <- mean(data$revision)
-    mean_abs_revision <- mean(abs(data$revision))
-    min_revision <- min(data$revision)
-    max_revision <- max(data$revision)
-    q10 <- stats::quantile(data$revision, 0.1)
-    q50 <- stats::median(data$revision)
-    q90 <- stats::quantile(data$revision, 0.9)
-    std_dev_revision <- stats::sd(data$revision)
-    noise_to_signal <- std_dev_revision / stats::sd(data$final_value)
-    correlation <- stats::cor(data$revision, data$value, use = "complete.obs")
-    autocorrelation <- stats::cor(
-      data$revision[-1],
-      data$revision[-length(data$revision)],
-      use = "complete.obs"
-    )
-
-    # Significance test for the Bias (mean) (Newey-West HAC standard errors)
-    mean_test_model <- stats::lm(revision ~ 1, data = data)
-    # Conventional t test:
-    mean_t_stat <- summary(mean_test_model)$coefficients[1, 3]
-    mean_p_value <- summary(mean_test_model)$coefficients[1, 4]
-
-    # Newey-West HAC standard errors t test:
-    # Throws an error if all revisions are 0, return NA in that case
-    mean_test_se <- tryCatch(
-      {
-        nw <- sandwich::NeweyWest(mean_test_model)
-
-        # Check if the result is numeric and finite before taking sqrt
-        if (is.numeric(nw) && all(is.finite(nw))) {
-          sqrt(nw)
-        } else {
-          NA_real_
-        }
-      },
-      error = function(e) NA_real_, # Return NA if an error occurs
-      warning = function(w) NA_real_ # Also handle warnings safely
-    )
-
-    mean_nw_t_stat <- stats::coef(mean_test_model)[1] / mean_test_se
-    # Two-sided p-value
-    mean_nw_p_value <- 2 * (1 - stats::pt(abs(mean_nw_t_stat), df = N - 1))
-
-    # Significance test for correlation
-    cor_t_stat <- correlation * sqrt((N - 2) / (1 - correlation^2))
-    # Two-sided p-value
-    cor_p_value <- 2 * (1 - stats::pt(abs(cor_t_stat), df = N - 2))
-
-    # Significance test for autocorrelation
-    auto_t_stat <- autocorrelation * sqrt((N - 2) / (1 - autocorrelation^2))
-    # Two-sided p-value
-    auto_p_value <- 2 * (1 - stats::pt(abs(auto_t_stat), df = N - 2))
-
-    # Ljung Box:
-    if (freq %in% c(4, 12)) {
-      ljung_box <- stats::Box.test(
-        data$revision,
-        lag = freq,
-        type = "Ljung-Box",
-        fitdf = 1
-      )$p.value
-    } else {
-      ljung_box <- NA
-    }
-
-    theils_u1 <- sqrt(mean((data$final_value - data$value)^2)) /
-      (sqrt(mean(data$final_value^2)) + sqrt(mean(data$value^2)))
-
-    theils_u2 <- sqrt(
-      sum(
-        (data$value[-1] - data$final_value[-1]) /
-          data$final_value[-length(data$final_value)]
-      )^2
-    ) /
-      sqrt(
-        sum(
-          (data$final_value[-1] - data$final_value[-length(data$final_value)]) /
-            data$final_value[-length(data$final_value)]
-        )^2
-      )
-
-    # Seasonality test
-    if (freq %in% c(4, 12)) {
-      friedman_p_value <- friedman_test(
-        data$revision,
-        frequency = freq
-      )$`p_value`
-    } else {
-      friedman_p_value <- NA
-    }
-
-    # Noise test with error handling (ensures no break if all revisions are 0)
-    noise_test_results <- tryCatch(
-      {
-        # Run the regression
-        noise_test <- stats::lm(revision ~ final_value, data = data)
-
-        # Compute HAC standard errors
-        hac_se <- sandwich::vcovHAC(noise_test)
-
-        # Wald test
-        test <- car::linearHypothesis(
-          noise_test,
-          c("(Intercept) = 0", "final_value = 0"),
-          vcov = hac_se
-        )
-
-        # Extract values safely
-        noise_wald_p_value <- test[2, 'Pr(>F)']
-        noise_intercept <- stats::coef(noise_test)[1]
-        noise_intercept_stderr <- sqrt(diag(hac_se))[1]
-        noise_intercept_p_value <- summary(noise_test)$coefficients[1, 4]
-        noise_coeff <- stats::coef(noise_test)[2]
-        noise_coeff_stderr <- sqrt(diag(hac_se))[2]
-        noise_coeff_p_value <- summary(noise_test)$coefficients[2, 4]
-
-        # Return results as a named list
-        list(
-          noise_wald_p_value = noise_wald_p_value,
-          noise_intercept = noise_intercept,
-          noise_intercept_stderr = noise_intercept_stderr,
-          noise_intercept_p_value = noise_intercept_p_value,
-          noise_coeff = noise_coeff,
-          noise_coeff_stderr = noise_coeff_stderr,
-          noise_coeff_p_value = noise_coeff_p_value
-        )
-      },
-      error = function(e) {
-        # Return a list with NA values if an error occurs
-        list(
-          noise_wald_p_value = NA,
-          noise_intercept = NA,
-          noise_intercept_stderr = NA,
-          noise_intercept_p_value = NA,
-          noise_coeff = NA,
-          noise_coeff_stderr = NA,
-          noise_coeff_p_value = NA
-        )
-      }
-    )
-
-    # Extract individual variables
-    noise_wald_p_value <- noise_test_results$noise_wald_p_value
-    noise_intercept <- noise_test_results$noise_intercept
-    noise_intercept_stderr <- noise_test_results$noise_intercept_stderr
-    noise_intercept_p_value <- noise_test_results$noise_intercept_p_value
-    noise_coeff <- noise_test_results$noise_coeff
-    noise_coeff_stderr <- noise_test_results$noise_coeff_stderr
-    noise_coeff_p_value <- noise_test_results$noise_coeff_p_value
-
-    # News test with error handling
-    news_test_results <- tryCatch(
-      {
-        # Run the regression
-        news_test <- stats::lm(revision ~ value, data = data)
-
-        # Compute HAC standard errors
-        hac_se <- sandwich::vcovHAC(news_test)
-
-        # Wald test
-        test <- car::linearHypothesis(
-          news_test,
-          c("(Intercept) = 0", "value = 0"),
-          vcov = hac_se
-        )
-
-        # Extract values safely
-        news_wald_p_value <- test[2, 'Pr(>F)']
-        news_intercept <- stats::coef(news_test)[1]
-        news_intercept_stderr <- sqrt(diag(hac_se))[1]
-        news_intercept_p_value <- summary(news_test)$coefficients[1, 4]
-        news_coeff <- stats::coef(news_test)[2]
-        news_coeff_stderr <- sqrt(diag(hac_se))[2]
-        news_coeff_p_value <- summary(news_test)$coefficients[2, 4]
-
-        # Return results as a named list
-        list(
-          news_wald_p_value = news_wald_p_value,
-          news_intercept = news_intercept,
-          news_intercept_stderr = news_intercept_stderr,
-          news_intercept_p_value = news_intercept_p_value,
-          news_coeff = news_coeff,
-          news_coeff_stderr = news_coeff_stderr,
-          news_coeff_p_value = news_coeff_p_value
-        )
-      },
-      error = function(e) {
-        # Return a list with NA values if an error occurs
-        list(
-          news_wald_p_value = NA,
-          news_intercept = NA,
-          news_intercept_stderr = NA,
-          news_intercept_p_value = NA,
-          news_coeff = NA,
-          news_coeff_stderr = NA,
-          news_coeff_p_value = NA
-        )
-      }
-    )
-
-    # Extract individual variables
-    news_wald_p_value <- news_test_results$news_wald_p_value
-    news_intercept <- news_test_results$news_intercept
-    news_intercept_stderr <- news_test_results$news_intercept_stderr
-    news_intercept_p_value <- news_test_results$news_intercept_p_value
-    news_coeff <- news_test_results$news_coeff
-    news_coeff_stderr <- news_test_results$news_coeff_stderr
-    news_coeff_p_value <- news_test_results$news_coeff_p_value
-
-    # Computes the fraction of sign changes
-    correct_sign <- data %>%
-      dplyr::mutate(early_sign = sign(value), late_sign = sign(final_value)) %>%
-      dplyr::summarise(
-        fraction_sign_correct = sum((early_sign - late_sign) == 0) / dplyr::n(),
-        fraction_sign_wrong = 1 - fraction_sign_correct,
-        n = dplyr::n()
-      ) %>%
-      dplyr::ungroup() %>%
-      dplyr::pull(fraction_sign_correct)
-
-    # Get the fraction of changes in the sign of the change in the growth rate
-    correct_change <- data %>%
-      dplyr::mutate(
-        diff_value = value - dplyr::lag(value, 1),
-        diff_final_value = final_value - dplyr::lag(final_value, 1)
-      ) %>%
-      dplyr::mutate(
-        early_sign = sign(diff_value),
-        late_sign = sign(diff_final_value)
-      ) %>%
-      dplyr::summarise(
-        fraction_sign_correct = sum(
-          (early_sign - late_sign) == 0,
-          na.rm = TRUE
-        ) /
-          dplyr::n(),
-        fraction_sign_wrong = 1 - fraction_sign_correct,
-        n = dplyr::n()
-      ) %>%
-      dplyr::ungroup() %>%
-      dplyr::pull(fraction_sign_correct)
-
-    tibble::tibble(
-      Statistic = c(
-        "N",
-        "Frequency",
-        "Bias (mean)",
-        "Bias (p-value)",
-        "Bias (robust p-value)",
-        "Minimum",
-        "Maximum",
-        "10Q",
-        "Median",
-        "90Q",
-        "MAR",
-        "Std. Dev.",
-        "Noise/Signal",
-        "Correlation",
-        "Correlation (p-value)",
-        "Autocorrelation (1st)",
-        "Autocorrelation (1st p-value)",
-        "Autocorrelation up to 1yr (Ljung-Box p-value)",
-        "Theil's U1",
-        "Theil's U2",
-        "Seasonality (Friedman p-value)",
-        "News test Intercept",
-        "News test Intercept (std.err)",
-        "News test Intercept (p-value)",
-        "News test Coefficient",
-        "News test Coefficient (std.err)",
-        "News test Coefficient (p-value)",
-        "News joint test (p-value)",
-        "Noise test Intercept",
-        "Noise test Intercept (std.err)",
-        "Noise test Intercept (p-value)",
-        "Noise test Coefficient",
-        "Noise test Coefficient (std.err)",
-        "Noise test Coefficient (p-value)",
-        "Noise joint test (p-value)",
-        "Fraction of correct sign",
-        "Fraction of correct growth rate change"
-      ),
-      Value = c(
-        N,
-        freq,
-        mean_revision,
-        mean_p_value,
-        mean_nw_p_value,
-        min_revision,
-        max_revision,
-        q10,
-        q50,
-        q90,
-        mean_abs_revision,
-        std_dev_revision,
-        noise_to_signal,
-        correlation,
-        cor_p_value,
-        autocorrelation,
-        auto_p_value,
-        ljung_box,
-        theils_u1,
-        theils_u2,
-        friedman_p_value,
-        news_intercept,
-        news_intercept_stderr,
-        news_intercept_p_value,
-        news_coeff,
-        news_coeff_stderr,
-        news_coeff_p_value,
-        news_wald_p_value,
-        noise_intercept,
-        noise_intercept_stderr,
-        noise_intercept_p_value,
-        noise_coeff,
-        noise_coeff_stderr,
-        noise_coeff_p_value,
-        noise_wald_p_value,
-        correct_sign,
-        correct_change
-      )
-    )
-  }
 
   # if no id or release column present, create a dummy id column
   if (!any(c("id", "release", "pub_date") %in% colnames(revisions))) {
@@ -1323,6 +1080,341 @@ get_revision_analysis <- function(
   }
 }
 
+#' Function to compute statistics and tests for each group
+#' @param data vector
+#' @return A data frame with the computed statistics
+#' @srrstats {TS1.8} rounded to whole days
+#' @keywords internal
+#' @noRd
+compute_stats <- function(data) {
+  N <- nrow(data)
+  freq <- round(
+    1 / ((mean(((as.numeric(diff(unique(data$time))) / 360)), na.rm = TRUE)))
+  )
+  mean_revision <- mean(data$revision)
+  mean_abs_revision <- mean(abs(data$revision))
+  min_revision <- min(data$revision)
+  max_revision <- max(data$revision)
+  q10 <- stats::quantile(data$revision, 0.1)
+  q50 <- stats::median(data$revision)
+  q90 <- stats::quantile(data$revision, 0.9)
+  std_dev_revision <- stats::sd(data$revision)
+  noise_to_signal <- std_dev_revision / stats::sd(data$final_value)
+  correlation <- stats::cor(data$revision, data$value, use = "complete.obs")
+  autocorrelation <- stats::cor(
+    data$revision[-1],
+    data$revision[-length(data$revision)],
+    use = "complete.obs"
+  )
+
+  # Significance test for the Bias (mean) (Newey-West HAC standard errors)
+  mean_test_model <- stats::lm(revision ~ 1, data = data)
+  # Conventional t test:
+  mean_t_stat <- summary(mean_test_model)$coefficients[1, 3]
+  mean_p_value <- summary(mean_test_model)$coefficients[1, 4]
+
+  # Newey-West HAC standard errors t test:
+  # Throws an error if all revisions are 0, return NA in that case
+  mean_test_se <- tryCatch(
+    {
+      nw <- sandwich::NeweyWest(mean_test_model)
+
+      # Check if the result is numeric and finite before taking sqrt
+      if (is.numeric(nw) && all(is.finite(nw))) {
+        sqrt(nw)
+      } else {
+        NA_real_
+      }
+    },
+    error = function(e) NA_real_, # Return NA if an error occurs
+    warning = function(w) NA_real_ # Also handle warnings safely
+  )
+
+  mean_nw_t_stat <- stats::coef(mean_test_model)[1] / mean_test_se
+  # Two-sided p-value
+  mean_nw_p_value <- 2 * (1 - stats::pt(abs(mean_nw_t_stat), df = N - 1))
+
+  # Significance test for correlation
+  cor_t_stat <- correlation * sqrt((N - 2) / (1 - correlation^2))
+  # Two-sided p-value
+  cor_p_value <- 2 * (1 - stats::pt(abs(cor_t_stat), df = N - 2))
+
+  # Significance test for autocorrelation
+  auto_t_stat <- autocorrelation * sqrt((N - 2) / (1 - autocorrelation^2))
+  # Two-sided p-value
+  auto_p_value <- 2 * (1 - stats::pt(abs(auto_t_stat), df = N - 2))
+
+  # Ljung Box:
+  if (freq %in% c(4, 12)) {
+    ljung_box <- stats::Box.test(
+      data$revision,
+      lag = freq,
+      type = "Ljung-Box",
+      fitdf = 1
+    )$p.value
+  } else {
+    ljung_box <- NA
+  }
+
+  theils_u1 <- sqrt(mean((data$final_value - data$value)^2)) /
+    (sqrt(mean(data$final_value^2)) + sqrt(mean(data$value^2)))
+
+  theils_u2 <- sqrt(
+    sum(
+      (data$value[-1] - data$final_value[-1]) /
+        data$final_value[-length(data$final_value)]
+    )^2
+  ) /
+    sqrt(
+      sum(
+        (data$final_value[-1] - data$final_value[-length(data$final_value)]) /
+          data$final_value[-length(data$final_value)]
+      )^2
+    )
+
+  # Seasonality test
+  if (freq %in% c(4, 12)) {
+    friedman_p_value <- friedman_test(
+      data$revision,
+      frequency = freq
+    )$`p_value`
+  } else {
+    friedman_p_value <- NA
+  }
+
+  # Noise test with error handling (ensures no break if all revisions are 0)
+  noise_test_results <- tryCatch(
+    {
+      # Run the regression
+      noise_test <- stats::lm(revision ~ final_value, data = data)
+
+      # Compute HAC standard errors
+      hac_se <- sandwich::vcovHAC(noise_test)
+
+      # Wald test
+      test <- car::linearHypothesis(
+        noise_test,
+        c("(Intercept) = 0", "final_value = 0"),
+        vcov = hac_se
+      )
+
+      # Extract values safely
+      noise_wald_p_value <- test[2, 'Pr(>F)']
+      noise_intercept <- stats::coef(noise_test)[1]
+      noise_intercept_stderr <- sqrt(diag(hac_se))[1]
+      noise_intercept_p_value <- summary(noise_test)$coefficients[1, 4]
+      noise_coeff <- stats::coef(noise_test)[2]
+      noise_coeff_stderr <- sqrt(diag(hac_se))[2]
+      noise_coeff_p_value <- summary(noise_test)$coefficients[2, 4]
+
+      # Return results as a named list
+      list(
+        noise_wald_p_value = noise_wald_p_value,
+        noise_intercept = noise_intercept,
+        noise_intercept_stderr = noise_intercept_stderr,
+        noise_intercept_p_value = noise_intercept_p_value,
+        noise_coeff = noise_coeff,
+        noise_coeff_stderr = noise_coeff_stderr,
+        noise_coeff_p_value = noise_coeff_p_value
+      )
+    },
+    error = function(e) {
+      # Return a list with NA values if an error occurs
+      list(
+        noise_wald_p_value = NA,
+        noise_intercept = NA,
+        noise_intercept_stderr = NA,
+        noise_intercept_p_value = NA,
+        noise_coeff = NA,
+        noise_coeff_stderr = NA,
+        noise_coeff_p_value = NA
+      )
+    }
+  )
+
+  # Extract individual variables
+  noise_wald_p_value <- noise_test_results$noise_wald_p_value
+  noise_intercept <- noise_test_results$noise_intercept
+  noise_intercept_stderr <- noise_test_results$noise_intercept_stderr
+  noise_intercept_p_value <- noise_test_results$noise_intercept_p_value
+  noise_coeff <- noise_test_results$noise_coeff
+  noise_coeff_stderr <- noise_test_results$noise_coeff_stderr
+  noise_coeff_p_value <- noise_test_results$noise_coeff_p_value
+
+  # News test with error handling
+  news_test_results <- tryCatch(
+    {
+      # Run the regression
+      news_test <- stats::lm(revision ~ value, data = data)
+
+      # Compute HAC standard errors
+      hac_se <- sandwich::vcovHAC(news_test)
+
+      # Wald test
+      test <- car::linearHypothesis(
+        news_test,
+        c("(Intercept) = 0", "value = 0"),
+        vcov = hac_se
+      )
+
+      # Extract values safely
+      news_wald_p_value <- test[2, 'Pr(>F)']
+      news_intercept <- stats::coef(news_test)[1]
+      news_intercept_stderr <- sqrt(diag(hac_se))[1]
+      news_intercept_p_value <- summary(news_test)$coefficients[1, 4]
+      news_coeff <- stats::coef(news_test)[2]
+      news_coeff_stderr <- sqrt(diag(hac_se))[2]
+      news_coeff_p_value <- summary(news_test)$coefficients[2, 4]
+
+      # Return results as a named list
+      list(
+        news_wald_p_value = news_wald_p_value,
+        news_intercept = news_intercept,
+        news_intercept_stderr = news_intercept_stderr,
+        news_intercept_p_value = news_intercept_p_value,
+        news_coeff = news_coeff,
+        news_coeff_stderr = news_coeff_stderr,
+        news_coeff_p_value = news_coeff_p_value
+      )
+    },
+    error = function(e) {
+      # Return a list with NA values if an error occurs
+      list(
+        news_wald_p_value = NA,
+        news_intercept = NA,
+        news_intercept_stderr = NA,
+        news_intercept_p_value = NA,
+        news_coeff = NA,
+        news_coeff_stderr = NA,
+        news_coeff_p_value = NA
+      )
+    }
+  )
+
+  # Extract individual variables
+  news_wald_p_value <- news_test_results$news_wald_p_value
+  news_intercept <- news_test_results$news_intercept
+  news_intercept_stderr <- news_test_results$news_intercept_stderr
+  news_intercept_p_value <- news_test_results$news_intercept_p_value
+  news_coeff <- news_test_results$news_coeff
+  news_coeff_stderr <- news_test_results$news_coeff_stderr
+  news_coeff_p_value <- news_test_results$news_coeff_p_value
+
+  # Computes the fraction of sign changes
+  correct_sign <- data %>%
+    dplyr::mutate(early_sign = sign(value), late_sign = sign(final_value)) %>%
+    dplyr::summarise(
+      fraction_sign_correct = sum((early_sign - late_sign) == 0) / dplyr::n(),
+      fraction_sign_wrong = 1 - fraction_sign_correct,
+      n = dplyr::n()
+    ) %>%
+    dplyr::ungroup() %>%
+    dplyr::pull(fraction_sign_correct)
+
+  # Get the fraction of changes in the sign of the change in the growth rate
+  correct_change <- data %>%
+    dplyr::mutate(
+      diff_value = value - dplyr::lag(value, 1),
+      diff_final_value = final_value - dplyr::lag(final_value, 1)
+    ) %>%
+    dplyr::mutate(
+      early_sign = sign(diff_value),
+      late_sign = sign(diff_final_value)
+    ) %>%
+    dplyr::summarise(
+      fraction_sign_correct = sum(
+        (early_sign - late_sign) == 0,
+        na.rm = TRUE
+      ) /
+        dplyr::n(),
+      fraction_sign_wrong = 1 - fraction_sign_correct,
+      n = dplyr::n()
+    ) %>%
+    dplyr::ungroup() %>%
+    dplyr::pull(fraction_sign_correct)
+
+  tibble::tibble(
+    Statistic = c(
+      "N",
+      "Frequency",
+      "Bias (mean)",
+      "Bias (p-value)",
+      "Bias (robust p-value)",
+      "Minimum",
+      "Maximum",
+      "10Q",
+      "Median",
+      "90Q",
+      "MAR",
+      "Std. Dev.",
+      "Noise/Signal",
+      "Correlation",
+      "Correlation (p-value)",
+      "Autocorrelation (1st)",
+      "Autocorrelation (1st p-value)",
+      "Autocorrelation up to 1yr (Ljung-Box p-value)",
+      "Theil's U1",
+      "Theil's U2",
+      "Seasonality (Friedman p-value)",
+      "News test Intercept",
+      "News test Intercept (std.err)",
+      "News test Intercept (p-value)",
+      "News test Coefficient",
+      "News test Coefficient (std.err)",
+      "News test Coefficient (p-value)",
+      "News joint test (p-value)",
+      "Noise test Intercept",
+      "Noise test Intercept (std.err)",
+      "Noise test Intercept (p-value)",
+      "Noise test Coefficient",
+      "Noise test Coefficient (std.err)",
+      "Noise test Coefficient (p-value)",
+      "Noise joint test (p-value)",
+      "Fraction of correct sign",
+      "Fraction of correct growth rate change"
+    ),
+    Value = c(
+      N,
+      freq,
+      mean_revision,
+      mean_p_value,
+      mean_nw_p_value,
+      min_revision,
+      max_revision,
+      q10,
+      q50,
+      q90,
+      mean_abs_revision,
+      std_dev_revision,
+      noise_to_signal,
+      correlation,
+      cor_p_value,
+      autocorrelation,
+      auto_p_value,
+      ljung_box,
+      theils_u1,
+      theils_u2,
+      friedman_p_value,
+      news_intercept,
+      news_intercept_stderr,
+      news_intercept_p_value,
+      news_coeff,
+      news_coeff_stderr,
+      news_coeff_p_value,
+      news_wald_p_value,
+      noise_intercept,
+      noise_intercept_stderr,
+      noise_intercept_p_value,
+      noise_coeff,
+      noise_coeff_stderr,
+      noise_coeff_p_value,
+      noise_wald_p_value,
+      correct_sign,
+      correct_change
+    )
+  )
+}
+
 
 #' Function for Friedman Test used in `get_revision_analysis`
 #' @param series vector
@@ -1395,6 +1487,9 @@ friedman_test <- function(series, frequency = 12) {
 #' - **"latest"**: Retrieves the most recent release for each time
 #' period (via `get_latest_release`).
 #'
+#' @srrstats {G2.3b} use `tolower()`
+#' @srrstats {G2.6} input 'n' is approproately pre processed
+#'
 #' @examples
 #' # Example data
 #' df <- dplyr::filter(reviser::gdp, id=="US")
@@ -1412,9 +1507,18 @@ friedman_test <- function(series, frequency = 12) {
 get_nth_release <- function(df, n = 0, diagonal = FALSE) {
   # Validate inputs
   if (is.numeric(n) && any(n < 0)) {
-    rlang::abort("The input 'n' must be >= 0, 'first', or 'latest'.")
+    rlang::abort("'n' must be a whole number >= 0, 'first', or 'latest'.")
+  } else if (is.numeric(n)) {
+    if (any(n %% 1 != 0)) {
+      rlang::abort("'n' must be a whole number >= 0, 'first', or 'latest'.")
+    }
+    n <- as.integer(n)
   } else if (is.character(n) && !tolower(n) %in% c("first", "latest")) {
-    rlang::abort("The input 'n' must be  >= 0, 'first', or 'latest'.")
+    rlang::abort("'n' must be a whole number >= 0, 'first', or 'latest'.")
+  }
+
+  if (!is.logical(diagonal)) {
+    rlang::abort("The 'diagonal' argument must be a logical value.")
   }
 
   check <- vintages_check(df)
@@ -1423,7 +1527,7 @@ get_nth_release <- function(df, n = 0, diagonal = FALSE) {
   }
   df <- vintages_assign_class(df)
 
-  if ("id" %in% colnames(df)) {
+  if ("id" %in% colnames(df) & length(unique(df$id)) > 1) {
     # Ensure data is sorted by pub_date and time
     df <- df %>%
       dplyr::arrange(id, pub_date, time)
@@ -1533,6 +1637,10 @@ get_first_release <- function(df, diagonal = FALSE) {
   }
   df <- vintages_assign_class(df)
 
+  if (!is.logical(diagonal)) {
+    rlang::abort("The 'diagonal' argument must be a logical value.")
+  }
+
   if ("id" %in% colnames(df)) {
     # Ensure data is sorted by pub_date and time
     df <- df %>%
@@ -1638,8 +1746,8 @@ get_latest_release <- function(df) {
 #' ("July") or an integer (7). Cannot be used with `quarter`.
 #' @param quarter An optional parameter specifying the target quarter (1-4).
 #' Cannot be used with `month`.
-#' @param years The number of years after `pub_date` for which the values
-#' should be extracted.
+#' @param years The integer number of unrestricted years after `pub_date` for
+#' which the values should be extracted.
 #'
 #' @return A filtered data frame containing values matching the
 #' specified criteria.
@@ -1656,10 +1764,14 @@ get_fixed_release <- function(df, years, month = NULL, quarter = NULL) {
     rlang::abort("Specify either a month or a quarter, not both.")
   }
 
-  # Ensure years is numeric
-  if (!is.numeric(years)) {
-    rlang::abort("'years' must be a numeric value.")
+  # Ensure years is numeric and integer or can be converted to integer
+  if (is.numeric(years)) {
+    if (years %% 1 != 0) {
+      rlang::abort("years' must be  a whole number.")
+    }
+    years <- as.integer(years)
   }
+
   # Ensure the month is in numeric format if provided
   if (!is.null(month)) {
     if (is.character(month)) {

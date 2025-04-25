@@ -171,10 +171,5 @@ results <- get_revision_analysis(
   final_release
  )
 
-results <- get_revision_analysis(
-  df,
-  final_release,
-  grouping_var = "pub_date"
- )
 
 }

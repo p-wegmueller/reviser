@@ -60,6 +60,7 @@
 #'   \item{data}{The input data in wide format.}
 #' }
 #'
+#'
 #' @examples
 #' # Example usage:
 #' df <- get_nth_release(
@@ -71,7 +72,7 @@
 #'      ),
 #'      n = 0:1
 #'    )
-#' df <- dplyr::select(df, -id)
+#' df <- dplyr::select(df, -c(id, pub_date))
 #' df <- na.omit(df)
 #'
 #' e <- 1  # Number of efficient release
@@ -83,16 +84,28 @@
 #' @references Kishor, N. Kundan and Koenig, Evan F., "VAR Estimation and
 #' Forecasting When Data Are Subject to Revision", Journal of Business and
 #' Economic Statistics, 2012.
-#' @srrstats {G1.0} Statistical Software should list at least one primary
-#' reference from published academic literature.
+#' @srrstats {G1.0} academic literature.
 #'
 #' @details
 #' The function supports multiple models, including the full Kishor-Koenig
 #' framework, Howrey's model, and a classical approach. It handles data
 #' preprocessing, estimation of system equations using Seemingly Unrelated
 #' Regressions (SUR), and application of the Kalman filter and smoother. This is
-#' the first openly available implementation of the Kishor-Koenig model.
-#' @srrstats {G1.1} The first implementation of a novel algorithm
+#' the first openly available implementation of the Kishor-Koenig model (See
+#' the vignette \code{vignette("nowcasting_revisions")} for more details).
+#' @srrstats {G1.1} first implementation of a novel algorithm
+#' @srrstats {G1.3} Terminology explained here and in vignette.
+#' @srrstats {G2.3b} use `tolower()`
+#' @srrstats {TS4.3} return data contains time colum
+#' @srrstats {TS4.6} Time Series Software which implements or otherwise
+#' enables forecasting should return either:
+#' @srrstats {TS4.6b} filtered/forecasted point estimates
+#' @srrstats {TS4.7} forecast values and models separately returned
+#' @srrstats {TS4.7a} only forecast values returned
+#' @srrstats {TS4.7b} forecast values and models separately returned
+#' @srrstats {G5.9a} `.Machine$double.eps` to data does not meaningfully
+#' change results
+#'
 #' @export
 kk_nowcast <- function(
   df,
@@ -111,6 +124,9 @@ kk_nowcast <- function(
     gradtol = 1e-6,
     steptol = 1e-6
   )
+
+  model <- tolower(model)
+  method <- tolower(method)
 
   # Check solver options input is list
   if (!is.list(solver_options)) {
@@ -145,7 +161,7 @@ kk_nowcast <- function(
   }
 
   # Check model input
-  if (!model %in% c("Kishor-Koenig", "KK", "Howrey", "Classical")) {
+  if (!model %in% tolower(c("Kishor-Koenig", "KK", "Howrey", "Classical"))) {
     rlang::abort(
       "'model' must be one of 'Kishor-Koenig', 'KK', 'Howrey', or 'Classical'!"
     )
@@ -171,10 +187,10 @@ kk_nowcast <- function(
 
   # KK input matrices
   n_param_mat <- dplyr::if_else(
-    model %in% c("Kishor-Koenig", "KK"),
+    model %in% tolower(c("Kishor-Koenig", "KK")),
     1 + e + e^2,
     dplyr::if_else(
-      model == "Howrey",
+      model == tolower("Howrey"),
       1 + e^2,
       1 # Classical
     )
@@ -273,7 +289,7 @@ kk_nowcast <- function(
   )
 
   # Estimation of parameters with SUR or OLS
-  if (method == "SUR") {
+  if (method == tolower("SUR")) {
     fit <- systemfit::nlsystemfit(
       equations,
       method = "SUR",
@@ -296,7 +312,7 @@ kk_nowcast <- function(
       params = params,
       type = "numeric"
     )$params
-  } else if (method == "OLS") {
+  } else if (method == tolower("OLS")) {
     ols_estim <- kk_ols_estim(
       equations = equations,
       model = model,
@@ -767,6 +783,8 @@ kk_arrange_data <- function(df, e) {
 #'     \item{\code{fit}: A list of fitted \code{lm} model objects.}
 #'   }
 #'
+#' @srrstats {G2.4b} convert  via `as.numeric()`
+#'
 #' @details
 #' This function is designed to handle different variations of the KK model,
 #' including "Classical", "Howrey", and the "KK" or "Kishor-Koenig" models.
@@ -775,6 +793,7 @@ kk_arrange_data <- function(df, e) {
 #' @keywords internal
 #' @noRd
 kk_ols_estim <- function(equations, data, model = "KK") {
+  model <- tolower(model)
   n_eq <- length(equations)
   e <- n_eq - 1
 
@@ -825,11 +844,11 @@ kk_ols_estim <- function(equations, data, model = "KK") {
       signs <- c("+", signs) # Assume first term has implicit '+'
     }
 
-    if (model == "Classical") {
+    if (model == tolower("Classical")) {
       sig2 <- var(data[[variables[1]]] - data[[variables[2]]])
       names(sig2) <- paste0("eps", e - ii + 1)
       ols_vars <- c(ols_vars, sig2)
-    } else if (model == "Howrey") {
+    } else if (model == tolower("Howrey")) {
       # Check length of extracted elements
       if (
         length(signs) != (length(variables) - 1) ||
@@ -888,7 +907,7 @@ kk_ols_estim <- function(equations, data, model = "KK") {
       names(sig2) <- paste0("eps", e - ii + 1)
       ols_vars <- c(ols_vars, sig2)
       fit[[ii]] <- modeli
-    } else if (model %in% c("KK", "Kishor-Koenig")) {
+    } else if (model %in% tolower(c("KK", "Kishor-Koenig"))) {
       # Check length of extracted elements
       if (
         length(signs) != (length(variables) - 1) ||
@@ -1021,6 +1040,9 @@ kk_ols_estim <- function(equations, data, model = "KK") {
 #' - \eqn{V} is the state noise covariance matrix.
 #' - \eqn{W} is the observation noise covariance matrix.
 #'
+#' @srrstats {G2.4b} convert via via `as.numeric()`
+#' @srrstats {G2.4c} convert via via `as.character()`
+#'
 #' @examples
 #' # Example 1: Kishor-Koenig model with character matrices
 #' matrices <- kk_matrices(e = 3, model = "KK", type = "character")
@@ -1034,8 +1056,11 @@ kk_ols_estim <- function(equations, data, model = "KK") {
 #' )
 #' str(matrices)
 #'
-#' @export
+#' @keywords internal
+#' @noRd
 kk_matrices <- function(e, model, params = NULL, type = "numeric") {
+  model <- tolower(model)
+
   # Start param count
   ii <- 1
 
@@ -1045,7 +1070,7 @@ kk_matrices <- function(e, model, params = NULL, type = "numeric") {
   }
 
   # Check model input
-  if (!model %in% c("Kishor-Koenig", "KK", "Howrey", "Classical")) {
+  if (!model %in% tolower(c("Kishor-Koenig", "KK", "Howrey", "Classical"))) {
     rlang::abort(
       "'model' must be one of 'Kishor-Koenig', 'KK', 'Howrey', or 'Classical'!"
     )
@@ -1076,10 +1101,10 @@ kk_matrices <- function(e, model, params = NULL, type = "numeric") {
 
   # Check params input
   n_param_mat <- dplyr::if_else(
-    model %in% c("Kishor-Koenig", "KK"),
+    model %in% tolower(c("Kishor-Koenig", "KK")),
     1 + e + e^2,
     dplyr::if_else(
-      model == "Howrey",
+      model == tolower("Howrey"),
       1 + e^2,
       1 # Classical
     )
@@ -1121,7 +1146,7 @@ kk_matrices <- function(e, model, params = NULL, type = "numeric") {
   # Define G matrix
   GG <- diag(e + 1)
 
-  if (model %in% c("Kishor-Koenig", "KK")) {
+  if (model %in% tolower(c("Kishor-Koenig", "KK"))) {
     # e * e+1 params for G
     for (i in 1:e) {
       for (j in 1:(e + 1)) {
@@ -1134,7 +1159,7 @@ kk_matrices <- function(e, model, params = NULL, type = "numeric") {
         ii <- ii + 1
       }
     }
-  } else if (model == "Howrey") {
+  } else if (model == tolower("Howrey")) {
     # e * e params for G
     for (i in 1:e) {
       for (j in 1:e) {
@@ -1148,7 +1173,7 @@ kk_matrices <- function(e, model, params = NULL, type = "numeric") {
         ii <- ii + 1
       }
     }
-  } else if (model == "Classical") {
+  } else if (model == tolower("Classical")) {
     GG <- diag(e + 1)
   } else {
     rlang::abort("'model' not recognized")
@@ -1262,7 +1287,8 @@ kk_matrices <- function(e, model, params = NULL, type = "numeric") {
 #' ss_matrices <- kk_to_ss(FF, GG, V, W)
 #' str(ss_matrices)
 #'
-#' @export
+#' @keywords internal
+#' @noRd
 kk_to_ss <- function(FF, GG, V, W, epsilon = 1e-6) {
   # Get efficient release, e
   e <- nrow(FF) - 1
