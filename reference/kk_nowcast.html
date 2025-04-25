@@ -175,7 +175,8 @@ from the KK model.</p></dd>
 framework, Howrey's model, and a classical approach. It handles data
 preprocessing, estimation of system equations using Seemingly Unrelated
 Regressions (SUR), and application of the Kalman filter and smoother. This is
-the first openly available implementation of the Kishor-Koenig model.</p>
+the first openly available implementation of the Kishor-Koenig model (See
+the vignette <code>vignette("nowcasting_revisions")</code> for more details).</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
@@ -196,13 +197,12 @@ Economic Statistics, 2012.</p>
 <span class="r-in"><span>     <span class="op">)</span>,</span></span>
 <span class="r-in"><span>     n <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">1</span></span></span>
 <span class="r-in"><span>   <span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">df</span>, <span class="op">-</span><span class="va">id</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">df</span>, <span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">id</span>, <span class="va">pub_date</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">e</span> <span class="op">&lt;-</span> <span class="fl">1</span>  <span class="co"># Number of efficient release</span></span></span>
 <span class="r-in"><span><span class="va">h</span> <span class="op">&lt;-</span> <span class="fl">2</span>  <span class="co"># Forecast horizon</span></span></span>
 <span class="r-in"><span><span class="va">model_result</span> <span class="op">&lt;-</span> <span class="fu">kk_nowcast</span><span class="op">(</span><span class="va">df</span>, <span class="va">e</span>, h <span class="op">=</span> <span class="va">h</span>, model <span class="op">=</span> <span class="st">"Kishor-Koenig"</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Ignoring columns: pub_date</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">model_result</span><span class="op">$</span><span class="va">params</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           F0         G0_0         G0_1           v0         eps0 </span>
