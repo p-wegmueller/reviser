@@ -16,7 +16,6 @@
 #' wide-format data frames, the output will be a single combined long-format
 #' data frame.
 #'
-#' @srrstats {G1.4} Uses roxygen2 to document the function
 #' @srrstats {G2.0} Implements assertions on types of inputs through parameter
 #' validation
 #' @srrstats {G2.3a} Uses parameter validation to restrict `names_to` to
@@ -144,10 +143,9 @@ vintages_long <- function(df, names_to = "pub_date", keep_na = FALSE) {
 #' wide-format data frames, one for each unique `id`. Otherwise, it returns a
 #' single wide-format data frame.
 #'
-#' @srrstats {G1.4} Uses roxygen2 to document the function
 #' @srrstats {G2.0} Implements assertions on types of inputs through required
 #' column checks
-#' @srrstats {G2.8} Provides appropriate conversion routines for tabular data
+#' @srrstats {G2.8} Provides appropriate conversion routines
 #' @srrstats {G2.9} Issues diagnostic messages for data conversion (warnings for
 #' ignored columns)
 #' @srrstats {G2.14} Handles missing data appropriately through pivot operations
@@ -276,7 +274,6 @@ vintages_wide <- function(df, names_from = "pub_date") {
 #' - `"long"` if the data frame is in long format.
 #' - `"wide"` if the data frame is in wide format.
 #'
-#' @srrstats {G1.4} roxygen2 is used for all documentation.
 #' @srrstats {G1.4a} All internal functions are also documented
 #' @srrstats {G2.0} Implements assertions on length of input by checking if the
 #' input data frame contains required columns.
@@ -298,8 +295,7 @@ vintages_wide <- function(df, names_from = "pub_date") {
 #' tabular data.
 #' @srrstats {G2.13} Implements appropriate checks for missing data in critical
 #' columns like 'time' and 'pub_date'.
-#' @srrstats {G5.2a} Every error message produced by stop() is unique and
-#' descriptive.
+#' @srrstats {G5.2a} unique and descriptive errors.
 #' @srrstats {G5.8} Includes edge condition tests to ensure appropriate behavior
 #' with invalid inputs.
 #' @srrstats {TS1.1}  documents the types and classes of input data

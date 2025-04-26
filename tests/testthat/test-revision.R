@@ -3,12 +3,11 @@ source("test-data.R")
 #' @srrstats {G5.2} Function implements explicit error behavior for unexpected
 #' inputs with unique error messages for different validation failures.
 #' @srrstats {G5.2b} Explicit tests demonstrate conditions which
-#' trigger those messages,
-#' @srrstats {G5.8} Edge condition tests: to test that these conditions produce
-#' expected behaviour such as clear warnings or errors:
-#' @srrstats {G5.8a} Zero-length data
-#' @srrstats {G5.8b} unsupported types
-#' @srrstats {G5.8c}all-`NA` fields or columns
+#' trigger messages,
+#' @srrstats {G5.8} Edge condition 
+#' @srrstats {G5.8a} Zero data
+#' @srrstats {G5.8b} not supported types
+#' @srrstats {G5.8c} only `NA` fields or columns
 
 test_that("interval works", {
   data <- get_revisions(df, interval = 1)

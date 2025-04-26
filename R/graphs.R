@@ -30,7 +30,6 @@
 #' @return A ggplot2 plot object representing the specified vintage
 #' data visualization.
 #'
-#' @srrstats {G1.4} Uses roxygen2 to document the function
 #' @srrstats {G2.0} Implements assertions on input types and parameters
 #' @srrstats {G2.1} Validates data types of inputs through explicit checks
 #' @srrstats {G2.3a} Uses explicit validation to only permit expected values
@@ -48,7 +47,7 @@
 #' @srrstats {TS5.0} Implements plotting methods for time series visualization
 #' @srrstats {TS5.1} Clearly labels time axis with continuous units (ensures
 #' time_col is Date class)
-#' @srrstats {TS5.2} Places time variable on horizontal axis by default
+#' @srrstats {TS5.2} time variable on horizontal axis by default
 #' @srrstats {TS5.3} Ensures time units are properly formatted as Date objects
 #' @srrstats {TS5.5} Handles data with missing values by filtering them out
 #' during pre-processing

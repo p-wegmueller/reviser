@@ -5,6 +5,7 @@
 #' `browseVignettes(package = "reviser")`
 #' The package will be actively developed and maintained.
 #' @srrstats {G1.2} Life Cycle Statement
+#' @srrstats {G1.4} Using roxygen2 for function documentation
 #' @keywords internal
 "_PACKAGE"
 utils::globalVariables(c(

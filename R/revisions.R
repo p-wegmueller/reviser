@@ -42,8 +42,7 @@
 #' Input validation ensures that only one of `ref_date`, `nth_release`, or
 #' `interval` is specified.
 #'
-#' @srrstats {G1.3} Statistical terminology for time series revisions defined
-#' @srrstats {G1.4} Using roxygen2 for function documentation
+#' @srrstats {G1.3} Statistical terminology for revisions defined
 #' @srrstats {G2.0} Implements assertions on lengths of inputs through
 #' validation checks
 #' @srrstats {G2.1} Implements assertions on types of inputs (e.g., date,
@@ -314,9 +313,7 @@ get_revisions <- function(
 #' @srrstats {TS2.1b} Function removes missings before passing data
 #' @srrstats {TS4.0} Return values are in a unique, class-defined format
 #' ('lst_efficient').
-#' @srrstats {TS4.2} The type and class of all return values are explicitly
-#' documented in the @return section.
-#'
+#' @srrstats {TS4.2} The type and class of all return values are documented
 #' @examples
 #' # Example data
 #' df <- get_nth_release(
