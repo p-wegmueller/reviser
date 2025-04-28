@@ -144,26 +144,25 @@ sign changes of growth rates in revisions.
 }
 \examples{
 # Example usage:
-df <- get_nth_release(
-  dplyr::filter(
+df <- dplyr::select(
     na.omit(
       tsbox::ts_pc(
         reviser::gdp)
             ),
-        id=="US"
-     ),
    n = 0:10
  )
+-pub_date
+)
 
-final_release <- get_nth_release(
-  dplyr::filter(
+final_release <- dplyr::select(
+  get_nth_release(
   na.omit(
   tsbox::ts_pc(
     reviser::gdp)
        ),
-    id=="US"
-   ),
  n = "latest"
+),
+-pub_date
 )
 
 results <- get_revision_analysis(

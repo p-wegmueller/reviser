@@ -64,7 +64,7 @@ Input validation ensures that only one of \code{ref_date}, \code{nth_release}, o
 df <- dplyr::filter(reviser::gdp , id=="US")
 
 # Calculate revisions using an interval of 1
-revisions_interval <- get_revisions(df, interval = 1L)
+revisions_interval <- get_revisions(df, interval = 1)
 
 # Calculate revisions using a fixed reference date
 revisions_date <- get_revisions(df, ref_date = as.Date("2023-02-01"))

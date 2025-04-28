@@ -61,4 +61,7 @@ latest_release <- get_nth_release(df, n = "latest")
 # Get the second release (n = 1)
 second_release <- get_nth_release(df, n = 1)
 
+# Get the first and second release (n = 0:1)
+releases <- get_nth_release(df, n = 0:1)
+
 }

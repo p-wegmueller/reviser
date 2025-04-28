@@ -77,7 +77,7 @@
 #' df <- dplyr::filter(reviser::gdp , id=="US")
 #'
 #' # Calculate revisions using an interval of 1
-#' revisions_interval <- get_revisions(df, interval = 1L)
+#' revisions_interval <- get_revisions(df, interval = 1)
 #'
 #' # Calculate revisions using a fixed reference date
 #' revisions_date <- get_revisions(df, ref_date = as.Date("2023-02-01"))
@@ -816,26 +816,25 @@ summary.lst_efficient <- function(object, ...) {
 #'
 #' @examples
 #' # Example usage:
-#' df <- get_nth_release(
-#'   dplyr::filter(
+#' df <- dplyr::select(
 #'     na.omit(
 #'       tsbox::ts_pc(
 #'         reviser::gdp)
 #'             ),
-#'         id=="US"
-#'      ),
 #'    n = 0:10
 #'  )
+#' -pub_date
+#' )
 #'
-#' final_release <- get_nth_release(
-#'   dplyr::filter(
+#' final_release <- dplyr::select(
+#'   get_nth_release(
 #'   na.omit(
 #'   tsbox::ts_pc(
 #'     reviser::gdp)
 #'        ),
-#'     id=="US"
-#'    ),
 #'  n = "latest"
+#' ),
+#' -pub_date
 #' )
 #'
 #' results <- get_revision_analysis(
@@ -986,7 +985,7 @@ get_revision_analysis <- function(
   # Apply the computation to each group and combine the results
   results <- revisions %>%
     dplyr::group_by(dplyr::across(dplyr::all_of(grouping_vars))) %>%
-    dplyr::group_modify(~ compute_stats(.x)) %>%
+    dplyr::group_modify(~ compute_revision_stats(.x)) %>%
     dplyr::ungroup()
 
   results <- results %>%
@@ -1083,7 +1082,7 @@ get_revision_analysis <- function(
 #' @srrstats {TS1.8} rounded to whole days
 #' @keywords internal
 #' @noRd
-compute_stats <- function(data) {
+compute_revision_stats <- function(data) {
   N <- nrow(data)
   freq <- round(
     1 / ((mean(((as.numeric(diff(unique(data$time))) / 360)), na.rm = TRUE)))
@@ -1499,6 +1498,9 @@ friedman_test <- function(series, frequency = 12) {
 #'
 #' # Get the second release (n = 1)
 #' second_release <- get_nth_release(df, n = 1)
+#'
+#' # Get the first and second release (n = 0:1)
+#' releases <- get_nth_release(df, n = 0:1)
 #'
 #' @export
 get_nth_release <- function(df, n = 0, diagonal = FALSE) {
