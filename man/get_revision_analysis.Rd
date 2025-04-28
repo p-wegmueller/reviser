@@ -145,12 +145,13 @@ sign changes of growth rates in revisions.
 \examples{
 # Example usage:
 df <- dplyr::select(
+  get_nth_release(
     na.omit(
       tsbox::ts_pc(
         reviser::gdp)
             ),
    n = 0:10
- )
+ ),
 -pub_date
 )
 
