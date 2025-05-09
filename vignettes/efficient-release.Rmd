@@ -55,7 +55,7 @@ One major challenge in identifying an efficient release using Mincer-Zarnowitz r
 An iterative approach is proposed to determine the optimal number of revisions, \( e \), beyond which further revisions are negligible. This approach is based on running Mincer-Zarnowitz-style regressions to assess which release provides an optimal estimate of the final value. The procedure follows these steps [@kishorVAREstimationForecasting2012; @strohsalDataRevisionsGerman2020]:
 
 
-1. **Regression Analysis**: Regress the final release \( y_t^f \) on the initial releases \( y_t^h \) for \( h = 1,2,\dots,e \):
+1. **Regression Analysis**: Regress the final release \( y_t^f \) on the initial releases \( y_t^h \) for \( h = 1,2,\dots, H \):
    \[
    y_t^f = \alpha + \beta y_t^h + \varepsilon_t
    \]

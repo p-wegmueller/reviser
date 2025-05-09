@@ -218,8 +218,8 @@ To test these categories, we run **two regression tests:**
   \]
   
   - The function tests the joint hypothesis (`"Noise joint test (p-value)"`) that both \( \alpha = 0 \) and \( \beta = 0 \) using a **heteroskedasticity and autocorrelation consistent (HAC) covariance matrix** to ensure robust inference.
-  - \( \alpha = 0 \) tests (`"News test Intercept (p-value)"`) whether the revisions have a systematic bias.
-  - \( \beta = 0 \) tests (`"News test Coefficient (p-value)"`) whether the revisions are correlated with the final value, indicating inefficiency.
+  - \( \alpha = 0 \) tests (`"Noise test Intercept (p-value)"`) whether the revisions have a systematic bias.
+  - \( \beta = 0 \) tests (`"Noise test Coefficient (p-value)"`) whether the revisions are correlated with the final value, indicating inefficiency.
 
 ####  2. **The News Test**
 
