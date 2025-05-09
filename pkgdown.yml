@@ -1,5 +1,5 @@
 pandoc: 3.1.11
-pkgdown: 2.1.1
+pkgdown: 2.1.2
 pkgdown_sha: ~
 articles:
   efficient-release: efficient-release.html
@@ -8,7 +8,7 @@ articles:
   reviser: reviser.html
   revision-analysis: revision-analysis.html
   understanding-revisions: understanding-revisions.html
-last_built: 2025-04-28T08:07Z
+last_built: 2025-05-09T09:27Z
 urls:
   reference: https://p-wegmueller.github.io/reviser/reference
   article: https://p-wegmueller.github.io/reviser/articles
