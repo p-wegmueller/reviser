@@ -902,7 +902,7 @@ get_revision_analysis <- function(
   ) {
     rlang::warn(
       "Both 'release' and 'pub_date' columns are present in 'df. 
-      The 'release' column will be used."
+      The 'release' column will be used for grouping."
     )
     df <- df %>%
       dplyr::select(-pub_date)
@@ -926,7 +926,7 @@ get_revision_analysis <- function(
     "id" %in%
       colnames(df) &
       "id" %in% colnames(final_release) &
-      length(unique(df$id)) > 1
+      length(unique(df$id)) > 0
   ) {
     final_release <- dplyr::select(final_release, time, final_value, id)
 
