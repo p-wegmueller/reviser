@@ -67,7 +67,8 @@ using a Mincer-Zarnowitz type linear regression and hypothesis testing.</p>
 <span>  <span class="va">df</span>,</span>
 <span>  <span class="va">final_release</span>,</span>
 <span>  significance <span class="op">=</span> <span class="fl">0.05</span>,</span>
-<span>  test_all <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  test_all <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  robust <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -98,6 +99,11 @@ the hypothesis test (default is <code>0.05</code>).</p></dd>
 <dt id="arg-test-all">test_all<a class="anchor" aria-label="anchor" href="#arg-test-all"></a></dt>
 <dd><p>A logical value indicating whether to test all releases,
 even after finding the first efficient release (default is <code>FALSE</code>).</p></dd>
+
+
+<dt id="arg-robust">robust<a class="anchor" aria-label="anchor" href="#arg-robust"></a></dt>
+<dd><p>A logical value indicating whether to use robust HAC standard
+errors (default is <code>TRUE</code>).</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -150,7 +156,16 @@ Money, Credit and Banking, 40(2-3), 319-340, 2008.</p>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Identify the first efficient release</span></span></span>
+<span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">get_first_efficient_release</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">df</span>, </span></span>
+<span class="r-in"><span>  <span class="va">final_release</span>, </span></span>
+<span class="r-in"><span>  significance <span class="op">=</span> <span class="fl">0.05</span>,</span></span>
+<span class="r-in"><span>  robust <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> There might be implicit NA values in the 'value' column. Consider setting 'keep_na = TRUE' if you want to retain them.</span>
+<span class="r-in"><span>   </span></span>
 <span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">get_first_efficient_release</span><span class="op">(</span><span class="va">df</span>, <span class="va">final_release</span>, significance <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> There might be implicit NA values in the 'value' column. Consider setting 'keep_na = TRUE' if you want to retain them.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Access the index of the first efficient release</span></span></span>
 <span class="r-in"><span><span class="va">result</span><span class="op">$</span><span class="va">e</span></span></span>
