@@ -9,9 +9,44 @@ template:
       <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
 
 reference:
-  - title: Function reference
-  - contents: has_concept()
+  - title: Package index
+  - subtitle: Revision analysis
+  desc: >
+    Functions for analyzing revisions of time series.
+  contents:
+  - has_concept("revision analysis")
   
+  - subtitle: Revision utilities
+  desc: >
+    Functions for working with revisions of time series.
+  contents:
+  - has_concept("revision utilities")
+  
+  - subtitle: Revision nowcasting
+  desc: >
+    Functions for nowcasting revisions of time series.
+  contents:
+  - has_concept("revision nowcasting")
+  
+  - subtitle: Revision graphs
+  desc: >
+    Functions for plotting revisions of time series.
+  contents:
+  - has_concept("revisions graphs")
+  
+  - subtitle: Helpers
+  desc: >
+    Helper functions to convert revisions to a tidy format.
+  contents:
+  - has_concept("helpers")
+  
+  - subtitle: Data
+  desc: >
+    GDP datasets used in the package.
+  contents:
+  - has_concept("dataset")
+
+
 articles:
 - title: "Main function"
   navbar: ~
