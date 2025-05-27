@@ -22,8 +22,6 @@ NULL
 #' @srrstatsNA {G2.4d}
 #' @srrstatsNA {G2.4e}
 #' @srrstatsNA {G2.5}
-#' @srrstatsNA {G2.11}
-#' @srrstatsNA {G2.12}
 #' @srrstatsNA {G2.14c}
 #' @srrstatsNA {G2.16}
 #' @srrstatsNA {G3.0}
