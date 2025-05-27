@@ -237,6 +237,18 @@ integration more complex. `reviser` offers a lightweight, R-native
 solution for revision analysis, combining user-friendly tools for data
 wrangling, visualization, and evaluation of release efficiency.
 
+## Contributing
+
+Contributions are encouraged and appreciated. If you’re uncertain about
+opening a pull request, consider starting with an issue to discuss your
+proposal. For more information, please refer to
+[CONTRIBUTING](https://p-wegmueller.github.io/reviser/CONTRIBUTING.html).
+
+Please note that the reviser project is released with a [Contributor
+Code of
+Conduct](https://p-wegmueller.github.io/reviser/CODE_OF_CONDUCT.html).
+By contributing to this project, you agree to abide by its terms.
+
 ## Citation
 
 Burri M, Wegmueller P (2025). reviser: Tools for Studying Revision

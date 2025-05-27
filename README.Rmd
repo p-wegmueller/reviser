@@ -115,5 +115,10 @@ summary(efficient_release)
 ## Comparison to [`rjd3revisions`](https://rjdverse.github.io/rjd3revisions/)
 The `reviser` package sets itself apart from `rjd3revisions` not only through its focus on advanced analysis of efficient releases and nowcasting performance, but also in its pure R implementation, which avoids external dependencies. In contrast, `rjd3revisions` relies heavily on Java via the JDemetra+ platform, which can make setup and integration more complex. `reviser` offers a lightweight, R-native solution for revision analysis, combining user-friendly tools for data wrangling, visualization, and evaluation of release efficiency.
 
+## Contributing
+Contributions are encouraged and appreciated. If you're uncertain about opening a pull request, consider starting with an issue to discuss your proposal. For more information, please refer to [CONTRIBUTING](https://p-wegmueller.github.io/reviser/CONTRIBUTING.html).
+
+Please note that the reviser project is released with a [Contributor Code of Conduct](https://p-wegmueller.github.io/reviser/CODE_OF_CONDUCT.html). By contributing to this project, you agree to abide by its terms.
+
 ## Citation
 Burri M, Wegmueller P (2025). reviser: Tools for Studying Revision Properties in Real-Time Time Series Vintages. R package version 0.1.0, https://p-wegmueller.github.io/reviser/.
