@@ -8,7 +8,8 @@ get_first_efficient_release(
   df,
   final_release,
   significance = 0.05,
-  test_all = FALSE
+  test_all = FALSE,
+  robust = TRUE
 )
 }
 \arguments{
@@ -32,6 +33,9 @@ the hypothesis test (default is \code{0.05}).}
 
 \item{test_all}{A logical value indicating whether to test all releases,
 even after finding the first efficient release (default is \code{FALSE}).}
+
+\item{robust}{A logical value indicating whether to use robust HAC standard
+errors (default is \code{TRUE}).}
 }
 \value{
 A list of class \code{list_eff_rel} with the following elements:
@@ -83,6 +87,13 @@ n = 10
 )
 
 # Identify the first efficient release
+result <- get_first_efficient_release(
+  df, 
+  final_release, 
+  significance = 0.05,
+  robust = FALSE
+  )
+   
 result <- get_first_efficient_release(df, final_release, significance = 0.05)
 
 # Access the index of the first efficient release

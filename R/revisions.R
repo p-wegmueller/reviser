@@ -257,6 +257,8 @@ get_revisions <- function(
 #' the hypothesis test (default is `0.05`).
 #' @param test_all A logical value indicating whether to test all releases,
 #' even after finding the first efficient release (default is `FALSE`).
+#' @param robust A logical value indicating whether to use robust HAC standard 
+#' errors (default is `TRUE`).
 #'
 #' @return A list of class `list_eff_rel` with the following elements:
 #'   - `e`: The index of the first efficient release. (0 indexed)
@@ -295,6 +297,8 @@ get_revisions <- function(
 #' of initial pre-processing to ensure uniform data type.
 #' @srrstats {G2.13} Function implements checks for missing data through
 #' stats::na.omit() before passing data to analytical algorithms.
+#' @srrstats {G3.1} Robust and standard covariance matrix allowed
+#' @srrstats {G3.1a} Shown in example
 #' @srrstats {G5.2a} Function implements explicit error behavior for unexpected
 #' inputs with unique error messages for different validation failures.
 #' @srrstats {G5.8d} Function handles edge cases where no efficient release is
@@ -328,6 +332,13 @@ get_revisions <- function(
 #' )
 #'
 #' # Identify the first efficient release
+#' result <- get_first_efficient_release(
+#'   df, 
+#'   final_release, 
+#'   significance = 0.05,
+#'   robust = FALSE
+#'   )
+#'    
 #' result <- get_first_efficient_release(df, final_release, significance = 0.05)
 #'
 #' # Access the index of the first efficient release
@@ -342,8 +353,15 @@ get_first_efficient_release <- function(
   df,
   final_release,
   significance = 0.05,
-  test_all = FALSE
+  test_all = FALSE,
+  robust = TRUE
 ) {
+  
+  # Check robust is logical
+  if (!is.logical(robust)) {
+    rlang::abort("The 'robust' argument must be a logical value.")
+  }
+  
   check <- vintages_check(df)
   if (check == "wide") {
     df <- vintages_long(df)
@@ -418,12 +436,14 @@ get_first_efficient_release <- function(
         formula <- stats::as.formula(paste0("final ~ ", es[i]))
 
         model <- stats::lm(formula, data = df_wide)
-        hac_se <- sandwich::vcovHAC(model)
-
+        
+        # Conditionally set vcov argument
+        vcov <- if (robust) sandwich::vcovHAC(model) else NULL
+        
         test <- car::linearHypothesis(
           model,
           c("(Intercept) = 0", paste0(es[i], " = 1")),
-          vcov = hac_se
+          vcov = vcov
         )
 
         p_value <- test[2, 'Pr(>F)']

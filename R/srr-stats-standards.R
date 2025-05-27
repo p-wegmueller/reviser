@@ -25,8 +25,6 @@ NULL
 #' @srrstatsNA {G2.14c}
 #' @srrstatsNA {G2.16}
 #' @srrstatsNA {G3.0}
-#' @srrstatsNA {G3.1}
-#' @srrstatsNA {G3.1a}
 #' @srrstatsNA {G4.0}
 #' @srrstatsNA {G5.0}
 #' @srrstatsNA {G5.1}
@@ -45,7 +43,6 @@ NULL
 #' @srrstatsNA {G5.11a}
 #' @srrstatsNA {G5.12}
 #' @srrstatsNA {TS1.7}
-#' @srrstatsNA {TS2.0}
 #' @srrstatsNA {TS2.1c}
 #' @srrstatsNA {TS2.2}
 #' @srrstatsNA {TS2.3}

@@ -27,6 +27,7 @@
 #' `keep_na` parameter
 #' @srrstats {TS1.1} Explicitly documents input data types and classes
 #' @srrstats {TS1.2} Validates inputs via `vintages_check()`
+#' @srrstats {TS2.0} Warns for possibly implicit missings
 #' @srrstats {TS4.2} Explicitly documents return value types and classes
 #'
 #' @examples
@@ -122,6 +123,8 @@ vintages_long <- function(df, names_to = "pub_date", keep_na = FALSE) {
     } else {
       long_df <- long_df %>%
         dplyr::filter(!is.na(value))
+      message("There might be implicit NA values in the 'value' column. ",
+              "Consider setting 'keep_na = TRUE' if you want to retain them.")
     }
     long_df <- vintages_assign_class(long_df)
     return(long_df)
@@ -398,7 +401,7 @@ vintages_check <- function(df) {
       }
     }
     
-    # You can add similar validation for 'release' if needed
+    # Possibly add similar validation for 'release' if needed
     return("long")
   }
   
