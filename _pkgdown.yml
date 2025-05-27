@@ -18,7 +18,7 @@ reference:
   
   - subtitle: Revision utilities
     desc: >
-      Functions for working with revisions of time series.
+      Utility functions for working with revisions of time series.
     contents:
     - has_concept("revision utilities")
   
@@ -32,7 +32,7 @@ reference:
     desc: >
       Functions for plotting revisions of time series.
     contents:
-    - has_concept("revisions graphs")
+    - has_concept("revision graphs")
   
   - subtitle: Helpers
     desc: >
