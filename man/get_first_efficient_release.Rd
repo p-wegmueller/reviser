@@ -94,8 +94,8 @@ Aruoba, S. Borağan, "Revisions Are Not Well Behaved", Journal of
 Money, Credit and Banking, 40(2-3), 319-340, 2008.
 }
 \seealso{
-Other {revision_analysis}: 
+Other revision analysis: 
 \code{\link{get_revision_analysis}()},
 \code{\link{summary.lst_efficient}()}
 }
-\concept{{revision_analysis}}
+\concept{revision analysis}

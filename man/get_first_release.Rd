@@ -39,7 +39,7 @@ first_release <- get_first_release(df)
 
 }
 \seealso{
-Other {revision_utilities}: 
+Other revision utilities: 
 \code{\link{get_days_to_release}()},
 \code{\link{get_fixed_release}()},
 \code{\link{get_latest_release}()},
@@ -47,4 +47,4 @@ Other {revision_utilities}:
 \code{\link{get_releases_by_date}()},
 \code{\link{get_revisions}()}
 }
-\concept{{revision_utilities}}
+\concept{revision utilities}

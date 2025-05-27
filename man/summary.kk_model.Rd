@@ -31,7 +31,7 @@ variables against both the final release and the true efficient release.
 
 }
 \seealso{
-Other revision_nowcasting: 
+Other revision nowcasting: 
 \code{\link{kk_nowcast}()}
 }
-\concept{revision_nowcasting}
+\concept{revision nowcasting}

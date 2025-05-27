@@ -66,7 +66,7 @@ releases <- get_nth_release(df, n = 0:1)
 
 }
 \seealso{
-Other {revision_utilities}: 
+Other revision utilities: 
 \code{\link{get_days_to_release}()},
 \code{\link{get_first_release}()},
 \code{\link{get_fixed_release}()},
@@ -74,4 +74,4 @@ Other {revision_utilities}:
 \code{\link{get_releases_by_date}()},
 \code{\link{get_revisions}()}
 }
-\concept{{revision_utilities}}
+\concept{revision utilities}

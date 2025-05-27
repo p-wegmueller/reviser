@@ -66,8 +66,8 @@ summary(result)
 
 }
 \seealso{
-Other {revision_analysis}: 
+Other revision analysis: 
 \code{\link{get_first_efficient_release}()},
 \code{\link{get_revision_analysis}()}
 }
-\concept{{revision_analysis}}
+\concept{revision analysis}
