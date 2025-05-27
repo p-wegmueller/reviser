@@ -11,40 +11,40 @@ template:
 reference:
   - title: Package index
   - subtitle: Revision analysis
-  desc: >
-    Functions for analyzing revisions of time series.
-  contents:
-  - has_concept("revision analysis")
+    desc: >
+      Functions for analyzing revisions of time series.
+    contents:
+    - has_concept("revision analysis")
   
   - subtitle: Revision utilities
-  desc: >
-    Functions for working with revisions of time series.
-  contents:
-  - has_concept("revision utilities")
+    desc: >
+      Functions for working with revisions of time series.
+    contents:
+    - has_concept("revision utilities")
   
   - subtitle: Revision nowcasting
-  desc: >
-    Functions for nowcasting revisions of time series.
-  contents:
-  - has_concept("revision nowcasting")
+    desc: >
+      Functions for nowcasting revisions of time series.
+    contents:
+    - has_concept("revision nowcasting")
   
   - subtitle: Revision graphs
-  desc: >
-    Functions for plotting revisions of time series.
-  contents:
-  - has_concept("revisions graphs")
+    desc: >
+      Functions for plotting revisions of time series.
+    contents:
+    - has_concept("revisions graphs")
   
   - subtitle: Helpers
-  desc: >
-    Helper functions to convert revisions to a tidy format.
-  contents:
-  - has_concept("helpers")
+    desc: >
+      Helper functions to convert revisions to a tidy format.
+    contents:
+    - has_concept("helpers")
   
   - subtitle: Data
-  desc: >
-    GDP datasets used in the package.
-  contents:
-  - has_concept("dataset")
+    desc: >
+      GDP datasets used in the package.
+    contents:
+    - has_concept("dataset")
 
 
 articles:
