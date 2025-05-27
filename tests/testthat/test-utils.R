@@ -20,7 +20,7 @@ test_that("vintages_wide works without id column", {
 test_that("vintages_wide works with id column", {
   df <- dplyr::tibble(
     id = c("A", "A", "B", "B"),
-    time = as.Date(c("2020-01-01", "2020-01-01", "2020-01-01", "2020-01-01")),
+    time = as.Date(c("2020-01-01", "2020-02-01", "2020-01-01", "2020-02-01")),
     pub_date = as.Date(c(
       "2020-01-10",
       "2020-01-20",
@@ -33,7 +33,7 @@ test_that("vintages_wide works with id column", {
   expect_type(result, "list")
   expect_named(result, c("A", "B"))
   expect_s3_class(result$A, "tbl_pubdate")
-  expect_equal(nrow(result$A), 1)
+  expect_equal(nrow(result$A), 2)
   expect_equal(
     result$A[1, "2020-01-10"]$`2020-01-10`,
     1
@@ -42,8 +42,8 @@ test_that("vintages_wide works with id column", {
 
 test_that("vintages_wide throws error on missing columns", {
   df <- dplyr::tibble(
-    time = as.Date("2020-01-01"),
-    value = 1.0
+    time = as.Date(c("2020-01-01", "2020-02-01")),
+    value = c(1.0, 1.0)
   )
   expect_error(
     vintages_wide(df),
@@ -53,10 +53,10 @@ test_that("vintages_wide throws error on missing columns", {
 
 test_that("vintages_wide warns and ignores extra columns", {
   df <- dplyr::tibble(
-    time = as.Date("2020-01-01"),
-    pub_date = as.Date("2020-01-10"),
-    value = 1.0,
-    extra = "ignore me"
+    time = as.Date(c("2020-01-01", "2020-04-01")),
+    pub_date = as.Date(c("2020-01-10", "2020-01-10")),
+    value = c(1.0, 1.0),
+    extra = c("ignore me", "please")
   )
   expect_warning(
     result <- vintages_wide(df),
@@ -67,9 +67,9 @@ test_that("vintages_wide warns and ignores extra columns", {
 
 test_that("vintages_wide handles names_from = 'release'", {
   df <- dplyr::tibble(
-    time = as.Date(c("2020-01-01", "2020-01-01")),
-    release = c(1, 2),
-    value = c(100, 200)
+    time = as.Date(c("2020-01-01", "2020-01-01", "2021-01-01", "2021-01-01")),
+    release = c(1, 2, 1, 2),
+    value = c(100, 200, 150, 250)
   )
   result <- vintages_wide(df, names_from = "release")
   expect_s3_class(result, "tbl_release")
@@ -78,8 +78,9 @@ test_that("vintages_wide handles names_from = 'release'", {
 
 test_that("vintages_wide returns input if already wide", {
   wide_df <- dplyr::tibble(
-    time = as.Date("2020-01-01"),
-    `2020-01-10` = 1.0
+    time = c(as.Date("2020-01-01"), as.Date("2021-01-01")),
+    `2020-01-10` = 1.0,
+    `2021-01-10` = 2.0
   )
   class(wide_df) <- c("tbl_pubdate", "tbl_df", "tbl", "data.frame")
   expect_warning(

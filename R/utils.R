@@ -27,7 +27,6 @@
 #' `keep_na` parameter
 #' @srrstats {TS1.1} Explicitly documents input data types and classes
 #' @srrstats {TS1.2} Validates inputs via `vintages_check()`
-#' @srrstats {TS2.0} Warns for possibly implicit missings
 #' @srrstats {TS4.2} Explicitly documents return value types and classes
 #'
 #' @examples
@@ -123,8 +122,6 @@ vintages_long <- function(df, names_to = "pub_date", keep_na = FALSE) {
     } else {
       long_df <- long_df %>%
         dplyr::filter(!is.na(value))
-      message("There might be implicit NA values in the 'value' column. ",
-              "Consider setting 'keep_na = TRUE' if you want to retain them.")
     }
     long_df <- vintages_assign_class(long_df)
     return(long_df)
@@ -274,6 +271,7 @@ vintages_wide <- function(df, names_from = "pub_date") {
 #'
 #' @param df A data frame or tibble containing data vintages. The data frame
 #' must have specific columns depending on whether it is in long or wide format.
+#' 
 #'
 #' @return A string indicating the format of the data:
 #' - `"long"` if the data frame is in long format.
@@ -311,6 +309,7 @@ vintages_wide <- function(df, names_from = "pub_date") {
 #' @srrstats {TS1.3}  pre-processing routine to validate input data and
 #' transform it to a uniform type.
 #' @srrstats {TS1.4} date column always there
+#' @srrstats {TS2.0} Checks for possibly implicit missings in time column
 #' @srrstats {TS4.2} type and class of all return values are documented.
 #'
 #' @examples
@@ -337,7 +336,7 @@ vintages_wide <- function(df, names_from = "pub_date") {
 #' vintages_check(wide_data) # Should return "wide"
 #' @keywords internal
 #' @noRd
-vintages_check <- function(df) {
+vintages_check <- function(df, time_col = "time") {
   # Helper: Check for simple (scalar, non-list) columns
   check_simple_columns <- function(df) {
     issues <- lapply(names(df), function(col) {
@@ -382,6 +381,15 @@ vintages_check <- function(df) {
   if (!"time" %in% colnames(df)) {
     rlang::abort("The 'time' column is missing in the data.frame.")
   }
+  
+  # Check for implicit missings in time column
+  implicit_missings <- check_implicit_missing(df, time_col)
+  if (implicit_missings$total_missing > 0) {
+    df <- make_explicit_missing(df, time_col)
+    rlang::warn("The 'time' column contains implicit missing values. I created 
+        a new 'time' column with explicit NA values. Please check your data.")
+  }
+  
   
   # Validate date format for "time"
   if (!all(!is.na(as.Date(df$time, format = "%Y-%m-%d")))) {
@@ -488,4 +496,120 @@ standardize_val_col <- function(df) {
   df %>%
     dplyr::rename(value = dplyr::any_of(c("value", "values"))) %>%
     suppressMessages()
+}
+
+#' Check for implicit missing dates in time series data
+#' @param data data.frame containing time series data
+#' @param time_col character, name of the date column
+#' @param freq character, frequency of the time series data (default is "auto")
+#' @return list with summary of results
+#' @srrstats {TS2.0} Checks for possibly implicit missings in time column
+#'
+#' @keywords internal
+#' @noRd
+check_implicit_missing <- function(data, time_col, freq = "auto") {
+  # Convert date column to Date if it isn't already
+  data[[time_col]] <- as.Date(data[[time_col]])
+  
+  # Auto-detect frequency if not specified
+  if (freq == "auto") {
+    dates <- sort(unique(data[[time_col]]))
+    if (length(dates) < 2) {
+      rlang::abort("Need at least 2 dates to determine frequency")
+    }
+    
+    # Calculate most common difference between consecutive dates
+    diffs <- as.numeric(diff(dates))
+    freq_days <- as.numeric(names(sort(table(diffs), decreasing = TRUE))[1])
+    
+    # Determine frequency based on most common difference
+    if (freq_days == 1) {
+      freq <- "day"
+    } else if (freq_days == 7) {
+      freq <- "week"
+    } else if (freq_days >= 28 & freq_days <= 31) {
+      freq <- "month"
+    } else if (freq_days >= 90 & freq_days <= 95) {
+      freq <- "quarter"
+    } else if (freq_days >= 365 & freq_days <= 366) {
+      freq <- "year"
+    } else {
+      freq <- paste(freq_days, "days")
+    }
+    
+    # cat("Auto-detected frequency:", freq, "\n")
+  }
+  
+  # Create complete sequence based on frequency
+  
+  min_date <- min(data[[time_col]])
+  max_date <- max(data[[time_col]])
+  
+  if (freq == "day") {
+    complete_seq <- seq(from = min_date, to = max_date, by = "day")
+  } else if (freq == "week") {
+    complete_seq <- seq(from = min_date, to = max_date, by = "week")
+  } else if (freq == "month") {
+    complete_seq <- seq(from = min_date, to = max_date, by = "month")
+  } else if (freq == "quarter") {
+    complete_seq <- seq(from = min_date, to = max_date, by = "quarter")
+  } else if (freq == "year") {
+    complete_seq <- seq(from = min_date, to = max_date, by = "year")
+  } else if (grepl("days", freq)) {
+    # Handle custom day intervals (e.g., "5 days")
+    days_interval <- as.numeric(gsub(" days", "", freq))
+    complete_seq <- seq(from = min_date, to = max_date, by = days_interval)
+  } else {
+    stop("Unsupported frequency. Use 'day', 'week', 'month', 'quarter', 'year', or 'X days'")
+  }
+  
+  # Find missing dates
+  existing_dates <- unique(data[[time_col]])
+  missing_dates <- setdiff(complete_seq, existing_dates)
+  
+  # Create summary
+  results <- list(
+    frequency = freq,
+    total_expected = length(complete_seq),
+    total_existing = length(existing_dates),
+    total_missing = length(missing_dates),
+    missing_dates = missing_dates,
+    missing_percentage = round(length(missing_dates) / length(complete_seq) * 100, 2)
+  )
+  
+  return(results)
+}
+
+
+#' Function to create complete dataset with explicit NAs
+#' @param data data.frame containing time series data
+#' @param time_col character, name of the date column
+#' @param freq character, frequency of the time series data (default is "auto")
+#' @return data.frame with explicit NAs for missing dates
+#' @srrstats {TS2.0} Creates explicit missings
+#'
+#' @keywords internal
+#' @noRd
+make_explicit_missing <- function(
+    data, 
+    time_col,
+    freq = "auto") {
+
+  # Get missing info
+  missing_info <- check_implicit_missing(data, time_col, freq)
+  
+  # Create complete date sequence
+  complete_dates <- data.frame(
+    time = c(unique(data[[time_col]]), missing_info$missing_dates)
+  )
+  names(complete_dates) <- time_col
+  
+  data_subset <- data %>% dplyr::select(c(time_col, dplyr::everything()))
+  
+  # Merge to create explicit NAs
+  complete_data <- complete_dates %>%
+    dplyr::left_join(data_subset, by = time_col) %>%
+    dplyr::arrange(!!rlang::sym(time_col))
+  
+  return(complete_data)
 }

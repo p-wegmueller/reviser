@@ -133,23 +133,8 @@ plot_vintages <- function(
       "The 'type' argument must be either 'line', 'point', 'bar' or 'boxplot'."
     )
   }
-
-  check <- vintages_check(df)
-  if (check == "wide") {
-    df <- vintages_long(df, keep_na = FALSE)
-  }
-
-  # Check 'dim_col' is column name of 'df'
-  if (!dim_col %in% colnames(df)) {
-    rlang::abort(
-      paste0(
-        "The column ",
-        dim_col,
-        " is not found in 'df'."
-      )
-    )
-  }
-
+  
+ 
   # Check 'time_col' is column name of 'df'
   if (!time_col %in% colnames(df)) {
     rlang::abort(
@@ -160,6 +145,25 @@ plot_vintages <- function(
       )
     )
   }
+
+  check <- vintages_check(df, time_col = time_col)
+  if (check == "wide") {
+    df <- vintages_long(df, keep_na = FALSE)
+  }
+
+  
+  # Check 'dim_col' is column name of 'df'
+  if (!dim_col %in% colnames(df)) {
+    rlang::abort(
+      paste0(
+        "The column ",
+        dim_col,
+        " is not found in 'df'."
+      )
+    )
+  }
+  
+
 
   # Check that 'time_col' is of date format
   if (!inherits(df[[time_col]], "Date")) {
