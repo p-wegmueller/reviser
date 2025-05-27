@@ -62,4 +62,5 @@ Indergand, R., Leist, S. A Real-Time Data Set for Switzerland.
 Swiss J Economics Statistics 150, 331–352 (2014).
 \url{https://doi.org/10.1007/BF03399410}
 }
+\concept{dataset}
 \keyword{datasets}

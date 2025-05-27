@@ -39,3 +39,13 @@ date <- as.Date("2020-04-01")
 releases_on_date <- get_releases_by_date(df, date)
 
 }
+\seealso{
+Other {revision_utilities}: 
+\code{\link{get_days_to_release}()},
+\code{\link{get_first_release}()},
+\code{\link{get_fixed_release}()},
+\code{\link{get_latest_release}()},
+\code{\link{get_nth_release}()},
+\code{\link{get_revisions}()}
+}
+\concept{{revision_utilities}}

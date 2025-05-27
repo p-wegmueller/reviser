@@ -33,3 +33,13 @@ df <- dplyr::filter(reviser::gdp, id=="US")
 latest_release <- get_latest_release(df)
 
 }
+\seealso{
+Other {revision_utilities}: 
+\code{\link{get_days_to_release}()},
+\code{\link{get_first_release}()},
+\code{\link{get_fixed_release}()},
+\code{\link{get_nth_release}()},
+\code{\link{get_releases_by_date}()},
+\code{\link{get_revisions}()}
+}
+\concept{{revision_utilities}}

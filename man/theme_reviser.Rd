@@ -58,3 +58,17 @@ ggplot(mtcars, aes(x = wt, y = mpg, color = factor(cyl))) +
   scale_color_reviser()
 
 }
+\seealso{
+Other revision_graphs: 
+\code{\link{plot_vintages}()}
+
+Other revision_graphs: 
+\code{\link{plot_vintages}()}
+
+Other revision_graphs: 
+\code{\link{plot_vintages}()}
+
+Other revision_graphs: 
+\code{\link{plot_vintages}()}
+}
+\concept{revision_graphs}

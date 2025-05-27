@@ -173,3 +173,9 @@ results <- get_revision_analysis(
 
 
 }
+\seealso{
+Other {revision_analysis}: 
+\code{\link{get_first_efficient_release}()},
+\code{\link{summary.lst_efficient}()}
+}
+\concept{{revision_analysis}}

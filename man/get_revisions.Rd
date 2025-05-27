@@ -73,3 +73,13 @@ revisions_date <- get_revisions(df, ref_date = as.Date("2023-02-01"))
 revisions_nth <- get_revisions(df, nth_release = 1)
 
 }
+\seealso{
+Other {revision_utilities}: 
+\code{\link{get_days_to_release}()},
+\code{\link{get_first_release}()},
+\code{\link{get_fixed_release}()},
+\code{\link{get_latest_release}()},
+\code{\link{get_nth_release}()},
+\code{\link{get_releases_by_date}()}
+}
+\concept{{revision_utilities}}

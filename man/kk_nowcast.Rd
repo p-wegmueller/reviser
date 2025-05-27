@@ -117,3 +117,8 @@ Kishor, N. Kundan and Koenig, Evan F., "VAR Estimation and
 Forecasting When Data Are Subject to Revision", Journal of Business and
 Economic Statistics, 2012.
 }
+\seealso{
+Other revision_nowcasting: 
+\code{\link{summary.kk_model}()}
+}
+\concept{revision_nowcasting}

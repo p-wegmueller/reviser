@@ -42,7 +42,7 @@ reference:
   
   - subtitle: Data
     desc: >
-      GDP datasets used in the package.
+      GDP data used in the package.
     contents:
     - has_concept("dataset")
 

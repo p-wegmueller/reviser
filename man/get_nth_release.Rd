@@ -65,3 +65,13 @@ second_release <- get_nth_release(df, n = 1)
 releases <- get_nth_release(df, n = 0:1)
 
 }
+\seealso{
+Other {revision_utilities}: 
+\code{\link{get_days_to_release}()},
+\code{\link{get_first_release}()},
+\code{\link{get_fixed_release}()},
+\code{\link{get_latest_release}()},
+\code{\link{get_releases_by_date}()},
+\code{\link{get_revisions}()}
+}
+\concept{{revision_utilities}}

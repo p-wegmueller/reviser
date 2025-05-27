@@ -42,3 +42,8 @@ long_data1 <- vintages_long(wide_data, names_to = "pub_date")
 long_data2 <- vintages_long(wide_list, names_to = "pub_date")
 
 }
+\seealso{
+Other helpers: 
+\code{\link{vintages_long}()}
+}
+\concept{helpers}

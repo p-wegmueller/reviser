@@ -35,3 +35,13 @@ dta <- get_fixed_release(df, month = 7, years = 3)
 dta <- get_fixed_release(df, quarter = 3, years = 3)
 
 }
+\seealso{
+Other {revision_utilities}: 
+\code{\link{get_days_to_release}()},
+\code{\link{get_first_release}()},
+\code{\link{get_latest_release}()},
+\code{\link{get_nth_release}()},
+\code{\link{get_releases_by_date}()},
+\code{\link{get_revisions}()}
+}
+\concept{{revision_utilities}}

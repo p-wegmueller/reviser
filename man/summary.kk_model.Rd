@@ -30,3 +30,8 @@ variables against both the final release and the true efficient release.
 # results <- summary.kk_model(kk_model_obj, your_data)
 
 }
+\seealso{
+Other revision_nowcasting: 
+\code{\link{kk_nowcast}()}
+}
+\concept{revision_nowcasting}

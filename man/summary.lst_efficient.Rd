@@ -65,3 +65,9 @@ result <- get_first_efficient_release(df, final_release, significance = 0.05)
 summary(result)
 
 }
+\seealso{
+Other {revision_analysis}: 
+\code{\link{get_first_efficient_release}()},
+\code{\link{get_revision_analysis}()}
+}
+\concept{{revision_analysis}}

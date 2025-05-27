@@ -44,3 +44,8 @@ wide_list <- list(
 long_data <- vintages_long(wide_list, names_to = "pub_date")
 
 }
+\seealso{
+Other helpers: 
+\code{\link{vintages_wide}()}
+}
+\concept{helpers}
