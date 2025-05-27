@@ -85,6 +85,7 @@
 #' # Calculate revisions relative to the nth release (2nd release)
 #' revisions_nth <- get_revisions(df, nth_release = 1)
 #'
+#' @family revision utilities
 #' @export
 get_revisions <- function(
   df,
@@ -335,6 +336,7 @@ get_revisions <- function(
 #' @references Aruoba, S. Borağan, "Revisions Are Not Well Behaved", Journal of
 #' Money, Credit and Banking, 40(2-3), 319-340, 2008.
 #'
+#' @family revision analysis
 #' @export
 get_first_efficient_release <- function(
   df,
@@ -585,6 +587,7 @@ get_first_efficient_release <- function(
 #' result <- get_first_efficient_release(df, final_release, significance = 0.05)
 #' summary(result)
 #'
+#' @family revision analysis
 #' @export
 summary.lst_efficient <- function(object, ...) {
   is_id_list <- is.null(object$e)
@@ -844,6 +847,7 @@ summary.lst_efficient <- function(object, ...) {
 #'  )
 #'
 #'
+#' @family revision analysis
 #' @export
 get_revision_analysis <- function(
   df,
@@ -1503,6 +1507,7 @@ friedman_test <- function(series, frequency = 12) {
 #' # Get the first and second release (n = 0:1)
 #' releases <- get_nth_release(df, n = 0:1)
 #'
+#' @family revision utilities
 #' @export
 get_nth_release <- function(df, n = 0, diagonal = FALSE) {
   # Validate inputs
@@ -1629,6 +1634,7 @@ get_nth_release <- function(df, n = 0, diagonal = FALSE) {
 #' # Get the first release for each time period
 #' first_release <- get_first_release(df)
 #'
+#' @family revision utilities
 #' @export
 get_first_release <- function(df, diagonal = FALSE) {
   check <- vintages_check(df)
@@ -1699,7 +1705,8 @@ get_first_release <- function(df, diagonal = FALSE) {
 #'
 #' # Get the latest release for each time period
 #' latest_release <- get_latest_release(df)
-#'
+#' 
+#' @family revision utilities
 #' @export
 get_latest_release <- function(df) {
   check <- vintages_check(df)
@@ -1757,6 +1764,7 @@ get_latest_release <- function(df) {
 #' dta <- get_fixed_release(df, month = 7, years = 3)
 #' dta <- get_fixed_release(df, quarter = 3, years = 3)
 #'
+#' @family revision utilities
 #' @export
 get_fixed_release <- function(df, years, month = NULL, quarter = NULL) {
   # Ensure only one of month or quarter is specified
@@ -1858,6 +1866,7 @@ get_fixed_release <- function(df, years, month = NULL, quarter = NULL) {
 #' date <- as.Date("2020-04-01")
 #' releases_on_date <- get_releases_by_date(df, date)
 #'
+#' @family revision utilities
 #' @export
 get_releases_by_date <- function(df, date) {
   date <- tryCatch(as.Date(date), error = function(e) e)
@@ -1914,6 +1923,7 @@ get_releases_by_date <- function(df, date) {
 #' # Calculate days to release
 #' df_with_days <- get_days_to_release(df)
 #'
+#' @family revision utilities
 #' @export
 get_days_to_release <- function(df) {
   check <- vintages_check(df)

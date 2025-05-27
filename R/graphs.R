@@ -116,6 +116,7 @@
 #'   subtitle = "Randomly generated data"
 #'   )
 #'
+#' @family revision graphs
 #' @export
 plot_vintages <- function(
   df,
@@ -333,6 +334,7 @@ plot_vintages <- function(
 #'   theme_reviser() +
 #'   scale_color_reviser()
 #'
+#' @family revision graphs
 #' @export
 theme_reviser <- function(
   base_size = 12,
@@ -381,7 +383,7 @@ theme_reviser <- function(
     )
 }
 
-
+#' @family revision graphs
 #' @export
 #' @name theme_reviser
 colors_reviser <- function() {
@@ -423,6 +425,7 @@ colors_reviser <- function() {
   )
 }
 
+#' @family revision graphs
 #' @export
 #' @name theme_reviser
 scale_color_reviser <- function(...) {
@@ -433,6 +436,7 @@ scale_color_reviser <- function(...) {
   )
 }
 
+#' @family revision graphs
 #' @export
 #' @name theme_reviser
 scale_fill_reviser <- function(...) {

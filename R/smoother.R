@@ -106,6 +106,7 @@
 #' @srrstats {G5.9a} `.Machine$double.eps` to data does not meaningfully
 #' change results
 #'
+#' @family revision nowcasting
 #' @export
 kk_nowcast <- function(
   df,
@@ -504,6 +505,7 @@ kk_nowcast <- function(
 #' # and 'your_data' is the original data frame.
 #' # results <- summary.kk_model(kk_model_obj, your_data)
 #'
+#' @family revision nowcasting
 #' @export
 summary.kk_model <- function(object, ...) {
   # Check if the input is a kk_model object

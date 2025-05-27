@@ -40,5 +40,6 @@
 #' @examples
 #' # Load [gdp] dataset
 #' data(gdp)
+#' @family dataset
 #' @format NULL
 "gdp"

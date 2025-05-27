@@ -45,6 +45,7 @@
 #' # Convert list to long format
 #' long_data <- vintages_long(wide_list, names_to = "pub_date")
 #'
+#' @family helpers
 #' @export
 vintages_long <- function(df, names_to = "pub_date", keep_na = FALSE) {
   names_to <- tolower(names_to)
@@ -173,6 +174,7 @@ vintages_long <- function(df, names_to = "pub_date", keep_na = FALSE) {
 #' long_data1 <- vintages_long(wide_data, names_to = "pub_date")
 #' long_data2 <- vintages_long(wide_list, names_to = "pub_date")
 #'
+#' @family helpers
 #' @export
 vintages_wide <- function(df, names_from = "pub_date") {
   names_from <- tolower(names_from)
