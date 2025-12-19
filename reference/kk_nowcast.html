@@ -99,12 +99,13 @@ implies no forecasts. Must be greater than or equal to 0.</p></dd>
 
 <dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
 <dd><p>A string specifying the estimation method to use. Options are
-"SUR" (default) and "OLS".</p></dd>
+"SUR" (default), Maximum likelihood ("MLE") and "OLS".</p></dd>
 
 
 <dt id="arg-solver-options">solver_options<a class="anchor" aria-label="anchor" href="#arg-solver-options"></a></dt>
 <dd><p>An optional list to control the behaviour of the
-underlying <code><a href="https://rdrr.io/pkg/systemfit/man/nlsystemfit.html" class="external-link">systemfit::nlsystemfit()</a></code> and <code><a href="https://rdrr.io/r/stats/nlm.html" class="external-link">stats::nlm()</a></code> solvers:</p><ul><li><p><strong>trace</strong>: An integer controlling the level of output for the
+underlying <code><a href="https://rdrr.io/pkg/systemfit/man/nlsystemfit.html" class="external-link">systemfit::nlsystemfit()</a></code>, <code><a href="https://rdrr.io/r/stats/optim.html" class="external-link">stats::optim()</a></code> and <code><a href="https://rdrr.io/r/stats/nlm.html" class="external-link">stats::nlm()</a></code>
+solvers:</p><ul><li><p><strong>trace</strong>: An integer controlling the level of output for the
 optimization procedure. Default is 0 (minimal output).</p></li>
 <li><p><strong>maxiter</strong>: An integer specifying the maximum number of iterations for
 the optimization procedure. Default is 1000.</p></li>
@@ -174,7 +175,7 @@ from the KK model.</p></dd>
     <p>The function supports multiple models, including the full Kishor-Koenig
 framework, Howrey's model, and a classical approach. It handles data
 preprocessing, estimation of system equations using Seemingly Unrelated
-Regressions (SUR), and application of the Kalman filter and smoother. This is
+Regressions (SUR), and application of the Kalman filter. This is
 the first openly available implementation of the Kishor-Koenig model (See
 the vignette <code>vignette("nowcasting_revisions")</code> for more details).</p>
     </div>
@@ -187,7 +188,7 @@ Economic Statistics, 2012.</p>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other revision nowcasting:
-<code><a href="summary.kk_model.html">summary.kk_model</a>()</code></p></div>
+<code><a href="summary.kk_model.html">summary.kk_model()</a></code></p></div>
     </div>
 
     <div class="section level2">
@@ -224,7 +225,7 @@ Economic Statistics, 2012.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>
