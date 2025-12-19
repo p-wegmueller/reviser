@@ -17,9 +17,10 @@
 #'  - "Howrey": Howrey's simplified framework.
 #'  - "Classical": Classical model without vintage effects.
 #' @param method A string specifying the estimation method to use. Options are
-#' "SUR" (default) and "OLS".
+#' "SUR" (default), Maximum likelihood ("MLE") and "OLS".
 #' @param solver_options An optional list to control the behaviour of the
-#'  underlying [systemfit::nlsystemfit()] and [stats::nlm()] solvers:
+#'  underlying [systemfit::nlsystemfit()], [stats::optim()] and [stats::nlm()]
+#'  solvers:
 #'
 #' - **trace**: An integer controlling the level of output for the
 #' optimization procedure. Default is 0 (minimal output).
@@ -90,7 +91,7 @@
 #' The function supports multiple models, including the full Kishor-Koenig
 #' framework, Howrey's model, and a classical approach. It handles data
 #' preprocessing, estimation of system equations using Seemingly Unrelated
-#' Regressions (SUR), and application of the Kalman filter and smoother. This is
+#' Regressions (SUR), and application of the Kalman filter. This is
 #' the first openly available implementation of the Kishor-Koenig model (See
 #' the vignette \code{vignette("nowcasting_revisions")} for more details).
 #' @srrstats {G1.1} first implementation of a novel algorithm
@@ -288,6 +289,11 @@ kk_nowcast <- function(
     df = df,
     e = e
   )
+  
+  # Create observable variable matrix
+  Ymat <- sur_data %>%
+    dplyr::select(dplyr::all_of(y_names)) %>%
+    as.matrix()
 
   # Estimation of parameters with SUR or OLS
   if (method == tolower("SUR")) {
@@ -331,6 +337,62 @@ kk_nowcast <- function(
       params = params,
       type = "numeric"
     )$params
+  } else if (method == tolower("MLE")) {
+    # 1. Define the Log-Likelihood Function
+    kk_loglik <- function(p, e, model, Ymat, m0, C0) {
+      # Map vector p back to named parameters
+      names(p) <- names(start_mat_mle)
+      
+      # Ensure variance parameters are positive
+      p[grep("v0|eps", names(p))] <- exp(p[grep("v0|eps", names(p))])
+      
+      k_mat <- kk_matrices(e = e, model = model, params = p, type = "numeric")
+      ss_mat <- kk_to_ss(k_mat$FF, k_mat$GG, k_mat$V, k_mat$W)
+      
+      mod <- KFAS::SSModel(Ymat ~ -1 + SSMcustom(
+        Z = ss_mat$Z, T = ss_mat$Tmat, R = ss_mat$R, Q = ss_mat$Q, a1 = m0, P1 = C0,
+        index = seq_len(ncol(Ymat))), H = ss_mat$H)
+      
+      # Return negative log-likelihood for minimization
+      ll <- stats::logLik(mod)
+      return(-as.numeric(ll))
+    }
+    
+    # 2. Prepare starting values (log-transform variances for unconstrained optimization)
+    if (is.null(default_solver_options$startvals)) {
+      # Use OLS estimates as smart starting values if none provided
+      ols_init <- kk_ols_estim(equations, sur_data, model)$params
+      start_mat_mle <- ols_init
+    } else {
+      start_mat_mle <- default_solver_options$startvals
+    }
+    
+    # Log-transform variances so optim can work in unconstrained space
+    var_idx <- grep("v0|eps", names(start_mat_mle))
+    start_mat_mle[var_idx] <- log(pmax(start_mat_mle[var_idx], 1e-6))
+    
+    # 3. Optimize
+    fit_mle <- stats::optim(
+      par = start_mat_mle,
+      fn = kk_loglik,
+      e = e,
+      model = model,
+      Ymat = Ymat, 
+      m0 = m0,
+      C0 = C0,
+      method = "BFGS",
+      control = list(maxit = default_solver_options$maxiter, 
+                     trace = default_solver_options$trace,
+                     factr = 1e7)
+    )
+    
+    # 4. Transform back and extract results
+    params <- fit_mle$par
+    params[var_idx] <- exp(params[var_idx])
+    fit <- fit_mle
+    
+    # Ensure parameter order is consistent
+    params <- kk_matrices(e = e, model = model, params = params, type = "numeric")$params
   }
 
   # Create model matrices with estimated parameters
@@ -349,11 +411,6 @@ kk_nowcast <- function(
     W = kk_mat_hat$W,
     epsilon = 1e-6
   )
-
-  # Create observable variable matrix
-  Ymat <- sur_data %>%
-    dplyr::select(dplyr::all_of(y_names)) %>%
-    as.matrix()
 
   # Create the SSM object
   model_kfas <- KFAS::SSModel(

@@ -32,10 +32,11 @@ implies no forecasts. Must be greater than or equal to 0.}
 }}
 
 \item{method}{A string specifying the estimation method to use. Options are
-"SUR" (default) and "OLS".}
+"SUR" (default), Maximum likelihood ("MLE") and "OLS".}
 
 \item{solver_options}{An optional list to control the behaviour of the
-underlying \code{\link[systemfit:nlsystemfit]{systemfit::nlsystemfit()}} and \code{\link[stats:nlm]{stats::nlm()}} solvers:
+underlying \code{\link[systemfit:nlsystemfit]{systemfit::nlsystemfit()}}, \code{\link[stats:optim]{stats::optim()}} and \code{\link[stats:nlm]{stats::nlm()}}
+solvers:
 \itemize{
 \item \strong{trace}: An integer controlling the level of output for the
 optimization procedure. Default is 0 (minimal output).
@@ -87,7 +88,7 @@ efficient estimation, and Kalman filtering and smoothing.
 The function supports multiple models, including the full Kishor-Koenig
 framework, Howrey's model, and a classical approach. It handles data
 preprocessing, estimation of system equations using Seemingly Unrelated
-Regressions (SUR), and application of the Kalman filter and smoother. This is
+Regressions (SUR), and application of the Kalman filter. This is
 the first openly available implementation of the Kishor-Koenig model (See
 the vignette \code{vignette("nowcasting_revisions")} for more details).
 }
