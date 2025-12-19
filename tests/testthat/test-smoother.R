@@ -59,6 +59,12 @@ test_that("kk_nowcast handles different models", {
   expect_silent(kk_nowcast(df_kk, e = 1, h = 0, model = "Classical"))
 })
 
+test_that("kk_nowcast handles different methods", {
+  expect_silent(kk_nowcast(df_kk, e = 1, h = 0, method = "SUR"))
+  expect_silent(kk_nowcast(df_kk, e = 1, h = 0, method = "MLE"))
+  expect_silent(kk_nowcast(df_kk, e = 1, h = 0, method = "OLS"))
+})
+
 test_that("kk_nowcast handles forecast horizon h > 0", {
   result_forecast <- kk_nowcast(df_kk, e = 1, h = 2, model = "Kishor-Koenig")
   expect_s3_class(result_forecast$forecast_z, "tbl_df")
