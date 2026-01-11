@@ -19,3 +19,13 @@ Computes and displays a summary of the results from a
 Jacobs-Van Norden (JVN) model fit, including convergence status,
 information criteria, and parameter estimates.
 }
+\seealso{
+Other revision nowcasting: 
+\code{\link{jvn_nowcast}()},
+\code{\link{kk_nowcast}()},
+\code{\link{plot.jvn_model}()},
+\code{\link{plot.kk_model}()},
+\code{\link{print.jvn_model}()},
+\code{\link{summary.kk_model}()}
+}
+\concept{revision nowcasting}

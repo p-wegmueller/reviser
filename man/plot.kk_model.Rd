@@ -21,3 +21,13 @@ A ggplot2 object visualizing the specified state estimates.
 \description{
 Plot JVN Model Results
 }
+\seealso{
+Other revision nowcasting: 
+\code{\link{jvn_nowcast}()},
+\code{\link{kk_nowcast}()},
+\code{\link{plot.jvn_model}()},
+\code{\link{print.jvn_model}()},
+\code{\link{summary.jvn_model}()},
+\code{\link{summary.kk_model}()}
+}
+\concept{revision nowcasting}

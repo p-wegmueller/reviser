@@ -18,3 +18,13 @@ The function returns the input \code{x} invisibly.
 Default print method for \code{jvn_model} objects.
 Wraps the \code{summary} method for a consistent output.
 }
+\seealso{
+Other revision nowcasting: 
+\code{\link{jvn_nowcast}()},
+\code{\link{kk_nowcast}()},
+\code{\link{plot.jvn_model}()},
+\code{\link{plot.kk_model}()},
+\code{\link{summary.jvn_model}()},
+\code{\link{summary.kk_model}()}
+}
+\concept{revision nowcasting}

@@ -123,6 +123,11 @@ Economic Statistics, 2012.
 }
 \seealso{
 Other revision nowcasting: 
+\code{\link{jvn_nowcast}()},
+\code{\link{plot.jvn_model}()},
+\code{\link{plot.kk_model}()},
+\code{\link{print.jvn_model}()},
+\code{\link{summary.jvn_model}()},
 \code{\link{summary.kk_model}()}
 }
 \concept{revision nowcasting}

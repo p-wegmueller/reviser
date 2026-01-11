@@ -32,6 +32,11 @@ variables against both the final release and the true efficient release.
 }
 \seealso{
 Other revision nowcasting: 
-\code{\link{kk_nowcast}()}
+\code{\link{jvn_nowcast}()},
+\code{\link{kk_nowcast}()},
+\code{\link{plot.jvn_model}()},
+\code{\link{plot.kk_model}()},
+\code{\link{print.jvn_model}()},
+\code{\link{summary.jvn_model}()}
 }
 \concept{revision nowcasting}

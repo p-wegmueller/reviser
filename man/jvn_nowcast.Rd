@@ -110,3 +110,13 @@ Jacobs, Jan P.A.M. and Van Norden, Simon, "Modeling Data
 Revisions: Measurement Error and Dynamics of 'True' Values", Journal of
 Econometrics, 2011.
 }
+\seealso{
+Other revision nowcasting: 
+\code{\link{kk_nowcast}()},
+\code{\link{plot.jvn_model}()},
+\code{\link{plot.kk_model}()},
+\code{\link{print.jvn_model}()},
+\code{\link{summary.jvn_model}()},
+\code{\link{summary.kk_model}()}
+}
+\concept{revision nowcasting}
