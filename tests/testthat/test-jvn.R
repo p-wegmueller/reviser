@@ -40,3 +40,76 @@ test_that("jvn_nowcast returns expected components", {
       "bic", "convergence", "data")
   )
 })
+
+test_that("jvn_nowcast works with different solvers", {
+  result <- jvn_nowcast(
+    df = df_jvn, e = 2, h = 0,
+    solver_options = list(method = "BFGS")
+  )
+  expect_named(
+    result,
+    c("states", "jvn_model_mat", "params", "fit", "loglik", "aic", 
+      "bic", "convergence", "data")
+  )
+  
+  result <- jvn_nowcast(
+    df = df_jvn, e = 2, h = 0,
+    solver_options = list(method = "nlminb")
+  )
+  expect_named(
+    result,
+    c("states", "jvn_model_mat", "params", "fit", "loglik", "aic", 
+      "bic", "convergence", "data")
+  )
+  
+  result <- jvn_nowcast(
+    df = df_jvn, e = 2, h = 0,
+    solver_options = list(method = "two-step")
+  )
+  expect_named(
+    result,
+    c("states", "jvn_model_mat", "params", "fit", "loglik", "aic", 
+      "bic", "convergence", "data")
+  )
+  
+  result <- jvn_nowcast(
+    df = df_jvn, e = 2, h = 0,
+    solver_options = list(n_starts = 2)
+  )
+  expect_named(
+    result,
+    c("states", "jvn_model_mat", "params", "fit", "loglik", "aic", 
+      "bic", "convergence", "data")
+  )
+})
+
+test_that("jvn_nowcast works with spillovers", {
+  result <- jvn_nowcast(
+    df = df_jvn, e = 2, h = 0,
+    include_spillovers = T
+  )
+  expect_named(
+    result,
+    c("states", "jvn_model_mat", "params", "fit", "loglik", "aic", 
+      "bic", "convergence", "data")
+  )
+})
+
+test_that("jvn_nowcast works with trace = 1", {
+  result <- jvn_nowcast(
+    df = df_jvn, e = 2, h = 0,
+    solver_options = list("trace" = 1)
+  )
+  expect_named(
+    result,
+    c("states", "jvn_model_mat", "params", "fit", "loglik", "aic", 
+      "bic", "convergence", "data")
+  )
+})
+
+test_that("plot returns a ggplot object", {
+  result <- jvn_nowcast(df_jvn, e = 2, h = 0)
+  p <- plot(result)
+  expect_s3_class(p, "ggplot")
+})
+

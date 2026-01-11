@@ -152,7 +152,11 @@ test_that("kk_nowcast handles irregular time series for forecasting", {
   )
 })
 
-
+test_that("plot returns a ggplot object", {
+  result <- kk_nowcast(df_kk, e = 1, h = 0, model = "Kishor-Koenig")
+  p <- plot(result)
+  expect_s3_class(p, "ggplot")
+})
 
 
 
