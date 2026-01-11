@@ -1222,6 +1222,7 @@ kk_to_ss <- function(FF, GG, V, W, epsilon = 1e-6) {
 #' @param ... Additional arguments passed to theme_reviser.
 #' 
 #' @return A ggplot2 object visualizing the specified state estimates.
+#' @examples
 #' df <- get_nth_release(
 #'   tsbox::ts_span(
 #'     tsbox::ts_pc(

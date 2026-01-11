@@ -17,15 +17,20 @@
 }
 \value{
 A ggplot2 object visualizing the specified state estimates.
+}
+\description{
+Plot Kishor-Koenig Model Results
+}
+\examples{
 df <- get_nth_release(
-tsbox::ts_span(
-tsbox::ts_pc(
-dplyr::filter(reviser::gdp, id=="US")
-),
-start = "1980-01-01"
-),
-n = 0:1
-)
+  tsbox::ts_span(
+    tsbox::ts_pc(
+      dplyr::filter(reviser::gdp, id=="US")
+      ),
+      start = "1980-01-01"
+     ),
+     n = 0:1
+   )
 df <- dplyr::select(df, -c(id, pub_date))
 df <- na.omit(df)
 
@@ -34,9 +39,7 @@ h <- 2  # Forecast horizon
 result <- kk_nowcast(df, e, h = h, model = "Kishor-Koenig")
 
 plot(result)
-}
-\description{
-Plot Kishor-Koenig Model Results
+
 }
 \seealso{
 Other revision nowcasting: 
