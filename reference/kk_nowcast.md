@@ -13,6 +13,7 @@ kk_nowcast(
   h = 0,
   model = "Kishor-Koenig",
   method = "SUR",
+  alpha = 0.05,
   solver_options = list()
 )
 ```
@@ -49,6 +50,10 @@ kk_nowcast(
 
   A string specifying the estimation method to use. Options are "SUR"
   (default), Maximum likelihood ("MLE") and "OLS".
+
+- alpha:
+
+  Significance level for confidence intervals (default = 0.05).
 
 - solver_options:
 
@@ -156,6 +161,11 @@ Statistics, 2012.
 ## See also
 
 Other revision nowcasting:
+[`jvn_nowcast()`](https://p-wegmueller.github.io/reviser/reference/jvn_nowcast.md),
+[`plot.jvn_model()`](https://p-wegmueller.github.io/reviser/reference/plot.jvn_model.md),
+[`plot.kk_model()`](https://p-wegmueller.github.io/reviser/reference/plot.kk_model.md),
+[`print.jvn_model()`](https://p-wegmueller.github.io/reviser/reference/print.jvn_model.md),
+[`summary.jvn_model()`](https://p-wegmueller.github.io/reviser/reference/summary.jvn_model.md),
 [`summary.kk_model()`](https://p-wegmueller.github.io/reviser/reference/summary.kk_model.md)
 
 ## Examples

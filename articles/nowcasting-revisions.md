@@ -109,8 +109,7 @@ zero and may be omitted, so this equation becomes
 
 $$y_{t} = Z\alpha_{t}$$
 
-**2. The State Equation**
-$$\alpha_{t + 1} = T\alpha_{t} + R\eta_{t + 1}$$
+**2. The State Equation** $$\alpha_{t + 1} = T\alpha_{t} + R\eta_{t}$$
 
 where $$\alpha_{t} = \begin{bmatrix}
 z_{t} \\
@@ -237,71 +236,34 @@ nowcast <- kk_nowcast(
     df = data, 
     e = e,
     model = "KK",
-    method = "SUR"
+    method = "MLE"
   )
 
 # Estimated parameters
 nowcast$params
 #>           F0         G0_0         G0_1         G0_2         G1_0         G1_1 
-#>  0.689513907  0.944522107 -0.038845693  0.002780479 -0.031990705  0.964424950 
+#>  0.633020718  0.950100987 -0.036742777 -0.180779881 -0.008917411  0.594439496 
 #>         G1_2           v0         eps0         eps1 
-#>  0.001287727  0.384934854  0.007567959  0.002374823
+#>  0.194089804  0.379792126  0.007786864  0.001397058
 
 # Filtered states
-filt_states <- nowcast$filtered_z
+filt_states <- nowcast$states
 tail(filt_states)
-#> # A tibble: 6 × 4
-#>   time       release_2_lag_2 release_2_lag_1 release_2_lag_0
-#>   <date>               <dbl>           <dbl>           <dbl>
-#> 1 2018-10-01           0.414          0.146            0.220
-#> 2 2019-01-01           0.136          0.241            0.402
-#> 3 2019-04-01           0.307          0.426            0.199
-#> 4 2019-07-01           0.441          0.191            0.238
-#> 5 2019-10-01           0.148          0.291            0.114
-#> 6 2020-01-01           0.299         -0.0370          -3.72
+#> # A tibble: 6 × 7
+#>   time       state           estimate lower upper filter   sample   
+#>   <date>     <chr>              <dbl> <dbl> <dbl> <chr>    <chr>    
+#> 1 2018-10-01 release_2_lag_2    0.414 0.412 0.416 smoothed in_sample
+#> 2 2019-01-01 release_2_lag_2    0.136 0.134 0.138 smoothed in_sample
+#> 3 2019-04-01 release_2_lag_2    0.307 0.305 0.309 smoothed in_sample
+#> 4 2019-07-01 release_2_lag_2    0.441 0.439 0.443 smoothed in_sample
+#> 5 2019-10-01 release_2_lag_2    0.147 0.146 0.149 smoothed in_sample
+#> 6 2020-01-01 release_2_lag_2    0.299 0.297 0.301 smoothed in_sample
 ```
 
 Now we can compare the nowcasts with the final values and the first
 release (which serves as a naive forecast). We calculate the root mean
 squared error (RMSE) of the models and naive nowcasts. The gain is not
 very high, but it is still better than the naive forecast.
-
-``` r
-# Compare nowcasts
-summary(nowcast)
-#> 
-#> ======================================================================
-#> Metrics against final release: 
-#> ======================================================================
-#> Release | MSE | RMSE | MAE 
-#> ----------------------------------------------------------------------
-#> release_2_filtered | 0.0352 | 0.1876 | 0.1552 
-#> release_0 | 0.0355 | 0.1884 | 0.1564 
-#> 
-#> ======================================================================
-#> Metrics against published efficient release: 
-#> ======================================================================
-#> Release | MSE | RMSE | MAE 
-#> ----------------------------------------------------------------------
-#> release_2_filtered | 0.0083 | 0.0913 | 0.0668 
-#> release_0 | 0.0089 | 0.0945 | 0.0701 
-#> 
-#> ======================================================================
-#> Metrics against final release relative to naive: 
-#> ======================================================================
-#> Release | MSE | RMSE | MAE 
-#> ----------------------------------------------------------------------
-#> release_2_filtered | 0.9921 | 0.9960 | 0.9922 
-#> release_0 | 1.0000 | 1.0000 | 1.0000 
-#> 
-#> ======================================================================
-#> Metrics against published efficient release relative to naive: 
-#> ======================================================================
-#> Release | MSE | RMSE | MAE 
-#> ----------------------------------------------------------------------
-#> release_2_filtered | 0.9332 | 0.9660 | 0.9528 
-#> release_0 | 1.0000 | 1.0000 | 1.0000
-```
 
 ### References
 

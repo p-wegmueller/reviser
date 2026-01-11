@@ -206,7 +206,7 @@ and therefore also
 are equal to zero and may be omitted, so this equation becomes</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>y</mi><mi>t</mi></msub><mo>=</mo><mi>Z</mi><msub><mi>α</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex"> y_t = Z \alpha_{t} </annotation></semantics></math></p>
 <p><strong>2. The State Equation</strong>
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>α</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><mi>T</mi><msub><mi>α</mi><mi>t</mi></msub><mo>+</mo><mi>R</mi><msub><mi>η</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub></mrow><annotation encoding="application/x-tex"> \alpha_{t+1} = T \alpha_{t} + R \eta_{t+1} </annotation></semantics></math></p>
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>α</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><mi>T</mi><msub><mi>α</mi><mi>t</mi></msub><mo>+</mo><mi>R</mi><msub><mi>η</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex"> \alpha_{t+1} = T \alpha_{t} + R \eta_{t} </annotation></semantics></math></p>
 <p>where
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>α</mi><mi>t</mi></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>z</mi><mi>t</mi></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>y</mi><mi>t</mi></msub><mo>−</mo><msub><mi>z</mi><mi>t</mi></msub></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex"> \alpha_t = \begin{bmatrix} z_t \\ y_t - z_t  \end{bmatrix} </annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Z</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mi>I</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>I</mi></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex"> Z = \begin{bmatrix} I &amp; I \end{bmatrix} </annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mi>F</mi></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mrow><mo stretchy="true" form="prefix">(</mo><mi>I</mi><mo>−</mo><mi>G</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>F</mi></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex"> T = \begin{bmatrix} F &amp; 0 \\ 0 &amp; (I-G)F \end{bmatrix} </annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>R</mi><mo>=</mo><mi>I</mi></mrow><annotation encoding="application/x-tex"> R = I </annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>η</mi><mi>t</mi></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>ν</mi><mi>t</mi></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>ϵ</mi><mi>t</mi></msub><mo>−</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>I</mi><mo>−</mo><mi>G</mi><mo stretchy="true" form="postfix">)</mo></mrow><msub><mi>ν</mi><mi>t</mi></msub></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex"> \eta_t = \begin{bmatrix} \nu_t \\ \epsilon_t - (I-G) \nu_t \end{bmatrix} </annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>η</mi><mi>t</mi></msub><mo>∼</mo><mi>N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><mi>Q</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex"> \eta_t \sim N(0, Q) </annotation></semantics></math></p>
 <p>The analyst sees truth and the revisions. Both truth and revisions
@@ -322,67 +322,32 @@ format.</p>
 <span>    df <span class="op">=</span> <span class="va">data</span>, </span>
 <span>    e <span class="op">=</span> <span class="va">e</span>,</span>
 <span>    model <span class="op">=</span> <span class="st">"KK"</span>,</span>
-<span>    method <span class="op">=</span> <span class="st">"SUR"</span></span>
+<span>    method <span class="op">=</span> <span class="st">"MLE"</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Estimated parameters</span></span>
 <span><span class="va">nowcast</span><span class="op">$</span><span class="va">params</span></span>
 <span><span class="co">#&gt;           F0         G0_0         G0_1         G0_2         G1_0         G1_1 </span></span>
-<span><span class="co">#&gt;  0.689513907  0.944522107 -0.038845693  0.002780479 -0.031990705  0.964424950 </span></span>
+<span><span class="co">#&gt;  0.633020718  0.950100987 -0.036742777 -0.180779881 -0.008917411  0.594439496 </span></span>
 <span><span class="co">#&gt;         G1_2           v0         eps0         eps1 </span></span>
-<span><span class="co">#&gt;  0.001287727  0.384934854  0.007567959  0.002374823</span></span>
+<span><span class="co">#&gt;  0.194089804  0.379792126  0.007786864  0.001397058</span></span>
 <span></span>
 <span><span class="co"># Filtered states</span></span>
-<span><span class="va">filt_states</span> <span class="op">&lt;-</span> <span class="va">nowcast</span><span class="op">$</span><span class="va">filtered_z</span></span>
+<span><span class="va">filt_states</span> <span class="op">&lt;-</span> <span class="va">nowcast</span><span class="op">$</span><span class="va">states</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="va">filt_states</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 4</span></span></span>
-<span><span class="co">#&gt;   time       release_2_lag_2 release_2_lag_1 release_2_lag_0</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2018-10-01           0.414          0.146            0.220</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2019-01-01           0.136          0.241            0.402</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2019-04-01           0.307          0.426            0.199</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2019-07-01           0.441          0.191            0.238</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2019-10-01           0.148          0.291            0.114</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 2020-01-01           0.299         -<span style="color: #BB0000;">0.037</span><span style="color: #BB0000; text-decoration: underline;">0</span>          -<span style="color: #BB0000;">3.72</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 7</span></span></span>
+<span><span class="co">#&gt;   time       state           estimate lower upper filter   sample   </span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2018-10-01 release_2_lag_2    0.414 0.412 0.416 smoothed in_sample</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2019-01-01 release_2_lag_2    0.136 0.134 0.138 smoothed in_sample</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2019-04-01 release_2_lag_2    0.307 0.305 0.309 smoothed in_sample</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2019-07-01 release_2_lag_2    0.441 0.439 0.443 smoothed in_sample</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2019-10-01 release_2_lag_2    0.147 0.146 0.149 smoothed in_sample</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 2020-01-01 release_2_lag_2    0.299 0.297 0.301 smoothed in_sample</span></span></code></pre></div>
 <p>Now we can compare the nowcasts with the final values and the first
 release (which serves as a naive forecast). We calculate the root mean
 squared error (RMSE) of the models and naive nowcasts. The gain is not
 very high, but it is still better than the naive forecast.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Compare nowcasts</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">nowcast</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ======================================================================</span></span>
-<span><span class="co">#&gt; Metrics against final release: </span></span>
-<span><span class="co">#&gt; ======================================================================</span></span>
-<span><span class="co">#&gt; Release | MSE | RMSE | MAE </span></span>
-<span><span class="co">#&gt; ----------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; release_2_filtered | 0.0352 | 0.1876 | 0.1552 </span></span>
-<span><span class="co">#&gt; release_0 | 0.0355 | 0.1884 | 0.1564 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ======================================================================</span></span>
-<span><span class="co">#&gt; Metrics against published efficient release: </span></span>
-<span><span class="co">#&gt; ======================================================================</span></span>
-<span><span class="co">#&gt; Release | MSE | RMSE | MAE </span></span>
-<span><span class="co">#&gt; ----------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; release_2_filtered | 0.0083 | 0.0913 | 0.0668 </span></span>
-<span><span class="co">#&gt; release_0 | 0.0089 | 0.0945 | 0.0701 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ======================================================================</span></span>
-<span><span class="co">#&gt; Metrics against final release relative to naive: </span></span>
-<span><span class="co">#&gt; ======================================================================</span></span>
-<span><span class="co">#&gt; Release | MSE | RMSE | MAE </span></span>
-<span><span class="co">#&gt; ----------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; release_2_filtered | 0.9921 | 0.9960 | 0.9922 </span></span>
-<span><span class="co">#&gt; release_0 | 1.0000 | 1.0000 | 1.0000 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ======================================================================</span></span>
-<span><span class="co">#&gt; Metrics against published efficient release relative to naive: </span></span>
-<span><span class="co">#&gt; ======================================================================</span></span>
-<span><span class="co">#&gt; Release | MSE | RMSE | MAE </span></span>
-<span><span class="co">#&gt; ----------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; release_2_filtered | 0.9332 | 0.9660 | 0.9528 </span></span>
-<span><span class="co">#&gt; release_0 | 1.0000 | 1.0000 | 1.0000</span></span></code></pre></div>
 </div>
 <div class="section level3 unnumbered">
 <h3 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
