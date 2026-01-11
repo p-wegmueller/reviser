@@ -10,21 +10,7 @@
 "_PACKAGE"
 utils::globalVariables(c(
   ".",
-  "id",
-  "n",
-  "final_value",
-  "pub_date",
-  "release",
-  "time",
-  "value",
-  "value_ref",
-  "target_date",
-  "diff_final_value",
-  "fraction_sign_correct",
-  "late_sign",
-  "diff_value",
-  "early_sign",
-  "realtime_period"
+  ".data"
 ))
 
 # Import from KFAS necessary to overcome a bug when defining the model
