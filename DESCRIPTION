@@ -35,7 +35,8 @@ Imports:
     scales,
     tibble,
     lubridate,
-    KFAS
+    KFAS,
+    numDeriv
 Suggests: 
     tsbox,
     testthat (>= 3.0.0),

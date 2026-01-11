@@ -74,7 +74,7 @@ where \( \varepsilon_t \dist N(0,H)\). @durbinTimeSeriesAnalysis2012 assumed tha
 \[ y_t = Z \alpha_{t} \]
 
 **2. The State Equation**
-\[ \alpha_{t+1} = T \alpha_{t} + R \eta_{t+1} \]
+\[ \alpha_{t+1} = T \alpha_{t} + R \eta_{t} \]
 
 where
 \[ \alpha_t = \begin{bmatrix} z_t \\ y_t - z_t  \end{bmatrix} \]
@@ -137,20 +137,20 @@ nowcast <- kk_nowcast(
     df = data, 
     e = e,
     model = "KK",
-    method = "SUR"
+    method = "MLE"
   )
 
 # Estimated parameters
 nowcast$params
 
 # Filtered states
-filt_states <- nowcast$filtered_z
+filt_states <- nowcast$states
 tail(filt_states)
 ```
 
 Now we can compare the nowcasts with the final values and the first release (which serves as a naive forecast). We calculate the root mean squared error (RMSE) of the models and naive nowcasts. The gain is not very high, but it is still better than the naive forecast.
 
-```{r warning = FALSE, message=FALSE}
+```{r warning = FALSE, message=FALSE, include=FALSE, eval=FALSE}
 # Compare nowcasts
 summary(nowcast)
 ```

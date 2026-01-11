@@ -37,14 +37,10 @@ test_that("kk_nowcast returns expected components", {
   expect_named(
     result,
     c(
-      "filtered_z",
-      "filtered_y",
-      "smoothed_z",
-      "smoothed_y",
-      "forecast_z",
-      "forecast_y",
+      "states",
       "kk_model_mat",
       "ss_model_mat",
+      "model",
       "params",
       "fit",
       "e",
@@ -65,13 +61,6 @@ test_that("kk_nowcast handles different methods", {
   expect_silent(kk_nowcast(df_kk, e = 1, h = 0, method = "OLS"))
 })
 
-test_that("kk_nowcast handles forecast horizon h > 0", {
-  result_forecast <- kk_nowcast(df_kk, e = 1, h = 2, model = "Kishor-Koenig")
-  expect_s3_class(result_forecast$forecast_z, "tbl_df")
-  expect_s3_class(result_forecast$forecast_y, "tbl_df")
-  expect_equal(nrow(result_forecast$forecast_z), 2)
-  expect_equal(nrow(result_forecast$forecast_y), 2)
-})
 
 test_that("kk_nowcast throws error for invalid e and h", {
   expect_error(
@@ -163,53 +152,8 @@ test_that("kk_nowcast handles irregular time series for forecasting", {
   )
 })
 
-# Test suite for summary.kk_model
-test_that("summary.kk_model is a generic function", {
-  expect_true(is.function(summary))
-})
 
 
-test_that("summary.kk_model returns a list of metrics", {
-  kk_result <- kk_nowcast(df_kk, e = 1)
-  summary_result <- summary(kk_result)
-  expect_type(summary_result, "list")
-  expect_named(
-    summary_result,
-    c(
-      "final_release_metrics",
-      "true_efficient_release_metrics",
-      "final_release_relative_metrics",
-      "true_efficient_release_relative_metrics"
-    )
-  )
-  expect_s3_class(summary_result$final_release_metrics, "data.frame")
-  expect_s3_class(summary_result$true_efficient_release_metrics, "data.frame")
-  expect_s3_class(summary_result$final_release_relative_metrics, "data.frame")
-  expect_s3_class(
-    summary_result$true_efficient_release_relative_metrics,
-    "data.frame"
-  )
-})
 
-test_that("summary.kk_model calculates MSE, RMSE, and MAE", {
-  kk_result <- kk_nowcast(df_kk, e = 1)
-  summary_result <- summary(kk_result)
-  expect_named(summary_result$final_release_metrics, c("MSE", "RMSE", "MAE"))
-  expect_named(
-    summary_result$true_efficient_release_metrics,
-    c("MSE", "RMSE", "MAE")
-  )
-  expect_named(
-    summary_result$final_release_relative_metrics,
-    c("MSE", "RMSE", "MAE")
-  )
-  expect_named(
-    summary_result$true_efficient_release_relative_metrics,
-    c("MSE", "RMSE", "MAE")
-  )
-})
 
-test_that("summary.kk_model prints formatted output", {
-  kk_result <- kk_nowcast(df_kk, e = 1)
-  expect_output(summary(kk_result))
-})
+

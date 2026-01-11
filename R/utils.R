@@ -75,7 +75,7 @@ vintages_long <- function(df, names_to = "pub_date", keep_na = FALSE) {
       }
       long_df_tmp <- df[[id]] %>%
         tidyr::pivot_longer(
-          cols = -time,
+          cols = -.data$time,
           names_to = names_to,
           values_to = "value"
         ) %>%
@@ -85,7 +85,7 @@ vintages_long <- function(df, names_to = "pub_date", keep_na = FALSE) {
         return(long_df_tmp)
       } else {
         long_df_tmp <- long_df_tmp %>%
-          dplyr::filter(!is.na(value))
+          dplyr::filter(!is.na(.data$value))
       }
     })
     # Combine into a single data.frame
@@ -102,18 +102,18 @@ vintages_long <- function(df, names_to = "pub_date", keep_na = FALSE) {
     # If input is a single wide data.frame
     long_df <- df %>%
       tidyr::pivot_longer(
-        cols = -time,
+        cols = -.data$time,
         names_to = names_to,
         values_to = "value"
       )
 
     if (names_to == "pub_date") {
       long_df <- long_df %>%
-        dplyr::mutate(pub_date = as.Date(pub_date)) %>%
-        dplyr::arrange(pub_date, time) # Ensure data is sorted
+        dplyr::mutate(pub_date = as.Date(.data$pub_date)) %>%
+        dplyr::arrange(.data$pub_date, .data$time) # Ensure data is sorted
     } else if (names_to == "release") {
       long_df <- long_df %>%
-        dplyr::arrange(time) # Ensure data is sorted by time
+        dplyr::arrange(.data$time) # Ensure data is sorted by time
     }
 
     if (keep_na) {
@@ -121,7 +121,7 @@ vintages_long <- function(df, names_to = "pub_date", keep_na = FALSE) {
       return(long_df)
     } else {
       long_df <- long_df %>%
-        dplyr::filter(!is.na(value))
+        dplyr::filter(!is.na(.data$value))
     }
     long_df <- vintages_assign_class(long_df)
     return(long_df)
@@ -232,10 +232,10 @@ vintages_wide <- function(df, names_from = "pub_date") {
       split(.$id) %>%
       lapply(function(sub_df) {
         sub_df <- sub_df %>%
-          dplyr::select(time, dplyr::all_of(names_from), value) %>%
+          dplyr::select(.data$time, dplyr::all_of(names_from), .data$value) %>%
           tidyr::pivot_wider(
             names_from = dplyr::all_of(names_from),
-            values_from = value
+            values_from = .data$value
           )
         if (names_from == "pub_date") {
           class(sub_df) <- c("tbl_pubdate", "tbl_df", "tbl", "data.frame")
@@ -250,7 +250,7 @@ vintages_wide <- function(df, names_from = "pub_date") {
     wide_df <- df %>%
       tidyr::pivot_wider(
         names_from = dplyr::all_of(names_from),
-        values_from = value
+        values_from = .data$value
       )
 
     if (names_from == "pub_date") {
@@ -337,6 +337,134 @@ vintages_wide <- function(df, names_from = "pub_date") {
 #' @keywords internal
 #' @noRd
 vintages_check <- function(df, time_col = "time") {
+  # Helper: Check for simple (scalar, non-list) columns
+  check_simple_columns <- function(df) {
+    issues <- lapply(names(df), function(col) {
+      column <- df[[col]]
+      
+      # G2.12: Check for list columns
+      if (is.list(column) && !is.data.frame(column)) {
+        return(paste0("Column '", col, "' is a list column."))
+      }
+      
+      # G2.11: Check for non-atomic or multi-valued entries
+      non_atomic <- which(!vapply(column, is.atomic, logical(1)))
+      if (length(non_atomic) > 0) {
+        return(paste0("Column '", col, "' has non-atomic elements."))
+      }
+      
+      not_scalar <- which(vapply(column, function(x) length(x) != 1, logical(1)))
+      if (length(not_scalar) > 0) {
+        return(paste0("Column '", col, "' has elements that are not scalar values."))
+      }
+      
+      return(NULL)
+    })
+    
+    issues <- unlist(issues)
+    if (length(issues) > 0) {
+      rlang::abort(paste("Invalid columns detected:\n", paste(issues, collapse = "\n")))
+    }
+    return(TRUE)
+  }
+  
+  # Helper: Check a single data frame
+  check_single_df <- function(df, df_name = NULL) {
+    prefix <- if (!is.null(df_name)) paste0("In element '", df_name, "': ") else ""
+    
+    # Ensure it's a data.frame or tibble
+    if (!is.data.frame(df)) {
+      rlang::abort(paste0(prefix, "The provided object is not a data.frame or tibble."))
+    }
+    
+    # Perform column structure check (G2.11 and G2.12)
+    tryCatch(
+      check_simple_columns(df),
+      error = function(e) {
+        rlang::abort(paste0(prefix, conditionMessage(e)))
+      }
+    )
+    
+    # Check for required "time" column
+    if (!"time" %in% colnames(df)) {
+      rlang::abort(paste0(prefix, "The 'time' column is missing in the data.frame."))
+    }
+    
+    # Check for implicit missings in time column
+    implicit_missings <- check_implicit_missing(df, time_col)
+    if (implicit_missings$total_missing > 0) {
+      df <- make_explicit_missing(df, time_col)
+      rlang::warn(paste0(prefix, "The 'time' column contains implicit missing values. ",
+                         "I created a new 'time' column with explicit NA values. ",
+                         "Please check your data."))
+    }
+    
+    # Validate date format for "time"
+    if (!all(!is.na(as.Date(df$time, format = "%Y-%m-%d")))) {
+      rlang::abort(paste0(prefix, "The 'time' column contains values that are not in the '%Y-%m-%d' format."))
+    }
+    
+    # Check for long format
+    long_format <- all(c("pub_date", "value") %in% colnames(df)) ||
+      all(c("pub_date", "values") %in% colnames(df)) ||
+      all(c("release", "value") %in% colnames(df)) ||
+      all(c("release", "values") %in% colnames(df))
+    
+    if (long_format) {
+      if ("pub_date" %in% colnames(df)) {
+        if (!all(!is.na(as.Date(df$pub_date, format = "%Y-%m-%d")))) {
+          rlang::abort(paste0(prefix, "The 'pub_date' column contains values that are not in '%Y-%m-%d' format."))
+        }
+      }
+      return("long")
+    }
+    
+    # Check for wide format
+    wide_format <- setdiff(colnames(df), "time")
+    if (length(wide_format) > 0) {
+      if (
+        all(!is.na(as.Date(wide_format, format = "%Y-%m-%d"))) ||
+        all(grepl("release|final", wide_format))
+      ) {
+        return("wide")
+      } else {
+        rlang::abort(paste0(prefix, "One or more column names in the 'wide format' are not labeled correctly."))
+      }
+    }
+    
+    rlang::abort(paste0(prefix, "The data.frame does not conform to either 'long format' or 'wide format'."))
+  }
+  
+  # === Main Logic ===
+  
+  # Case 1: Input is a list of data frames (wide format with IDs as names)
+  if (is.list(df) && !is.data.frame(df)) {
+    # Check if all elements are data frames
+    if (!all(vapply(df, is.data.frame, logical(1)))) {
+      rlang::abort("All elements in the list must be data.frames or tibbles.")
+    }
+    
+    # Check if list has names
+    if (is.null(names(df)) || any(names(df) == "")) {
+      rlang::abort("All elements in the list must be named (these names serve as IDs).")
+    }
+    
+    # Check each data frame in the list
+    formats <- lapply(names(df), function(name) {
+      check_single_df(df[[name]], df_name = name)
+    })
+    
+    # Return a named list of formats
+    names(formats) <- names(df)
+    return(formats)
+  }
+  
+  # Case 2: Input is a single data frame
+  return(check_single_df(df))
+}
+
+
+vintages_check_old <- function(df, time_col = "time") {
   # Helper: Check for simple (scalar, non-list) columns
   check_simple_columns <- function(df) {
     issues <- lapply(names(df), function(col) {
