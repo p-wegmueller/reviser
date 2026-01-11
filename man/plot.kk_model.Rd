@@ -2,14 +2,14 @@
 % Please edit documentation in R/kk.R
 \name{plot.kk_model}
 \alias{plot.kk_model}
-\title{Plot JVN Model Results}
+\title{Plot Kishor-Koenig Model Results}
 \usage{
 \method{plot}{kk_model}(x, state = NULL, type = "filtered", ...)
 }
 \arguments{
-\item{x}{An object of class 'jvn_model'}
+\item{x}{An object of class 'kk_model'}
 
-\item{state}{String. The name of the state to visualize (e.g., "state_1").}
+\item{state}{String. The name of the state to visualize.}
 
 \item{type}{String. Type of estimate to plot: "filtered" or "smoothed".}
 
@@ -17,9 +17,26 @@
 }
 \value{
 A ggplot2 object visualizing the specified state estimates.
+df <- get_nth_release(
+tsbox::ts_span(
+tsbox::ts_pc(
+dplyr::filter(reviser::gdp, id=="US")
+),
+start = "1980-01-01"
+),
+n = 0:1
+)
+df <- dplyr::select(df, -c(id, pub_date))
+df <- na.omit(df)
+
+e <- 1  # Number of efficient release
+h <- 2  # Forecast horizon
+result <- kk_nowcast(df, e, h = h, model = "Kishor-Koenig")
+
+plot(result)
 }
 \description{
-Plot JVN Model Results
+Plot Kishor-Koenig Model Results
 }
 \seealso{
 Other revision nowcasting: 
@@ -27,7 +44,6 @@ Other revision nowcasting:
 \code{\link{kk_nowcast}()},
 \code{\link{plot.jvn_model}()},
 \code{\link{print.jvn_model}()},
-\code{\link{summary.jvn_model}()},
-\code{\link{summary.kk_model}()}
+\code{\link{summary.jvn_model}()}
 }
 \concept{revision nowcasting}

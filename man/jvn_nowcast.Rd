@@ -83,7 +83,6 @@ Implements the Jacobs & Van Norden (2011) state-space model for analyzing
 data revisions, allowing for news and noise components in measurement errors.
 }
 \examples{
-# Simulate data
 gdp <- dplyr::filter(
   tsbox::ts_pc(
     reviser::gdp
@@ -116,7 +115,6 @@ Other revision nowcasting:
 \code{\link{plot.jvn_model}()},
 \code{\link{plot.kk_model}()},
 \code{\link{print.jvn_model}()},
-\code{\link{summary.jvn_model}()},
-\code{\link{summary.kk_model}()}
+\code{\link{summary.jvn_model}()}
 }
 \concept{revision nowcasting}

@@ -111,9 +111,9 @@ df <- na.omit(df)
 
 e <- 1  # Number of efficient release
 h <- 2  # Forecast horizon
-model_result <- kk_nowcast(df, e, h = h, model = "Kishor-Koenig")
+result <- kk_nowcast(df, e, h = h, model = "Kishor-Koenig")
 
-model_result$params
+result$params
 
 }
 \references{
@@ -127,7 +127,6 @@ Other revision nowcasting:
 \code{\link{plot.jvn_model}()},
 \code{\link{plot.kk_model}()},
 \code{\link{print.jvn_model}()},
-\code{\link{summary.jvn_model}()},
-\code{\link{summary.kk_model}()}
+\code{\link{summary.jvn_model}()}
 }
 \concept{revision nowcasting}

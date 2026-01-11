@@ -79,9 +79,9 @@
 #'
 #' e <- 1  # Number of efficient release
 #' h <- 2  # Forecast horizon
-#' model_result <- kk_nowcast(df, e, h = h, model = "Kishor-Koenig")
+#' result <- kk_nowcast(df, e, h = h, model = "Kishor-Koenig")
 #'
-#' model_result$params
+#' result$params
 #'
 #' @references Kishor, N. Kundan and Koenig, Evan F., "VAR Estimation and
 #' Forecasting When Data Are Subject to Revision", Journal of Business and
@@ -1213,53 +1213,32 @@ kk_to_ss <- function(FF, GG, V, W, epsilon = 1e-6) {
   return(list(Z = Z, Tmat = Tmat, H = H, Q = Q, R = R))
 }
 
-#' Summarize the results of a kk_model object.
-#'
-#' This function calculates and prints the Mean Squared Error (MSE), Root Mean
-#' Squared Error (RMSE), and Mean Absolute Error (MAE) of the filtered state
-#' variables against both the final release and the true efficient release.
-#'
-#' @param object A list of class 'kk_model' produced by the
-#' \code{\link{kk_nowcast}} function.
-#' @param ... Additional arguments (not used).
-#'
-#' @return A list containing two data frames:
-#'   \item{final_release_metrics}{A data frame with MSE, RMSE, and MAE against
-#'   the final release.}
-#'   \item{true_efficient_release_metrics}{A data frame with MSE, RMSE, and
-#'   MAE against the true efficient release.}
-#'
-#' @examples
-#' # Assuming 'kk_model_obj' is the result of kk_nowcast(your_data, ...)
-#' # and 'your_data' is the original data frame.
-#' # results <- summary.kk_model(kk_model_obj, your_data)
-#'
-#' @family revision nowcasting
-#' @export
-summary.kk_model <- function(object, ...) {
-  cat("\n=== Kishor-Koenig Model ===\n\n")
-  cat("Convergence:", ifelse(object$convergence == 0, "Success", "Failed"), "\n")
-  cat("Log-likelihood:", round(object$loglik, 2), "\n")
-  cat("AIC:", round(object$aic, 2), "\n")
-  cat("BIC:", round(object$bic, 2), "\n\n")
-  cat("Parameter Estimates:\n")
-  #print(object$params, digits = 2, row.names = FALSE)
-  df_print <- object$params
-  df_print$Estimate <- sprintf("%.3f", df_print$Estimate)
-  df_print$Std.Error <- sprintf("%.3f", df_print$Std.Error)
-  print(df_print, row.names = FALSE, quote = FALSE)
-  cat("\n")
-  invisible(object)
-}
 
-#' Plot JVN Model Results
+#' Plot Kishor-Koenig Model Results
 #' 
-#' @param x An object of class 'jvn_model'
-#' @param state String. The name of the state to visualize (e.g., "state_1").
+#' @param x An object of class 'kk_model'
+#' @param state String. The name of the state to visualize.
 #' @param type String. Type of estimate to plot: "filtered" or "smoothed".
 #' @param ... Additional arguments passed to theme_reviser.
 #' 
 #' @return A ggplot2 object visualizing the specified state estimates.
+#' df <- get_nth_release(
+#'   tsbox::ts_span(
+#'     tsbox::ts_pc(
+#'       dplyr::filter(reviser::gdp, id=="US")
+#'       ),
+#'       start = "1980-01-01"
+#'      ),
+#'      n = 0:1
+#'    )
+#' df <- dplyr::select(df, -c(id, pub_date))
+#' df <- na.omit(df)
+#'
+#' e <- 1  # Number of efficient release
+#' h <- 2  # Forecast horizon
+#' result <- kk_nowcast(df, e, h = h, model = "Kishor-Koenig")
+#'
+#' plot(result)
 #' 
 #' @family revision nowcasting
 #' @export

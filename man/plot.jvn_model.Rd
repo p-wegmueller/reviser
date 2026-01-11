@@ -9,7 +9,7 @@
 \arguments{
 \item{x}{An object of class 'jvn_model'}
 
-\item{state}{String. The name of the state to visualize (e.g., "state_1").}
+\item{state}{String. The name of the state to visualize.}
 
 \item{type}{String. Type of estimate to plot: "filtered" or "smoothed".}
 
@@ -21,13 +21,35 @@ A ggplot2 object visualizing the specified state estimates.
 \description{
 Plot JVN Model Results
 }
+\examples{
+gdp <- dplyr::filter(
+  tsbox::ts_pc(
+    reviser::gdp
+), id \%in\% c("EA"),
+   time >= min(pub_date),
+   time <= as.Date("2020-01-01")
+  ) 
+gdp <- tidyr::drop_na(gdp)
+df <- get_nth_release(gdp, n = 0:4)
+
+# Estimate model
+result <- jvn_nowcast(
+  df = df,
+  e = 3,
+  ar_order = 2,
+  h = 4,
+  include_news = TRUE,
+  include_noise = TRUE
+)
+plot(result)
+
+}
 \seealso{
 Other revision nowcasting: 
 \code{\link{jvn_nowcast}()},
 \code{\link{kk_nowcast}()},
 \code{\link{plot.kk_model}()},
 \code{\link{print.jvn_model}()},
-\code{\link{summary.jvn_model}()},
-\code{\link{summary.kk_model}()}
+\code{\link{summary.jvn_model}()}
 }
 \concept{revision nowcasting}

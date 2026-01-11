@@ -19,13 +19,35 @@ Computes and displays a summary of the results from a
 Jacobs-Van Norden (JVN) model fit, including convergence status,
 information criteria, and parameter estimates.
 }
+\examples{
+gdp <- dplyr::filter(
+  tsbox::ts_pc(
+    reviser::gdp
+), id \%in\% c("EA"),
+   time >= min(pub_date),
+   time <= as.Date("2020-01-01")
+  ) 
+gdp <- tidyr::drop_na(gdp)
+df <- get_nth_release(gdp, n = 0:4)
+
+# Estimate model
+result <- jvn_nowcast(
+  df = df,
+  e = 3,
+  ar_order = 2,
+  h = 4,
+  include_news = TRUE,
+  include_noise = TRUE
+)
+summary(result)
+
+}
 \seealso{
 Other revision nowcasting: 
 \code{\link{jvn_nowcast}()},
 \code{\link{kk_nowcast}()},
 \code{\link{plot.jvn_model}()},
 \code{\link{plot.kk_model}()},
-\code{\link{print.jvn_model}()},
-\code{\link{summary.kk_model}()}
+\code{\link{print.jvn_model}()}
 }
 \concept{revision nowcasting}
