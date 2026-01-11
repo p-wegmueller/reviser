@@ -1,6 +1,6 @@
-# Plot JVN Model Results
+# Plot Kishor-Koenig Model Results
 
-Plot JVN Model Results
+Plot Kishor-Koenig Model Results
 
 ## Usage
 
@@ -13,11 +13,11 @@ plot(x, state = NULL, type = "filtered", ...)
 
 - x:
 
-  An object of class 'jvn_model'
+  An object of class 'kk_model'
 
 - state:
 
-  String. The name of the state to visualize (e.g., "state_1").
+  String. The name of the state to visualize.
 
 - type:
 
@@ -29,7 +29,15 @@ plot(x, state = NULL, type = "filtered", ...)
 
 ## Value
 
-A ggplot2 object visualizing the specified state estimates.
+A ggplot2 object visualizing the specified state estimates. df \<-
+get_nth_release( tsbox::ts_span( tsbox::ts_pc(
+dplyr::filter(reviser::gdp, id=="US") ), start = "1980-01-01" ), n = 0:1
+) df \<- dplyr::select(df, -c(id, pub_date)) df \<- na.omit(df)
+
+e \<- 1 \# Number of efficient release h \<- 2 \# Forecast horizon
+result \<- kk_nowcast(df, e, h = h, model = "Kishor-Koenig")
+
+plot(result)
 
 ## See also
 
@@ -38,5 +46,4 @@ Other revision nowcasting:
 [`kk_nowcast()`](https://p-wegmueller.github.io/reviser/reference/kk_nowcast.md),
 [`plot.jvn_model()`](https://p-wegmueller.github.io/reviser/reference/plot.jvn_model.md),
 [`print.jvn_model()`](https://p-wegmueller.github.io/reviser/reference/print.jvn_model.md),
-[`summary.jvn_model()`](https://p-wegmueller.github.io/reviser/reference/summary.jvn_model.md),
-[`summary.kk_model()`](https://p-wegmueller.github.io/reviser/reference/summary.kk_model.md)
+[`summary.jvn_model()`](https://p-wegmueller.github.io/reviser/reference/summary.jvn_model.md)

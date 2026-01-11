@@ -165,8 +165,7 @@ Other revision nowcasting:
 [`plot.jvn_model()`](https://p-wegmueller.github.io/reviser/reference/plot.jvn_model.md),
 [`plot.kk_model()`](https://p-wegmueller.github.io/reviser/reference/plot.kk_model.md),
 [`print.jvn_model()`](https://p-wegmueller.github.io/reviser/reference/print.jvn_model.md),
-[`summary.jvn_model()`](https://p-wegmueller.github.io/reviser/reference/summary.jvn_model.md),
-[`summary.kk_model()`](https://p-wegmueller.github.io/reviser/reference/summary.kk_model.md)
+[`summary.jvn_model()`](https://p-wegmueller.github.io/reviser/reference/summary.jvn_model.md)
 
 ## Examples
 
@@ -186,9 +185,9 @@ df <- na.omit(df)
 
 e <- 1  # Number of efficient release
 h <- 2  # Forecast horizon
-model_result <- kk_nowcast(df, e, h = h, model = "Kishor-Koenig")
+result <- kk_nowcast(df, e, h = h, model = "Kishor-Koenig")
 
-model_result$params
+result$params
 #>           F0         G0_0         G0_1           v0         eps0 
 #>  0.200853533  0.995630065 -0.001694615  1.598322193  0.006664367 
 ```
