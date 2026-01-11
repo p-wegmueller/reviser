@@ -18,6 +18,7 @@
 #'  - "Classical": Classical model without vintage effects.
 #' @param method A string specifying the estimation method to use. Options are
 #' "SUR" (default), Maximum likelihood ("MLE") and "OLS".
+#' @param alpha Significance level for confidence intervals (default = 0.05).
 #' @param solver_options An optional list to control the behaviour of the
 #'  underlying [systemfit::nlsystemfit()], [stats::optim()] and [stats::nlm()]
 #'  solvers:
@@ -115,6 +116,7 @@ kk_nowcast <- function(
   h = 0,
   model = "Kishor-Koenig",
   method = "SUR",
+  alpha = 0.05,
   solver_options = list()
 ) {
   # Default solver options
@@ -229,48 +231,34 @@ kk_nowcast <- function(
     names(start_mat) <- names(kk_mat_sur$params)[1:n_param_mat]
   }
 
-  # Check start values for the expected value of the pre-sample state vector m0
-  # and the covariance matrix C0
-  m0 <- 0
-  C0 <- 1e-6
-
-  # Both must be numeric
-  if (!is.numeric(m0) || !is.numeric(C0)) {
-    rlang::abort("Both 'm0' and 'C0' must be numeric!")
-  }
-  if (length(m0) == 1) {
-    m0 <- rep(m0, (e + 1) * 2)
-  } else if (length(m0) != (e + 1) * 2) {
-    rlang::abort(
-      paste0("The length of 'm0' must be 1 or ", (e + 1) * 2),
-      " if 'e' = ",
-      e
-    )
-  }
-
-  if (length(C0) == 1) {
-    C0 <- diag(C0, (e + 1) * 2)
-  } else if (length(C0) == (e + 1) * 2) {
-    C0 <- diag(C0)
-  } else if (all(dim(C0) == c((e + 1) * 2, (e + 1) * 2))) {
-    C0 <- C0
-  } else {
-    rlang::abort(paste0(
-      "'C0' must be a vector of length 1 or ",
-      (e + 1) * 2,
-      " or a ",
-      (e + 1) * 2,
-      "x",
-      (e + 1) * 2,
-      " matrix if 'e' = ",
-      e
-    ))
-  }
 
   # Check data input
   check <- vintages_check(df)
+  
+  # Reject lists with multiple IDs
+  if (is.list(check)) {
+    if (length(check) > 1) {
+      rlang::abort(paste0(
+        "'df' must contain a single ID, but ", length(check), 
+        " IDs were provided: ", paste(names(check), collapse = ", ")
+      ))
+    }
+    # Extract single data frame from list
+    df <- df[[1]]
+    check <- check[[1]]
+  }
+  
+  # Convert long to wide if needed
   if (check == "long") {
+    if ("id" %in% colnames(df) && length(unique(df$id)) > 1) {
+      rlang::abort(paste0(
+        "'df' contains ", length(unique(df$id)), " different IDs. ",
+        "Filter to a single ID first."
+      ))
+    }
     df <- vintages_wide(df, names_from = "release")
+    # Handle if vintages_wide returns a list
+    if (is.list(df) && !is.data.frame(df)) df <- df[[1]]
   }
 
   # Define state and observable variable names
@@ -278,6 +266,8 @@ kk_nowcast <- function(
   z_lag_names <- c(paste0("release_", e, "_lag_", (e + 1):1))
   y_names <- c(paste0("release_", e:0, "_lag_", e:0))
   y_lag_names <- c(paste0("release_", e:0, "_lag_", (e + 1):1))
+  
+  n_states <- length(c(z_names, y_names))
 
   # Define equations
   equations <- kk_equations(
@@ -294,6 +284,15 @@ kk_nowcast <- function(
   Ymat <- sur_data %>%
     dplyr::select(dplyr::all_of(y_names)) %>%
     as.matrix()
+  
+  # TODO: ar_order specifiable
+  ar_order <- 1
+  if (default_solver_options$trace > 0) {
+    cat("Estimating", model, "model with", 
+        n_param, "parameters...\n")
+    cat("Estimation:", method, "\n")
+    cat("AR order:", ar_order, "\n")
+  }
 
   # Estimation of parameters with SUR or OLS
   if (method == tolower("SUR")) {
@@ -339,7 +338,7 @@ kk_nowcast <- function(
     )$params
   } else if (method == tolower("MLE")) {
     # 1. Define the Log-Likelihood Function
-    kk_loglik <- function(p, e, model, Ymat, m0, C0) {
+    kk_loglik <- function(p, e, model, Ymat) {
       # Map vector p back to named parameters
       names(p) <- names(start_mat_mle)
       
@@ -349,9 +348,17 @@ kk_nowcast <- function(
       k_mat <- kk_matrices(e = e, model = model, params = p, type = "numeric")
       ss_mat <- kk_to_ss(k_mat$FF, k_mat$GG, k_mat$V, k_mat$W)
       
-      mod <- KFAS::SSModel(Ymat ~ -1 + SSMcustom(
-        Z = ss_mat$Z, T = ss_mat$Tmat, R = ss_mat$R, Q = ss_mat$Q, a1 = m0, P1 = C0,
-        index = seq_len(ncol(Ymat))), H = ss_mat$H)
+      mod <- KFAS::SSModel(Ymat ~ -1 + 
+                             SSMcustom(
+                               Z = ss_mat$Z, 
+                               T = ss_mat$Tmat, 
+                               R = ss_mat$R, 
+                               Q = ss_mat$Q, 
+                               a1 = c(rep(0.2, n_states/2), rep(0, n_states/2)),
+                               P1inf = diag(c(rep(1, n_states/2), rep(0, n_states/2)), n_states),
+                               P1 = diag(c(rep(0, n_states/2), rep(1, n_states/2)), n_states),
+                               index = seq_len(ncol(Ymat))), 
+                           H = ss_mat$H)
       
       # Return negative log-likelihood for minimization
       ll <- stats::logLik(mod)
@@ -378,8 +385,6 @@ kk_nowcast <- function(
       e = e,
       model = model,
       Ymat = Ymat, 
-      m0 = m0,
-      C0 = C0,
       method = "BFGS",
       control = list(maxit = default_solver_options$maxiter, 
                      trace = default_solver_options$trace,
@@ -411,6 +416,32 @@ kk_nowcast <- function(
     W = kk_mat_hat$W,
     epsilon = 1e-6
   )
+  
+  # Calculate forecasts if h > 0
+  if (h > 0) {
+    frequency <- unique((round(as.numeric(diff(df$time)) / 30)))
+    if (length(frequency) > 1) {
+      rlang::abort(
+        "The time series seems not to be regular, 
+        please provide a regular time series!"
+      )
+    }
+    
+    forecast_dates <- seq.Date(
+      df$time[nrow(df)],
+      by = paste0(frequency, " months"),
+      length.out = (h + 1)
+    )[2:(h + 1)]
+    
+    output_dates <- c(as.Date(rownames(Ymat)), forecast_dates)
+    
+    # Create extended data by appending NAs
+    Ymat <- rbind(Ymat, matrix(NA, h, dim(Ymat)[2]))
+    
+  } else {
+    output_dates <- c(as.Date(rownames(Ymat)))
+    forecast_dates <- as.Date(character(0))
+  }
 
   # Create the SSM object
   model_kfas <- KFAS::SSModel(
@@ -421,8 +452,9 @@ kk_nowcast <- function(
           T = sur_ss_mat$Tmat,
           R = sur_ss_mat$R,
           Q = sur_ss_mat$Q,
-          a1 = m0,
-          P1 = C0,
+          a1 = c(rep(0.2, n_states/2), rep(0, n_states/2)),
+          P1inf = diag(c(rep(1, n_states/2), rep(0, n_states/2)), n_states),
+          P1 = diag(c(rep(0, n_states/2), rep(1, n_states/2)), n_states),
           index = c(seq_len(dim(Ymat)[2]))
         ),
     H = sur_ss_mat$H
@@ -430,107 +462,71 @@ kk_nowcast <- function(
 
   # Run the Kalman filter
   kalman <- KFAS::KFS(model_kfas)
-
-  # Filtered states
-  filtered_z <- tibble::tibble(as.data.frame(kalman$att[,
-    1:((e + 1))
-  ])) %>%
-    dplyr::mutate(time = df$time[(e + 1):(nrow(kalman$att) + e)]) %>%
-    dplyr::select(time, !!!stats::setNames(seq_along(z_names), z_names))
-
-  filtered_y <- (kalman$att[, 1:(e + 1)] +
-    kalman$att[, (e + 2):(2 * (e + 1))]) %>%
-    dplyr::as_tibble() %>%
-    dplyr::mutate(time = df$time[(e + 1):(nrow(kalman$att) + e)]) %>%
-    dplyr::select(time, !!!stats::setNames(seq_along(y_names), y_names))
-
-  # Smoothed states
-  smoothed_z <- tibble::tibble(as.data.frame(kalman$alphahat[,
-    1:((e + 1))
-  ])) %>%
-    dplyr::mutate(time = df$time[(e + 1):(nrow(kalman$att) + e)]) %>%
-    dplyr::select(time, !!!stats::setNames(seq_along(z_names), z_names))
-
-  smoothed_y <- (kalman$alphahat[, 1:(e + 1)] +
-    kalman$alphahat[, (e + 2):(2 * (e + 1))]) %>%
-    dplyr::as_tibble() %>%
-    dplyr::mutate(time = df$time[(e + 1):(nrow(kalman$att) + e)]) %>%
-    dplyr::select(time, !!!stats::setNames(seq_along(y_names), y_names))
-
-  # Calculate forecasts if h > 0
-  if (h > 0) {
-    frequency <- unique((round(as.numeric(diff(df$time)) / 30)))
-    if (length(frequency) > 1) {
-      rlang::abort(
-        "The time series seems not to be regular, 
-        please provide a regular time series!"
-      )
-    }
-
-    forecast_dates <- seq.Date(
-      df$time[nrow(df)],
-      by = paste0(frequency, " months"),
-      length.out = (h + 1)
-    )[2:(h + 1)]
-
-    # Forecast
-    forecast <- array(NA, c(h + 1, (2 * (e + 1))))
-    forecast[2, ] <- sur_ss_mat$Tmat %*%
-      kalman$att[nrow(kalman$att), ]
-    if (h > 1) {
-      for (hh in 2:(h)) {
-        forecast[hh + 1, ] <- sur_ss_mat$Tmat %*% forecast[hh, ]
-      }
-    }
-
-    # Forecasted states
-    forecast_z <- tibble::tibble(as.data.frame(forecast[
-      1:(h + 1),
-      1:(e + 1)
-    ])) %>%
-      stats::na.omit() %>%
-      dplyr::mutate(time = forecast_dates) %>%
-      dplyr::select(
-        time,
-        !!!stats::setNames(seq_along(z_names), z_names)
-      )
-
-    # Forecasted observations
-    forecast_y <- tibble::tibble(as.data.frame(forecast[
-      1:(h + 1),
-    ])) %>%
-      stats::na.omit()
-    forecast_y <- forecast_y %>%
-      dplyr::mutate(dplyr::across(
-        .cols = 1:(ncol(forecast_y) - (e + 1)), # Columns to sum (e.g. 1 to n-e)
-        .fns = ~ . +
-          forecast_y[[
-            which(names(forecast_y) == dplyr::cur_column()) + e
-          ]],
-        .names = "obs_{col}" # Name of the new column
-      )) %>%
-      dplyr::mutate(time = forecast_dates) %>%
-      dplyr::select(dplyr::contains("obs_"), time) %>%
-      dplyr::select(
-        time,
-        !!!stats::setNames(seq_along(y_names), y_names)
-      )
-  } else {
-    forecast_z <- forecast_y <- NULL
+  
+  # Number of state variables
+  n_states <- length(z_names)
+  n_total <- length(output_dates)
+  
+  # Initialize list to store results
+  state_results <- list()
+  
+  # Loop through each state variable
+  for (i in 1:n_states) {
+    
+    # Extract filtered estimates
+    filtered_est <- kalman$att[, i]
+    filtered_se <- sqrt(kalman$Ptt[i, i, ])
+    
+    # Extract smoothed estimates
+    smoothed_est <- kalman$alphahat[, i]
+    smoothed_se <- sqrt(kalman$V[i, i, ])
+    
+    # Create filtered data frame
+    filtered_df <- dplyr::tibble(
+      time = output_dates,
+      state = z_names[i],
+      estimate = filtered_est,
+      lower = filtered_est - stats::qnorm(1-alpha/2) * filtered_se,
+      upper = filtered_est + stats::qnorm(1-alpha/2) * filtered_se,
+      filter = "filtered",
+      sample = dplyr::if_else(output_dates %in% forecast_dates, 
+                              "out_of_sample",
+                              "in_sample")
+    )
+    
+    # Create smoothed data frame
+    smoothed_df <- dplyr::tibble(
+      time = output_dates,
+      state = z_names[i],
+      estimate = smoothed_est,
+      lower = smoothed_est - stats::qnorm(1-alpha/2) * smoothed_se,
+      upper = smoothed_est + stats::qnorm(1-alpha/2) * smoothed_se,
+      filter = "smoothed",
+      sample = dplyr::if_else(output_dates %in% forecast_dates, 
+                              "out_of_sample",
+                              "in_sample")
+    )
+    
+    # Combine filtered and smoothed
+    state_results[[i]] <- dplyr::bind_rows(filtered_df, smoothed_df)
   }
-
+  
+  # Combine all states into one data frame
+  states_long <- dplyr::bind_rows(state_results)
+  
+  # Optional: Convert to tibble if using tidyverse
+  states_long <- dplyr::as_tibble(states_long) %>%
+    dplyr::arrange(.data$filter, .data$state, .data$time)
+  
+  
   # Remove the parameters from the model matrices
   kk_mat_hat$params <- NULL
 
   results <- list(
-    filtered_z = filtered_z,
-    filtered_y = filtered_y,
-    smoothed_z = smoothed_z,
-    smoothed_y = smoothed_y,
-    forecast_z = forecast_z,
-    forecast_y = forecast_y,
+    states = states_long,
     kk_model_mat = kk_mat_hat,
     ss_model_mat = sur_ss_mat,
+    model = model_kfas,
     params = params,
     fit = fit,
     e = e,
@@ -539,176 +535,6 @@ kk_nowcast <- function(
   class(results) <- c("kk_model", class(results))
 
   return(results)
-}
-
-#' Summarize the results of a kk_model object.
-#'
-#' This function calculates and prints the Mean Squared Error (MSE), Root Mean
-#' Squared Error (RMSE), and Mean Absolute Error (MAE) of the filtered state
-#' variables against both the final release and the true efficient release.
-#'
-#' @param object A list of class 'kk_model' produced by the
-#' \code{\link{kk_nowcast}} function.
-#' @param ... Additional arguments (not used).
-#'
-#' @return A list containing two data frames:
-#'   \item{final_release_metrics}{A data frame with MSE, RMSE, and MAE against
-#'   the final release.}
-#'   \item{true_efficient_release_metrics}{A data frame with MSE, RMSE, and
-#'   MAE against the true efficient release.}
-#'
-#' @examples
-#' # Assuming 'kk_model_obj' is the result of kk_nowcast(your_data, ...)
-#' # and 'your_data' is the original data frame.
-#' # results <- summary.kk_model(kk_model_obj, your_data)
-#'
-#' @family revision nowcasting
-#' @export
-summary.kk_model <- function(object, ...) {
-  # Check if the input is a kk_model object
-  if (!inherits(object, "kk_model")) {
-    rlang::abort("Input must be a 'kk_model' object.")
-  }
-
-  e <- object$e
-  filtered_z <- object$filtered_z[, c(1, e + 2)]
-  colnames(filtered_z) <- c("time", paste0("release_", e, "_filtered"))
-  df <- object$data
-
-  # Extract final and true efficient releases
-  final_release <- df[, c("time", "final")]
-  true_efficient_release <- df[, c(1, e + 2)]
-
-  # Extract first release (naive nowcast)
-  first_release <- df[, c(1, 2)]
-
-  # Merge filtered_z with naive
-  filtered_z <- merge(filtered_z, first_release, by = "time", all.x = TRUE)
-
-  # Merge filtered_z with final and true efficient releases
-  merged_final <- merge(filtered_z, final_release, by = "time", all.x = TRUE)
-  merged_true <- merge(
-    filtered_z,
-    true_efficient_release,
-    by = "time",
-    all.x = TRUE
-  )
-
-  # Calculate MSE, RMSE, and MAE against final release
-  mse_final <- vapply(
-    names(filtered_z)[-1],
-    function(col) {
-      mean((merged_final[[col]] - merged_final$final)^2, na.rm = TRUE)
-    },
-    FUN.VALUE = numeric(1)
-  ) # Specify numeric(1) for MSE
-
-  rmse_final <- sqrt(mse_final)
-
-  mae_final <- vapply(
-    names(filtered_z)[-1],
-    function(col) {
-      mean(abs(merged_final[[col]] - merged_final$final), na.rm = TRUE)
-    },
-    FUN.VALUE = numeric(1)
-  ) # Specify numeric(1) for MAE
-
-  # Calculate MSE, RMSE, and MAE against true efficient release
-  mse_true <- vapply(
-    names(filtered_z)[-1],
-    function(col) {
-      mean(
-        (merged_true[[col]] -
-          merged_true[[names(true_efficient_release)[2]]])^2,
-        na.rm = TRUE
-      )
-    },
-    FUN.VALUE = numeric(1)
-  ) # Specify numeric(1) for MSE
-
-  rmse_true <- sqrt(mse_true)
-
-  mae_true <- vapply(
-    names(filtered_z)[-1],
-    function(col) {
-      mean(
-        abs(
-          merged_true[[col]] - merged_true[[names(true_efficient_release)[2]]]
-        ),
-        na.rm = TRUE
-      )
-    },
-    FUN.VALUE = numeric(1)
-  ) # Specify numeric(1) for MAE
-
-  # Create result list
-  results <- list(
-    final_release_metrics = data.frame(
-      MSE = mse_final,
-      RMSE = rmse_final,
-      MAE = mae_final
-    ),
-    true_efficient_release_metrics = data.frame(
-      MSE = mse_true,
-      RMSE = rmse_true,
-      MAE = mae_true
-    ),
-    final_release_relative_metrics = data.frame(
-      MSE = mse_final / mse_final[length(mse_final)],
-      RMSE = rmse_final / rmse_final[length(rmse_final)],
-      MAE = mae_final / mae_final[length(mae_final)]
-    ),
-    true_efficient_release_relative_metrics = data.frame(
-      MSE = mse_true / mse_true[length(mse_true)],
-      RMSE = rmse_true / rmse_true[length(rmse_true)],
-      MAE = mae_true / mae_true[length(mae_true)]
-    )
-  )
-
-  # Function to print results in a nicely formatted way
-  print_metrics <- function(title, metrics) {
-    cat("\n", strrep("=", 70), "\n", sep = "")
-    cat(title, "\n")
-    cat(strrep("=", 70), "\n", sep = "")
-
-    # Ensure row names are included
-    formatted_metrics <- cbind(
-      Release = rownames(metrics),
-      as.data.frame(lapply(
-        metrics,
-        function(x) formatC(x, format = "f", digits = 4)
-      ))
-    )
-
-    # Print column headers
-    cat(paste(names(formatted_metrics), collapse = " | "), "\n")
-    cat(strrep("-", 70), "\n", sep = "")
-
-    # Print each row with proper spacing
-    apply(
-      formatted_metrics,
-      1,
-      function(row) cat(paste(row, collapse = " | "), "\n")
-    )
-  }
-
-  # Print the metrics
-  print_metrics("Metrics against final release:", results$final_release_metrics)
-  print_metrics(
-    "Metrics against published efficient release:",
-    results$true_efficient_release_metrics
-  )
-  print_metrics(
-    "Metrics against final release relative to naive:",
-    results$final_release_relative_metrics
-  )
-  print_metrics(
-    "Metrics against published efficient release relative to naive:",
-    results$true_efficient_release_relative_metrics
-  )
-  cat("\n")
-
-  return(invisible(results))
 }
 
 #' @title Create Equations for Kishor-Koenig (KK) Models
@@ -781,6 +607,7 @@ kk_equations <- function(kk_mat_sur) {
 #' @keywords internal
 #' @noRd
 kk_arrange_data <- function(df, e) {
+  dates <- df$time
   z_names <- c(paste0("release_", e, "_lag_", (e):0))
   z_lag_names <- c(paste0("release_", e, "_lag_", (e + 1):1))
   y_names <- c(paste0("release_", e:0, "_lag_", e:0))
@@ -816,7 +643,9 @@ kk_arrange_data <- function(df, e) {
   colnames(y) <- c(paste0("release_", (e - 1):0, "_lag_", (e - 1):0))
   colnames(y_lag) <- c(paste0("release_", (e - 1):0, "_lag_", e:1))
 
-  data <- cbind(z, y, y_lag) %>% tidyr::drop_na()
+  data <- cbind(z, y, y_lag) 
+  rownames(data) <- dates
+  data <- data %>% tidyr::drop_na()
 
   return(data)
 }
@@ -1382,4 +1211,60 @@ kk_to_ss <- function(FF, GG, V, W, epsilon = 1e-6) {
   }
 
   return(list(Z = Z, Tmat = Tmat, H = H, Q = Q, R = R))
+}
+
+#' Summarize the results of a kk_model object.
+#'
+#' This function calculates and prints the Mean Squared Error (MSE), Root Mean
+#' Squared Error (RMSE), and Mean Absolute Error (MAE) of the filtered state
+#' variables against both the final release and the true efficient release.
+#'
+#' @param object A list of class 'kk_model' produced by the
+#' \code{\link{kk_nowcast}} function.
+#' @param ... Additional arguments (not used).
+#'
+#' @return A list containing two data frames:
+#'   \item{final_release_metrics}{A data frame with MSE, RMSE, and MAE against
+#'   the final release.}
+#'   \item{true_efficient_release_metrics}{A data frame with MSE, RMSE, and
+#'   MAE against the true efficient release.}
+#'
+#' @examples
+#' # Assuming 'kk_model_obj' is the result of kk_nowcast(your_data, ...)
+#' # and 'your_data' is the original data frame.
+#' # results <- summary.kk_model(kk_model_obj, your_data)
+#'
+#' @family revision nowcasting
+#' @export
+summary.kk_model <- function(object, ...) {
+  cat("\n=== Kishor-Koenig Model ===\n\n")
+  cat("Convergence:", ifelse(object$convergence == 0, "Success", "Failed"), "\n")
+  cat("Log-likelihood:", round(object$loglik, 2), "\n")
+  cat("AIC:", round(object$aic, 2), "\n")
+  cat("BIC:", round(object$bic, 2), "\n\n")
+  cat("Parameter Estimates:\n")
+  #print(object$params, digits = 2, row.names = FALSE)
+  df_print <- object$params
+  df_print$Estimate <- sprintf("%.3f", df_print$Estimate)
+  df_print$Std.Error <- sprintf("%.3f", df_print$Std.Error)
+  print(df_print, row.names = FALSE, quote = FALSE)
+  cat("\n")
+  invisible(object)
+}
+
+#' Plot JVN Model Results
+#' 
+#' @param x An object of class 'jvn_model'
+#' @param state String. The name of the state to visualize (e.g., "state_1").
+#' @param type String. Type of estimate to plot: "filtered" or "smoothed".
+#' @param ... Additional arguments passed to theme_reviser.
+#' 
+#' @return A ggplot2 object visualizing the specified state estimates.
+#' @export
+plot.kk_model <- function(x, state = NULL, type = "filtered", ...) {
+  if (is.null(state)) {
+    state <- x$states[x$states$filter == type, ]$state[1]
+  }
+  # Forward to the base method with KK defaults
+  plot.revision_model(x, state = state, type = type, ...)
 }

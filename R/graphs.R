@@ -189,8 +189,8 @@ plot_vintages <- function(
   n <- length(unique(df[[dim_col]]))
 
   df <- df %>%
-    dplyr::group_by(time) %>%
-    dplyr::arrange(dplyr::desc(abs(value)), .by_group = TRUE) %>%
+    dplyr::group_by(.data$time) %>%
+    dplyr::arrange(dplyr::desc(abs(.data$value)), .by_group = TRUE) %>%
     dplyr::ungroup()
 
   if (n > 1) {
@@ -212,19 +212,19 @@ plot_vintages <- function(
   if (n == 1L) {
     if (type == "line") {
       p <- p +
-        ggplot2::geom_line(ggplot2::aes(x = !!time_col, y = value), data = df) +
+        ggplot2::geom_line(ggplot2::aes(x = !!time_col, y = .data$value), data = df) +
         scale_color_reviser()
     } else if (type == "point") {
       p <- p +
         ggplot2::geom_point(
-          ggplot2::aes(x = !!time_col, y = value),
+          ggplot2::aes(x = !!time_col, y = .data$value),
           data = df
         ) +
         scale_color_reviser()
     } else if (type == "bar") {
       p <- p +
         ggplot2::geom_bar(
-          ggplot2::aes(x = !!time_col, y = value),
+          ggplot2::aes(x = !!time_col, y = .data$value),
           data = df,
           position = "identity",
           stat = "identity"
@@ -242,14 +242,14 @@ plot_vintages <- function(
     if (type == "line") {
       p <- p +
         ggplot2::geom_line(
-          ggplot2::aes(x = !!time_col, y = value, color = !!dim_col),
+          ggplot2::aes(x = !!time_col, y = .data$value, color = !!dim_col),
           data = df
         ) +
         scale_color_reviser()
     } else if (type == "point") {
       p <- p +
         ggplot2::geom_point(
-          ggplot2::aes(x = !!time_col, y = value, color = !!dim_col),
+          ggplot2::aes(x = !!time_col, y = .data$value, color = !!dim_col),
           data = df
         ) +
         scale_color_reviser()
@@ -258,7 +258,7 @@ plot_vintages <- function(
         ggplot2::geom_bar(
           ggplot2::aes(
             x = !!time_col,
-            y = value,
+            y = .data$value,
             color = !!dim_col,
             fill = !!dim_col
           ),
@@ -271,7 +271,7 @@ plot_vintages <- function(
     } else if (type == "boxplot") {
       p <- p +
         ggplot2::geom_boxplot(
-          ggplot2::aes(x = !!time_col, y = value, fill = factor(!!time_col)),
+          ggplot2::aes(x = !!time_col, y = .data$value, fill = factor(!!time_col)),
           data = df
         ) +
         scale_fill_reviser() +
@@ -301,6 +301,130 @@ plot_vintages <- function(
     }
   }
   p
+}
+
+#' Plot Revision Model Results
+#' 
+#' @param x An object of class 'revision_model'
+#' @param state String. The name of the state to visualize.
+#' @param type String. Type of estimate: "filtered" or "smoothed".
+#' @param ... Additional arguments passed to theme_reviser.
+#' 
+#' @keywords internal
+#' @noRd
+plot.revision_model <- function(x, state = NULL, type = "filtered", ...) {
+
+  # Handle defaults if not provided by the child method
+  if (is.null(state)) {
+    state <- x$states[x$states$filter == type, ]$state[1]
+    rlang::warn(paste("No state specified. Defaulting to first state:", state))
+  }
+  
+  # Filter data
+  plot_data <- x$states[x$states$state == state & x$states$filter == type, ]
+  
+  if (nrow(plot_data) == 0) {
+    rlang::abort(paste("State", state, "not found in model results."))
+  }
+  # Setup Aesthetics (Unified Legend)
+  pal <- colors_reviser()
+  col_values <- c("in_sample" = pal[1], "out_of_sample" = pal[2])
+  line_values <- c("in_sample" = "solid", "out_of_sample" = "solid")
+  label_values <- c("in_sample" = "In-sample", "out_of_sample" = "Out-of-sample")
+  
+  # Build Plot
+  # Split samples
+  in_sample_data  <- plot_data[plot_data$sample == "in_sample", ]
+  oos_data        <- plot_data[plot_data$sample == "out_of_sample", ]
+  
+  p <- ggplot2::ggplot() +
+    
+    # ---- In-sample: always line + ribbon ----
+  ggplot2::geom_ribbon(
+    data = in_sample_data,
+    ggplot2::aes(
+      x = .data$time, ymin = .data$lower, ymax = .data$upper, fill = sample
+    ),
+    alpha = 0.2
+  ) +
+    ggplot2::geom_line(
+      data = in_sample_data,
+      ggplot2::aes(
+        x = .data$time, y = .data$estimate, color = sample, linetype = sample
+      ),
+      linewidth = 0.8
+    )
+  
+  # ---- Out-of-sample: branch on length ----
+  if (nrow(oos_data) == 1) {
+    
+    p <- p +
+      ggplot2::geom_crossbar(
+        data = oos_data,
+        ggplot2::aes(
+          x = .data$time,
+          y = .data$estimate,
+          ymin = .data$lower,
+          ymax = .data$upper,
+          color = sample,
+          fill = sample
+        ),
+        width = 0.1,
+        linewidth = 0.8
+      ) +
+      ggplot2::geom_point(
+        data = oos_data,
+        ggplot2::aes(
+          x = .data$time, y = .data$estimate, color = sample, fill = sample
+        ),
+        size = 2
+      )
+    
+  } else {
+    
+    p <- p +
+      ggplot2::geom_ribbon(
+        data = oos_data,
+        ggplot2::aes(
+          x = .data$time, ymin = .data$lower, ymax = .data$upper, fill = sample
+        ),
+        alpha = 0.2
+      ) +
+      ggplot2::geom_line(
+        data = oos_data,
+        ggplot2::aes(
+          x = .data$time, y = .data$estimate, color = sample, linetype = sample
+        ),
+        linewidth = 0.8
+      )
+  }
+  
+  # ---- Scales & theme ----
+  p <- p +
+    ggplot2::scale_fill_manual(
+      values = col_values,
+      labels = label_values
+    ) +
+    ggplot2::scale_linetype_manual(
+      values = line_values,
+      guide = "none"
+    ) +
+    ggplot2::scale_color_manual(
+      values = col_values,
+      labels = label_values
+    ) +
+    theme_reviser(...) +
+    ggplot2::labs(
+      title = paste(type, "estimate:", state),
+      subtitle = "with 95% confidence intervals",
+      color = "Sample", fill = "Sample", linetype = "Sample"
+    ) +
+    ggplot2::ylab("")
+  
+  p
+  
+  
+  return(p)
 }
 
 

@@ -6,6 +6,16 @@
 \usage{
 \method{summary}{jvn_model}(object, ...)
 }
+\arguments{
+\item{object}{An object of class \code{jvn_model}.}
+
+\item{...}{Additional arguments passed to or from other methods.}
+}
+\value{
+The function returns the input \code{object} invisibly.
+}
 \description{
-Summary Method for JVN Model
+Computes and displays a summary of the results from a
+Jacobs-Van Norden (JVN) model fit, including convergence status,
+information criteria, and parameter estimates.
 }

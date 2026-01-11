@@ -5,6 +5,8 @@
 #'
 #' @param df A matrix or data frame where each column represents a different 
 #'   vintage estimate for the same time period. Rows are time periods.
+#' @param e An integer indicating the number of data vintages to include in the
+#'  model. Must be greater than 0.
 #' @param ar_order Integer specifying the AR order for true values (default = 2).
 #' @param h Integer specifying the forecast horizon (default = 0).
 #' @param include_news Logical, whether to include news component in measurement 
@@ -19,13 +21,16 @@
 #'   (default = TRUE).
 #' @param method A string specifying the estimation method to use. Options are
 #'  Maximum likelihood ("MLE") for now.
+#' @param alpha Significance level for confidence intervals (default = 0.05).
 #' @param solver_options List of options for the optimizer:
 #'   - trace: Integer controlling output level (default = 0)
 #'   - maxiter: Maximum iterations (default = 1000)
 #'   - startvals: Named vector of starting values (optional)
 #'   - transform_se: T/F whether standard errors should be constrained to be 
 #'     positive in optimization.
-#'.  - method: String specifying optimization method (default = "BFGS").
+#'.  - method: String specifying optimization method (default = "L-BFGS-B").
+#'   - se_method: Method for standard error calculation (default = "hessian")
+#'   - n_starts: Number of random starting points for multi-start optimization
 #'
 #' @return A list of class 'jvn_model' with components:
 #' \describe{
@@ -48,20 +53,22 @@
 #'
 #' @examples
 #' # Simulate data
-#' set.seed(123)
-#' n_obs <- 150
-#' n_vint <- 4
-#' y_true <- arima.sim(n = n_obs, list(ar = c(0.4, 0.1)), sd = 0.9)
-#' data <- matrix(NA, n_obs, n_vint)
-#' for(v in 1:n_vint) {
-#'   data[, v] <- y_true + rnorm(n_obs, 0, 0.3 / v)
-#' }
+#' gdp <- dplyr::filter(
+#'   tsbox::ts_pc(
+#'     reviser::gdp
+#' ), id %in% c("EA"),
+#'    time >= min(pub_date),
+#'    time <= as.Date("2020-01-01")
+#'   ) 
+#' gdp <- tidyr::drop_na(gdp)
+#' df <- get_nth_release(gdp, n = 0:4)
 #' 
 #' # Estimate model
 #' result <- jvn_nowcast(
-#'   df = data,
+#'   df = df,
+#'   e = 3,
 #'   ar_order = 2,
-#'   h = 12,
+#'   h = 4,
 #'   include_news = TRUE,
 #'   include_noise = TRUE
 #' )
@@ -83,10 +90,12 @@ jvn_nowcast <- function(df,
   # Default solver options
   default_solver_options <- list(
     trace = 0,
-    method = "BFGS",
+    method = "L-BFGS-B",
     maxiter = 1000,
     transform_se = TRUE,
-    startvals = NULL
+    startvals = NULL,
+    se_method = "hessian",
+    n_starts = 1
   )
   
   # Check ar order is integer and > 0:
@@ -130,15 +139,37 @@ jvn_nowcast <- function(df,
   
   # Check data input
   check <- vintages_check(df)
+  
+  # Reject lists with multiple IDs
+  if (is.list(check)) {
+    if (length(check) > 1) {
+      rlang::abort(paste0(
+        "'df' must contain a single ID, but ", length(check), 
+        " IDs were provided: ", paste(names(check), collapse = ", ")
+      ))
+    }
+    # Extract single data frame from list
+    df <- df[[1]]
+    check <- check[[1]]
+  }
+  
+  # Convert long to wide if needed
   if (check == "long") {
+    if ("id" %in% colnames(df) && length(unique(df$id)) > 1) {
+      rlang::abort(paste0(
+        "'df' contains ", length(unique(df$id)), " different IDs. ",
+        "Filter to a single ID first."
+      ))
+    }
     df <- vintages_wide(df, names_from = "release")
+    # Handle if vintages_wide returns a list
+    if (is.list(df) && !is.data.frame(df)) df <- df[[1]]
   }
   
   # Arrange data
   df_intern <- df[,1:(e+1)]
-  z_names <- colnames(df_intern)[2:(e+1)]
   
-  Ymat <- as.matrix(dplyr::select(df_intern, -time))
+  Ymat <- as.matrix(dplyr::select(df_intern, -.data$time))
   rownames(Ymat) <- as.character(df$time)
   
   # Build model structure
@@ -152,6 +183,8 @@ jvn_nowcast <- function(df,
     spillover_news = spillover_news,
     spillover_noise = spillover_noise
   )
+  
+  state_names <- model_struct$state_names
 
   # Initialize parameters
   if (!is.null(default_solver_options$startvals)) {
@@ -165,8 +198,9 @@ jvn_nowcast <- function(df,
   } else {
     init_params <- jvn_init_params(
       model_struct, 
+      Ymat,
       transform_se = default_solver_options$transform_se
-      )
+    )
   }
   
   if (default_solver_options$trace > 0) {
@@ -176,39 +210,368 @@ jvn_nowcast <- function(df,
         " Spillovers:", include_spillovers, "\n\n")
   }
   
-  # Optimize
-  opt_result <- stats::optim(
-    par = init_params,
-    fn = jvn_negloglik,
-    model_struct = model_struct,
-    data = Ymat,
-    transform_se = default_solver_options$transform_se,
-    method = default_solver_options$method,
-    control = list(
-      trace = default_solver_options$trace,
-      maxit = default_solver_options$maxiter
-    ),
-    hessian = FALSE
-  )
+  # ===== OPTIMIZATION =====
+  
+  # Check if multi-start is requested
+  n_starts <- if (!is.null(default_solver_options$n_starts)) {
+    max(1, default_solver_options$n_starts)
+  } else {
+    1
+  }
+  
+  if (n_starts > 1 && default_solver_options$trace > 0) {
+    cat("\nUsing multi-start optimization with", n_starts, "starting points\n")
+    cat("Method:", default_solver_options$method, "\n\n")
+  }
+  
+  # Storage for multi-start results
+  all_results <- vector("list", n_starts)
+  all_values <- numeric(n_starts)
+  
+  # Run optimization from multiple starting points
+  for (start_idx in 1:n_starts) {
+    
+    if (n_starts > 1 && default_solver_options$trace > 0) {
+      cat("=== Starting point", start_idx, "of", n_starts, "===\n")
+    }
+    
+    # Generate starting values
+    if (start_idx == 1) {
+      # First start: use default initialization
+      current_init <- init_params
+    } else {
+      # Subsequent starts: perturb around default
+      current_init <- init_params + stats::rnorm(length(init_params), 0, 0.5)
+      
+      # Ensure perturbations respect constraints
+      if (default_solver_options$transform_se) {
+        # For log-transformed SDs, keep them reasonable
+        sd_indices <- c(model_struct$param_info$sigma_e_idx,
+                        model_struct$param_info$sigma_nu_idx,
+                        model_struct$param_info$sigma_zeta_idx)
+        sd_indices <- unlist(sd_indices)
+        # Keep log(sigma) between log(0.01) and log(10)
+        current_init[sd_indices] <- pmax(pmin(current_init[sd_indices], log(100)), log(0.001))
+      }
+      
+      # For AR coefficients, ensure stationarity
+      ar_indices <- model_struct$param_info$ar_coef_idx
+      current_init[ar_indices] <- pmax(pmin(current_init[ar_indices], 0.9), -0.9)
+      
+      # For spillover parameters, keep between 0 and 1
+      if (!is.null(model_struct$param_info$spill_nu_idx)) {
+        current_init[model_struct$param_info$spill_nu_idx] <- 
+          pmax(pmin(current_init[model_struct$param_info$spill_nu_idx], 0.9), -0.9)
+      }
+      if (!is.null(model_struct$param_info$spill_zeta_idx)) {
+        current_init[model_struct$param_info$spill_zeta_idx] <- 
+          pmax(pmin(current_init[model_struct$param_info$spill_zeta_idx], 0.9), -0.9)
+      }
+    }
+    
+    # Determine optimization method
+    opt_method <- default_solver_options$method
+    
+    # ===== TWO-STEP METHOD =====
+    if (opt_method == "two-step") {
+      
+      if (default_solver_options$trace > 0) {
+        cat("Step 1: Nelder-Mead (global search)...\n")
+      }
+      
+      opt_result_nm <- stats::optim(
+        par = current_init,
+        fn = jvn_negloglik,
+        model_struct = model_struct,
+        data = Ymat,
+        transform_se = default_solver_options$transform_se,
+        method = "Nelder-Mead",
+        control = list(
+          trace = max(0, default_solver_options$trace ),
+          maxit = 500
+        )
+      )
+      
+      if (default_solver_options$trace > 0) {
+        cat("Step 2: BFGS (local refinement)...\n")
+      }
+      
+      current_result <- stats::optim(
+        par = opt_result_nm$par,
+        fn = jvn_negloglik,
+        model_struct = model_struct,
+        data = Ymat,
+        transform_se = default_solver_options$transform_se,
+        method = "BFGS",
+        control = list(
+          trace = max(0, default_solver_options$trace ),
+          maxit = default_solver_options$maxiter
+        ),
+        hessian = FALSE
+      )
+      
+      # ===== L-BFGS-B METHOD =====
+    } else if (opt_method == "L-BFGS-B") {
+      
+      # Set bounds for parameters
+      n_params <- model_struct$n_params
+      lower_bounds <- rep(-Inf, n_params)
+      upper_bounds <- rep(Inf, n_params)
+      
+      # For log-transformed standard deviations
+      if (default_solver_options$transform_se) {
+        param_info <- model_struct$param_info
+        
+        # log(sigma) bounds: log(0.001) to log(100)
+        sd_indices <- c(param_info$sigma_e_idx, 
+                        param_info$sigma_nu_idx, 
+                        param_info$sigma_zeta_idx)
+        sd_indices <- unlist(sd_indices)
+        
+        lower_bounds[sd_indices] <- log(0.001)
+        upper_bounds[sd_indices] <- log(100)
+      }
+      
+      # AR coefficients: ensure stationarity
+      ar_indices <- model_struct$param_info$ar_coef_idx
+      lower_bounds[ar_indices] <- -0.9
+      upper_bounds[ar_indices] <- 0.9
+      
+      # Spillover parameters: between 0 and 0.99
+      if (!is.null(model_struct$param_info$spill_nu_idx)) {
+        lower_bounds[model_struct$param_info$spill_nu_idx] <- -0.9
+        upper_bounds[model_struct$param_info$spill_nu_idx] <- 0.9
+      }
+      if (!is.null(model_struct$param_info$spill_zeta_idx)) {
+        lower_bounds[model_struct$param_info$spill_zeta_idx] <- -0.9
+        upper_bounds[model_struct$param_info$spill_zeta_idx] <- 0.9
+      }
+      
+      current_result <- stats::optim(
+        par = current_init,
+        fn = jvn_negloglik,
+        model_struct = model_struct,
+        data = Ymat,
+        transform_se = default_solver_options$transform_se,
+        method = "L-BFGS-B",
+        lower = lower_bounds,
+        upper = upper_bounds,
+        control = list(
+          trace = max(0, default_solver_options$trace ),
+          maxit = default_solver_options$maxiter
+        ),
+        hessian = FALSE
+      )
+      
+      # ===== NLMINB METHOD =====
+    } else if (opt_method == "nlminb") {
+      
+      # Set bounds
+      n_params <- model_struct$n_params
+      lower_bounds <- rep(-Inf, n_params)
+      upper_bounds <- rep(Inf, n_params)
+      
+      if (default_solver_options$transform_se) {
+        param_info <- model_struct$param_info
+        sd_indices <- c(param_info$sigma_e_idx, 
+                        param_info$sigma_nu_idx, 
+                        param_info$sigma_zeta_idx)
+        sd_indices <- unlist(sd_indices)
+        lower_bounds[sd_indices] <- log(0.001)
+        upper_bounds[sd_indices] <- log(100)
+      }
+      
+      # AR stationarity
+      ar_indices <- model_struct$param_info$ar_coef_idx
+      lower_bounds[ar_indices] <- -0.9
+      upper_bounds[ar_indices] <- 0.9
+      
+      # Spillovers
+      if (!is.null(model_struct$param_info$spill_nu_idx)) {
+        lower_bounds[model_struct$param_info$spill_nu_idx] <- -0.9
+        upper_bounds[model_struct$param_info$spill_nu_idx] <- 0.9
+      }
+      if (!is.null(model_struct$param_info$spill_zeta_idx)) {
+        lower_bounds[model_struct$param_info$spill_zeta_idx] <- -0.9
+        upper_bounds[model_struct$param_info$spill_zeta_idx] <- 0.9
+      }
+      
+      opt_result_nlminb <- stats::nlminb(
+        start = current_init,
+        objective = jvn_negloglik,
+        model_struct = model_struct,
+        data = Ymat,
+        transform_se = default_solver_options$transform_se,
+        lower = lower_bounds,
+        upper = upper_bounds,
+        control = list(
+          trace = max(0, default_solver_options$trace),
+          eval.max = default_solver_options$maxiter * 2,
+          iter.max = default_solver_options$maxiter
+        )
+      )
+      
+      # Convert nlminb output to optim format
+      current_result <- list(
+        par = opt_result_nlminb$par,
+        value = opt_result_nlminb$objective,
+        convergence = opt_result_nlminb$convergence,
+        message = opt_result_nlminb$message
+      )
+      
+      # ===== STANDARD METHODS (BFGS, Nelder-Mead, etc.) =====
+    } else {
+      
+      current_result <- stats::optim(
+        par = current_init,
+        fn = jvn_negloglik,
+        model_struct = model_struct,
+        data = Ymat,
+        transform_se = default_solver_options$transform_se,
+        method = opt_method,
+        control = list(
+          trace = max(0, default_solver_options$trace),
+          maxit = default_solver_options$maxiter
+        ),
+        hessian = FALSE
+      )
+    }
+    
+    # Store results
+    all_results[[start_idx]] <- current_result
+    all_values[start_idx] <- current_result$value
+    
+    if (n_starts > 1 && default_solver_options$trace > 0) {
+      cat("Negative log-likelihood:", round(current_result$value, 4), "\n")
+      cat("Convergence:", current_result$convergence, "\n\n")
+    }
+  }
+  
+  # Select best result from all starting points
+  best_idx <- which.min(all_values)
+  opt_result <- all_results[[best_idx]]
+  
+  if (n_starts > 1 && default_solver_options$trace > 0) {
+    cat("=== Multi-start Summary ===\n")
+    cat("Best result from starting point", best_idx, "\n")
+    cat("Negative log-likelihoods across starts:\n")
+    for (i in 1:n_starts) {
+      marker <- if(i == best_idx) " <- BEST" else ""
+      cat(sprintf("  Start %d: %.4f%s\n", i, all_values[i], marker))
+    }
+    cat("\n")
+  }
+  
   
   # Extract results (raw scale from optimizer)
   params_raw <- opt_result$par
   loglik <- -opt_result$value
   
-  # Calculate initial standard errors (on the scale the optimizer used)
-  # Calculate high-precision Hessian
-  precise_hessian <- numDeriv::hessian(
-    func = jvn_negloglik,
-    x = params_raw,           
-    model_struct = model_struct,              
-    data = Ymat,
-    transform_se = default_solver_options$transform_se
-  )
-  se_raw <- tryCatch({
-    sqrt(diag(MASS::ginv(precise_hessian)))
-  }, error = function(e) {
-    rep(NA, length(params_raw))
-  })
+  # ===== STANDARD ERROR CALCULATION =====
+  se_method <- default_solver_options$se_method
+  
+  if (se_method == "hessian") {
+    # ===== HESSIAN METHOD =====
+    hessian_failed <- FALSE
+    se_warning <- NULL
+    
+    se_raw <- suppressWarnings(tryCatch({
+      # Calculate high-precision Hessian
+      precise_hessian <- numDeriv::hessian(
+        func = jvn_negloglik,
+        x = params_raw,           
+        model_struct = model_struct,              
+        data = Ymat,
+        transform_se = default_solver_options$transform_se,
+        method.args = list(eps = 1e-4, d = 0.01, r = 6)
+      )
+      
+      # Check condition number
+      cond_num <- tryCatch(
+        kappa(precise_hessian, exact = FALSE),
+        error = function(e) Inf
+      )
+      
+      if (!is.finite(cond_num) || cond_num > 1e10) {
+        se_warning <- paste0(
+          "Hessian is poorly conditioned",
+          if (is.finite(cond_num)) paste0(" (condition number = ", 
+                                          format(cond_num, scientific = TRUE, digits = 2), ")") else "",
+          ". Standard errors may be unreliable. "
+        )
+        hessian_failed <- TRUE
+        rep(NA, length(params_raw))
+      } else {
+        # Try to invert
+        fisher_info <- tryCatch({
+          solve(precise_hessian)
+        }, error = function(e) {
+          # Add small ridge regularization
+          ridge <- 1e-6 * mean(abs(diag(precise_hessian)))
+          if (default_solver_options$trace > 0) {
+            cat("Adding ridge regularization to Hessian (\u03BB =", 
+                format(ridge, scientific = TRUE), ")\n")
+          }
+          tryCatch({
+            solve(precise_hessian + ridge * diag(nrow(precise_hessian)))
+          }, error = function(e2) {
+            NULL
+          })
+        })
+        
+        if (is.null(fisher_info)) {
+          se_warning <- paste0(
+            "Failed to invert Hessian matrix. ",
+            "Standard errors cannot be computed. "
+          )
+          hessian_failed <- TRUE
+          rep(NA, length(params_raw))
+        } else {
+          se_calc <- sqrt(diag(fisher_info))
+          
+          # Check for NaNs or very large SEs
+          n_nan <- sum(is.nan(se_calc))
+          n_large <- sum(se_calc > 1e3, na.rm = TRUE)
+          n_problems <- n_nan + n_large
+          
+          if (n_problems > 0) {
+            se_warning <- paste0(
+              n_problems, " parameter(s) have problematic standard errors",
+              if (n_nan > 0) paste0(" (", n_nan, " NaN)") else "",
+              if (n_large > 0) paste0(" (", n_large, " very large)") else ""
+            )
+            hessian_failed <- TRUE
+          }
+          
+          # Replace NaN with NA
+          se_calc[is.nan(se_calc)] <- NA
+          se_calc
+        }
+      }
+    }, error = function(e) {
+      se_warning <<- paste0(
+        "Hessian calculation failed: ", e$message, ". "
+      )
+      hessian_failed <<- TRUE
+      rep(NA, length(params_raw))
+    }))
+    
+    ci_lower_raw <- NULL
+    ci_upper_raw <- NULL
+    se_method_used <- "hessian"
+    
+    # Issue warning if Hessian was problematic
+    if (hessian_failed && !is.null(se_warning)) {
+      warning(se_warning, call. = FALSE)
+    }
+  }
+  
+  if (default_solver_options$trace > 0) {
+    cat("Standard error method used:", se_method_used, "\n")
+    if (!is.null(se_warning) && default_solver_options$trace > 1) {
+      cat("Warning:", se_warning, "\n")
+    }
+  }
   
   # Initialize final objects
   params <- params_raw
@@ -272,6 +635,7 @@ jvn_nowcast <- function(df,
     
   } else {
     output_dates <- c(as.Date(rownames(Ymat)))
+    forecast_dates <- as.Date(character(0))
   }
   
   # Build KFAS model
@@ -293,7 +657,7 @@ jvn_nowcast <- function(df,
   kalman <- KFAS::KFS(kfas_model)
   
   # Number of state variables
-  n_states <- length(z_names)
+  n_states <- length(state_names)
   n_total <- length(output_dates)
   
   # Initialize list to store results
@@ -313,10 +677,10 @@ jvn_nowcast <- function(df,
     # Create filtered data frame
     filtered_df <- dplyr::tibble(
       time = output_dates,
-      state = paste0("state_",i),#z_names[i],
+      state = state_names[i],
       estimate = filtered_est,
-      lower = filtered_est - qnorm(1-alpha/2) * filtered_se,
-      upper = filtered_est + qnorm(1-alpha/2) * filtered_se,
+      lower = filtered_est - stats::qnorm(1-alpha/2) * filtered_se,
+      upper = filtered_est + stats::qnorm(1-alpha/2) * filtered_se,
       filter = "filtered",
       sample = dplyr::if_else(output_dates %in% forecast_dates, 
                               "out_of_sample",
@@ -326,10 +690,10 @@ jvn_nowcast <- function(df,
     # Create smoothed data frame
     smoothed_df <- dplyr::tibble(
       time = output_dates,
-      state = paste0("state_",i), #z_names[i],
+      state = state_names[i],
       estimate = smoothed_est,
-      lower = smoothed_est - qnorm(1-alpha/2) * smoothed_se,
-      upper = smoothed_est + qnorm(1-alpha/2) * smoothed_se,
+      lower = smoothed_est - stats::qnorm(1-alpha/2) * smoothed_se,
+      upper = smoothed_est + stats::qnorm(1-alpha/2) * smoothed_se,
       filter = "smoothed",
       sample = dplyr::if_else(output_dates %in% forecast_dates, 
                               "out_of_sample",
@@ -345,7 +709,7 @@ jvn_nowcast <- function(df,
   
   # Optional: Convert to tibble if using tidyverse
   states_long <- dplyr::as_tibble(states_long) %>%
-    arrange(filter, state, time)
+    dplyr::arrange(.data$filter, .data$state, .data$time)
   
   # Prepare results
   results <- list(
@@ -382,7 +746,7 @@ jvn_matrices <- function(n_obs, n_vint, ar_order, include_news, include_noise,
                          include_spillovers, spillover_news, spillover_noise) {
   
   # State dimensions following paper notation
-  # State vector: [ỹ_t, ỹ_{t-1}, ..., ỹ_{t-p+1}, ν_t, ζ_t]
+  # State vector: $\tilde{y}_t, \tilde{y}_{t-1}, \ldots, \tilde{y}_{t-p+1}, \nu_t, \zeta_t$
   state_dim <- ar_order  # For AR(p) we need p lags
   news_dim <- if (include_news) n_vint else 0
   noise_dim <- if (include_noise) n_vint else 0
@@ -394,7 +758,7 @@ jvn_matrices <- function(n_obs, n_vint, ar_order, include_news, include_noise,
   # ===== Measurement Matrix Z =====
   # KFAS requires: (p x m) matrix or (p x m x 1) array for time-invariant case
   Z <- matrix(0, n_vint, m)
-  Z[, 1] <- 1  # All vintages depend on true value ỹ_t
+  Z[, 1] <- 1  # All vintages depend on true value $\tilde{y}_t$
   
   if (include_news) {
     news_start <- ar_order + 1
@@ -413,51 +777,53 @@ jvn_matrices <- function(n_obs, n_vint, ar_order, include_news, include_noise,
   Tmat <- matrix(0, m, m)
   
   # AR dynamics for true value (first row)
-  # ỹ_t = ρ_1*ỹ_{t-1} + ... + ρ_p*ỹ_{t-p} + shocks
-  # Will be filled with AR coefficients (ρ_1, ..., ρ_p)
+  # $\tilde{y}_t = \rho_1 \tilde{y}_{t-1} + \ldots + \rho_p \tilde{y}_{t-p} + \text{shocks}$
+  # Will be filled with AR coefficients $(\rho_1, \ldots, \rho_p)$
   
   # Companion form for AR lags (if ar_order > 1)
   if (ar_order > 1) {
     for (i in 2:ar_order) {
-      Tmat[i, i - 1] <- 1  # ỹ_{t-i+1} = ỹ_{t-i}
+      Tmat[i, i - 1] <- 1  # $\tilde{y}_{t-i+1} = \tilde{y}_{t-i}$
     }
   }
   
   # ===== R Matrix (Error Loading Matrix) =====
   # KFAS requires: (m x r) matrix or (m x r x 1) array for time-invariant case
-  # η_t = [η_{et}, η_{ν1t}, ..., η_{νlt}, η_{ζ1t}, ..., η_{ζlt}]'
+  # $\eta_t = [\eta_{e t}, \eta_{\nu 1 t}, \ldots, \eta_{\nu l t}, \eta_{\zeta 1 t}, \ldots, \eta_{\zeta l t}]'$
+  
   
   R <- matrix(0, m, n_eta)
   
-  # First state (true value ỹ_t) gets:
-  # - AR shock (σ_e)
-  # - ALL news shocks (σ_{ν1}, ..., σ_{νl}) 
-  R[1, 1] <- 1  # Placeholder for σ_e, will be filled during update
+  # First state (true value $\tilde{y}_t$) gets:
+  # - AR shock $(\sigma_e)$
+  # - ALL news shocks $(\sigma_{\nu 1}, \ldots, \sigma_{\nu l})$
+  R[1, 1] <- 1  # Placeholder for $\sigma_e$, will be filled during update
   
   if (include_news) {
-    # Paper equation: ỹ_{t+1} = ... + R_3 * η_{νt}
-    # where R_3 = [σ_{ν1}, σ_{ν2}, ..., σ_{νl}]
-    R[1, 2:(n_vint + 1)] <- 1  # Placeholders for σ_ν, filled during update
+    # Paper equation: $\tilde{y}_{t+1} = \ldots + R_3 \eta_{\nu t}$
+    # where $R_3 = [\sigma_{\nu 1}, \sigma_{\nu 2}, \ldots, \sigma_{\nu l}]$
+    R[1, 2:(n_vint + 1)] <- 1  # Placeholders for $\sigma_{\nu}$, filled during update
     
-    # News states get: -U_1 · diag(R_3) · η_{νt}
-    # U_1 is upper triangular matrix with 1s on and above diagonal
+    # News states get: $-U_1 · diag(R_3) \eta_{\nu t}$
+    # $U_1$ is upper triangular matrix with 1s on and above diagonal
     # This creates the cumulative news structure
     news_start <- ar_order + 1
     for (i in 1:n_vint) {
       for (j in i:n_vint) {
-        # ν_{jt} gets shock from η_{νit} for all i <= j
-        R[news_start + j - 1, 1 + i] <- -1  # Placeholder, will be -σ_{νi}
+        # $\nu_{j t}$ gets shock from $\eta_{\nu i t}$ for all $i \le j$
+        R[news_start + j - 1, 1 + i] <- -1  # Placeholder, will be $-\sigma_{\nu i}$
       }
     }
   }
   
   if (include_noise) {
     # Noise states get independent shocks
-    # Paper: R_4 = diag(σ_{ζ1}, ..., σ_{ζl})
+    # Paper: $R_4 = \mathrm{diag}(\sigma_{\zeta 1}, \ldots, \sigma_{\zeta l})$
     noise_start <- ar_order + news_dim + 1
     shock_start <- 1 + news_dim + 1
     for (i in 1:n_vint) {
-      R[noise_start + i - 1, shock_start + i - 1] <- 1  # Placeholder for σ_ζ
+      # Placeholder for $\sigma_{\zeta}$
+      R[noise_start + i - 1, shock_start + i - 1] <- 1
     }
   }
   
@@ -501,6 +867,25 @@ jvn_matrices <- function(n_obs, n_vint, ar_order, include_news, include_noise,
     if (include_noise && spillover_noise) n_params <- n_params + n_vint
   }
   
+  # State names
+  # 1. True Value Labels ($\tilde{y}_t, \tilde{y}_{t-1}, \ldots$)
+  true_names <- paste0("true_lag_", 0:(ar_order - 1))
+  
+  # 2. News Labels ($\nu_1, \nu_2, \ldots$)
+  news_names <- NULL
+  if (include_news) {
+    news_names <- paste0("news_vint", 1:n_vint)
+  }
+  
+  # 3. Noise Labels ($\zeta_1, \zeta_2, \ldots$)
+  noise_names <- NULL
+  if (include_noise) {
+    noise_names <- paste0("noise_vint", 1:n_vint)
+  }
+  
+  # Combine in the order they appear in the state vector
+  state_names <- c(true_names, news_names, noise_names)
+  
   list(
     Z = Z,
     Tmat = Tmat,
@@ -509,6 +894,7 @@ jvn_matrices <- function(n_obs, n_vint, ar_order, include_news, include_noise,
     Q = Q,
     param_info = param_info,
     n_params = n_params,
+    state_names = state_names,
     m = m
   )
 }
@@ -535,7 +921,7 @@ jvn_update_matrices <- function(model_struct, params) {
     # Update first row: true value gets all news shocks
     R[1, 2:(info$n_vint + 1)] <- sigma_nu
     
-    # Update news state rows: -U_1 · diag(R_3) structure
+    # Update news state rows: -U_1 x diag(R_3) structure
     news_start <- info$ar_order + 1
     for (i in 1:info$n_vint) {
       for (j in i:info$n_vint) {
@@ -633,54 +1019,142 @@ jvn_negloglik <- function(params, model_struct, data, transform_se = TRUE) {
   )
 }
 
-#' Initialize parameters
+#' Initialize Parameters with Data-Driven Starting Values
 #' @keywords internal
 #' @noRd
-jvn_init_params <- function(model_struct, transform_se = TRUE) {
+jvn_init_params <- function(model_struct, data, transform_se = TRUE) {
+  
   info <- model_struct$param_info
   params <- numeric(model_struct$n_params)
+  n_vint <- info$n_vint
+  ar_order <- info$ar_order
   
-  # AR coefficients: decreasing values that sum to < 1
-  params[info$ar_coef_idx] <- seq(0.5, 0.1, length.out = info$ar_order)
+  # Remove NA rows for estimation
+  data_clean <- data[stats::complete.cases(data), , drop = FALSE]
   
-  # AR shock standard deviation
-  params[info$sigma_e_idx] <- 1.5
-  
-  # News shock standard deviations (decreasing)
-  if (!is.null(info$sigma_nu_idx)) {
-    params[info$sigma_nu_idx] <- seq(1.5, 0.1, length.out = info$n_vint)
+  if (nrow(data_clean) < ar_order + 10) {
+    warning("Insufficient data for smart initialization. Using default values.")
+    return(jvn_init_params(model_struct, transform_se))
   }
   
-  # Noise shock standard deviations (decreasing)
-  if (!is.null(info$sigma_zeta_idx)) {
-    params[info$sigma_zeta_idx] <- seq(1.5, 0.1, length.out = info$n_vint)
+  # ===== 1. AR COEFFICIENTS AND SHOCK from final vintage =====
+  final_vintage <- data_clean[, n_vint]
+  
+  ar_fit <- tryCatch({
+    stats::ar(final_vintage, aic = FALSE, order.max = ar_order, method = "ols")
+  }, error = function(e) {
+    y <- final_vintage[(ar_order + 1):length(final_vintage)]
+    X <- matrix(0, length(y), ar_order)
+    for (i in 1:ar_order) {
+      X[, i] <- final_vintage[(ar_order + 1 - i):(length(final_vintage) - i)]
+    }
+    lm_fit <- stats::lm(y ~ X - 1)
+    list(ar = stats::coef(lm_fit), var.pred = summary(lm_fit)$sigma^2)
+  })
+  
+  params[info$ar_coef_idx] <- ar_fit$ar
+  params[info$sigma_e_idx] <- sqrt(ar_fit$var.pred)
+  
+  # ===== 2. NEWS SHOCKS from revision variances =====
+  if (info$include_news) {
+    # Calculate vintage-to-vintage revisions
+    revision_vars <- numeric(n_vint)
+    
+    for (v in 1:(n_vint - 1)) {
+      revisions <- data_clean[, v + 1] - data_clean[, v]
+      revision_vars[v] <- stats::var(revisions, na.rm = TRUE)
+    }
+    revision_vars[n_vint] <- revision_vars[n_vint - 1] * 0.5  # Assume smaller for final
+    
+    # Take square root and ensure decreasing pattern
+    sigma_nu_init <- sqrt(pmax(revision_vars, 0.01))
+    
+    # Force monotonic decrease
+    for (v in 2:n_vint) {
+      sigma_nu_init[v] <- min(sigma_nu_init[v], sigma_nu_init[v - 1] * 0.9)
+    }
+    
+    params[info$sigma_nu_idx] <- pmax(sigma_nu_init, 0.05)
   }
   
-  # Spillover parameters (small positive values)
-  if (!is.null(info$spill_nu_idx)) {
-    params[info$spill_nu_idx] <- rep(0.5, info$n_vint)
+  # ===== 3. NOISE SHOCKS from cross-vintage deviations =====
+  if (info$include_noise) {
+    # Measure noise as deviation from cross-vintage mean
+    vintage_mean <- rowMeans(data_clean, na.rm = TRUE)
+    
+    sigma_zeta_init <- numeric(n_vint)
+    for (v in 1:n_vint) {
+      deviations <- data_clean[, v] - vintage_mean
+      sigma_zeta_init[v] <- stats::sd(deviations, na.rm = TRUE)
+    }
+    
+    # Force monotonic decrease (later vintages should be less noisy)
+    for (v in 2:n_vint) {
+      sigma_zeta_init[v] <- min(sigma_zeta_init[v], sigma_zeta_init[v - 1] * 0.85)
+    }
+    
+    params[info$sigma_zeta_idx] <- pmax(sigma_zeta_init, 0.05)
   }
   
-  if (!is.null(info$spill_zeta_idx)) {
-    params[info$spill_zeta_idx] <- rep(0.5, info$n_vint)
+  # ===== 4. SPILLOVER PARAMETERS from AR(1) on revisions/residuals =====
+  if (info$include_spillovers) {
+    
+    if (info$include_news && info$spillover_news) {
+      spillover_nu <- numeric(n_vint)
+      
+      for (v in 1:(n_vint - 1)) {
+        revisions <- data_clean[, v + 1] - data_clean[, v]
+        ar1 <- tryCatch({
+          stats::ar(revisions, aic = FALSE, order.max = 1, method = "ols")$ar[1]
+        }, error = function(e) 0.3)
+        spillover_nu[v] <- ar1
+      }
+      spillover_nu[n_vint] <- mean(spillover_nu[1:(n_vint - 1)])
+      
+      params[info$spill_nu_idx] <- pmax(pmin(spillover_nu, 0.9), 0.1)
+    }
+    
+    if (info$include_noise && info$spillover_noise) {
+      spillover_zeta <- numeric(n_vint)
+      
+      for (v in 1:n_vint) {
+        residuals <- diff(data_clean[, v])
+        ar1 <- tryCatch({
+          stats::ar(residuals, aic = FALSE, order.max = 1, method = "ols")$ar[1]
+        }, error = function(e) 0.2)
+        spillover_zeta[v] <- ar1 * 0.7  # Dampen
+      }
+      
+      params[info$spill_zeta_idx] <- pmax(pmin(spillover_zeta, 0.8), 0.05)
+    }
   }
   
-  # Take log of standard deviations
+  # ===== 5. TRANSFORMATIONS =====
   if (transform_se) {
     if (!is.null(info$sigma_e_idx)) {
       params[info$sigma_e_idx] <- log(params[info$sigma_e_idx])
     }
-    
     if (!is.null(info$sigma_nu_idx)) {
       params[info$sigma_nu_idx] <- log(params[info$sigma_nu_idx])
     }
-    
     if (!is.null(info$sigma_zeta_idx)) {
       params[info$sigma_zeta_idx] <- log(params[info$sigma_zeta_idx])
     }
   }
   
-  params
+  # ===== 6. VALIDATION =====
+  if (any(!is.finite(params))) {
+    warning("Some starting values are non-finite. Falling back to defaults.")
+    return(jvn_init_params(model_struct, transform_se))
+  }
+  
+  # Ensure AR stationarity
+  ar_sum <- sum(params[info$ar_coef_idx])
+  if (abs(ar_sum) >= 1) {
+    params[info$ar_coef_idx] <- params[info$ar_coef_idx] * 0.9 / abs(ar_sum)
+  }
+  
+  return(params)
 }
 
 #' Create Parameter Table
@@ -742,8 +1216,17 @@ jvn_param_table <- function(params, se, param_info) {
   )
 }
 
-
 #' Summary Method for JVN Model
+#' 
+#' @description Computes and displays a summary of the results from a 
+#' Jacobs-Van Norden (JVN) model fit, including convergence status, 
+#' information criteria, and parameter estimates.
+#'
+#' @param object An object of class \code{jvn_model}.
+#' @param ... Additional arguments passed to or from other methods.
+#' 
+#' @return The function returns the input \code{object} invisibly.
+#' @method summary jvn_model
 #' @export
 summary.jvn_model <- function(object, ...) {
   cat("\n=== Jacobs-Van Norden Model ===\n\n")
@@ -751,19 +1234,43 @@ summary.jvn_model <- function(object, ...) {
   cat("Log-likelihood:", round(object$loglik, 2), "\n")
   cat("AIC:", round(object$aic, 2), "\n")
   cat("BIC:", round(object$bic, 2), "\n\n")
+  
   cat("Parameter Estimates:\n")
-  #print(object$params, digits = 2, row.names = FALSE)
   df_print <- object$params
   df_print$Estimate <- sprintf("%.3f", df_print$Estimate)
   df_print$Std.Error <- sprintf("%.3f", df_print$Std.Error)
   print(df_print, row.names = FALSE, quote = FALSE)
+  
   cat("\n")
   invisible(object)
 }
 
 
 #' Print Method for JVN Model
+#' 
+#' @description Default print method for \code{jvn_model} objects. 
+#' Wraps the \code{summary} method for a consistent output.
+#'
+#' @param x An object of class \code{jvn_model}.
+#' @param ... Additional arguments passed to \code{summary.jvn_model}.
+#' 
+#' @return The function returns the input \code{x} invisibly.
+#' @method print jvn_model
 #' @export
 print.jvn_model <- function(x, ...) {
   summary.jvn_model(x, ...)
+}
+
+#' Plot JVN Model Results
+#' 
+#' @param x An object of class 'jvn_model'
+#' @param state String. The name of the state to visualize (e.g., "state_1").
+#' @param type String. Type of estimate to plot: "filtered" or "smoothed".
+#' @param ... Additional arguments passed to theme_reviser.
+#' 
+#' @return A ggplot2 object visualizing the specified state estimates.
+#' @export
+plot.jvn_model <- function(x, state = "true_lag_0", type = "filtered", ...) {
+  # Forward to the base method with JVN defaults
+  plot.revision_model(x, state = state, type = type, ...)
 }

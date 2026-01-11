@@ -6,6 +6,15 @@
 \usage{
 \method{print}{jvn_model}(x, ...)
 }
+\arguments{
+\item{x}{An object of class \code{jvn_model}.}
+
+\item{...}{Additional arguments passed to \code{summary.jvn_model}.}
+}
+\value{
+The function returns the input \code{x} invisibly.
+}
 \description{
-Print Method for JVN Model
+Default print method for \code{jvn_model} objects.
+Wraps the \code{summary} method for a consistent output.
 }

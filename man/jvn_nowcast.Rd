@@ -23,6 +23,9 @@ jvn_nowcast(
 \item{df}{A matrix or data frame where each column represents a different
 vintage estimate for the same time period. Rows are time periods.}
 
+\item{e}{An integer indicating the number of data vintages to include in the
+model. Must be greater than 0.}
+
 \item{ar_order}{Integer specifying the AR order for true values (default = 2).}
 
 \item{h}{Integer specifying the forecast horizon (default = 0).}
@@ -45,6 +48,8 @@ error (default = TRUE).}
 \item{method}{A string specifying the estimation method to use. Options are
 Maximum likelihood ("MLE") for now.}
 
+\item{alpha}{Significance level for confidence intervals (default = 0.05).}
+
 \item{solver_options}{List of options for the optimizer:
 \itemize{
 \item trace: Integer controlling output level (default = 0)
@@ -52,7 +57,9 @@ Maximum likelihood ("MLE") for now.}
 \item startvals: Named vector of starting values (optional)
 \item transform_se: T/F whether standard errors should be constrained to be
 positive in optimization.
-.  - method: String specifying optimization method (default = "BFGS").
+.  - method: String specifying optimization method (default = "L-BFGS-B").
+\item se_method: Method for standard error calculation (default = "hessian")
+\item n_starts: Number of random starting points for multi-start optimization
 }}
 }
 \value{
@@ -77,20 +84,22 @@ data revisions, allowing for news and noise components in measurement errors.
 }
 \examples{
 # Simulate data
-set.seed(123)
-n_obs <- 150
-n_vint <- 4
-y_true <- arima.sim(n = n_obs, list(ar = c(0.4, 0.1)), sd = 0.9)
-data <- matrix(NA, n_obs, n_vint)
-for(v in 1:n_vint) {
-  data[, v] <- y_true + rnorm(n_obs, 0, 0.3 / v)
-}
+gdp <- dplyr::filter(
+  tsbox::ts_pc(
+    reviser::gdp
+), id \%in\% c("EA"),
+   time >= min(pub_date),
+   time <= as.Date("2020-01-01")
+  ) 
+gdp <- tidyr::drop_na(gdp)
+df <- get_nth_release(gdp, n = 0:4)
 
 # Estimate model
 result <- jvn_nowcast(
-  df = data,
+  df = df,
+  e = 3,
   ar_order = 2,
-  h = 12,
+  h = 4,
   include_news = TRUE,
   include_noise = TRUE
 )
