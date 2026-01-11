@@ -72,7 +72,8 @@
 #'   include_news = TRUE,
 #'   include_noise = TRUE
 #' )
-#' 
+#'
+#' @family revision nowcasting
 #' @export
 jvn_nowcast <- function(df,
                         e,
@@ -1227,6 +1228,8 @@ jvn_param_table <- function(params, se, param_info) {
 #' 
 #' @return The function returns the input \code{object} invisibly.
 #' @method summary jvn_model
+#'
+#' @family revision nowcasting
 #' @export
 summary.jvn_model <- function(object, ...) {
   cat("\n=== Jacobs-Van Norden Model ===\n\n")
@@ -1256,6 +1259,8 @@ summary.jvn_model <- function(object, ...) {
 #' 
 #' @return The function returns the input \code{x} invisibly.
 #' @method print jvn_model
+#'
+#' @family revision nowcasting
 #' @export
 print.jvn_model <- function(x, ...) {
   summary.jvn_model(x, ...)
@@ -1269,6 +1274,8 @@ print.jvn_model <- function(x, ...) {
 #' @param ... Additional arguments passed to theme_reviser.
 #' 
 #' @return A ggplot2 object visualizing the specified state estimates.
+#'
+#' @family revision nowcasting
 #' @export
 plot.jvn_model <- function(x, state = "true_lag_0", type = "filtered", ...) {
   # Forward to the base method with JVN defaults

@@ -1260,6 +1260,8 @@ summary.kk_model <- function(object, ...) {
 #' @param ... Additional arguments passed to theme_reviser.
 #' 
 #' @return A ggplot2 object visualizing the specified state estimates.
+#' 
+#' @family revision nowcasting
 #' @export
 plot.kk_model <- function(x, state = NULL, type = "filtered", ...) {
   if (is.null(state)) {
