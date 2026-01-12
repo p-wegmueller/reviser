@@ -62,7 +62,6 @@ result <- jvn_nowcast(
   include_news = TRUE,
   include_noise = TRUE
 )
-#> Warning: Ignoring columns: pub_date
 #> Warning: 2 parameter(s) have problematic standard errors (2 NaN)
 plot(result)
 
