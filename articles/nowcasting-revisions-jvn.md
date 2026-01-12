@@ -90,16 +90,16 @@ The state vector evolves according to:
 & 0 & \tau\_{\zeta 3} \end{bmatrix} \begin{bmatrix} \tilde{y}\_{t-1} \\
 \tilde{y}\_{t-2} \\ \nu\_{1,t-1} \\ \nu\_{2,t-1} \\ \nu\_{3,t-1} \\
 \zeta\_{1,t-1} \\ \zeta\_{2,t-1} \\ \zeta\_{3,t-1} \end{bmatrix} + \\
-\begin{bmatrix} \sigma \_{e} & \sigma \_{\nu 1} & \sigma \_{\nu 2} &
-\sigma \_{\nu 3} & 0 & 0 & 0 \\ 0 & 0 & 0 & 0 & 0 & 0 & 0 \\ 0 & -\sigma
-\_{\nu 1} & -\sigma \_{\nu 2} & -\sigma \_{\nu 3} & 0 & 0 & 0 \\ 0 & 0 &
--\sigma \_{\nu 2} & -\sigma \_{\nu 3} & 0 & 0 & 0 \\ 0 & 0 & 0 & -\sigma
-\_{\nu 3} & 0 & 0 & 0 \\ 0 & 0 & 0 & 0 & 0 & \sigma \_{\zeta 1} & 0 & 0
-\\ 0 & 0 & 0 & 0 & 0 & 0 & \sigma \_{\zeta 2} & 0 \\ 0 & 0 & 0 & 0 & 0 &
-0 & 0 & \sigma \_{\zeta 3} \\ \end{bmatrix} \cdot \begin{bmatrix} \eta
-\_{et} \\ \eta \_{\nu \_{1}t} \\ \eta \_{\nu \_{2}t} \\ \eta \_{\nu
-\_{3}t} \\ \eta \_{\zeta \_{1}t} \\ \eta \_{\zeta \_{2}t} \\ \eta
-\_{\zeta \_{3}t} \\ \end{bmatrix} \$\$
+\begin{bmatrix} \sigma\_{e} & \sigma\_{\nu 1} & \sigma\_{\nu 2} &
+\sigma\_{\nu 3} & 0 & 0 & 0 \\ 0 & 0 & 0 & 0 & 0 & 0 & 0 \\ 0 &
+-\sigma\_{\nu 1} & -\sigma\_{\nu 2} & -\sigma\_{\nu 3} & 0 & 0 & 0 \\ 0
+& 0 & -\sigma\_{\nu 2} & -\sigma\_{\nu 3} & 0 & 0 & 0 \\ 0 & 0 & 0 &
+-\sigma\_{\nu 3} & 0 & 0 & 0 \\ 0 & 0 & 0 & 0 & \sigma\_{\zeta 1} & 0 &
+0 \\ 0 & 0 & 0 & 0 & 0 & \sigma\_{\zeta 2} & 0 \\ 0 & 0 & 0 & 0 & 0 & 0
+& \sigma\_{\zeta 3} \\ \end{bmatrix} \cdot \begin{bmatrix} \eta\_{et} \\
+\eta\_{\nu\_{1}t} \\ \eta\_{\nu\_{2}t} \\ \eta\_{\nu\_{3}t} \\
+\eta\_{\zeta\_{1}t} \\ \eta\_{\zeta\_{2}t} \\ \eta\_{\zeta\_{3}t} \\
+\end{bmatrix} \$\$
 
 The error loading matrix $R$ and shock vector $\eta_{t}$ capture how
 structural innovations affect each component. The true value
@@ -262,7 +262,7 @@ summary(nowcast)
 #> 
 #> Parameter Estimates:
 #>     Parameter Estimate Std.Error
-#>         rho_1    0.596     0.139
+#>         rho_1    0.596     0.138
 #>       sigma_e    0.001     0.426
 #>    sigma_nu_1    1.023     0.257
 #>    sigma_nu_2    0.001     0.023
