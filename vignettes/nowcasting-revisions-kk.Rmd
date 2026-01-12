@@ -1,11 +1,11 @@
 ---
-title: "Nowcasting Revisions"
+title: "Nowcasting revisions using the generalized Kishor-Koenig model"
 output: rmarkdown::html_vignette
 bibliography: references.bib
 biblio-style: apalike
 link-citations: true
 vignette: >
-  %\VignetteIndexEntry{nowcasting-revisions}
+  %\VignetteIndexEntry{nowcasting-revisions-kk}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -148,11 +148,10 @@ filt_states <- nowcast$states
 tail(filt_states)
 ```
 
-Now we can compare the nowcasts with the final values and the first release (which serves as a naive forecast). We calculate the root mean squared error (RMSE) of the models and naive nowcasts. The gain is not very high, but it is still better than the naive forecast.
+Now we can plot the forecast.
 
 ```{r warning = FALSE, message=FALSE, include=FALSE, eval=FALSE}
-# Compare nowcasts
-summary(nowcast)
+plot(nowcast)
 ```
 
 

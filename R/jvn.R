@@ -161,7 +161,7 @@ jvn_nowcast <- function(df,
         "Filter to a single ID first."
       ))
     }
-    df <- vintages_wide(df, names_from = "release")
+    df <- suppressWarnings(vintages_wide(df, names_from = "release"))
     # Handle if vintages_wide returns a list
     if (is.list(df) && !is.data.frame(df)) df <- df[[1]]
   }
