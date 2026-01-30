@@ -9,7 +9,7 @@
 state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![R-CMD-check](https://github.com/p-wegmueller/reviser/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/p-wegmueller/reviser/actions/workflows/R-CMD-check.yaml)
-[![pkgcheck](https://github.com/p-wegmueller/reviser/workflows/pkgcheck/badge.svg)](https://github.com/p-wegmueller/reviser/actions?query=workflow%3Apkgcheck)
+[![pkgcheck](https://github.com/p-wegmueller/reviser/workflows/pkgcheck/badge.svg)](https://github.com/p-wegmueller/reviser/actions/workflows/pkgcheck.yaml)
 [![Lifecycle:
 stable](https://img.shields.io/badge/lifecycle-stable-green.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 [![reviser status
@@ -157,7 +157,7 @@ plot_vintages(
   subtitle = "qoq growth rates")
 ```
 
-<img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-3-1.png" alt="" width="100%" />
 
 ``` r
   
@@ -179,9 +179,6 @@ print(summary)
 #> 7 US    release_6   168      -0.0182             0.116                   0.202
 #> # ℹ 8 more variables: Minimum <dbl>, Maximum <dbl>, `10Q` <dbl>, Median <dbl>,
 #> #   `90Q` <dbl>, MAR <dbl>, `Std. Dev.` <dbl>, `Noise/Signal` <dbl>
-```
-
-``` r
 
 efficient_release <- get_first_efficient_release(df, final_release)
 summary(efficient_release)
@@ -210,9 +207,8 @@ summary(efficient_release)
 #> 
 #> 
 #> Test summary: 
-#> Linear hypothesis test
 #> 
-#> Hypothesis:
+#> Linear hypothesis test:
 #> (Intercept) = 0
 #> release_0 = 1
 #> 
