@@ -133,8 +133,7 @@ plot_vintages <- function(
       "The 'type' argument must be either 'line', 'point', 'bar' or 'boxplot'."
     )
   }
-  
- 
+
   # Check 'time_col' is column name of 'df'
   if (!time_col %in% colnames(df)) {
     rlang::abort(
@@ -151,7 +150,6 @@ plot_vintages <- function(
     df <- vintages_long(df, keep_na = FALSE)
   }
 
-  
   # Check 'dim_col' is column name of 'df'
   if (!dim_col %in% colnames(df)) {
     rlang::abort(
@@ -162,8 +160,6 @@ plot_vintages <- function(
       )
     )
   }
-  
-
 
   # Check that 'time_col' is of date format
   if (!inherits(df[[time_col]], "Date")) {
@@ -212,7 +208,9 @@ plot_vintages <- function(
   if (n == 1L) {
     if (type == "line") {
       p <- p +
-        ggplot2::geom_line(ggplot2::aes(x = !!time_col, y = .data$value), data = df) +
+        ggplot2::geom_line(
+          ggplot2::aes(x = !!time_col, y = .data$value), data = df
+        ) +
         scale_color_reviser()
     } else if (type == "point") {
       p <- p +
@@ -271,7 +269,9 @@ plot_vintages <- function(
     } else if (type == "boxplot") {
       p <- p +
         ggplot2::geom_boxplot(
-          ggplot2::aes(x = !!time_col, y = .data$value, fill = factor(!!time_col)),
+          ggplot2::aes(
+            x = !!time_col, y = .data$value, fill = factor(!!time_col)
+          ),
           data = df
         ) +
         scale_fill_reviser() +
@@ -304,12 +304,12 @@ plot_vintages <- function(
 }
 
 #' Plot Revision Model Results
-#' 
+#'
 #' @param x An object of class 'revision_model'
 #' @param state String. The name of the state to visualize.
 #' @param type String. Type of estimate: "filtered" or "smoothed".
 #' @param ... Additional arguments passed to theme_reviser.
-#' 
+#'
 #' @keywords internal
 #' @noRd
 plot.revision_model <- function(x, state = NULL, type = "filtered", ...) {
@@ -319,10 +319,10 @@ plot.revision_model <- function(x, state = NULL, type = "filtered", ...) {
     state <- x$states[x$states$filter == type, ]$state[1]
     rlang::warn(paste("No state specified. Defaulting to first state:", state))
   }
-  
+
   # Filter data
   plot_data <- x$states[x$states$state == state & x$states$filter == type, ]
-  
+
   if (nrow(plot_data) == 0) {
     rlang::abort(paste("State", state, "not found in model results."))
   }
@@ -330,23 +330,25 @@ plot.revision_model <- function(x, state = NULL, type = "filtered", ...) {
   pal <- colors_reviser()
   col_values <- c("in_sample" = pal[1], "out_of_sample" = pal[2])
   line_values <- c("in_sample" = "solid", "out_of_sample" = "solid")
-  label_values <- c("in_sample" = "In-sample", "out_of_sample" = "Out-of-sample")
-  
+  label_values <- c(
+    "in_sample" = "In-sample", "out_of_sample" = "Out-of-sample"
+  )
+
   # Build Plot
   # Split samples
   in_sample_data  <- plot_data[plot_data$sample == "in_sample", ]
   oos_data        <- plot_data[plot_data$sample == "out_of_sample", ]
-  
+
   p <- ggplot2::ggplot() +
-    
+
     # ---- In-sample: always line + ribbon ----
-  ggplot2::geom_ribbon(
-    data = in_sample_data,
-    ggplot2::aes(
-      x = .data$time, ymin = .data$lower, ymax = .data$upper, fill = sample
-    ),
-    alpha = 0.2
-  ) +
+    ggplot2::geom_ribbon(
+      data = in_sample_data,
+      ggplot2::aes(
+        x = .data$time, ymin = .data$lower, ymax = .data$upper, fill = sample
+      ),
+      alpha = 0.2
+    ) +
     ggplot2::geom_line(
       data = in_sample_data,
       ggplot2::aes(
@@ -354,10 +356,10 @@ plot.revision_model <- function(x, state = NULL, type = "filtered", ...) {
       ),
       linewidth = 0.8
     )
-  
+
   # ---- Out-of-sample: branch on length ----
   if (nrow(oos_data) == 1) {
-    
+
     p <- p +
       ggplot2::geom_crossbar(
         data = oos_data,
@@ -379,9 +381,7 @@ plot.revision_model <- function(x, state = NULL, type = "filtered", ...) {
         ),
         size = 2
       )
-    
   } else {
-    
     p <- p +
       ggplot2::geom_ribbon(
         data = oos_data,
@@ -398,7 +398,7 @@ plot.revision_model <- function(x, state = NULL, type = "filtered", ...) {
         linewidth = 0.8
       )
   }
-  
+
   # ---- Scales & theme ----
   p <- p +
     ggplot2::scale_fill_manual(
@@ -420,10 +420,8 @@ plot.revision_model <- function(x, state = NULL, type = "filtered", ...) {
       color = "Sample", fill = "Sample", linetype = "Sample"
     ) +
     ggplot2::ylab("")
-  
+
   p
-  
-  
   return(p)
 }
 

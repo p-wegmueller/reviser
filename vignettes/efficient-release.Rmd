@@ -88,7 +88,7 @@ library(reviser)
 library(dplyr)
 
 gdp <- reviser::gdp %>%
-  tsbox::ts_pc() 
+  tsbox::ts_pc()
 
 df <- get_nth_release(gdp, n = 0:19)
 
@@ -111,10 +111,10 @@ Note: The identification of the first efficient release is related to the news h
 
 ```{r, warning=FALSE, message=FALSE}
 analysis <- get_revision_analysis(
-  df, 
+  df,
   final_release,
-  degree=3
-  )
+  degree = 3
+)
 head(analysis)
 ```
 

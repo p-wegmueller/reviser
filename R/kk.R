@@ -68,17 +68,17 @@
 #' df <- get_nth_release(
 #'   tsbox::ts_span(
 #'     tsbox::ts_pc(
-#'       dplyr::filter(reviser::gdp, id=="US")
-#'       ),
-#'       start = "1980-01-01"
-#'      ),
-#'      n = 0:1
-#'    )
+#'       dplyr::filter(reviser::gdp, id == "US")
+#'     ),
+#'     start = "1980-01-01"
+#'   ),
+#'   n = 0:1
+#' )
 #' df <- dplyr::select(df, -c(id, pub_date))
 #' df <- na.omit(df)
 #'
-#' e <- 1  # Number of efficient release
-#' h <- 2  # Forecast horizon
+#' e <- 1 # Number of efficient release
+#' h <- 2 # Forecast horizon
 #' result <- kk_nowcast(df, e, h = h, model = "Kishor-Koenig")
 #'
 #' result$params
@@ -234,12 +234,12 @@ kk_nowcast <- function(
 
   # Check data input
   check <- vintages_check(df)
-  
+
   # Reject lists with multiple IDs
   if (is.list(check)) {
     if (length(check) > 1) {
       rlang::abort(paste0(
-        "'df' must contain a single ID, but ", length(check), 
+        "'df' must contain a single ID, but ", length(check),
         " IDs were provided: ", paste(names(check), collapse = ", ")
       ))
     }
@@ -247,7 +247,7 @@ kk_nowcast <- function(
     df <- df[[1]]
     check <- check[[1]]
   }
-  
+
   # Convert long to wide if needed
   if (check == "long") {
     if ("id" %in% colnames(df) && length(unique(df$id)) > 1) {
@@ -263,10 +263,8 @@ kk_nowcast <- function(
 
   # Define state and observable variable names
   z_names <- c(paste0("release_", e, "_lag_", (e):0))
-  z_lag_names <- c(paste0("release_", e, "_lag_", (e + 1):1))
   y_names <- c(paste0("release_", e:0, "_lag_", e:0))
-  y_lag_names <- c(paste0("release_", e:0, "_lag_", (e + 1):1))
-  
+
   n_states <- length(c(z_names, y_names))
 
   # Define equations
@@ -279,17 +277,19 @@ kk_nowcast <- function(
     df = df,
     e = e
   )
-  
+
   # Create observable variable matrix
   Ymat <- sur_data %>%
     dplyr::select(dplyr::all_of(y_names)) %>%
     as.matrix()
-  
+
   # TODO: ar_order specifiable
   ar_order <- 1
   if (default_solver_options$trace > 0) {
-    cat("Estimating", model, "model with", 
-        n_param, "parameters...\n")
+    cat(
+      "Estimating", model, "model with",
+      n_param, "parameters...\n"
+    )
     cat("Estimation:", method, "\n")
     cat("AR order:", ar_order, "\n")
   }
@@ -341,31 +341,37 @@ kk_nowcast <- function(
     kk_loglik <- function(p, e, model, Ymat) {
       # Map vector p back to named parameters
       names(p) <- names(start_mat_mle)
-      
+
       # Ensure variance parameters are positive
       p[grep("v0|eps", names(p))] <- exp(p[grep("v0|eps", names(p))])
-      
+
       k_mat <- kk_matrices(e = e, model = model, params = p, type = "numeric")
       ss_mat <- kk_to_ss(k_mat$FF, k_mat$GG, k_mat$V, k_mat$W)
-      
-      mod <- KFAS::SSModel(Ymat ~ -1 + 
-                             SSMcustom(
-                               Z = ss_mat$Z, 
-                               T = ss_mat$Tmat, 
-                               R = ss_mat$R, 
-                               Q = ss_mat$Q, 
-                               a1 = c(rep(0.2, n_states/2), rep(0, n_states/2)),
-                               P1inf = diag(c(rep(1, n_states/2), rep(0, n_states/2)), n_states),
-                               P1 = diag(c(rep(0, n_states/2), rep(1, n_states/2)), n_states),
-                               index = seq_len(ncol(Ymat))), 
-                           H = ss_mat$H)
-      
+
+      mod <- KFAS::SSModel(
+        Ymat ~ -1 +
+          SSMcustom(
+            Z = ss_mat$Z,
+            T = ss_mat$Tmat,
+            R = ss_mat$R,
+            Q = ss_mat$Q,
+            a1 = c(rep(0.2, n_states / 2), rep(0, n_states / 2)),
+            P1inf = diag(
+              c(rep(1, n_states / 2), rep(0, n_states / 2)), n_states
+            ),
+            P1 = diag(c(rep(0, n_states / 2), rep(1, n_states / 2)), n_states),
+            index = seq_len(ncol(Ymat))
+          ),
+        H = ss_mat$H
+      )
+
       # Return negative log-likelihood for minimization
       ll <- stats::logLik(mod)
       return(-as.numeric(ll))
     }
-    
-    # 2. Prepare starting values (log-transform variances for unconstrained optimization)
+
+    # 2. Prepare starting values (log-transform variances for
+    # unconstrained optimization)
     if (is.null(default_solver_options$startvals)) {
       # Use OLS estimates as smart starting values if none provided
       ols_init <- kk_ols_estim(equations, sur_data, model)$params
@@ -373,31 +379,35 @@ kk_nowcast <- function(
     } else {
       start_mat_mle <- default_solver_options$startvals
     }
-    
+
     # Log-transform variances so optim can work in unconstrained space
     var_idx <- grep("v0|eps", names(start_mat_mle))
     start_mat_mle[var_idx] <- log(pmax(start_mat_mle[var_idx], 1e-6))
-    
+
     # 3. Optimize
     fit_mle <- stats::optim(
       par = start_mat_mle,
       fn = kk_loglik,
       e = e,
       model = model,
-      Ymat = Ymat, 
+      Ymat = Ymat,
       method = "BFGS",
-      control = list(maxit = default_solver_options$maxiter, 
-                     trace = default_solver_options$trace,
-                     factr = 1e7)
+      control = list(
+        maxit = default_solver_options$maxiter,
+        trace = default_solver_options$trace,
+        factr = 1e7
+      )
     )
-    
+
     # 4. Transform back and extract results
     params <- fit_mle$par
     params[var_idx] <- exp(params[var_idx])
     fit <- fit_mle
-    
+
     # Ensure parameter order is consistent
-    params <- kk_matrices(e = e, model = model, params = params, type = "numeric")$params
+    params <- kk_matrices(
+      e = e, model = model, params = params, type = "numeric"
+    )$params
   }
 
   # Create model matrices with estimated parameters
@@ -416,7 +426,7 @@ kk_nowcast <- function(
     W = kk_mat_hat$W,
     epsilon = 1e-6
   )
-  
+
   # Calculate forecasts if h > 0
   if (h > 0) {
     frequency <- unique((round(as.numeric(diff(df$time)) / 30)))
@@ -426,18 +436,17 @@ kk_nowcast <- function(
         please provide a regular time series!"
       )
     }
-    
+
     forecast_dates <- seq.Date(
       df$time[nrow(df)],
       by = paste0(frequency, " months"),
       length.out = (h + 1)
     )[2:(h + 1)]
-    
+
     output_dates <- c(as.Date(rownames(Ymat)), forecast_dates)
-    
+
     # Create extended data by appending NAs
     Ymat <- rbind(Ymat, matrix(NA, h, dim(Ymat)[2]))
-    
   } else {
     output_dates <- c(as.Date(rownames(Ymat)))
     forecast_dates <- as.Date(character(0))
@@ -452,9 +461,9 @@ kk_nowcast <- function(
           T = sur_ss_mat$Tmat,
           R = sur_ss_mat$R,
           Q = sur_ss_mat$Q,
-          a1 = c(rep(0.2, n_states/2), rep(0, n_states/2)),
-          P1inf = diag(c(rep(1, n_states/2), rep(0, n_states/2)), n_states),
-          P1 = diag(c(rep(0, n_states/2), rep(1, n_states/2)), n_states),
+          a1 = c(rep(0.2, n_states / 2), rep(0, n_states / 2)),
+          P1inf = diag(c(rep(1, n_states / 2), rep(0, n_states / 2)), n_states),
+          P1 = diag(c(rep(0, n_states / 2), rep(1, n_states / 2)), n_states),
           index = c(seq_len(dim(Ymat)[2]))
         ),
     H = sur_ss_mat$H
@@ -462,63 +471,63 @@ kk_nowcast <- function(
 
   # Run the Kalman filter
   kalman <- KFAS::KFS(model_kfas)
-  
+
   # Number of state variables
   n_states <- length(z_names)
-  n_total <- length(output_dates)
-  
+
   # Initialize list to store results
   state_results <- list()
-  
+
   # Loop through each state variable
   for (i in 1:n_states) {
-    
     # Extract filtered estimates
     filtered_est <- kalman$att[, i]
     filtered_se <- sqrt(kalman$Ptt[i, i, ])
-    
+
     # Extract smoothed estimates
     smoothed_est <- kalman$alphahat[, i]
     smoothed_se <- sqrt(kalman$V[i, i, ])
-    
+
     # Create filtered data frame
     filtered_df <- dplyr::tibble(
       time = output_dates,
       state = z_names[i],
       estimate = filtered_est,
-      lower = filtered_est - stats::qnorm(1-alpha/2) * filtered_se,
-      upper = filtered_est + stats::qnorm(1-alpha/2) * filtered_se,
+      lower = filtered_est - stats::qnorm(1 - alpha / 2) * filtered_se,
+      upper = filtered_est + stats::qnorm(1 - alpha / 2) * filtered_se,
       filter = "filtered",
-      sample = dplyr::if_else(output_dates %in% forecast_dates, 
-                              "out_of_sample",
-                              "in_sample")
+      sample = dplyr::if_else(output_dates %in% forecast_dates,
+        "out_of_sample",
+        "in_sample"
+      )
     )
-    
+
     # Create smoothed data frame
     smoothed_df <- dplyr::tibble(
       time = output_dates,
       state = z_names[i],
       estimate = smoothed_est,
-      lower = smoothed_est - stats::qnorm(1-alpha/2) * smoothed_se,
-      upper = smoothed_est + stats::qnorm(1-alpha/2) * smoothed_se,
+      lower = smoothed_est - stats::qnorm(1 - alpha / 2) * smoothed_se,
+      upper = smoothed_est + stats::qnorm(1 - alpha / 2) * smoothed_se,
       filter = "smoothed",
-      sample = dplyr::if_else(output_dates %in% forecast_dates, 
-                              "out_of_sample",
-                              "in_sample")
+      sample = dplyr::if_else(output_dates %in% forecast_dates,
+        "out_of_sample",
+        "in_sample"
+      )
     )
-    
+
     # Combine filtered and smoothed
     state_results[[i]] <- dplyr::bind_rows(filtered_df, smoothed_df)
   }
-  
+
   # Combine all states into one data frame
   states_long <- dplyr::bind_rows(state_results)
-  
+
   # Optional: Convert to tibble if using tidyverse
   states_long <- dplyr::as_tibble(states_long) %>%
     dplyr::arrange(.data$filter, .data$state, .data$time)
-  
-  
+
+
   # Remove the parameters from the model matrices
   kk_mat_hat$params <- NULL
 
@@ -610,8 +619,6 @@ kk_arrange_data <- function(df, e) {
   dates <- df$time
   z_names <- c(paste0("release_", e, "_lag_", (e):0))
   z_lag_names <- c(paste0("release_", e, "_lag_", (e + 1):1))
-  y_names <- c(paste0("release_", e:0, "_lag_", e:0))
-  y_lag_names <- c(paste0("release_", e:0, "_lag_", (e + 1):1))
 
   # Arrange data
   z <- array(NA, c(nrow(df), e + 1))
@@ -643,7 +650,7 @@ kk_arrange_data <- function(df, e) {
   colnames(y) <- c(paste0("release_", (e - 1):0, "_lag_", (e - 1):0))
   colnames(y_lag) <- c(paste0("release_", (e - 1):0, "_lag_", e:1))
 
-  data <- cbind(z, y, y_lag) 
+  data <- cbind(z, y, y_lag)
   rownames(data) <- dates
   data <- data %>% tidyr::drop_na()
 
@@ -821,7 +828,7 @@ kk_ols_estim <- function(equations, data, model = "KK") {
         sign <- ifelse(signs[i] == "+", 1, -1)
 
         if (is.null(regressors[[g]])) {
-          if (i == 1 & ii == n_eq) {
+          if (i == 1 && ii == n_eq) {
             regressors[[g]] <- sign * data[[var]] * ols_coeffs["F0"]
           } else {
             regressors[[g]] <- sign * data[[var]]
@@ -940,7 +947,7 @@ kk_ols_estim <- function(equations, data, model = "KK") {
 #' params <- rep(0.1, 17)
 #' names(params) <- names(matrices$params)
 #' matrices <- kk_matrices(
-#'   e = 3, params = params,  model = "KK", type = "numeric"
+#'   e = 3, params = params, model = "KK", type = "numeric"
 #' )
 #' str(matrices)
 #'
@@ -1002,7 +1009,7 @@ kk_matrices <- function(e, model, params = NULL, type = "numeric") {
 
   n_param <- n_param_mat + n_param_cov
 
-  if (!is.null(params) & length(params) != n_param) {
+  if (!is.null(params) && length(params) != n_param) {
     rlang::abort(paste0(
       "'params' must have length ",
       n_param,
@@ -1016,9 +1023,6 @@ kk_matrices <- function(e, model, params = NULL, type = "numeric") {
   } else if (is.null(params) && type == "character") {
     params <- rep(NA_real_, n_param)
   }
-
-  # Define I matrix
-  II <- diag(e + 1)
 
   # Define F matrix
   FF <- array(0, c(e + 1, e + 1))
@@ -1215,32 +1219,32 @@ kk_to_ss <- function(FF, GG, V, W, epsilon = 1e-6) {
 
 
 #' Plot Kishor-Koenig Model Results
-#' 
+#'
 #' @param x An object of class 'kk_model'
 #' @param state String. The name of the state to visualize.
 #' @param type String. Type of estimate to plot: "filtered" or "smoothed".
 #' @param ... Additional arguments passed to theme_reviser.
-#' 
+#'
 #' @return A ggplot2 object visualizing the specified state estimates.
 #' @examples
 #' df <- get_nth_release(
 #'   tsbox::ts_span(
 #'     tsbox::ts_pc(
-#'       dplyr::filter(reviser::gdp, id=="US")
-#'       ),
-#'       start = "1980-01-01"
-#'      ),
-#'      n = 0:1
-#'    )
+#'       dplyr::filter(reviser::gdp, id == "US")
+#'     ),
+#'     start = "1980-01-01"
+#'   ),
+#'   n = 0:1
+#' )
 #' df <- dplyr::select(df, -c(id, pub_date))
 #' df <- na.omit(df)
 #'
-#' e <- 1  # Number of efficient release
-#' h <- 2  # Forecast horizon
+#' e <- 1 # Number of efficient release
+#' h <- 2 # Forecast horizon
 #' result <- kk_nowcast(df, e, h = h, model = "Kishor-Koenig")
 #'
 #' plot(result)
-#' 
+#'
 #' @family revision nowcasting
 #' @export
 plot.kk_model <- function(x, state = NULL, type = "filtered", ...) {

@@ -254,7 +254,7 @@ data_quarterly_update <- dplyr::tibble(
   )
 )
 
-data_quarterly_update_irregular <- dplyr::tibble(
+data_quarterly_irregular <- dplyr::tibble(
   pub_date = as.Date(c(
     rep("2022-10-25", 5),
     rep("2023-01-25", 6),

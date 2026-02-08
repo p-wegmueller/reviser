@@ -157,7 +157,3 @@ test_that("plot returns a ggplot object", {
   p <- plot(result)
   expect_s3_class(p, "ggplot")
 })
-
-
-
-

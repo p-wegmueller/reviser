@@ -46,7 +46,7 @@ For illustration, the package provides a dataset in **long format**, `gdp`. Belo
 ```{r}
 # Example long-format US GDP data
 data("gdp")
-gdp_us_short <- gdp %>% 
+gdp_us_short <- gdp %>%
   dplyr::filter(id == "US") %>%
   ts_pc() %>%
   filter(
@@ -120,7 +120,7 @@ Once data follows the package conventions, it can be analyzed further. A common 
 gdp_releases <- get_nth_release(gdp_short, n = 0)
 vintages_wide(gdp_releases)
 
-# The function uses the pub_date column by default to define columns in wide 
+# The function uses the pub_date column by default to define columns in wide
 # format. Specifying the `names_from` argument allows to use the release column.
 gdp_releases <- get_nth_release(gdp_short, n = 0:1)
 vintages_wide(gdp_releases, names_from = "release")
@@ -139,22 +139,22 @@ vintages_wide(gdp_final)
 Some agencies **fix** their data after a certain period (e.g., Germany finalizes GDP data in August four years after the initial release). The function `get_fixed_release()` extracts these fixed releases.
 
 ```{r}
-gdp_ea_longer <- gdp %>% 
+gdp_ea_longer <- gdp %>%
   dplyr::filter(id == "EA") %>%
-  ts_pc() %>% 
+  ts_pc() %>%
   filter(
     time >= as.Date("2000-01-01"),
     time < as.Date("2006-01-01"),
     pub_date >= as.Date("2000-01-01"),
     pub_date <= as.Date("2006-01-01")
-    )
+  )
 
 # Get the release from October four years after the initial release
 gdp_releases <- get_fixed_release(
-  gdp_ea_longer, 
-  years = 4, 
+  gdp_ea_longer,
+  years = 4,
   month = "October"
-  )
+)
 gdp_releases
 ```
 
@@ -179,7 +179,7 @@ plot_vintages(
   gdp_us_short,
   title = "Real-time GDP Estimates for the US",
   subtitle = "Growth Rate in %"
-  )
+)
 
 # Line plot showing GDP vintages over the release dimension
 gdp_releases <- get_nth_release(gdp_us_short, n = 0:3)
@@ -195,18 +195,18 @@ plot_vintages(
   type = "boxplot",
   title = "Real-time GDP Estimates for the Euro Area",
   subtitle = "Growth Rate in %"
-  )
+)
 
 # Line plot showing GDP vintages over id dimension
 plot_vintages(
-  gdp %>% 
-    ts_pc() %>% 
+  gdp %>%
+    ts_pc() %>%
     get_latest_release() %>%
-    na.omit(), 
+    na.omit(),
   dim_col = "id",
   title = "Recent GDP Estimates",
   subtitle = "Growth Rate in %"
-  )
+)
 ```
 
 For further customization, you can apply custom themes and color scales using:
@@ -228,4 +228,3 @@ After defining the final release, we can analyze revisions and releases in multi
 - Analyze the revisions: `get_revision_analysis()`. See vignette [Revision Patterns and Statistics](revision-analysis.html) for more details.  
 - Identify the first efficient release: `get_first_efficient_release()`. See vignette [Efficient Release Identification](efficient-release.html) for more details.  
 - Nowcast future revisions: `kk_nowcast()`. See vignette [Nowcasting Revisions](nowcasting-revisions.html) for more details.  
-

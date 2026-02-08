@@ -31,7 +31,7 @@
 #'
 #' @examples
 #' # Example wide-format data
-#' long_data <- dplyr::filter(reviser::gdp, id=="US")
+#' long_data <- dplyr::filter(reviser::gdp, id == "US")
 #'
 #' # Convert to wide format
 #' wide_data <- vintages_wide(long_data)
@@ -159,7 +159,7 @@ vintages_long <- function(df, names_to = "pub_date", keep_na = FALSE) {
 #'
 #' @examples
 #' # Example wide-format data
-#' long_data <- dplyr::filter(reviser::gdp, id=="US")
+#' long_data <- dplyr::filter(reviser::gdp, id == "US")
 #'
 #' # Convert to wide format
 #' wide_data <- vintages_wide(long_data)
@@ -271,7 +271,7 @@ vintages_wide <- function(df, names_from = "pub_date") {
 #'
 #' @param df A data frame or tibble containing data vintages. The data frame
 #' must have specific columns depending on whether it is in long or wide format.
-#' 
+#'
 #'
 #' @return A string indicating the format of the data:
 #' - `"long"` if the data frame is in long format.
@@ -316,10 +316,12 @@ vintages_wide <- function(df, names_from = "pub_date") {
 #' # Example of long format data
 #' long_data <- tibble::tibble(
 #'   time = seq.Date(
-#'     as.Date("2020-01-01"), as.Date("2020-08-01"), by = "month"
+#'     as.Date("2020-01-01"), as.Date("2020-08-01"),
+#'     by = "month"
 #'   ),
 #'   pub_date = seq.Date(
-#'     as.Date("2020-01-15"), as.Date("2020-08-15"), by = "month"
+#'     as.Date("2020-01-15"), as.Date("2020-08-15"),
+#'     by = "month"
 #'   ),
 #'   value = rnorm(8)
 #' )
@@ -328,8 +330,9 @@ vintages_wide <- function(df, names_from = "pub_date") {
 #' # Example of wide format data
 #' wide_data <- tibble::tibble(
 #'   time = seq.Date(
-#'     as.Date("2020-01-01"), as.Date("2020-08-01"), by = "month"
-#'     ),
+#'     as.Date("2020-01-01"), as.Date("2020-08-01"),
+#'     by = "month"
+#'   ),
 #'   `2020-01-15` = rnorm(8),
 #'   `2020-02-15` = rnorm(8)
 #' )
@@ -341,42 +344,54 @@ vintages_check <- function(df, time_col = "time") {
   check_simple_columns <- function(df) {
     issues <- lapply(names(df), function(col) {
       column <- df[[col]]
-      
+
       # G2.12: Check for list columns
       if (is.list(column) && !is.data.frame(column)) {
         return(paste0("Column '", col, "' is a list column."))
       }
-      
+
       # G2.11: Check for non-atomic or multi-valued entries
       non_atomic <- which(!vapply(column, is.atomic, logical(1)))
       if (length(non_atomic) > 0) {
         return(paste0("Column '", col, "' has non-atomic elements."))
       }
-      
-      not_scalar <- which(vapply(column, function(x) length(x) != 1, logical(1)))
+
+      not_scalar <- which(
+        vapply(column, function(x) length(x) != 1, logical(1))
+      )
       if (length(not_scalar) > 0) {
-        return(paste0("Column '", col, "' has elements that are not scalar values."))
+        return(
+          paste0("Column '", col, "' has elements that are not scalar values.")
+        )
       }
-      
+
       return(NULL)
     })
-    
+
     issues <- unlist(issues)
     if (length(issues) > 0) {
-      rlang::abort(paste("Invalid columns detected:\n", paste(issues, collapse = "\n")))
+      rlang::abort(
+        paste("Invalid columns detected:\n", paste(issues, collapse = "\n"))
+      )
     }
     return(TRUE)
   }
-  
+
   # Helper: Check a single data frame
   check_single_df <- function(df, df_name = NULL) {
-    prefix <- if (!is.null(df_name)) paste0("In element '", df_name, "': ") else ""
-    
+    prefix <- if (!is.null(df_name)) {
+      paste0("In element '", df_name, "': ")
+    } else {
+      ""
+    }
+
     # Ensure it's a data.frame or tibble
     if (!is.data.frame(df)) {
-      rlang::abort(paste0(prefix, "The provided object is not a data.frame or tibble."))
+      rlang::abort(
+        paste0(prefix, "The provided object is not a data.frame or tibble.")
+      )
     }
-    
+
     # Perform column structure check (G2.11 and G2.12)
     tryCatch(
       check_simple_columns(df),
@@ -384,81 +399,90 @@ vintages_check <- function(df, time_col = "time") {
         rlang::abort(paste0(prefix, conditionMessage(e)))
       }
     )
-    
+
     # Check for required "time" column
     if (!"time" %in% colnames(df)) {
-      rlang::abort(paste0(prefix, "The 'time' column is missing in the data.frame."))
+      rlang::abort(
+        paste0(prefix, "The 'time' column is missing in the data.frame.")
+      )
     }
-    
+
     # Check for implicit missings in time column
     implicit_missings <- check_implicit_missing(df, time_col)
     if (implicit_missings$total_missing > 0) {
       df <- make_explicit_missing(df, time_col)
-      rlang::warn(paste0(prefix, "The 'time' column contains implicit missing values. ",
-                         "I created a new 'time' column with explicit NA values. ",
-                         "Please check your data."))
+      rlang::warn(paste0(
+        prefix, "The 'time' column contains implicit missing values. ",
+        "I created a new 'time' column with explicit NA values. ",
+        "Please check your data."
+      ))
     }
-    
+
     # Validate date format for "time"
     if (!all(!is.na(as.Date(df$time, format = "%Y-%m-%d")))) {
-      rlang::abort(paste0(prefix, "The 'time' column contains values that are not in the '%Y-%m-%d' format."))
+      rlang::abort(paste0(prefix, "The 'time' column contains values that 
+                          are not in the '%Y-%m-%d' format."))
     }
-    
+
     # Check for long format
     long_format <- all(c("pub_date", "value") %in% colnames(df)) ||
       all(c("pub_date", "values") %in% colnames(df)) ||
       all(c("release", "value") %in% colnames(df)) ||
       all(c("release", "values") %in% colnames(df))
-    
+
     if (long_format) {
       if ("pub_date" %in% colnames(df)) {
         if (!all(!is.na(as.Date(df$pub_date, format = "%Y-%m-%d")))) {
-          rlang::abort(paste0(prefix, "The 'pub_date' column contains values that are not in '%Y-%m-%d' format."))
+          rlang::abort(paste0(prefix, "The 'pub_date' column contains values 
+                              that are not in '%Y-%m-%d' format."))
         }
       }
       return("long")
     }
-    
+
     # Check for wide format
     wide_format <- setdiff(colnames(df), "time")
     if (length(wide_format) > 0) {
       if (
         all(!is.na(as.Date(wide_format, format = "%Y-%m-%d"))) ||
-        all(grepl("release|final", wide_format))
+          all(grepl("release|final", wide_format))
       ) {
         return("wide")
       } else {
-        rlang::abort(paste0(prefix, "One or more column names in the 'wide format' are not labeled correctly."))
+        rlang::abort(paste0(prefix, "One or more column names in the 'wide 
+                            format' are not labeled correctly."))
       }
     }
-    
-    rlang::abort(paste0(prefix, "The data.frame does not conform to either 'long format' or 'wide format'."))
+
+    rlang::abort(paste0(prefix, "The data.frame does not conform to either 
+                        'long format' or 'wide format'."))
   }
-  
+
   # === Main Logic ===
-  
+
   # Case 1: Input is a list of data frames (wide format with IDs as names)
   if (is.list(df) && !is.data.frame(df)) {
     # Check if all elements are data frames
     if (!all(vapply(df, is.data.frame, logical(1)))) {
       rlang::abort("All elements in the list must be data.frames or tibbles.")
     }
-    
+
     # Check if list has names
     if (is.null(names(df)) || any(names(df) == "")) {
-      rlang::abort("All elements in the list must be named (these names serve as IDs).")
+      rlang::abort("All elements in the list must be named (these names 
+                   serve as IDs).")
     }
-    
+
     # Check each data frame in the list
     formats <- lapply(names(df), function(name) {
       check_single_df(df[[name]], df_name = name)
     })
-    
+
     # Return a named list of formats
     names(formats) <- names(df)
     return(formats)
   }
-  
+
   # Case 2: Input is a single data frame
   return(check_single_df(df))
 }
@@ -469,47 +493,53 @@ vintages_check_old <- function(df, time_col = "time") {
   check_simple_columns <- function(df) {
     issues <- lapply(names(df), function(col) {
       column <- df[[col]]
-      
+
       # G2.12: Check for list columns
       if (is.list(column) && !is.data.frame(column)) {
         return(paste0("Column '", col, "' is a list column."))
       }
-      
+
       # G2.11: Check for non-atomic or multi-valued entries
       non_atomic <- which(!vapply(column, is.atomic, logical(1)))
       if (length(non_atomic) > 0) {
         return(paste0("Column '", col, "' has non-atomic elements."))
       }
-      
-      not_scalar <- which(vapply(column, function(x) length(x) != 1, logical(1)))
+
+      not_scalar <- which(
+        vapply(column, function(x) length(x) != 1, logical(1))
+      )
       if (length(not_scalar) > 0) {
-        return(paste0("Column '", col, "' has elements that are not scalar values."))
+        return(
+          paste0("Column '", col, "' has elements that are not scalar values.")
+        )
       }
-      
+
       return(NULL)
     })
-    
+
     issues <- unlist(issues)
     if (length(issues) > 0) {
-      rlang::abort(paste("Invalid columns detected:\n", paste(issues, collapse = "\n")))
+      rlang::abort(
+        paste("Invalid columns detected:\n", paste(issues, collapse = "\n"))
+      )
     }
     return(TRUE)
   }
-  
+
   # === Begin Main Checks ===
   # Ensure it's a data.frame or tibble
   if (!is.data.frame(df)) {
     rlang::abort("The provided object is not a data.frame or tibble.")
   }
-  
+
   # Perform column structure check (G2.11 and G2.12)
   check_simple_columns(df)
-  
+
   # Check for required "time" column
   if (!"time" %in% colnames(df)) {
     rlang::abort("The 'time' column is missing in the data.frame.")
   }
-  
+
   # Check for implicit missings in time column
   implicit_missings <- check_implicit_missing(df, time_col)
   if (implicit_missings$total_missing > 0) {
@@ -517,44 +547,51 @@ vintages_check_old <- function(df, time_col = "time") {
     rlang::warn("The 'time' column contains implicit missing values. I created 
         a new 'time' column with explicit NA values. Please check your data.")
   }
-  
-  
+
+
   # Validate date format for "time"
   if (!all(!is.na(as.Date(df$time, format = "%Y-%m-%d")))) {
-    rlang::abort("The 'time' column contains values that are not in the '%Y-%m-%d' format.")
+    rlang::abort(
+      "The 'time' column contains values that are not in the '%Y-%m-%d' format."
+    )
   }
-  
+
   # Check for long format
   long_format <- all(c("pub_date", "value") %in% colnames(df)) ||
     all(c("pub_date", "values") %in% colnames(df)) ||
     all(c("release", "value") %in% colnames(df)) ||
     all(c("release", "values") %in% colnames(df))
-  
+
   if (long_format) {
     if ("pub_date" %in% colnames(df)) {
       if (!all(!is.na(as.Date(df$pub_date, format = "%Y-%m-%d")))) {
-        rlang::abort("The 'pub_date' column contains values that are not in '%Y-%m-%d' format.")
+        rlang::abort(
+          "The 'pub_date' column contains values that are 
+          not in '%Y-%m-%d' format."
+        )
       }
     }
-    
+
     # Possibly add similar validation for 'release' if needed
     return("long")
   }
-  
+
   # Check for wide format
   wide_format <- setdiff(colnames(df), "time")
   if (length(wide_format) > 0) {
     if (
       all(!is.na(as.Date(wide_format, format = "%Y-%m-%d"))) ||
-      all(grepl("release|final", wide_format))
+        all(grepl("release|final", wide_format))
     ) {
       return("wide")
     } else {
-      rlang::abort("One or more column names in the 'wide format' are not labeled correctly.")
+      rlang::abort("One or more column names in the 
+                   'wide format' are not labeled correctly.")
     }
   }
-  
-  rlang::abort("The data.frame does not conform to either 'long format' or 'wide format'.")
+
+  rlang::abort("The data.frame does not conform to 
+               either 'long format' or 'wide format'.")
 }
 
 
@@ -638,41 +675,39 @@ standardize_val_col <- function(df) {
 check_implicit_missing <- function(data, time_col, freq = "auto") {
   # Convert date column to Date if it isn't already
   data[[time_col]] <- as.Date(data[[time_col]])
-  
+
   # Auto-detect frequency if not specified
   if (freq == "auto") {
     dates <- sort(unique(data[[time_col]]))
     if (length(dates) < 2) {
       rlang::abort("Need at least 2 dates to determine frequency")
     }
-    
+
     # Calculate most common difference between consecutive dates
     diffs <- as.numeric(diff(dates))
     freq_days <- as.numeric(names(sort(table(diffs), decreasing = TRUE))[1])
-    
+
     # Determine frequency based on most common difference
     if (freq_days == 1) {
       freq <- "day"
     } else if (freq_days == 7) {
       freq <- "week"
-    } else if (freq_days >= 28 & freq_days <= 31) {
+    } else if (freq_days >= 28 && freq_days <= 31) {
       freq <- "month"
-    } else if (freq_days >= 90 & freq_days <= 95) {
+    } else if (freq_days >= 90 && freq_days <= 95) {
       freq <- "quarter"
-    } else if (freq_days >= 365 & freq_days <= 366) {
+    } else if (freq_days >= 365 && freq_days <= 366) {
       freq <- "year"
     } else {
       freq <- paste(freq_days, "days")
     }
-    
-    # cat("Auto-detected frequency:", freq, "\n")
   }
-  
+
   # Create complete sequence based on frequency
-  
+
   min_date <- min(data[[time_col]])
   max_date <- max(data[[time_col]])
-  
+
   if (freq == "day") {
     complete_seq <- seq(from = min_date, to = max_date, by = "day")
   } else if (freq == "week") {
@@ -688,13 +723,14 @@ check_implicit_missing <- function(data, time_col, freq = "auto") {
     days_interval <- as.numeric(gsub(" days", "", freq))
     complete_seq <- seq(from = min_date, to = max_date, by = days_interval)
   } else {
-    stop("Unsupported frequency. Use 'day', 'week', 'month', 'quarter', 'year', or 'X days'")
+    stop("Unsupported frequency. Use 'day', 'week', 'month', 
+         'quarter', 'year', or 'X days'")
   }
-  
+
   # Find missing dates
   existing_dates <- unique(data[[time_col]])
   missing_dates <- setdiff(complete_seq, existing_dates)
-  
+
   # Create summary
   results <- list(
     frequency = freq,
@@ -702,9 +738,11 @@ check_implicit_missing <- function(data, time_col, freq = "auto") {
     total_existing = length(existing_dates),
     total_missing = length(missing_dates),
     missing_dates = missing_dates,
-    missing_percentage = round(length(missing_dates) / length(complete_seq) * 100, 2)
+    missing_percentage = round(
+      length(missing_dates) / length(complete_seq) * 100, 2
+    )
   )
-  
+
   return(results)
 }
 
@@ -719,25 +757,25 @@ check_implicit_missing <- function(data, time_col, freq = "auto") {
 #' @keywords internal
 #' @noRd
 make_explicit_missing <- function(
-    data, 
-    time_col,
-    freq = "auto") {
-
+  data,
+  time_col,
+  freq = "auto"
+) {
   # Get missing info
   missing_info <- check_implicit_missing(data, time_col, freq)
-  
+
   # Create complete date sequence
   complete_dates <- data.frame(
     time = c(unique(data[[time_col]]), missing_info$missing_dates)
   )
   names(complete_dates) <- time_col
-  
+
   data_subset <- data %>% dplyr::select(c(time_col, dplyr::everything()))
-  
+
   # Merge to create explicit NAs
   complete_data <- complete_dates %>%
     dplyr::left_join(data_subset, by = time_col) %>%
     dplyr::arrange(!!rlang::sym(time_col))
-  
+
   return(complete_data)
 }
