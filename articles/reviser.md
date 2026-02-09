@@ -41,7 +41,7 @@ during the 2007–2009 financial crisis.
 ``` r
 # Example long-format US GDP data
 data("gdp")
-gdp_us_short <- gdp %>% 
+gdp_us_short <- gdp %>%
   dplyr::filter(id == "US") %>%
   ts_pc() %>%
   filter(
@@ -212,7 +212,7 @@ vintages_wide(gdp_releases)
 #> 7 2008-07-01       NA           NA            NA          NA           NA    
 #> # ℹ 2 more variables: `2008-07-01` <dbl>, `2008-10-01` <dbl>
 
-# The function uses the pub_date column by default to define columns in wide 
+# The function uses the pub_date column by default to define columns in wide
 # format. Specifying the `names_from` argument allows to use the release column.
 gdp_releases <- get_nth_release(gdp_short, n = 0:1)
 vintages_wide(gdp_releases, names_from = "release")
@@ -285,22 +285,22 @@ function
 extracts these fixed releases.
 
 ``` r
-gdp_ea_longer <- gdp %>% 
+gdp_ea_longer <- gdp %>%
   dplyr::filter(id == "EA") %>%
-  ts_pc() %>% 
+  ts_pc() %>%
   filter(
     time >= as.Date("2000-01-01"),
     time < as.Date("2006-01-01"),
     pub_date >= as.Date("2000-01-01"),
     pub_date <= as.Date("2006-01-01")
-    )
+  )
 
 # Get the release from October four years after the initial release
 gdp_releases <- get_fixed_release(
-  gdp_ea_longer, 
-  years = 4, 
+  gdp_ea_longer,
+  years = 4,
   month = "October"
-  )
+)
 gdp_releases
 #> # A tibble: 8 × 4
 #>   time       pub_date     value id   
@@ -348,7 +348,7 @@ plot_vintages(
   gdp_us_short,
   title = "Real-time GDP Estimates for the US",
   subtitle = "Growth Rate in %"
-  )
+)
 ```
 
 ![](reviser_files/figure-html/unnamed-chunk-9-1.png)
@@ -373,7 +373,7 @@ plot_vintages(
   type = "boxplot",
   title = "Real-time GDP Estimates for the Euro Area",
   subtitle = "Growth Rate in %"
-  )
+)
 ```
 
 ![](reviser_files/figure-html/unnamed-chunk-10-1.png)
@@ -382,14 +382,14 @@ plot_vintages(
 
 # Line plot showing GDP vintages over id dimension
 plot_vintages(
-  gdp %>% 
-    ts_pc() %>% 
+  gdp %>%
+    ts_pc() %>%
     get_latest_release() %>%
-    na.omit(), 
+    na.omit(),
   dim_col = "id",
   title = "Recent GDP Estimates",
   subtitle = "Growth Rate in %"
-  )
+)
 ```
 
 ![](reviser_files/figure-html/unnamed-chunk-10-2.png)

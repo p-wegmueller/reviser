@@ -25,7 +25,7 @@ get_nth_release(df, n = 0, diagonal = FALSE)
 
   The release number to extract. Accepts:
 
-  - Positive integer or vector (e.g., 1 for first release, 2 for second,
+  - Positive integer or vector (e.g., 0 for first release, 1 for second,
     etc.)
 
   - `"first"` to extract the first release.
@@ -72,7 +72,7 @@ Other revision utilities:
 
 ``` r
 # Example data
-df <- dplyr::filter(reviser::gdp, id=="US")
+df <- dplyr::filter(reviser::gdp, id == "US")
 
 # Get the first release (n = 0)
 first_release <- get_nth_release(df, n = 0)

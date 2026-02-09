@@ -244,10 +244,10 @@ uncertainty in initial estimates.</p>
 <span><span class="va">final_release</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_latest_release.html">get_latest_release</a></span><span class="op">(</span><span class="va">gdp</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_revision_analysis.html">get_revision_analysis</a></span><span class="op">(</span></span>
-<span>  <span class="va">df</span>, </span>
+<span>  <span class="va">df</span>,</span>
 <span>  <span class="va">final_release</span>,</span>
 <span>  degree <span class="op">=</span> <span class="fl">1</span></span>
-<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 14</span></span></span>
@@ -359,10 +359,10 @@ autocorrelated.</p>
 predictability, and potential biases in data revisions.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_revision_analysis.html">get_revision_analysis</a></span><span class="op">(</span></span>
-<span>  <span class="va">df</span>, </span>
+<span>  <span class="va">df</span>,</span>
 <span>  <span class="va">final_release</span>,</span>
 <span>  degree <span class="op">=</span> <span class="fl">2</span></span>
-<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 8</span></span></span>
@@ -534,10 +534,10 @@ and
 for the presence of noise and news in the data revisions.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_revision_analysis.html">get_revision_analysis</a></span><span class="op">(</span></span>
-<span>  <span class="va">df</span>, </span>
+<span>  <span class="va">df</span>,</span>
 <span>  <span class="va">final_release</span>,</span>
 <span>  degree <span class="op">=</span> <span class="fl">3</span></span>
-<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 17</span></span></span>
@@ -685,10 +685,10 @@ for all
 estimates.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_revision_analysis.html">get_revision_analysis</a></span><span class="op">(</span></span>
-<span>  <span class="va">df</span>, </span>
+<span>  <span class="va">df</span>,</span>
 <span>  <span class="va">final_release</span>,</span>
 <span>  degree <span class="op">=</span> <span class="fl">4</span></span>
-<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 8</span></span></span>
@@ -721,10 +721,10 @@ Alternatively, it can be specified via the optional function argument
 <span></span>
 <span></span>
 <span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_revision_analysis.html">get_revision_analysis</a></span><span class="op">(</span></span>
-<span>  <span class="va">df</span>, </span>
+<span>  <span class="va">df</span>,</span>
 <span>  <span class="va">final_release</span>,</span>
 <span>  degree <span class="op">=</span> <span class="fl">5</span></span>
-<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 39</span></span></span>
@@ -760,17 +760,16 @@ and then combines the results into a single dataframe.</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">pub_date</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Run the function for each pair of consecutive publication dates</span></span>
-<span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map_dfr.html" class="external-link">map_dfr</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">pub_dates</span><span class="op">[</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">pub_dates</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span> </span>
-<span>  <span class="op">{</span></span>
-<span>  </span>
-<span>  <span class="va">df</span> <span class="op">&lt;-</span> <span class="va">gdp</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">pub_date</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">pub_dates</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span></span>
-<span>  </span>
-<span>  <span class="va">final_release</span> <span class="op">&lt;-</span> <span class="va">gdp</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">pub_date</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">pub_dates</span><span class="op">[</span><span class="va">i</span> <span class="op">+</span> <span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
-<span>  </span>
-<span>  <span class="fu"><a href="../reference/get_revision_analysis.html">get_revision_analysis</a></span><span class="op">(</span><span class="va">df</span>, <span class="va">final_release</span>, degree <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
-<span><span class="op">}</span></span>
+<span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map_dfr.html" class="external-link">map_dfr</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">pub_dates</span><span class="op">[</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">pub_dates</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>  <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">df</span> <span class="op">&lt;-</span> <span class="va">gdp</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>      <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">pub_date</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">pub_dates</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span></span>
+<span></span>
+<span>    <span class="va">final_release</span> <span class="op">&lt;-</span> <span class="va">gdp</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>      <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">pub_date</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">pub_dates</span><span class="op">[</span><span class="va">i</span> <span class="op">+</span> <span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
+<span></span>
+<span>    <span class="fu"><a href="../reference/get_revision_analysis.html">get_revision_analysis</a></span><span class="op">(</span><span class="va">df</span>, <span class="va">final_release</span>, degree <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span>

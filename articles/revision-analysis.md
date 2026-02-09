@@ -114,10 +114,10 @@ df <- get_nth_release(gdp, 0:1)
 final_release <- get_latest_release(gdp)
 
 results <- get_revision_analysis(
-  df, 
+  df,
   final_release,
   degree = 1
-  )
+)
 
 head(results)
 #> # A tibble: 6 × 14
@@ -206,10 +206,10 @@ predictability, and potential biases in data revisions.
 
 ``` r
 results <- get_revision_analysis(
-  df, 
+  df,
   final_release,
   degree = 2
-  )
+)
 
 head(results)
 #> # A tibble: 6 × 8
@@ -341,10 +341,10 @@ $\beta = 1$ for the presence of noise and news in the data revisions.
 
 ``` r
 results <- get_revision_analysis(
-  df, 
+  df,
   final_release,
   degree = 3
-  )
+)
 
 head(results)
 #> # A tibble: 6 × 17
@@ -450,10 +450,10 @@ preferred metric** for evaluating preliminary estimates.
 
 ``` r
 results <- get_revision_analysis(
-  df, 
+  df,
   final_release,
   degree = 4
-  )
+)
 
 head(results)
 #> # A tibble: 6 × 8
@@ -489,10 +489,10 @@ df <- gdp %>%
 
 
 results <- get_revision_analysis(
-  df, 
+  df,
   final_release,
   degree = 5
-  )
+)
 
 head(results)
 #> # A tibble: 6 × 39
@@ -534,17 +534,16 @@ pub_dates <- gdp %>%
   pull(pub_date)
 
 # Run the function for each pair of consecutive publication dates
-results <- purrr::map_dfr(seq_along(pub_dates[-length(pub_dates)]), function(i) 
-  {
-  
-  df <- gdp %>%
-    filter(pub_date %in% pub_dates[i])
-  
-  final_release <- gdp %>%
-    filter(pub_date %in% pub_dates[i + 1])
-  
-  get_revision_analysis(df, final_release, degree = 5)
-}
+results <- purrr::map_dfr(seq_along(pub_dates[-length(pub_dates)]),
+  function(i) {
+    df <- gdp %>%
+      filter(pub_date %in% pub_dates[i])
+
+    final_release <- gdp %>%
+      filter(pub_date %in% pub_dates[i + 1])
+
+    get_revision_analysis(df, final_release, degree = 5)
+  }
 )
 
 head(results)

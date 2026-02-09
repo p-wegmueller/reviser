@@ -89,7 +89,7 @@ model. Must be greater than 0.</p></dd>
 
 
 <dt id="arg-ar-order">ar_order<a class="anchor" aria-label="anchor" href="#arg-ar-order"></a></dt>
-<dd><p>Integer specifying the AR order for true values (default = 2).</p></dd>
+<dd><p>Integer specifying AR order for true values (default = 2).</p></dd>
 
 
 <dt id="arg-h">h<a class="anchor" aria-label="anchor" href="#arg-h"></a></dt>
@@ -97,13 +97,13 @@ model. Must be greater than 0.</p></dd>
 
 
 <dt id="arg-include-news">include_news<a class="anchor" aria-label="anchor" href="#arg-include-news"></a></dt>
-<dd><p>Logical, whether to include news component in measurement
-error (default = TRUE).</p></dd>
+<dd><p>Logical, whether to include news component in
+measurement error (default = TRUE).</p></dd>
 
 
 <dt id="arg-include-noise">include_noise<a class="anchor" aria-label="anchor" href="#arg-include-noise"></a></dt>
-<dd><p>Logical, whether to include noise component in measurement
-error (default = TRUE).</p></dd>
+<dd><p>Logical, whether to include noise component in
+measurement error (default = TRUE).</p></dd>
 
 
 <dt id="arg-include-spillovers">include_spillovers<a class="anchor" aria-label="anchor" href="#arg-include-spillovers"></a></dt>
@@ -200,10 +200,10 @@ Econometrics, 2011.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">gdp</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="fu">tsbox</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/tsbox/reference/ts_pc.html" class="external-link">ts_pc</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    <span class="fu">reviser</span><span class="fu">::</span><span class="va"><a href="gdp.html">gdp</a></span></span></span>
-<span class="r-in"><span><span class="op">)</span>, <span class="va">id</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"EA"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>   <span class="va">time</span> <span class="op">&gt;=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">pub_date</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>   <span class="va">time</span> <span class="op">&lt;=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2020-01-01"</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="op">)</span> </span></span>
+<span class="r-in"><span>  <span class="op">)</span>, <span class="va">id</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"EA"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="va">time</span> <span class="op">&gt;=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">pub_date</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="va">time</span> <span class="op">&lt;=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2020-01-01"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">gdp</span> <span class="op">&lt;-</span> <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/drop_na.html" class="external-link">drop_na</a></span><span class="op">(</span><span class="va">gdp</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_nth_release.html">get_nth_release</a></span><span class="op">(</span><span class="va">gdp</span>, n <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>

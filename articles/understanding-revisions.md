@@ -241,7 +241,7 @@ revisions_interval <- get_revisions(gdp, interval = 1)
 # Preview results
 # How do the 2nd and 3rd release revise compared to previous quarter?
 plot_vintages(
-  revisions_interval %>% 
+  revisions_interval %>%
     filter(id == "US") %>%
     get_nth_release(1:2),
   dim_col = "release",
@@ -287,7 +287,7 @@ plot_vintages(
   dim_col = "id",
   title = "Revisions of the latest release compared to Q4 2005",
   subtitle = "For several countries",
-  type="bar"
+  type = "bar"
 )
 ```
 
@@ -309,7 +309,7 @@ plot_vintages(
   dim_col = "id",
   title = "Revisions of the latest compared to first release",
   subtitle = "For several countries",
-  type="bar"
+  type = "bar"
 )
 ```
 
@@ -320,7 +320,6 @@ plot_vintages(
 ``` r
 
 growthrates_q405 <- get_releases_by_date(gdp, as.Date("2005-10-01"))
-  
 
 # Preview results
 plot_vintages(
@@ -329,7 +328,7 @@ plot_vintages(
   time_col = "pub_date",
   title = "Evolution of growth rates for GDP Q4 2005",
   subtitle = "For several countries",
-  type="line"
+  type = "line"
 )
 ```
 

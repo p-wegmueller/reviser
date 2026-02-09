@@ -44,7 +44,7 @@ Other revision utilities:
 
 ``` r
 # Example data
-df <- dplyr::filter(reviser::gdp, id=="US")
+df <- dplyr::filter(reviser::gdp, id == "US")
 
 # Get the latest release for each time period
 latest_release <- get_latest_release(df)

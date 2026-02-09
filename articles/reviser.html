@@ -133,7 +133,7 @@ for the US and Euro Area during the 2007–2009 financial crisis.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Example long-format US GDP data</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"gdp"</span><span class="op">)</span></span>
-<span><span class="va">gdp_us_short</span> <span class="op">&lt;-</span> <span class="va">gdp</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span><span class="va">gdp_us_short</span> <span class="op">&lt;-</span> <span class="va">gdp</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">id</span> <span class="op">==</span> <span class="st">"US"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://docs.ropensci.org/tsbox/reference/ts_pc.html" class="external-link">ts_pc</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span></span>
@@ -296,7 +296,7 @@ release corresponds to <code>n = 0</code>.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> 2008-07-01       <span style="color: #BB0000;">NA</span>           <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>           <span style="color: #BB0000;">NA</span>    </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 more variables: `2008-07-01` &lt;dbl&gt;, `2008-10-01` &lt;dbl&gt;</span></span></span>
 <span></span>
-<span><span class="co"># The function uses the pub_date column by default to define columns in wide </span></span>
+<span><span class="co"># The function uses the pub_date column by default to define columns in wide</span></span>
 <span><span class="co"># format. Specifying the `names_from` argument allows to use the release column.</span></span>
 <span><span class="va">gdp_releases</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_nth_release.html">get_nth_release</a></span><span class="op">(</span><span class="va">gdp_short</span>, n <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/vintages_wide.html">vintages_wide</a></span><span class="op">(</span><span class="va">gdp_releases</span>, names_from <span class="op">=</span> <span class="st">"release"</span><span class="op">)</span></span>
@@ -363,22 +363,22 @@ recent vintage.</p>
 release). The function <code><a href="../reference/get_fixed_release.html">get_fixed_release()</a></code> extracts these
 fixed releases.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">gdp_ea_longer</span> <span class="op">&lt;-</span> <span class="va">gdp</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<code class="sourceCode R"><span><span class="va">gdp_ea_longer</span> <span class="op">&lt;-</span> <span class="va">gdp</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">id</span> <span class="op">==</span> <span class="st">"EA"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://docs.ropensci.org/tsbox/reference/ts_pc.html" class="external-link">ts_pc</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://docs.ropensci.org/tsbox/reference/ts_pc.html" class="external-link">ts_pc</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span></span>
 <span>    <span class="va">time</span> <span class="op">&gt;=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2000-01-01"</span><span class="op">)</span>,</span>
 <span>    <span class="va">time</span> <span class="op">&lt;</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2006-01-01"</span><span class="op">)</span>,</span>
 <span>    <span class="va">pub_date</span> <span class="op">&gt;=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2000-01-01"</span><span class="op">)</span>,</span>
 <span>    <span class="va">pub_date</span> <span class="op">&lt;=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2006-01-01"</span><span class="op">)</span></span>
-<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Get the release from October four years after the initial release</span></span>
 <span><span class="va">gdp_releases</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_fixed_release.html">get_fixed_release</a></span><span class="op">(</span></span>
-<span>  <span class="va">gdp_ea_longer</span>, </span>
-<span>  years <span class="op">=</span> <span class="fl">4</span>, </span>
+<span>  <span class="va">gdp_ea_longer</span>,</span>
+<span>  years <span class="op">=</span> <span class="fl">4</span>,</span>
 <span>  month <span class="op">=</span> <span class="st">"October"</span></span>
-<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span><span class="va">gdp_releases</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 8 × 4</span></span></span>
 <span><span class="co">#&gt;   time       pub_date     value id   </span></span>
@@ -423,7 +423,7 @@ can create a line plot comparing different vintages:</p>
 <span>  <span class="va">gdp_us_short</span>,</span>
 <span>  title <span class="op">=</span> <span class="st">"Real-time GDP Estimates for the US"</span>,</span>
 <span>  subtitle <span class="op">=</span> <span class="st">"Growth Rate in %"</span></span>
-<span>  <span class="op">)</span></span></code></pre></div>
+<span><span class="op">)</span></span></code></pre></div>
 <p><img src="reviser_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="" width="700"></p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
@@ -441,20 +441,20 @@ recent 30 are displayed to maintain readability.</p>
 <span>  type <span class="op">=</span> <span class="st">"boxplot"</span>,</span>
 <span>  title <span class="op">=</span> <span class="st">"Real-time GDP Estimates for the Euro Area"</span>,</span>
 <span>  subtitle <span class="op">=</span> <span class="st">"Growth Rate in %"</span></span>
-<span>  <span class="op">)</span></span></code></pre></div>
+<span><span class="op">)</span></span></code></pre></div>
 <p><img src="reviser_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="700"></p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># Line plot showing GDP vintages over id dimension</span></span>
 <span><span class="fu"><a href="../reference/plot_vintages.html">plot_vintages</a></span><span class="op">(</span></span>
-<span>  <span class="va">gdp</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>    <span class="fu"><a href="https://docs.ropensci.org/tsbox/reference/ts_pc.html" class="external-link">ts_pc</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="va">gdp</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://docs.ropensci.org/tsbox/reference/ts_pc.html" class="external-link">ts_pc</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>    <span class="fu"><a href="../reference/get_latest_release.html">get_latest_release</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="op">)</span>, </span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  dim_col <span class="op">=</span> <span class="st">"id"</span>,</span>
 <span>  title <span class="op">=</span> <span class="st">"Recent GDP Estimates"</span>,</span>
 <span>  subtitle <span class="op">=</span> <span class="st">"Growth Rate in %"</span></span>
-<span>  <span class="op">)</span></span></code></pre></div>
+<span><span class="op">)</span></span></code></pre></div>
 <p><img src="reviser_files/figure-html/unnamed-chunk-10-2.png" class="r-plt" alt="" width="700"></p>
 <p>For further customization, you can apply custom themes and color
 scales using:</p>

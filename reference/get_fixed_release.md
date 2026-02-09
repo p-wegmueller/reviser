@@ -50,7 +50,7 @@ Other revision utilities:
 ## Examples
 
 ``` r
-df <- dplyr::filter(reviser::gdp, id=="US")
+df <- dplyr::filter(reviser::gdp, id == "US")
 dta <- get_fixed_release(df, month = "July", years = 3)
 dta <- get_fixed_release(df, month = 7, years = 3)
 dta <- get_fixed_release(df, quarter = 3, years = 3)

@@ -394,7 +394,7 @@ between consecutive releases:</p>
 <span><span class="co"># Preview results</span></span>
 <span><span class="co"># How do the 2nd and 3rd release revise compared to previous quarter?</span></span>
 <span><span class="fu"><a href="../reference/plot_vintages.html">plot_vintages</a></span><span class="op">(</span></span>
-<span>  <span class="va">revisions_interval</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="va">revisions_interval</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">id</span> <span class="op">==</span> <span class="st">"US"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>    <span class="fu"><a href="../reference/get_nth_release.html">get_nth_release</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">)</span>,</span>
 <span>  dim_col <span class="op">=</span> <span class="st">"release"</span>,</span>
@@ -434,7 +434,7 @@ against an initial estimate:</p>
 <span>  dim_col <span class="op">=</span> <span class="st">"id"</span>,</span>
 <span>  title <span class="op">=</span> <span class="st">"Revisions of the latest release compared to Q4 2005"</span>,</span>
 <span>  subtitle <span class="op">=</span> <span class="st">"For several countries"</span>,</span>
-<span>  type<span class="op">=</span><span class="st">"bar"</span></span>
+<span>  type <span class="op">=</span> <span class="st">"bar"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="understanding-revisions_files/figure-html/unnamed-chunk-3-1.png" class="r-plt" alt="" width="700"></p>
 </div>
@@ -454,7 +454,7 @@ revisions between the first and last releases:</p>
 <span>  dim_col <span class="op">=</span> <span class="st">"id"</span>,</span>
 <span>  title <span class="op">=</span> <span class="st">"Revisions of the latest compared to first release"</span>,</span>
 <span>  subtitle <span class="op">=</span> <span class="st">"For several countries"</span>,</span>
-<span>  type<span class="op">=</span><span class="st">"bar"</span></span>
+<span>  type <span class="op">=</span> <span class="st">"bar"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="understanding-revisions_files/figure-html/unnamed-chunk-4-1.png" class="r-plt" alt="" width="700"></p>
 </div>
@@ -464,7 +464,6 @@ revisions between the first and last releases:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">growthrates_q405</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_releases_by_date.html">get_releases_by_date</a></span><span class="op">(</span><span class="va">gdp</span>, <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2005-10-01"</span><span class="op">)</span><span class="op">)</span></span>
-<span>  </span>
 <span></span>
 <span><span class="co"># Preview results</span></span>
 <span><span class="fu"><a href="../reference/plot_vintages.html">plot_vintages</a></span><span class="op">(</span></span>
@@ -473,7 +472,7 @@ revisions between the first and last releases:</p>
 <span>  time_col <span class="op">=</span> <span class="st">"pub_date"</span>,</span>
 <span>  title <span class="op">=</span> <span class="st">"Evolution of growth rates for GDP Q4 2005"</span>,</span>
 <span>  subtitle <span class="op">=</span> <span class="st">"For several countries"</span>,</span>
-<span>  type<span class="op">=</span><span class="st">"line"</span></span>
+<span>  type <span class="op">=</span> <span class="st">"line"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="understanding-revisions_files/figure-html/unnamed-chunk-5-1.png" class="r-plt" alt="" width="700"></p>
 </div>

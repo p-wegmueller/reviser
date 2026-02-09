@@ -163,10 +163,10 @@ library(lubridate)
 
 gdp <- reviser::gdp %>%
   tsbox::ts_pc() %>%
-  dplyr::filter(id == "EA",
-         time >= min(pub_date),
-         time <= as.Date("2020-01-01")
-         ) %>%
+    dplyr::filter(id == "EA",
+      time >= min(pub_date),
+      time <= as.Date("2020-01-01")
+  ) %>%
   tidyr::drop_na()
 
 df <- get_nth_release(gdp, n = 0:14)
@@ -233,7 +233,7 @@ returns a dataset in this format.
 
 ``` r
 nowcast <- kk_nowcast(
-    df = data, 
+    df = data,
     e = e,
     model = "KK",
     method = "MLE"

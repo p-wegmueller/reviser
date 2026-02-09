@@ -50,7 +50,7 @@ Other revision utilities:
 
 ``` r
 # Example data
-df <- dplyr::filter(reviser::gdp, id=="US")
+df <- dplyr::filter(reviser::gdp, id == "US")
 
 # Get releases for a specific date
 date <- as.Date("2020-04-01")

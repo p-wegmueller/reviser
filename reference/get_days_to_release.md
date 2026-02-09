@@ -46,7 +46,7 @@ Other revision utilities:
 
 ``` r
 # Example data
-df <- dplyr::filter(reviser::gdp, id=="US")
+df <- dplyr::filter(reviser::gdp, id == "US")
 
 # Calculate days to release
 df_with_days <- get_days_to_release(df)

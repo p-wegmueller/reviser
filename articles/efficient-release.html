@@ -275,7 +275,7 @@ for each country, ranging from the 1st (Japan, US) to the 13th
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">gdp</span> <span class="op">&lt;-</span> <span class="fu">reviser</span><span class="fu">::</span><span class="va"><a href="../reference/gdp.html">gdp</a></span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu">tsbox</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/tsbox/reference/ts_pc.html" class="external-link">ts_pc</a></span><span class="op">(</span><span class="op">)</span> </span>
+<span>  <span class="fu">tsbox</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/tsbox/reference/ts_pc.html" class="external-link">ts_pc</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_nth_release.html">get_nth_release</a></span><span class="op">(</span><span class="va">gdp</span>, n <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">19</span><span class="op">)</span></span>
 <span></span>
@@ -473,10 +473,10 @@ nowcasts of preliminary releases (See vignette <a href="nowcasting-revisions.htm
 details).</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">analysis</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_revision_analysis.html">get_revision_analysis</a></span><span class="op">(</span></span>
-<span>  <span class="va">df</span>, </span>
+<span>  <span class="va">df</span>,</span>
 <span>  <span class="va">final_release</span>,</span>
-<span>  degree<span class="op">=</span><span class="fl">3</span></span>
-<span>  <span class="op">)</span></span>
+<span>  degree <span class="op">=</span> <span class="fl">3</span></span>
+<span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">analysis</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 17</span></span></span>
 <span><span class="co">#&gt;   id    release        N `News test Intercept` `News test Intercept (std.err)`</span></span>

@@ -74,12 +74,12 @@ Other revision analysis:
 ``` r
 # Example usage
 df <- get_nth_release(
-  tsbox::ts_pc(dplyr::filter(reviser::gdp , id=="US")),
+  tsbox::ts_pc(dplyr::filter(reviser::gdp, id == "US")),
   n = 1:4
 )
 
 final_release <- get_nth_release(
-  tsbox::ts_pc(dplyr::filter(reviser::gdp, id=="US")),
+  tsbox::ts_pc(dplyr::filter(reviser::gdp, id == "US")),
   n = 10
 )
 

@@ -131,7 +131,7 @@ library(reviser)
 library(dplyr)
 
 gdp <- reviser::gdp %>%
-  tsbox::ts_pc() 
+  tsbox::ts_pc()
 
 df <- get_nth_release(gdp, n = 0:19)
 
@@ -335,10 +335,10 @@ for more details).
 
 ``` r
 analysis <- get_revision_analysis(
-  df, 
+  df,
   final_release,
-  degree=3
-  )
+  degree = 3
+)
 head(analysis)
 #> # A tibble: 6 × 17
 #>   id    release        N `News test Intercept` `News test Intercept (std.err)`
