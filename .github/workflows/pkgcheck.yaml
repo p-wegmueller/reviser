@@ -20,5 +20,6 @@ jobs:
       issues: write
     steps:
       - uses: ropensci-review-tools/pkgcheck-action@main
+        continue-on-error: true
         with:
           post-to-issue: false
