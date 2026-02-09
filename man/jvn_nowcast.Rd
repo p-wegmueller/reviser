@@ -83,15 +83,15 @@ Implements the Jacobs & Van Norden (2011) state-space model for analyzing
 data revisions, allowing for news and noise components in measurement errors.
 }
 \examples{
-gdp <- dplyr::filter(
+gdp_growth <- dplyr::filter(
   tsbox::ts_pc(
     reviser::gdp
   ), id \%in\% c("EA"),
   time >= min(pub_date),
   time <= as.Date("2020-01-01")
 )
-gdp <- tidyr::drop_na(gdp)
-df <- get_nth_release(gdp, n = 0:4)
+gdp_growth <- tidyr::drop_na(gdp_growth)
+df <- get_nth_release(gdp_growth, n = 0:4)
 
 # Estimate model
 result <- jvn_nowcast(
