@@ -160,13 +160,13 @@ get_revisions <- function(
         dplyr::inner_join(
           df %>%
             dplyr::filter(.data$pub_date == ref_date) %>%
-            dplyr::select(.data$id, .data$time, value_ref = .data$value),
+            dplyr::select("id", "time", "value_ref" = "value"),
           by = c("id", "time")
         ) %>%
         dplyr::group_by(.data$id, .data$time) %>%
         dplyr::mutate(value = .data$value_ref - .data$value) %>%
         dplyr::ungroup() %>%
-        dplyr::select(.data$id, .data$pub_date, .data$time, .data$value)
+        dplyr::select("id", "pub_date", "time", "value")
     } else if (!is.null(interval)) {
       # Get revisions relative to estimates published 'interval' periods ago
       revisions <- df %>%
@@ -179,19 +179,19 @@ get_revisions <- function(
         ) %>%
         dplyr::mutate(value = .data$value_ref - .data$value) %>%
         dplyr::ungroup() %>%
-        dplyr::select(.data$id, .data$pub_date, .data$time, .data$value)
+        dplyr::select("id", "pub_date", "time", "value")
     } else if (!is.null(nth_release)) {
       # Calculate revisions relative to the nth release
       revisions <- df %>%
         dplyr::inner_join(
           get_nth_release(df, n = nth_release) %>%
-            dplyr::select(.data$id, .data$time, value_ref = .data$value),
+            dplyr::select("id", "time", "value_ref" = "value"),
           by = c("id", "time")
         ) %>%
         dplyr::group_by(.data$id, .data$time) %>%
         dplyr::mutate(value = .data$value_ref - .data$value) %>%
         dplyr::ungroup() %>%
-        dplyr::select(.data$id, .data$pub_date, .data$time, .data$value)
+        dplyr::select("id", "pub_date", "time", "value")
     }
   } else {
     # Ensure data is sorted by pub_date and time
@@ -204,11 +204,11 @@ get_revisions <- function(
         dplyr::inner_join(
           df %>%
             dplyr::filter(.data$pub_date == ref_date) %>%
-            dplyr::select(.data$time, value_ref = .data$value),
+            dplyr::select("time", "value_ref" = "value"),
           by = "time"
         ) %>%
         dplyr::mutate(value = .data$value_ref - .data$value) %>%
-        dplyr::select(.data$pub_date, .data$time, .data$value)
+        dplyr::select("pub_date", "time", "value")
     } else if (!is.null(interval)) {
       # Get revisions relative to estimates published 'interval' periods ago
       revisions <- df %>%
@@ -221,17 +221,17 @@ get_revisions <- function(
         ) %>%
         dplyr::ungroup() %>%
         dplyr::mutate(value = .data$value_ref - .data$value) %>%
-        dplyr::select(.data$pub_date, .data$time, .data$value)
+        dplyr::select("pub_date", "time", "value")
     } else if (!is.null(nth_release)) {
       # Calculate revisions relative to the nth release
       revisions <- df %>%
         dplyr::inner_join(
           get_nth_release(df, n = nth_release) %>%
-            dplyr::select(.data$time, value_ref = .data$value),
+            dplyr::select("time", "value_ref" = "value"),
           by = "time"
         ) %>%
         dplyr::mutate(value = .data$value_ref - .data$value) %>%
-        dplyr::select(.data$pub_date, .data$time, .data$value)
+        dplyr::select("pub_date", "time", "value")
     }
   }
 
@@ -414,12 +414,12 @@ get_first_efficient_release <- function(
       tests <- list()
       final_release_id <- final_release %>%
         dplyr::filter(.data$id == iidd) %>%
-        dplyr::select(.data$time, .data$value) %>%
+        dplyr::select("time", "value") %>%
         dplyr::mutate(release = "final")
 
       df_id <- df %>%
         dplyr::filter(.data$id == iidd) %>%
-        dplyr::select(.data$time, .data$value, .data$release)
+        dplyr::select("time", "value", "release")
 
       # Ensure data is sorted by pub_date and time
       df_id <- df_id %>%
@@ -486,11 +486,11 @@ get_first_efficient_release <- function(
     models <- list()
     tests <- list()
 
-    final_release <- dplyr::select(final_release, .data$time, .data$value) %>%
+    final_release <- dplyr::select(final_release, "time", "value") %>%
       dplyr::mutate(release = "final")
 
     df <- df %>%
-      dplyr::select(.data$time, .data$value, .data$release)
+      dplyr::select("time", "value", "release")
 
     # Ensure data is sorted by pub_date and time
     df <- df %>%
@@ -847,7 +847,7 @@ summary.lst_efficient <- function(object, ...) {
 #'     ),
 #'     n = 0:10
 #'   ),
-#'   -pub_date
+#'   -"pub_date"
 #' )
 #'
 #' final_release <- dplyr::select(
@@ -859,7 +859,7 @@ summary.lst_efficient <- function(object, ...) {
 #'     ),
 #'     n = "latest"
 #'   ),
-#'   -pub_date
+#'   -"pub_date"
 #' )
 #'
 #' results <- get_revision_analysis(
@@ -929,7 +929,7 @@ get_revision_analysis <- function(
       The 'release' column will be used for grouping."
     )
     df <- df %>%
-      dplyr::select(-.data$pub_date)
+      dplyr::select(-"pub_date")
   }
 
   if (!is.null(grouping_var)) {
@@ -943,7 +943,7 @@ get_revision_analysis <- function(
   }
 
   final_release <- final_release %>%
-    dplyr::rename(final_value = .data$value)
+    dplyr::rename("final_value" = "value")
 
   # Check if df has id column:
   if (
@@ -953,21 +953,21 @@ get_revision_analysis <- function(
       length(unique(df$id)) > 0
   ) {
     final_release <- dplyr::select(
-      final_release, .data$time, .data$final_value, .data$id
+      final_release, "time", "final_value", "id"
     )
 
     df <- df %>%
-      dplyr::select(.data$time, .data$value, dplyr::all_of(df_var), .data$id)
+      dplyr::select("time", "value", dplyr::all_of(df_var), "id")
 
     df <- df %>%
       dplyr::left_join(final_release, by = c("time" = "time", "id" = "id")) %>%
       dplyr::arrange(.data$id, .data$time) %>%
       stats::na.omit()
   } else {
-    final_release <- dplyr::select(final_release, .data$time, .data$final_value)
+    final_release <- dplyr::select(final_release, "time", "final_value")
 
     df <- df %>%
-      dplyr::select(.data$time, .data$value, dplyr::all_of(df_var))
+      dplyr::select("time", "value", dplyr::all_of(df_var))
 
     df <- df %>%
       dplyr::left_join(final_release, by = c("time" = "time")) %>%
@@ -1350,7 +1350,7 @@ compute_revision_stats <- function(data) {
       n = dplyr::n()
     ) %>%
     dplyr::ungroup() %>%
-    dplyr::pull(.data$fraction_sign_correct)
+    dplyr::pull("fraction_sign_correct")
 
   tibble::tibble(
     Statistic = c(
@@ -1576,14 +1576,14 @@ get_nth_release <- function(df, n = 0, diagonal = FALSE) {
       min_pub_date <- df %>%
         dplyr::group_by("id") %>%
         dplyr::summarize(min_pub_date = min(.data$pub_date)) %>%
-        dplyr::pull(.data$min_pub_date, .data$id) %>%
+        dplyr::pull("min_pub_date", "id") %>%
         as.Date()
 
       max_time <- df %>%
         dplyr::filter(.data$pub_date == min_pub_date) %>%
         dplyr::group_by(.data$id) %>%
         dplyr::summarize(max_time = max(.data$time)) %>%
-        dplyr::pull(.data$max_time, .data$id) %>%
+        dplyr::pull("max_time", "id") %>%
         as.Date()
 
       # Filter using direct vectorized lookup
@@ -1853,7 +1853,7 @@ get_fixed_release <- function(df, years, month = NULL, quarter = NULL) {
       lubridate::year(.data$pub_date) == lubridate::year(.data$target_date) &
         lubridate::month(.data$pub_date) == lubridate::month(.data$target_date)
     ) %>%
-    dplyr::select(-.data$target_date)
+    dplyr::select(-"target_date")
 
   # Add the class only if it is not already present
   df <- vintages_assign_class(df)

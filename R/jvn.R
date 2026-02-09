@@ -168,7 +168,7 @@ jvn_nowcast <- function(df,
   # Arrange data
   df_intern <- df[, 1:(e + 1)]
 
-  y_mat <- as.matrix(dplyr::select(df_intern, -.data$time))
+  y_mat <- as.matrix(dplyr::select(df_intern, -"time"))
   rownames(y_mat) <- as.character(df$time)
 
   # Build model structure

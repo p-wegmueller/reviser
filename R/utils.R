@@ -75,7 +75,7 @@ vintages_long <- function(df, names_to = "pub_date", keep_na = FALSE) {
       }
       long_df_tmp <- df[[id]] %>%
         tidyr::pivot_longer(
-          cols = -.data$time,
+          cols = -"time",
           names_to = names_to,
           values_to = "value"
         ) %>%
@@ -102,7 +102,7 @@ vintages_long <- function(df, names_to = "pub_date", keep_na = FALSE) {
     # If input is a single wide data.frame
     long_df <- df %>%
       tidyr::pivot_longer(
-        cols = -.data$time,
+        cols = -"time",
         names_to = names_to,
         values_to = "value"
       )
@@ -232,10 +232,10 @@ vintages_wide <- function(df, names_from = "pub_date") {
       split(.$id) %>%
       lapply(function(sub_df) {
         sub_df <- sub_df %>%
-          dplyr::select(.data$time, dplyr::all_of(names_from), .data$value) %>%
+          dplyr::select("time", dplyr::all_of(names_from), "value") %>%
           tidyr::pivot_wider(
             names_from = dplyr::all_of(names_from),
-            values_from = .data$value
+            values_from = "value"
           )
         if (names_from == "pub_date") {
           class(sub_df) <- c("tbl_pubdate", "tbl_df", "tbl", "data.frame")
@@ -250,7 +250,7 @@ vintages_wide <- function(df, names_from = "pub_date") {
     wide_df <- df %>%
       tidyr::pivot_wider(
         names_from = dplyr::all_of(names_from),
-        values_from = .data$value
+        values_from = "value"
       )
 
     if (names_from == "pub_date") {
@@ -552,7 +552,7 @@ vintages_assign_class <- function(df) {
 #' @noRd
 standardize_val_col <- function(df) {
   df %>%
-    dplyr::rename(value = dplyr::any_of(c("value", "values"))) %>%
+    dplyr::rename("value" = dplyr::any_of(c("value", "values"))) %>%
     suppressMessages()
 }
 
