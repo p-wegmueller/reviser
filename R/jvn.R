@@ -479,10 +479,9 @@ jvn_nowcast <- function(df,
 
   if (se_method == "hessian") {
     # ===== HESSIAN METHOD =====
-    hessian_failed <- FALSE
-    se_warning <- NULL
-
-    se_raw <- suppressWarnings(tryCatch(
+    
+    # We wrap the whole logic in a list-returning tryCatch
+    se_result <- suppressWarnings(tryCatch(
       {
         # Calculate high-precision Hessian
         precise_hessian <- numDeriv::hessian(
@@ -493,95 +492,70 @@ jvn_nowcast <- function(df,
           transform_se = default_solver_options$transform_se,
           method.args = list(eps = 1e-4, d = 0.01, r = 6)
         )
-
+        
         # Check condition number
-        cond_num <- tryCatch(
-          kappa(precise_hessian, exact = FALSE),
-          error = function(e) Inf
-        )
-
+        cond_num <- tryCatch(kappa(precise_hessian, exact = FALSE), error = function(e) Inf)
+        
         if (!is.finite(cond_num) || cond_num > 1e10) {
-          se_warning <- paste0(
-            "Hessian is poorly conditioned",
-            if (is.finite(cond_num)) {
-              paste0(
-                " (condition number = ",
-                format(cond_num, scientific = TRUE, digits = 2), ")"
-              )
-            } else {
-              ""
-            },
-            ". Standard errors may be unreliable. "
-          )
-          hessian_failed <- TRUE
-          rep(NA, length(params_raw))
+          msg <- paste0("Hessian is poorly conditioned", 
+                        if (is.finite(cond_num)) paste0(" (cond = ", format(cond_num, scientific = TRUE, digits = 2), ")") else "",
+                        ". SEs may be unreliable.")
+          
+          # Return a list instead of updating external variables
+          list(se = rep(NA, length(params_raw)), warning = msg, failed = TRUE)
+          
         } else {
           # Try to invert
-          fisher_info <- tryCatch(
-            {
-              solve(precise_hessian)
-            },
-            error = function(e) {
-              # Add small ridge regularization
-              ridge <- 1e-6 * mean(abs(diag(precise_hessian)))
-              if (default_solver_options$trace > 0) {
-                cat(
-                  "Adding ridge regularization to Hessian (\u03BB =",
-                  format(ridge, scientific = TRUE), ")\n"
-                )
-              }
-              tryCatch(
-                {
-                  solve(precise_hessian + ridge * diag(nrow(precise_hessian)))
-                },
-                error = function(e2) {
-                  NULL
-                }
-              )
+          fisher_info <- tryCatch({
+            solve(precise_hessian)
+          }, error = function(e) {
+            ridge <- 1e-6 * mean(abs(diag(precise_hessian)))
+            if (default_solver_options$trace > 0) {
+              cat("Adding ridge regularization (\u03BB =", format(ridge, scientific = TRUE), ")\n")
             }
-          )
-
+            tryCatch(solve(precise_hessian + ridge * diag(nrow(precise_hessian))), error = function(e2) NULL)
+          })
+          
           if (is.null(fisher_info)) {
-            se_warning <- paste0(
-              "Failed to invert Hessian matrix. ",
-              "Standard errors cannot be computed. "
+            list(
+              se = rep(NA, length(params_raw)), 
+              warning = "Failed to invert Hessian matrix.", 
+              failed = TRUE
             )
-            hessian_failed <- TRUE
-            rep(NA, length(params_raw))
           } else {
             se_calc <- sqrt(diag(fisher_info))
-
-            # Check for NaNs or very large SEs
             n_nan <- sum(is.nan(se_calc))
             n_large <- sum(se_calc > 1e3, na.rm = TRUE)
-            n_problems <- n_nan + n_large
-
-            if (n_problems > 0) {
-              se_warning <- paste0(
-                n_problems, " parameter(s) have problematic standard errors",
-                if (n_nan > 0) paste0(" (", n_nan, " NaN)") else "",
-                if (n_large > 0) paste0(" (", n_large, " very large)") else ""
-              )
-              hessian_failed <- TRUE
+            
+            problem_msg <- NULL
+            has_failed <- FALSE
+            
+            if ((n_nan + n_large) > 0) {
+              problem_msg <- paste0((n_nan + n_large), " parameter(s) have problematic SEs")
+              has_failed <- TRUE
             }
-
-            # Replace NaN with NA
+            
             se_calc[is.nan(se_calc)] <- NA
-            se_calc
+            list(se = se_calc, warning = problem_msg, failed = has_failed)
           }
         }
       },
       error = function(e) {
-        se_warning <<- paste0(
-          "Hessian calculation failed: ", e$message, ". "
+        # No more <<- operator! We return the list directly from the handler.
+        list(
+          se = rep(NA, length(params_raw)), 
+          warning = paste0("Hessian calculation failed: ", e$message), 
+          failed = TRUE
         )
-        hessian_failed <<- TRUE
-        rep(NA, length(params_raw))
       }
     ))
-
+    
+    # Extract results back into your local variables
+    se_raw         <- se_result$se
+    se_warning     <- se_result$warning
+    hessian_failed <- se_result$failed
     se_method_used <- "hessian"
-
+    
     # Issue warning if Hessian was problematic
     if (hessian_failed && !is.null(se_warning)) {
       warning(se_warning, call. = FALSE)
