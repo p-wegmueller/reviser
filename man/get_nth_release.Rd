@@ -16,7 +16,7 @@ include the columns:
 
 \item{n}{The release number to extract. Accepts:
 \itemize{
-\item Positive integer or vector (e.g., 1 for first release, 2 for  second, etc.)
+\item Positive integer or vector (e.g., 0 for first release, 1 for  second, etc.)
 \item \code{"first"} to extract the first release.
 \item \code{"latest"} to extract the most recent release.
 Default is 1 (the first release).
@@ -50,7 +50,7 @@ period (via \code{get_latest_release}).
 }
 \examples{
 # Example data
-df <- dplyr::filter(reviser::gdp, id=="US")
+df <- dplyr::filter(reviser::gdp, id == "US")
 
 # Get the first release (n = 0)
 first_release <- get_nth_release(df, n = 0)

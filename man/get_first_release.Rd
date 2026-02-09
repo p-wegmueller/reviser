@@ -32,7 +32,7 @@ historic values for which no  vintages exist are not returned.
 }
 \examples{
 # Example data
-df <- dplyr::filter(reviser::gdp, id=="US")
+df <- dplyr::filter(reviser::gdp, id == "US")
 
 # Get the first release for each time period
 first_release <- get_first_release(df)

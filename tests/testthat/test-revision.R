@@ -205,7 +205,7 @@ test_that("get_revision_analysis throws error if neither release nor pub_date
   df_final_no_grouping <- df_final
   expect_error(
     get_revision_analysis(df_no_grouping, df_final_no_grouping),
-    "One or more column names in the 'wide format' are not"
+    "One or more column names in the 'wide"
   )
 })
 

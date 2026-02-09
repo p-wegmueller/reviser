@@ -77,23 +77,23 @@ If no efficient release is found, a warning is issued.
 \examples{
 # Example data
 df <- get_nth_release(
-  tsbox::ts_pc(dplyr::filter(reviser::gdp, id=="US")),
+  tsbox::ts_pc(dplyr::filter(reviser::gdp, id == "US")),
   n = 0:3
-  )
+)
 
 final_release <- get_nth_release(
-tsbox::ts_pc(dplyr::filter(reviser::gdp, id=="US")),
-n = 10
+  tsbox::ts_pc(dplyr::filter(reviser::gdp, id == "US")),
+  n = 10
 )
 
 # Identify the first efficient release
 result <- get_first_efficient_release(
-  df, 
-  final_release, 
+  df,
+  final_release,
   significance = 0.05,
   robust = FALSE
-  )
-   
+)
+
 result <- get_first_efficient_release(df, final_release, significance = 0.05)
 
 # Access the index of the first efficient release

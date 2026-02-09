@@ -26,15 +26,15 @@ vintage estimate for the same time period. Rows are time periods.}
 \item{e}{An integer indicating the number of data vintages to include in the
 model. Must be greater than 0.}
 
-\item{ar_order}{Integer specifying the AR order for true values (default = 2).}
+\item{ar_order}{Integer specifying AR order for true values (default = 2).}
 
 \item{h}{Integer specifying the forecast horizon (default = 0).}
 
-\item{include_news}{Logical, whether to include news component in measurement
-error (default = TRUE).}
+\item{include_news}{Logical, whether to include news component in
+measurement error (default = TRUE).}
 
-\item{include_noise}{Logical, whether to include noise component in measurement
-error (default = TRUE).}
+\item{include_noise}{Logical, whether to include noise component in
+measurement error (default = TRUE).}
 
 \item{include_spillovers}{Logical, whether to include spillover effects
 (default = FALSE).}
@@ -86,10 +86,10 @@ data revisions, allowing for news and noise components in measurement errors.
 gdp <- dplyr::filter(
   tsbox::ts_pc(
     reviser::gdp
-), id \%in\% c("EA"),
-   time >= min(pub_date),
-   time <= as.Date("2020-01-01")
-  ) 
+  ), id \%in\% c("EA"),
+  time >= min(pub_date),
+  time <= as.Date("2020-01-01")
+)
 gdp <- tidyr::drop_na(gdp)
 df <- get_nth_release(gdp, n = 0:4)
 

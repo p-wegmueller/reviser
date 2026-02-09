@@ -61,7 +61,7 @@ Input validation ensures that only one of \code{ref_date}, \code{nth_release}, o
 }
 \examples{
 # Example data
-df <- dplyr::filter(reviser::gdp , id=="US")
+df <- dplyr::filter(reviser::gdp, id == "US")
 
 # Calculate revisions using an interval of 1
 revisions_interval <- get_revisions(df, interval = 1)

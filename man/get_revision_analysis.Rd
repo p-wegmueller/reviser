@@ -148,29 +148,30 @@ df <- dplyr::select(
   get_nth_release(
     na.omit(
       tsbox::ts_pc(
-        reviser::gdp)
-            ),
-   n = 0:10
- ),
--pub_date
+        reviser::gdp
+      )
+    ),
+    n = 0:10
+  ),
+  -pub_date
 )
 
 final_release <- dplyr::select(
   get_nth_release(
-  na.omit(
-  tsbox::ts_pc(
-    reviser::gdp)
-       ),
- n = "latest"
-),
--pub_date
+    na.omit(
+      tsbox::ts_pc(
+        reviser::gdp
+      )
+    ),
+    n = "latest"
+  ),
+  -pub_date
 )
 
 results <- get_revision_analysis(
   df,
   final_release
- )
-
+)
 
 }
 \seealso{

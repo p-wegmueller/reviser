@@ -100,17 +100,17 @@ the vignette \code{vignette("nowcasting_revisions")} for more details).
 df <- get_nth_release(
   tsbox::ts_span(
     tsbox::ts_pc(
-      dplyr::filter(reviser::gdp, id=="US")
-      ),
-      start = "1980-01-01"
-     ),
-     n = 0:1
-   )
+      dplyr::filter(reviser::gdp, id == "US")
+    ),
+    start = "1980-01-01"
+  ),
+  n = 0:1
+)
 df <- dplyr::select(df, -c(id, pub_date))
 df <- na.omit(df)
 
-e <- 1  # Number of efficient release
-h <- 2  # Forecast horizon
+e <- 1 # Number of efficient release
+h <- 2 # Forecast horizon
 result <- kk_nowcast(df, e, h = h, model = "Kishor-Koenig")
 
 result$params

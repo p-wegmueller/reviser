@@ -1561,7 +1561,7 @@ get_nth_release <- function(df, n = 0, diagonal = FALSE) {
       nth_release <- df %>%
         dplyr::group_by(.data$time, .data$id) %>%
         dplyr::mutate(
-          release = paste0("release_", (seq_len(dplyr::n() - 1)))
+          release = paste0("release_", (seq_len(dplyr::n()) - 1))
         ) %>%
         dplyr::slice(n) %>%
         dplyr::ungroup()
@@ -1601,7 +1601,7 @@ get_nth_release <- function(df, n = 0, diagonal = FALSE) {
       nth_release <- df %>%
         dplyr::group_by(.data$time) %>%
         dplyr::mutate(
-          release = paste0("release_", (seq_len(dplyr::n() - 1)))
+          release = paste0("release_", (seq_len(dplyr::n()) - 1))
         ) %>%
         dplyr::slice(n) %>%
         dplyr::ungroup()

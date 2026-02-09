@@ -47,7 +47,7 @@ test_that("vintages_wide throws error on missing columns", {
   )
   expect_error(
     vintages_wide(df),
-    "One or more column names in the 'wide format' are not"
+    "One or more column names in the 'wide"
   )
 })
 

@@ -27,7 +27,7 @@ release as \code{release_N}, where \code{N} is the release index (zero indexed).
 }
 \examples{
 # Example data
-df <- dplyr::filter(reviser::gdp, id=="US")
+df <- dplyr::filter(reviser::gdp, id == "US")
 
 # Get the latest release for each time period
 latest_release <- get_latest_release(df)

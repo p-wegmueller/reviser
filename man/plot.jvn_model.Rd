@@ -25,10 +25,10 @@ Plot JVN Model Results
 gdp <- dplyr::filter(
   tsbox::ts_pc(
     reviser::gdp
-), id \%in\% c("EA"),
-   time >= min(pub_date),
-   time <= as.Date("2020-01-01")
-  ) 
+  ), id \%in\% c("EA"),
+  time >= min(pub_date),
+  time <= as.Date("2020-01-01")
+)
 gdp <- tidyr::drop_na(gdp)
 df <- get_nth_release(gdp, n = 0:4)
 

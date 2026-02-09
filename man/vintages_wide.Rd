@@ -26,7 +26,7 @@ rows and values (\code{value}) as cell contents.
 }
 \examples{
 # Example wide-format data
-long_data <- dplyr::filter(reviser::gdp, id=="US")
+long_data <- dplyr::filter(reviser::gdp, id == "US")
 
 # Convert to wide format
 wide_data <- vintages_wide(long_data)
