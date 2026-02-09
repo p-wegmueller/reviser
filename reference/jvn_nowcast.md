@@ -179,5 +179,5 @@ result <- jvn_nowcast(
   include_news = TRUE,
   include_noise = TRUE
 )
-#> Warning: 2 parameter(s) have problematic standard errors (2 NaN)
+#> Warning: 2 parameter(s) have problematic SEs
 ```
