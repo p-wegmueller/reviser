@@ -4,6 +4,15 @@
 \name{gdp}
 \alias{gdp}
 \title{Vintages Data}
+\format{
+A tibble with quarterly observations and 4 variables:
+\describe{
+\item{time}{Date of the observation}
+\item{pub_date}{Publication date of the vintage}
+\item{value}{Numeric, real GDP (seasonally adjusted)}
+\item{id}{Country code}
+}
+}
 \usage{
 gdp
 }
@@ -12,17 +21,9 @@ A collection of real-time datasets.
 }
 \details{
 \itemize{
-\item \link{gdp}: Quarterly Vintages (Billions of real dollars, seasonally adjusted)
+\item GDP: Quarterly Vintages (Billions of real dollars, seasonally adjusted)
 \item Timeframe: Q1 1980 - Q4 2024
 \item Real-Time Vintages: Q4 2002 - Q4 2024
-\item Frequency: Quarterly
-\item Format: A tibble with quarterly observations and 3 variables:
-\itemize{
-\item \code{time}: Date of the observation.
-\item \code{pub_date}: Publication date of the vintage
-\item \code{values}: Numeric, real GDP (seasonally adjusted).
-\item \code{id}: Country code
-}
 }
 }
 \section{Sources}{
@@ -54,8 +55,9 @@ A collection of real-time datasets.
 }
 
 \examples{
-# Load [gdp] dataset
+# Load gdp dataset
 data(gdp)
+head(gdp)
 }
 \references{
 Indergand, R., Leist, S. A Real-Time Data Set for Switzerland.
