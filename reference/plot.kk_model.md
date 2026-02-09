@@ -52,7 +52,7 @@ df <- get_nth_release(
   ),
   n = 0:1
 )
-df <- dplyr::select(df, -c(id, pub_date))
+df <- dplyr::select(df, -c("id", "pub_date"))
 df <- na.omit(df)
 
 e <- 1 # Number of efficient release
