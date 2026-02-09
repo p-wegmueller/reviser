@@ -59,17 +59,27 @@
     </div>
 
     <div class="section level2">
+    <h2 id="format">Format<a class="anchor" aria-label="anchor" href="#format"></a></h2>
+    <p>A tibble with quarterly observations and 4 variables:</p><dl><dt>time</dt>
+<dd><p>Date of the observation</p></dd>
+
+<dt>pub_date</dt>
+<dd><p>Publication date of the vintage</p></dd>
+
+<dt>value</dt>
+<dd><p>Numeric, real GDP (seasonally adjusted)</p></dd>
+
+<dt>id</dt>
+<dd><p>Country code</p></dd>
+
+
+</dl></div>
+    <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
 
-<ul><li><p>gdp: Quarterly Vintages (Billions of real dollars, seasonally adjusted)</p></li>
+<ul><li><p>GDP: Quarterly Vintages (Billions of real dollars, seasonally adjusted)</p></li>
 <li><p>Timeframe: Q1 1980 - Q4 2024</p></li>
 <li><p>Real-Time Vintages: Q4 2002 - Q4 2024</p></li>
-<li><p>Frequency: Quarterly</p></li>
-<li><p>Format: A tibble with quarterly observations and 3 variables:</p><ul><li><p><code>time</code>: Date of the observation.</p></li>
-<li><p><code>pub_date</code>: Publication date of the vintage</p></li>
-<li><p><code>values</code>: Numeric, real GDP (seasonally adjusted).</p></li>
-<li><p><code>id</code>: Country code</p></li>
-</ul></li>
 </ul></div>
     <div class="section level2">
     <h2 id="sources">Sources<a class="anchor" aria-label="anchor" href="#sources"></a></h2>
@@ -99,8 +109,18 @@ Swiss J Economics Statistics 150, 331–352 (2014).
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Load [gdp] dataset</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Load gdp dataset</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">gdp</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">gdp</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 × 4</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   time       pub_date    value id   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> 1980-01-01 2002-10-01 <span style="text-decoration: underline;">64</span>551. CHE  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> 1980-01-01 2003-01-01 <span style="text-decoration: underline;">64</span>551. CHE  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> 1980-01-01 2003-04-01 <span style="text-decoration: underline;">64</span>556. CHE  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> 1980-01-01 2003-07-01 <span style="text-decoration: underline;">64</span>551. CHE  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> 1980-01-01 2003-10-01 <span style="text-decoration: underline;">64</span>551. CHE  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> 1980-01-01 2004-04-01 <span style="text-decoration: underline;">75</span>004. CHE  </span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
