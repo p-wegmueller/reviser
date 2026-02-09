@@ -211,7 +211,7 @@ df <- dplyr::select(
     ),
     n = 0:10
   ),
-  -pub_date
+  -"pub_date"
 )
 
 final_release <- dplyr::select(
@@ -223,7 +223,7 @@ final_release <- dplyr::select(
     ),
     n = "latest"
   ),
-  -pub_date
+  -"pub_date"
 )
 
 results <- get_revision_analysis(
