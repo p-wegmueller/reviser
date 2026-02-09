@@ -2,15 +2,16 @@
 #'
 #' A collection of real-time datasets.
 #'
-#' * `gdp`: Quarterly Vintages (Billions of real dollars, seasonally adjusted)
+#' * GDP: Quarterly Vintages (Billions of real dollars, seasonally adjusted)
 #' * Timeframe: Q1 1980 - Q4 2024
 #' * Real-Time Vintages: Q4 2002 - Q4 2024
-#' * Frequency: Quarterly
-#' * Format: A tibble with quarterly observations and 3 variables:
-#'     * `time`: Date of the observation.
-#'     * `pub_date`: Publication date of the vintage
-#'     * `values`: Numeric, real GDP (seasonally adjusted).
-#'     * `id`: Country code
+#' @format A tibble with quarterly observations and 4 variables:
+#' \describe{
+#'   \item{time}{Date of the observation}
+#'   \item{pub_date}{Publication date of the vintage}
+#'   \item{value}{Numeric, real GDP (seasonally adjusted)}
+#'   \item{id}{Country code}
+#' }
 #'
 #' @section Sources:
 #' * All the data is from the realtime database of Indergand and Leist (2014).
@@ -30,6 +31,7 @@
 #' * JP:
 #'   * Japan
 #'   * Sources: Cabinet Office (Japan), OECD
+#'   
 #'
 #' @srrstats {G1.0} academic literature
 #'
@@ -38,8 +40,8 @@
 #'  \url{https://doi.org/10.1007/BF03399410}
 #'
 #' @examples
-#' # Load `gdp` dataset
+#' # Load gdp dataset
 #' data(gdp)
+#' head(gdp)
 #' @family dataset
-#' @format NULL
 "gdp"

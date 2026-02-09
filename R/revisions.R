@@ -1574,7 +1574,7 @@ get_nth_release <- function(df, n = 0, diagonal = FALSE) {
     }
     if (diagonal) {
       min_pub_date <- df %>%
-        dplyr::group_by(.data$id) %>%
+        dplyr::group_by("id") %>%
         dplyr::summarize(min_pub_date = min(.data$pub_date)) %>%
         dplyr::pull(.data$min_pub_date, .data$id) %>%
         as.Date()
