@@ -2,7 +2,7 @@
 #'
 #' A collection of real-time datasets.
 #'
-#' * [gdp]: Quarterly Vintages (Billions of real dollars, seasonally adjusted)
+#' * `gdp`: Quarterly Vintages (Billions of real dollars, seasonally adjusted)
 #' * Timeframe: Q1 1980 - Q4 2024
 #' * Real-Time Vintages: Q4 2002 - Q4 2024
 #' * Frequency: Quarterly
@@ -38,7 +38,7 @@
 #'  \url{https://doi.org/10.1007/BF03399410}
 #'
 #' @examples
-#' # Load [gdp] dataset
+#' # Load `gdp` dataset
 #' data(gdp)
 #' @family dataset
 #' @format NULL

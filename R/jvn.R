@@ -494,12 +494,19 @@ jvn_nowcast <- function(df,
         )
         
         # Check condition number
-        cond_num <- tryCatch(kappa(precise_hessian, exact = FALSE), error = function(e) Inf)
+        cond_num <- tryCatch(
+          kappa(precise_hessian, exact = FALSE), error = function(e) Inf
+          )
         
         if (!is.finite(cond_num) || cond_num > 1e10) {
-          msg <- paste0("Hessian is poorly conditioned", 
-                        if (is.finite(cond_num)) paste0(" (cond = ", format(cond_num, scientific = TRUE, digits = 2), ")") else "",
-                        ". SEs may be unreliable.")
+          msg <- paste0(
+            "Hessian is poorly conditioned", 
+            if (is.finite(cond_num)) {
+              paste0(" (cond = ", 
+                     format(cond_num, scientific = TRUE, digits = 2), 
+                     ")") } else {
+                       ""},
+            ". SEs may be unreliable.")
           
           # Return a list instead of updating external variables
           list(se = rep(NA, length(params_raw)), warning = msg, failed = TRUE)
@@ -511,9 +518,12 @@ jvn_nowcast <- function(df,
           }, error = function(e) {
             ridge <- 1e-6 * mean(abs(diag(precise_hessian)))
             if (default_solver_options$trace > 0) {
-              cat("Adding ridge regularization (\u03BB =", format(ridge, scientific = TRUE), ")\n")
+              cat("Adding ridge regularization (\u03BB =", 
+                  format(ridge, scientific = TRUE), ")\n")
             }
-            tryCatch(solve(precise_hessian + ridge * diag(nrow(precise_hessian))), error = function(e2) NULL)
+            tryCatch(solve(
+              precise_hessian + ridge * diag(nrow(precise_hessian))
+              ), error = function(e2) NULL)
           })
           
           if (is.null(fisher_info)) {
@@ -531,7 +541,8 @@ jvn_nowcast <- function(df,
             has_failed <- FALSE
             
             if ((n_nan + n_large) > 0) {
-              problem_msg <- paste0((n_nan + n_large), " parameter(s) have problematic SEs")
+              problem_msg <- paste0((n_nan + n_large), 
+                                    " parameter(s) have problematic SEs")
               has_failed <- TRUE
             }
             
