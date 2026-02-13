@@ -89,6 +89,11 @@ distinguish between multiple series.
 wide_ea_short <- vintages_wide(gdp_ea_short)
 head(wide_ea_short)
 #> $EA
+#> 
+#> # Vintages data (publication date format)
+#> # Time periods: 7 
+#> # Vintages: 7 
+#> 
 #> # A tibble: 7 × 8
 #>   time       `2007-04-01` `2007-07-01` `2007-10-01` `2008-01-01` `2008-04-01`
 #>   <date>            <dbl>        <dbl>        <dbl>        <dbl>        <dbl>
@@ -115,6 +120,12 @@ or contain the string `"release"`.
 # Convert back to long format
 long_ea_short <- vintages_long(wide_ea_short)
 head(long_ea_short)
+#> 
+#> # Vintages data (publication date format)
+#> # Time periods: 6 
+#> # IDs: 1 
+#> # Vintages: 2 
+#> 
 #> # A tibble: 6 × 4
 #>   time       pub_date   value id   
 #>   <date>     <chr>      <dbl> <chr>
@@ -144,6 +155,11 @@ gdp_short <- bind_rows(
 gdp_wide_short <- vintages_wide(gdp_short)
 head(gdp_wide_short)
 #> $EA
+#> 
+#> # Vintages data (publication date format)
+#> # Time periods: 7 
+#> # Vintages: 7 
+#> 
 #> # A tibble: 7 × 8
 #>   time       `2007-04-01` `2007-07-01` `2007-10-01` `2008-01-01` `2008-04-01`
 #>   <date>            <dbl>        <dbl>        <dbl>        <dbl>        <dbl>
@@ -157,6 +173,11 @@ head(gdp_wide_short)
 #> # ℹ 2 more variables: `2008-07-01` <dbl>, `2008-10-01` <dbl>
 #> 
 #> $US
+#> 
+#> # Vintages data (publication date format)
+#> # Time periods: 7 
+#> # Vintages: 7 
+#> 
 #> # A tibble: 7 × 8
 #>   time       `2007-04-01` `2007-07-01` `2007-10-01` `2008-01-01` `2008-04-01`
 #>   <date>            <dbl>        <dbl>        <dbl>        <dbl>        <dbl>
@@ -187,6 +208,11 @@ gdp_releases <- get_nth_release(gdp_short, n = 0)
 vintages_wide(gdp_releases)
 #> Warning: Ignoring columns: release
 #> $EA
+#> 
+#> # Vintages data (publication date format)
+#> # Time periods: 7 
+#> # Vintages: 7 
+#> 
 #> # A tibble: 7 × 8
 #>   time       `2007-04-01` `2007-07-01` `2007-10-01` `2008-01-01` `2008-04-01`
 #>   <date>            <dbl>        <dbl>        <dbl>        <dbl>        <dbl>
@@ -200,6 +226,11 @@ vintages_wide(gdp_releases)
 #> # ℹ 2 more variables: `2008-07-01` <dbl>, `2008-10-01` <dbl>
 #> 
 #> $US
+#> 
+#> # Vintages data (publication date format)
+#> # Time periods: 7 
+#> # Vintages: 7 
+#> 
 #> # A tibble: 7 × 8
 #>   time       `2007-04-01` `2007-07-01` `2007-10-01` `2008-01-01` `2008-04-01`
 #>   <date>            <dbl>        <dbl>        <dbl>        <dbl>        <dbl>
@@ -218,6 +249,12 @@ gdp_releases <- get_nth_release(gdp_short, n = 0:1)
 vintages_wide(gdp_releases, names_from = "release")
 #> Warning: Ignoring columns: pub_date
 #> $EA
+#> 
+#> # Vintages data (release format)
+#> # Format: wide
+#> # Time periods: 7 
+#> # Releases: 2 
+#> 
 #> # A tibble: 7 × 3
 #>   time       release_0 release_1
 #>   <date>         <dbl>     <dbl>
@@ -230,6 +267,12 @@ vintages_wide(gdp_releases, names_from = "release")
 #> 7 2008-07-01    -0.194    NA    
 #> 
 #> $US
+#> 
+#> # Vintages data (release format)
+#> # Format: wide
+#> # Time periods: 7 
+#> # Releases: 2 
+#> 
 #> # A tibble: 7 × 3
 #>   time       release_0 release_1
 #>   <date>         <dbl>     <dbl>
@@ -254,6 +297,11 @@ gdp_final <- get_nth_release(gdp_short, n = "latest")
 vintages_wide(gdp_final)
 #> Warning: Ignoring columns: release
 #> $EA
+#> 
+#> # Vintages data (publication date format)
+#> # Time periods: 7 
+#> # Vintages: 1 
+#> 
 #> # A tibble: 7 × 2
 #>   time       `2008-10-01`
 #>   <date>            <dbl>
@@ -266,6 +314,11 @@ vintages_wide(gdp_final)
 #> 7 2008-07-01       -0.194
 #> 
 #> $US
+#> 
+#> # Vintages data (publication date format)
+#> # Time periods: 7 
+#> # Vintages: 1 
+#> 
 #> # A tibble: 7 × 2
 #>   time       `2008-10-01`
 #>   <date>            <dbl>
@@ -302,6 +355,12 @@ gdp_releases <- get_fixed_release(
   month = "October"
 )
 gdp_releases
+#> 
+#> # Vintages data (publication date format)
+#> # Time periods: 8 
+#> # IDs: 1 
+#> # Vintages: 2 
+#> 
 #> # A tibble: 8 × 4
 #>   time       pub_date     value id   
 #>   <date>     <date>       <dbl> <chr>

@@ -241,12 +241,22 @@ Properties in Real-Time Time Series Vintages. R package version 0.1.0,
 
 Functions for analyzing revisions of time series.
 
+- [`diagnose()`](https://p-wegmueller.github.io/reviser/reference/diagnose.md)
+  : Diagnose Revision Quality
+- [`diagnose(`*`<revision_summary>`*`)`](https://p-wegmueller.github.io/reviser/reference/diagnose.revision_summary.md)
+  : Diagnose Revision Quality
 - [`get_first_efficient_release()`](https://p-wegmueller.github.io/reviser/reference/get_first_efficient_release.md)
   : Identify the First Efficient Release in Vintage Data
 - [`get_revision_analysis()`](https://p-wegmueller.github.io/reviser/reference/get_revision_analysis.md)
   : Revision Analysis Summary Statistics
+- [`print(`*`<lst_efficient>`*`)`](https://p-wegmueller.github.io/reviser/reference/print.lst_efficient.md)
+  : Print Method for Efficient Release Results
+- [`print(`*`<revision_summary>`*`)`](https://p-wegmueller.github.io/reviser/reference/print.revision_summary.md)
+  : Print Method for Revision Summary
 - [`summary(`*`<lst_efficient>`*`)`](https://p-wegmueller.github.io/reviser/reference/summary.lst_efficient.md)
   : Summary of Efficient Release Models
+- [`summary(`*`<revision_summary>`*`)`](https://p-wegmueller.github.io/reviser/reference/summary.revision_summary.md)
+  : Summary Method for Revision Summary
 
 ### Revision utilities
 
@@ -281,13 +291,21 @@ Functions for nowcasting revisions of time series.
   : Plot Kishor-Koenig Model Results
 - [`print(`*`<jvn_model>`*`)`](https://p-wegmueller.github.io/reviser/reference/print.jvn_model.md)
   : Print Method for JVN Model
+- [`print(`*`<kk_model>`*`)`](https://p-wegmueller.github.io/reviser/reference/print.kk_model.md)
+  : Print Method for KK Model
 - [`summary(`*`<jvn_model>`*`)`](https://p-wegmueller.github.io/reviser/reference/summary.jvn_model.md)
   : Summary Method for JVN Model
+- [`summary(`*`<kk_model>`*`)`](https://p-wegmueller.github.io/reviser/reference/summary.kk_model.md)
+  : Summary Method for KK Model
 
 ### Revision graphs
 
 Functions for plotting revisions of time series.
 
+- [`plot(`*`<tbl_pubdate>`*`)`](https://p-wegmueller.github.io/reviser/reference/plot.tbl_pubdate.md)
+  : Plot Method for Publication Date Vintages
+- [`plot(`*`<tbl_release>`*`)`](https://p-wegmueller.github.io/reviser/reference/plot.tbl_release.md)
+  : Plot Method for Release Vintages
 - [`plot_vintages()`](https://p-wegmueller.github.io/reviser/reference/plot_vintages.md)
   : Plot Vintages Data
 - [`theme_reviser()`](https://p-wegmueller.github.io/reviser/reference/theme_reviser.md)
@@ -300,6 +318,14 @@ Functions for plotting revisions of time series.
 
 Helper functions to convert revisions to a tidy format.
 
+- [`print(`*`<tbl_pubdate>`*`)`](https://p-wegmueller.github.io/reviser/reference/print.tbl_pubdate.md)
+  : Print Method for Publication Date Vintages
+- [`print(`*`<tbl_release>`*`)`](https://p-wegmueller.github.io/reviser/reference/print.tbl_release.md)
+  : Print Method for Release Vintages
+- [`summary(`*`<tbl_pubdate>`*`)`](https://p-wegmueller.github.io/reviser/reference/summary.tbl_pubdate.md)
+  : Summary Method for Publication Date Vintages
+- [`summary(`*`<tbl_release>`*`)`](https://p-wegmueller.github.io/reviser/reference/summary.tbl_release.md)
+  : Summary Method for Release Vintages
 - [`vintages_long()`](https://p-wegmueller.github.io/reviser/reference/vintages_long.md)
   : Convert Vintages Data to Long Format
 - [`vintages_wide()`](https://p-wegmueller.github.io/reviser/reference/vintages_wide.md)

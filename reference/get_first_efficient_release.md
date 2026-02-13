@@ -57,7 +57,7 @@ get_first_efficient_release(
 
 ## Value
 
-A list of class `list_eff_rel` with the following elements:
+A list of class `lst_efficient` with the following elements:
 
 - `e`: The index of the first efficient release. (0 indexed)
 
@@ -98,8 +98,13 @@ Credit and Banking, 40(2-3), 319-340, 2008.
 ## See also
 
 Other revision analysis:
+[`diagnose()`](https://p-wegmueller.github.io/reviser/reference/diagnose.md),
+[`diagnose.revision_summary()`](https://p-wegmueller.github.io/reviser/reference/diagnose.revision_summary.md),
 [`get_revision_analysis()`](https://p-wegmueller.github.io/reviser/reference/get_revision_analysis.md),
-[`summary.lst_efficient()`](https://p-wegmueller.github.io/reviser/reference/summary.lst_efficient.md)
+[`print.lst_efficient()`](https://p-wegmueller.github.io/reviser/reference/print.lst_efficient.md),
+[`print.revision_summary()`](https://p-wegmueller.github.io/reviser/reference/print.revision_summary.md),
+[`summary.lst_efficient()`](https://p-wegmueller.github.io/reviser/reference/summary.lst_efficient.md),
+[`summary.revision_summary()`](https://p-wegmueller.github.io/reviser/reference/summary.revision_summary.md)
 
 ## Examples
 

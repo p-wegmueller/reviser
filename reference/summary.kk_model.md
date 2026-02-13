@@ -1,9 +1,8 @@
-# Summarize the results of a kk_model object.
+# Summary Method for KK Model
 
-This function calculates and prints the Mean Squared Error (MSE), Root
-Mean Squared Error (RMSE), and Mean Absolute Error (MAE) of the filtered
-state variables against both the final release and the true efficient
-release.
+Computes and displays a summary of the results from a Kishor-Koenig (KK)
+model fit, including convergence status, information criteria, and
+parameter estimates.
 
 ## Usage
 
@@ -16,26 +15,15 @@ summary(object, ...)
 
 - object:
 
-  A list of class 'kk_model' produced by the
-  [`kk_nowcast`](https://p-wegmueller.github.io/reviser/reference/kk_nowcast.md)
-  function.
+  An object of class `kk_model`.
 
 - ...:
 
-  Additional arguments (not used).
+  Additional arguments passed to or from other methods.
 
 ## Value
 
-A list containing two data frames:
-
-- final_release_metrics:
-
-  A data frame with MSE, RMSE, and MAE against the final release.
-
-- true_efficient_release_metrics:
-
-  A data frame with MSE, RMSE, and MAE against the true efficient
-  release.
+The function returns the input `object` invisibly.
 
 ## See also
 
@@ -45,12 +33,42 @@ Other revision nowcasting:
 [`plot.jvn_model()`](https://p-wegmueller.github.io/reviser/reference/plot.jvn_model.md),
 [`plot.kk_model()`](https://p-wegmueller.github.io/reviser/reference/plot.kk_model.md),
 [`print.jvn_model()`](https://p-wegmueller.github.io/reviser/reference/print.jvn_model.md),
+[`print.kk_model()`](https://p-wegmueller.github.io/reviser/reference/print.kk_model.md),
 [`summary.jvn_model()`](https://p-wegmueller.github.io/reviser/reference/summary.jvn_model.md)
 
 ## Examples
 
 ``` r
-# Assuming 'kk_model_obj' is the result of kk_nowcast(your_data, ...)
-# and 'your_data' is the original data frame.
-# results <- summary.kk_model(kk_model_obj, your_data)
+df <- get_nth_release(
+  tsbox::ts_span(
+    tsbox::ts_pc(
+      dplyr::filter(reviser::gdp, id == "US")
+    ),
+    start = "1980-01-01"
+  ),
+  n = 0:1
+)
+df <- dplyr::select(df, -c("id", "pub_date"))
+df <- na.omit(df)
+
+e <- 1
+h <- 2
+result <- kk_nowcast(df, e, h = h, model = "Kishor-Koenig", method = "MLE")
+summary(result)
+#> 
+#> === Kishor-Koenig Model ===
+#> 
+#> Convergence: Success 
+#> Log-likelihood: -100.83 
+#> AIC: 211.67 
+#> BIC: 230.99 
+#> 
+#> Parameter Estimates:
+#>  Parameter Estimate Std.Error
+#>         F0    0.198     0.073
+#>       G0_0    0.990     0.005
+#>       G0_1    0.080     0.076
+#>         v0    1.598     0.171
+#>       eps0    0.007     0.001
+#> 
 ```

@@ -478,22 +478,51 @@ details).</p>
 <span>  degree <span class="op">=</span> <span class="fl">3</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">analysis</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; === Revision Analysis Summary ===</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 17</span></span></span>
 <span><span class="co">#&gt;   id    release        N `News test Intercept` `News test Intercept (std.err)`</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>                           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> CHE   release_0    158                0.180                           0.054<span style="text-decoration: underline;">0</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> CHE   release_1    158                0.163                           0.054<span style="text-decoration: underline;">4</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> CHE   release_10   157                0.128                           0.047<span style="text-decoration: underline;">5</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> CHE   release_11   158                0.126                           0.046<span style="text-decoration: underline;">9</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> CHE   release_12   157                0.092<span style="text-decoration: underline;">0</span>                          0.040<span style="text-decoration: underline;">6</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> CHE   release_13   157                0.059<span style="text-decoration: underline;">8</span>                          0.029<span style="text-decoration: underline;">2</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> CHE   release_0    158                 0.18                            0.054</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> CHE   release_1    158                 0.163                           0.054</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> CHE   release_10   157                 0.128                           0.047</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> CHE   release_11   158                 0.126                           0.047</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> CHE   release_12   157                 0.092                           0.041</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> CHE   release_13   157                 0.06                            0.029</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 12 more variables: `News test Intercept (p-value)` &lt;dbl&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   `News test Coefficient` &lt;dbl&gt;, `News test Coefficient (std.err)` &lt;dbl&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   `News test Coefficient (p-value)` &lt;dbl&gt;, `News joint test (p-value)` &lt;dbl&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   `Noise test Intercept` &lt;dbl&gt;, `Noise test Intercept (std.err)` &lt;dbl&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   `Noise test Intercept (p-value)` &lt;dbl&gt;, `Noise test Coefficient` &lt;dbl&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   `Noise test Coefficient (std.err)` &lt;dbl&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   `Noise test Coefficient (p-value)` &lt;dbl&gt;, …</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `Noise test Coefficient (p-value)` &lt;dbl&gt;, …</span></span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; === Interpretation ===</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; id=CHE, release=release_0:</span></span>
+<span><span class="co">#&gt;   • Revisions contain NEWS (p = 0.004 ): systematic information</span></span>
+<span><span class="co">#&gt;   • Revisions contain NOISE (p = 0 ): measurement error</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; id=CHE, release=release_1:</span></span>
+<span><span class="co">#&gt;   • Revisions contain NEWS (p = 0.011 ): systematic information</span></span>
+<span><span class="co">#&gt;   • Revisions contain NOISE (p = 0 ): measurement error</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; id=CHE, release=release_10:</span></span>
+<span><span class="co">#&gt;   • Revisions contain NEWS (p = 0.003 ): systematic information</span></span>
+<span><span class="co">#&gt;   • Revisions contain NOISE (p = 0 ): measurement error</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; id=CHE, release=release_11:</span></span>
+<span><span class="co">#&gt;   • Revisions contain NEWS (p = 0.003 ): systematic information</span></span>
+<span><span class="co">#&gt;   • Revisions contain NOISE (p = 0 ): measurement error</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; id=CHE, release=release_12:</span></span>
+<span><span class="co">#&gt;   • Revisions contain NEWS (p = 0.017 ): systematic information</span></span>
+<span><span class="co">#&gt;   • Revisions contain NOISE (p = 0.001 ): measurement error</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; id=CHE, release=release_13:</span></span>
+<span><span class="co">#&gt;   • Revisions do NOT contain news (p = 0.053 )</span></span>
+<span><span class="co">#&gt;   • Revisions do NOT contain noise (p = 0.121 )</span></span></code></pre></div>
 </div>
 <div class="section level2 unnumbered">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>

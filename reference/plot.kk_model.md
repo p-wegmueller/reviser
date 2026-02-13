@@ -38,7 +38,9 @@ Other revision nowcasting:
 [`kk_nowcast()`](https://p-wegmueller.github.io/reviser/reference/kk_nowcast.md),
 [`plot.jvn_model()`](https://p-wegmueller.github.io/reviser/reference/plot.jvn_model.md),
 [`print.jvn_model()`](https://p-wegmueller.github.io/reviser/reference/print.jvn_model.md),
-[`summary.jvn_model()`](https://p-wegmueller.github.io/reviser/reference/summary.jvn_model.md)
+[`print.kk_model()`](https://p-wegmueller.github.io/reviser/reference/print.kk_model.md),
+[`summary.jvn_model()`](https://p-wegmueller.github.io/reviser/reference/summary.jvn_model.md),
+[`summary.kk_model()`](https://p-wegmueller.github.io/reviser/reference/summary.kk_model.md)
 
 ## Examples
 

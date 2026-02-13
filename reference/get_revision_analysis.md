@@ -37,7 +37,7 @@ get_revision_analysis(df, final_release, degree = 1, grouping_var = NULL)
   output: 1: Default, includes information about revision size. 2:
   includes correlation statistics of revision. 3: includes news and
   noise tests. 4: includes sign switches, seasonality analysis and
-  Theil’s U. 5: Full set of all statistics and tests.
+  Theil's U. 5: Full set of all statistics and tests.
 
 - grouping_var:
 
@@ -195,8 +195,13 @@ for more details):
 ## See also
 
 Other revision analysis:
+[`diagnose()`](https://p-wegmueller.github.io/reviser/reference/diagnose.md),
+[`diagnose.revision_summary()`](https://p-wegmueller.github.io/reviser/reference/diagnose.revision_summary.md),
 [`get_first_efficient_release()`](https://p-wegmueller.github.io/reviser/reference/get_first_efficient_release.md),
-[`summary.lst_efficient()`](https://p-wegmueller.github.io/reviser/reference/summary.lst_efficient.md)
+[`print.lst_efficient()`](https://p-wegmueller.github.io/reviser/reference/print.lst_efficient.md),
+[`print.revision_summary()`](https://p-wegmueller.github.io/reviser/reference/print.revision_summary.md),
+[`summary.lst_efficient()`](https://p-wegmueller.github.io/reviser/reference/summary.lst_efficient.md),
+[`summary.revision_summary()`](https://p-wegmueller.github.io/reviser/reference/summary.revision_summary.md)
 
 ## Examples
 

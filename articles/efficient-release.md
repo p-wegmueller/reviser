@@ -340,15 +340,18 @@ analysis <- get_revision_analysis(
   degree = 3
 )
 head(analysis)
+#> 
+#> === Revision Analysis Summary ===
+#> 
 #> # A tibble: 6 × 17
 #>   id    release        N `News test Intercept` `News test Intercept (std.err)`
 #>   <chr> <chr>      <dbl>                 <dbl>                           <dbl>
-#> 1 CHE   release_0    158                0.180                           0.0540
-#> 2 CHE   release_1    158                0.163                           0.0544
-#> 3 CHE   release_10   157                0.128                           0.0475
-#> 4 CHE   release_11   158                0.126                           0.0469
-#> 5 CHE   release_12   157                0.0920                          0.0406
-#> 6 CHE   release_13   157                0.0598                          0.0292
+#> 1 CHE   release_0    158                 0.18                            0.054
+#> 2 CHE   release_1    158                 0.163                           0.054
+#> 3 CHE   release_10   157                 0.128                           0.047
+#> 4 CHE   release_11   158                 0.126                           0.047
+#> 5 CHE   release_12   157                 0.092                           0.041
+#> 6 CHE   release_13   157                 0.06                            0.029
 #> # ℹ 12 more variables: `News test Intercept (p-value)` <dbl>,
 #> #   `News test Coefficient` <dbl>, `News test Coefficient (std.err)` <dbl>,
 #> #   `News test Coefficient (p-value)` <dbl>, `News joint test (p-value)` <dbl>,
@@ -356,6 +359,32 @@ head(analysis)
 #> #   `Noise test Intercept (p-value)` <dbl>, `Noise test Coefficient` <dbl>,
 #> #   `Noise test Coefficient (std.err)` <dbl>,
 #> #   `Noise test Coefficient (p-value)` <dbl>, …
+#> 
+#> === Interpretation ===
+#> 
+#> id=CHE, release=release_0:
+#>   • Revisions contain NEWS (p = 0.004 ): systematic information
+#>   • Revisions contain NOISE (p = 0 ): measurement error
+#> 
+#> id=CHE, release=release_1:
+#>   • Revisions contain NEWS (p = 0.011 ): systematic information
+#>   • Revisions contain NOISE (p = 0 ): measurement error
+#> 
+#> id=CHE, release=release_10:
+#>   • Revisions contain NEWS (p = 0.003 ): systematic information
+#>   • Revisions contain NOISE (p = 0 ): measurement error
+#> 
+#> id=CHE, release=release_11:
+#>   • Revisions contain NEWS (p = 0.003 ): systematic information
+#>   • Revisions contain NOISE (p = 0 ): measurement error
+#> 
+#> id=CHE, release=release_12:
+#>   • Revisions contain NEWS (p = 0.017 ): systematic information
+#>   • Revisions contain NOISE (p = 0.001 ): measurement error
+#> 
+#> id=CHE, release=release_13:
+#>   • Revisions do NOT contain news (p = 0.053 )
+#>   • Revisions do NOT contain noise (p = 0.121 )
 ```
 
 ## References

@@ -88,20 +88,22 @@ information criteria, and parameter estimates.</p>
 <code><a href="kk_nowcast.html">kk_nowcast()</a></code>,
 <code><a href="plot.jvn_model.html">plot.jvn_model()</a></code>,
 <code><a href="plot.kk_model.html">plot.kk_model()</a></code>,
-<code><a href="print.jvn_model.html">print.jvn_model()</a></code></p></div>
+<code><a href="print.jvn_model.html">print.jvn_model()</a></code>,
+<code><a href="print.kk_model.html">print.kk_model()</a></code>,
+<code><a href="summary.kk_model.html">summary.kk_model()</a></code></p></div>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">gdp</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">gdp_growth</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="fu">tsbox</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/tsbox/reference/ts_pc.html" class="external-link">ts_pc</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    <span class="fu">reviser</span><span class="fu">::</span><span class="va"><a href="gdp.html">gdp</a></span></span></span>
 <span class="r-in"><span>  <span class="op">)</span>, <span class="va">id</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"EA"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  <span class="va">time</span> <span class="op">&gt;=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">pub_date</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  <span class="va">time</span> <span class="op">&lt;=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2020-01-01"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">gdp</span> <span class="op">&lt;-</span> <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/drop_na.html" class="external-link">drop_na</a></span><span class="op">(</span><span class="va">gdp</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_nth_release.html">get_nth_release</a></span><span class="op">(</span><span class="va">gdp</span>, n <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">gdp_growth</span> <span class="op">&lt;-</span> <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/drop_na.html" class="external-link">drop_na</a></span><span class="op">(</span><span class="va">gdp_growth</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_nth_release.html">get_nth_release</a></span><span class="op">(</span><span class="va">gdp_growth</span>, n <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Estimate model</span></span></span>
 <span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="jvn_nowcast.html">jvn_nowcast</a></span><span class="op">(</span></span></span>

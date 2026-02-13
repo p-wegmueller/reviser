@@ -17,7 +17,7 @@ summary(object, ...)
 - object:
 
   An output object from the `get_first_efficient_release` function. The
-  object must be of class `list_eff_rel`.
+  object must be of class `lst_efficient`.
 
 - ...:
 
@@ -66,8 +66,13 @@ The function assumes the object includes:
 ## See also
 
 Other revision analysis:
+[`diagnose()`](https://p-wegmueller.github.io/reviser/reference/diagnose.md),
+[`diagnose.revision_summary()`](https://p-wegmueller.github.io/reviser/reference/diagnose.revision_summary.md),
 [`get_first_efficient_release()`](https://p-wegmueller.github.io/reviser/reference/get_first_efficient_release.md),
-[`get_revision_analysis()`](https://p-wegmueller.github.io/reviser/reference/get_revision_analysis.md)
+[`get_revision_analysis()`](https://p-wegmueller.github.io/reviser/reference/get_revision_analysis.md),
+[`print.lst_efficient()`](https://p-wegmueller.github.io/reviser/reference/print.lst_efficient.md),
+[`print.revision_summary()`](https://p-wegmueller.github.io/reviser/reference/print.revision_summary.md),
+[`summary.revision_summary()`](https://p-wegmueller.github.io/reviser/reference/summary.revision_summary.md)
 
 ## Examples
 

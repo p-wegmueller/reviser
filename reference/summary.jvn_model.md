@@ -32,20 +32,22 @@ Other revision nowcasting:
 [`kk_nowcast()`](https://p-wegmueller.github.io/reviser/reference/kk_nowcast.md),
 [`plot.jvn_model()`](https://p-wegmueller.github.io/reviser/reference/plot.jvn_model.md),
 [`plot.kk_model()`](https://p-wegmueller.github.io/reviser/reference/plot.kk_model.md),
-[`print.jvn_model()`](https://p-wegmueller.github.io/reviser/reference/print.jvn_model.md)
+[`print.jvn_model()`](https://p-wegmueller.github.io/reviser/reference/print.jvn_model.md),
+[`print.kk_model()`](https://p-wegmueller.github.io/reviser/reference/print.kk_model.md),
+[`summary.kk_model()`](https://p-wegmueller.github.io/reviser/reference/summary.kk_model.md)
 
 ## Examples
 
 ``` r
-gdp <- dplyr::filter(
+gdp_growth <- dplyr::filter(
   tsbox::ts_pc(
     reviser::gdp
   ), id %in% c("EA"),
   time >= min(pub_date),
   time <= as.Date("2020-01-01")
 )
-gdp <- tidyr::drop_na(gdp)
-df <- get_nth_release(gdp, n = 0:4)
+gdp_growth <- tidyr::drop_na(gdp_growth)
+df <- get_nth_release(gdp_growth, n = 0:4)
 
 # Estimate model
 result <- jvn_nowcast(

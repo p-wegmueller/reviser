@@ -59,15 +59,23 @@ A customized ggplot2 theme, color palette, or scale.
 ## See also
 
 Other revision graphs:
+[`plot.tbl_pubdate()`](https://p-wegmueller.github.io/reviser/reference/plot.tbl_pubdate.md),
+[`plot.tbl_release()`](https://p-wegmueller.github.io/reviser/reference/plot.tbl_release.md),
 [`plot_vintages()`](https://p-wegmueller.github.io/reviser/reference/plot_vintages.md)
 
 Other revision graphs:
+[`plot.tbl_pubdate()`](https://p-wegmueller.github.io/reviser/reference/plot.tbl_pubdate.md),
+[`plot.tbl_release()`](https://p-wegmueller.github.io/reviser/reference/plot.tbl_release.md),
 [`plot_vintages()`](https://p-wegmueller.github.io/reviser/reference/plot_vintages.md)
 
 Other revision graphs:
+[`plot.tbl_pubdate()`](https://p-wegmueller.github.io/reviser/reference/plot.tbl_pubdate.md),
+[`plot.tbl_release()`](https://p-wegmueller.github.io/reviser/reference/plot.tbl_release.md),
 [`plot_vintages()`](https://p-wegmueller.github.io/reviser/reference/plot_vintages.md)
 
 Other revision graphs:
+[`plot.tbl_pubdate()`](https://p-wegmueller.github.io/reviser/reference/plot.tbl_pubdate.md),
+[`plot.tbl_release()`](https://p-wegmueller.github.io/reviser/reference/plot.tbl_release.md),
 [`plot_vintages()`](https://p-wegmueller.github.io/reviser/reference/plot_vintages.md)
 
 ## Examples

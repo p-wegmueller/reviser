@@ -120,17 +120,46 @@ results <- get_revision_analysis(
 )
 
 head(results)
+#> 
+#> === Revision Analysis Summary ===
+#> 
 #> # A tibble: 6 × 14
 #>   id    release       N `Bias (mean)` `Bias (p-value)` `Bias (robust p-value)`
 #>   <chr> <chr>     <dbl>         <dbl>            <dbl>                   <dbl>
-#> 1 CHE   release_0   178       0.110            0.00692                0.000107
-#> 2 CHE   release_1   177       0.0960           0.0148                 0.000202
-#> 3 EA    release_0   178       0.0553           0.00167                0.000450
-#> 4 EA    release_1   177       0.0502           0.00367                0.000673
-#> 5 JP    release_0   178       0.00989          0.848                  0.795   
-#> 6 JP    release_1   177       0.00920          0.859                  0.790   
+#> 1 CHE   release_0   178         0.11             0.007                   0    
+#> 2 CHE   release_1   177         0.096            0.015                   0    
+#> 3 EA    release_0   178         0.055            0.002                   0    
+#> 4 EA    release_1   177         0.05             0.004                   0.001
+#> 5 JP    release_0   178         0.01             0.848                   0.795
+#> 6 JP    release_1   177         0.009            0.859                   0.79 
 #> # ℹ 8 more variables: Minimum <dbl>, Maximum <dbl>, `10Q` <dbl>, Median <dbl>,
 #> #   `90Q` <dbl>, MAR <dbl>, `Std. Dev.` <dbl>, `Noise/Signal` <dbl>
+#> 
+#> === Interpretation ===
+#> 
+#> id=CHE, release=release_0:
+#>   • Significant upward bias detected (p = 0 )
+#>   • High revision volatility (Noise/Signal = 0.542 )
+#> 
+#> id=CHE, release=release_1:
+#>   • Significant upward bias detected (p = 0 )
+#>   • High revision volatility (Noise/Signal = 0.522 )
+#> 
+#> id=EA, release=release_0:
+#>   • Significant upward bias detected (p = 0 )
+#>   • Moderate revision volatility (Noise/Signal = 0.169 )
+#> 
+#> id=EA, release=release_1:
+#>   • Significant upward bias detected (p = 0.001 )
+#>   • Moderate revision volatility (Noise/Signal = 0.165 )
+#> 
+#> id=JP, release=release_0:
+#>   • No significant bias detected (p = 0.795 )
+#>   • High revision volatility (Noise/Signal = 0.55 )
+#> 
+#> id=JP, release=release_1:
+#>   • No significant bias detected (p = 0.79 )
+#>   • High revision volatility (Noise/Signal = 0.548 )
 ```
 
 ### Correlation of Revisions
@@ -212,18 +241,44 @@ results <- get_revision_analysis(
 )
 
 head(results)
+#> 
+#> === Revision Analysis Summary ===
+#> 
 #> # A tibble: 6 × 8
 #>   id    release      N Correlation Correlation (p-value…¹ Autocorrelation (1st…²
 #>   <chr> <chr>    <dbl>       <dbl>                  <dbl>                  <dbl>
-#> 1 CHE   release…   178      -0.209              0.00517                  -0.0887
-#> 2 CHE   release…   177      -0.204              0.00656                  -0.114 
-#> 3 EA    release…   178      -0.315              0.0000187                -0.0922
-#> 4 EA    release…   177      -0.318              0.0000158                -0.157 
-#> 5 JP    release…   178      -0.204              0.00626                  -0.278 
-#> 6 JP    release…   177      -0.241              0.00126                  -0.292 
+#> 1 CHE   release…   178      -0.209                  0.005                 -0.089
+#> 2 CHE   release…   177      -0.204                  0.007                 -0.114
+#> 3 EA    release…   178      -0.315                  0                     -0.092
+#> 4 EA    release…   177      -0.318                  0                     -0.157
+#> 5 JP    release…   178      -0.204                  0.006                 -0.278
+#> 6 JP    release…   177      -0.241                  0.001                 -0.292
 #> # ℹ abbreviated names: ¹​`Correlation (p-value)`, ²​`Autocorrelation (1st)`
 #> # ℹ 2 more variables: `Autocorrelation (1st p-value)` <dbl>,
 #> #   `Autocorrelation up to 1yr (Ljung-Box p-value)` <dbl>
+#> 
+#> === Interpretation ===
+#> 
+#> id=CHE, release=release_0:
+#>   • Significant negative correlation between revisions and initial values (ρ = -0.209 , p = 0.005 )
+#> 
+#> id=CHE, release=release_1:
+#>   • Significant negative correlation between revisions and initial values (ρ = -0.204 , p = 0.007 )
+#> 
+#> id=EA, release=release_0:
+#>   • Significant negative correlation between revisions and initial values (ρ = -0.315 , p = 0 )
+#> 
+#> id=EA, release=release_1:
+#>   • Significant negative correlation between revisions and initial values (ρ = -0.318 , p = 0 )
+#>   • Significant autocorrelation in revisions (ρ₁ = -0.157 ): revisions are persistent
+#> 
+#> id=JP, release=release_0:
+#>   • Significant negative correlation between revisions and initial values (ρ = -0.204 , p = 0.006 )
+#>   • Significant autocorrelation in revisions (ρ₁ = -0.278 ): revisions are persistent
+#> 
+#> id=JP, release=release_1:
+#>   • Significant negative correlation between revisions and initial values (ρ = -0.241 , p = 0.001 )
+#>   • Significant autocorrelation in revisions (ρ₁ = -0.292 ): revisions are persistent
 ```
 
 ### Sign Switches
@@ -347,15 +402,18 @@ results <- get_revision_analysis(
 )
 
 head(results)
+#> 
+#> === Revision Analysis Summary ===
+#> 
 #> # A tibble: 6 × 17
 #>   id    release       N `News test Intercept` `News test Intercept (std.err)`
 #>   <chr> <chr>     <dbl>                 <dbl>                           <dbl>
-#> 1 CHE   release_0   178                0.149                           0.0419
-#> 2 CHE   release_1   177                0.134                           0.0440
-#> 3 EA    release_0   178                0.0741                          0.0195
-#> 4 EA    release_1   177                0.0690                          0.0180
-#> 5 JP    release_0   178                0.0585                          0.0438
-#> 6 JP    release_1   177                0.0650                          0.0407
+#> 1 CHE   release_0   178                 0.149                           0.042
+#> 2 CHE   release_1   177                 0.134                           0.044
+#> 3 EA    release_0   178                 0.074                           0.02 
+#> 4 EA    release_1   177                 0.069                           0.018
+#> 5 JP    release_0   178                 0.059                           0.044
+#> 6 JP    release_1   177                 0.065                           0.041
 #> # ℹ 12 more variables: `News test Intercept (p-value)` <dbl>,
 #> #   `News test Coefficient` <dbl>, `News test Coefficient (std.err)` <dbl>,
 #> #   `News test Coefficient (p-value)` <dbl>, `News joint test (p-value)` <dbl>,
@@ -363,6 +421,32 @@ head(results)
 #> #   `Noise test Intercept (p-value)` <dbl>, `Noise test Coefficient` <dbl>,
 #> #   `Noise test Coefficient (std.err)` <dbl>,
 #> #   `Noise test Coefficient (p-value)` <dbl>, …
+#> 
+#> === Interpretation ===
+#> 
+#> id=CHE, release=release_0:
+#>   • Revisions contain NEWS (p = 0.001 ): systematic information
+#>   • Revisions contain NOISE (p = 0 ): measurement error
+#> 
+#> id=CHE, release=release_1:
+#>   • Revisions contain NEWS (p = 0.004 ): systematic information
+#>   • Revisions contain NOISE (p = 0 ): measurement error
+#> 
+#> id=EA, release=release_0:
+#>   • Revisions contain NEWS (p = 0 ): systematic information
+#>   • Revisions contain NOISE (p = 0.007 ): measurement error
+#> 
+#> id=EA, release=release_1:
+#>   • Revisions contain NEWS (p = 0 ): systematic information
+#>   • Revisions contain NOISE (p = 0.005 ): measurement error
+#> 
+#> id=JP, release=release_0:
+#>   • Revisions do NOT contain news (p = 0.142 )
+#>   • Revisions contain NOISE (p = 0.039 ): measurement error
+#> 
+#> id=JP, release=release_1:
+#>   • Revisions do NOT contain news (p = 0.106 )
+#>   • Revisions do NOT contain noise (p = 0.082 )
 ```
 
 ### Test of Seasonality in Revisions
@@ -456,19 +540,48 @@ results <- get_revision_analysis(
 )
 
 head(results)
+#> 
+#> === Revision Analysis Summary ===
+#> 
 #> # A tibble: 6 × 8
 #>   id    release     N Fraction of correct …¹ Fraction of correct …² `Theil's U1`
 #>   <chr> <chr>   <dbl>                  <dbl>                  <dbl>        <dbl>
-#> 1 CHE   releas…   178                  0.803                  0.652       0.262 
-#> 2 CHE   releas…   177                  0.802                  0.644       0.250 
-#> 3 EA    releas…   178                  0.944                  0.764       0.0818
-#> 4 EA    releas…   177                  0.944                  0.763       0.0797
-#> 5 JP    releas…   178                  0.820                  0.725       0.266 
-#> 6 JP    releas…   177                  0.802                  0.712       0.262 
+#> 1 CHE   releas…   178                  0.803                  0.652        0.262
+#> 2 CHE   releas…   177                  0.802                  0.644        0.25 
+#> 3 EA    releas…   178                  0.944                  0.764        0.082
+#> 4 EA    releas…   177                  0.944                  0.763        0.08 
+#> 5 JP    releas…   178                  0.82                   0.725        0.266
+#> 6 JP    releas…   177                  0.802                  0.712        0.262
 #> # ℹ abbreviated names: ¹​`Fraction of correct sign`,
 #> #   ²​`Fraction of correct growth rate change`
 #> # ℹ 2 more variables: `Theil's U2` <dbl>,
 #> #   `Seasonality (Friedman p-value)` <dbl>
+#> 
+#> === Interpretation ===
+#> 
+#> id=CHE, release=release_0:
+#>   • Good forecast accuracy (Theil's U1 = 0.262 )
+#>   • Good sign prediction (80.3% correct)
+#> 
+#> id=CHE, release=release_1:
+#>   • Good forecast accuracy (Theil's U1 = 0.25 )
+#>   • Good sign prediction (80.2% correct)
+#> 
+#> id=EA, release=release_0:
+#>   • Good forecast accuracy (Theil's U1 = 0.082 )
+#>   • Excellent sign prediction (94.4% correct)
+#> 
+#> id=EA, release=release_1:
+#>   • Good forecast accuracy (Theil's U1 = 0.08 )
+#>   • Excellent sign prediction (94.4% correct)
+#> 
+#> id=JP, release=release_0:
+#>   • Good forecast accuracy (Theil's U1 = 0.266 )
+#>   • Good sign prediction (82% correct)
+#> 
+#> id=JP, release=release_1:
+#>   • Good forecast accuracy (Theil's U1 = 0.262 )
+#>   • Good sign prediction (80.2% correct)
 ```
 
 In the above examples, we analyze GDP revisions by comparing the final
@@ -495,15 +608,18 @@ results <- get_revision_analysis(
 )
 
 head(results)
+#> 
+#> === Revision Analysis Summary ===
+#> 
 #> # A tibble: 6 × 39
 #>   id    pub_date       N Frequency `Bias (mean)` `Bias (p-value)`
 #>   <chr> <date>     <dbl>     <dbl>         <dbl>            <dbl>
-#> 1 CHE   2024-04-01   176         4       0.00226            0.478
-#> 2 CHE   2024-07-01   177         4      -0.00123            0.371
-#> 3 EA    2024-04-01   176         4       0.00656            0.159
-#> 4 EA    2024-07-01   177         4       0.00205            0.520
-#> 5 JP    2024-04-01   176         4      -0.00323            0.490
-#> 6 JP    2024-07-01   177         4      -0.00276            0.305
+#> 1 CHE   2024-04-01   176         4         0.002            0.478
+#> 2 CHE   2024-07-01   177         4        -0.001            0.371
+#> 3 EA    2024-04-01   176         4         0.007            0.159
+#> 4 EA    2024-07-01   177         4         0.002            0.52 
+#> 5 JP    2024-04-01   176         4        -0.003            0.49 
+#> 6 JP    2024-07-01   177         4        -0.003            0.305
 #> # ℹ 33 more variables: `Bias (robust p-value)` <dbl>, Minimum <dbl>,
 #> #   Maximum <dbl>, `10Q` <dbl>, Median <dbl>, `90Q` <dbl>, MAR <dbl>,
 #> #   `Std. Dev.` <dbl>, `Noise/Signal` <dbl>, Correlation <dbl>,
@@ -511,6 +627,61 @@ head(results)
 #> #   `Autocorrelation (1st p-value)` <dbl>,
 #> #   `Autocorrelation up to 1yr (Ljung-Box p-value)` <dbl>, `Theil's U1` <dbl>,
 #> #   `Theil's U2` <dbl>, `Seasonality (Friedman p-value)` <dbl>, …
+#> 
+#> === Interpretation ===
+#> 
+#> id=CHE, pub_date=2024-04-01:
+#>   • No significant bias detected (p = 0.515 )
+#>   • Very low revision volatility (Noise/Signal = 0.042 )
+#>   • Revisions do NOT contain news (p = 0.232 )
+#>   • Revisions do NOT contain noise (p = 0.553 )
+#>   • Good forecast accuracy (Theil's U1 = 0.019 )
+#>   • Excellent sign prediction (98.9% correct)
+#> 
+#> id=CHE, pub_date=2024-07-01:
+#>   • No significant bias detected (p = 0.358 )
+#>   • Very low revision volatility (Noise/Signal = 0.018 )
+#>   • Revisions do NOT contain news (p = 0.61 )
+#>   • Revisions do NOT contain noise (p = 0.65 )
+#>   • Good forecast accuracy (Theil's U1 = 0.008 )
+#>   • Excellent sign prediction (100% correct)
+#> 
+#> id=EA, pub_date=2024-04-01:
+#>   • Significant upward bias detected (p = 0.033 )
+#>   • Very low revision volatility (Noise/Signal = 0.045 )
+#>   • Revisions do NOT contain news (p = 0.237 )
+#>   • Revisions do NOT contain noise (p = 0.069 )
+#>   • Significant autocorrelation in revisions (ρ₁ = -0.201 ): revisions are persistent
+#>   • Good forecast accuracy (Theil's U1 = 0.022 )
+#>   • Excellent sign prediction (97.2% correct)
+#> 
+#> id=EA, pub_date=2024-07-01:
+#>   • No significant bias detected (p = 0.375 )
+#>   • Very low revision volatility (Noise/Signal = 0.031 )
+#>   • Revisions do NOT contain news (p = 0.579 )
+#>   • Revisions do NOT contain noise (p = 0.279 )
+#>   • Good forecast accuracy (Theil's U1 = 0.015 )
+#>   • Excellent sign prediction (98.9% correct)
+#> 
+#> id=JP, pub_date=2024-04-01:
+#>   • No significant bias detected (p = 0.355 )
+#>   • Very low revision volatility (Noise/Signal = 0.049 )
+#>   • Significant negative correlation between revisions and initial values (ρ = -0.219 , p = 0.003 )
+#>   • Revisions do NOT contain news (p = 0.18 )
+#>   • Revisions do NOT contain noise (p = 0.298 )
+#>   • Significant autocorrelation in revisions (ρ₁ = -0.232 ): revisions are persistent
+#>   • Good forecast accuracy (Theil's U1 = 0.023 )
+#>   • Excellent sign prediction (100% correct)
+#> 
+#> id=JP, pub_date=2024-07-01:
+#>   • No significant bias detected (p = 0.24 )
+#>   • Very low revision volatility (Noise/Signal = 0.028 )
+#>   • Significant negative correlation between revisions and initial values (ρ = -0.203 , p = 0.007 )
+#>   • Revisions contain NEWS (p = 0.04 ): systematic information
+#>   • Revisions do NOT contain noise (p = 0.067 )
+#>   • Significant autocorrelation in revisions (ρ₁ = -0.198 ): revisions are persistent
+#>   • Good forecast accuracy (Theil's U1 = 0.013 )
+#>   • Excellent sign prediction (100% correct)
 ```
 
 The
@@ -547,15 +718,18 @@ results <- purrr::map_dfr(seq_along(pub_dates[-length(pub_dates)]),
 )
 
 head(results)
+#> 
+#> === Revision Analysis Summary ===
+#> 
 #> # A tibble: 6 × 39
 #>   id    pub_date       N Frequency `Bias (mean)` `Bias (p-value)`
 #>   <chr> <date>     <dbl>     <dbl>         <dbl>            <dbl>
-#> 1 CHE   2002-10-01    90         4      0.000632            0.634
-#> 2 EA    2002-10-01    90         4      0.00106             0.512
-#> 3 JP    2002-10-01    90         4      0.0231              0.629
-#> 4 US    2002-10-01    90         4      0                 NaN    
-#> 5 CHE   2003-01-01    91         4     -0.00384             0.563
-#> 6 EA    2003-01-01    91         4      0.00192             0.750
+#> 1 CHE   2002-10-01    90         4         0.001            0.634
+#> 2 EA    2002-10-01    90         4         0.001            0.512
+#> 3 JP    2002-10-01    90         4         0.023            0.629
+#> 4 US    2002-10-01    90         4         0              NaN    
+#> 5 CHE   2003-01-01    91         4        -0.004            0.563
+#> 6 EA    2003-01-01    91         4         0.002            0.75 
 #> # ℹ 33 more variables: `Bias (robust p-value)` <dbl>, Minimum <dbl>,
 #> #   Maximum <dbl>, `10Q` <dbl>, Median <dbl>, `90Q` <dbl>, MAR <dbl>,
 #> #   `Std. Dev.` <dbl>, `Noise/Signal` <dbl>, Correlation <dbl>,
@@ -563,6 +737,54 @@ head(results)
 #> #   `Autocorrelation (1st p-value)` <dbl>,
 #> #   `Autocorrelation up to 1yr (Ljung-Box p-value)` <dbl>, `Theil's U1` <dbl>,
 #> #   `Theil's U2` <dbl>, `Seasonality (Friedman p-value)` <dbl>, …
+#> 
+#> === Interpretation ===
+#> 
+#> id=CHE, pub_date=2002-10-01:
+#>   • No significant bias detected (p = 0.181 )
+#>   • Very low revision volatility (Noise/Signal = 0.021 )
+#>   • Revisions do NOT contain news (p = 0.318 )
+#>   • Revisions do NOT contain noise (p = 0.376 )
+#>   • Significant autocorrelation in revisions (ρ₁ = -0.494 ): revisions are persistent
+#>   • Good forecast accuracy (Theil's U1 = 0.009 )
+#>   • Excellent sign prediction (100% correct)
+#> 
+#> id=EA, pub_date=2002-10-01:
+#>   • No significant bias detected (p = 0.175 )
+#>   • Very low revision volatility (Noise/Signal = 0.032 )
+#>   • Revisions do NOT contain news (p = 0.612 )
+#>   • Revisions do NOT contain noise (p = 0.623 )
+#>   • Significant autocorrelation in revisions (ρ₁ = -0.378 ): revisions are persistent
+#>   • Good forecast accuracy (Theil's U1 = 0.011 )
+#>   • Excellent sign prediction (98.9% correct)
+#> 
+#> id=JP, pub_date=2002-10-01:
+#>   • No significant bias detected (p = 0.231 )
+#>   • High revision volatility (Noise/Signal = 0.472 )
+#>   • Revisions do NOT contain news (p = 0.355 )
+#>   • Revisions contain NOISE (p = 0.015 ): measurement error
+#>   • Good forecast accuracy (Theil's U1 = 0.199 )
+#>   • Excellent sign prediction (91.1% correct)
+#> 
+#> id=US, pub_date=2002-10-01:
+#>   • Very low revision volatility (Noise/Signal = 0 )
+#>   • Good forecast accuracy (Theil's U1 = 0 )
+#>   • Excellent sign prediction (100% correct)
+#> 
+#> id=CHE, pub_date=2003-01-01:
+#>   • No significant bias detected (p = 0.254 )
+#>   • Moderate revision volatility (Noise/Signal = 0.104 )
+#>   • Revisions do NOT contain news (p = 0.333 )
+#>   • Revisions do NOT contain noise (p = 0.779 )
+#>   • Good forecast accuracy (Theil's U1 = 0.045 )
+#>   • Excellent sign prediction (97.8% correct)
+#> 
+#> id=EA, pub_date=2003-01-01:
+#>   • Moderate revision volatility (Noise/Signal = 0.119 )
+#>   • Revisions do NOT contain news (p = 0.829 )
+#>   • Revisions do NOT contain noise (p = 0.377 )
+#>   • Good forecast accuracy (Theil's U1 = 0.041 )
+#>   • Excellent sign prediction (98.9% correct)
 ```
 
 ## References

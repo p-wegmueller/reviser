@@ -86,37 +86,25 @@ kk_nowcast(
     [`stats::nlm()`](https://rdrr.io/r/stats/nlm.html)). Default is
     1e-6.
 
+  - **transform_se**: T/F whether standard errors should be constrained
+    to be positive in optimization.
+
+  - **method**: String specifying optimization method (default =
+    "L-BFGS-B").
+
+  - **se_method**: Method for standard error calculation (default =
+    "hessian")
+
+  - **n_starts**: Number of random starting points for multi-start
+    optimization
+
 ## Value
 
 A list with the following components:
 
-- filtered_z:
+- states:
 
-  A tibble of filtered latent state variables based on the Kalman
-  filter.
-
-- filtered_y:
-
-  A tibble of filtered observed variables based on the Kalman filter.
-
-- smoothed_z:
-
-  A tibble of smoothed latent state variables obtained using the Kalman
-  smoother.
-
-- smoothed_y:
-
-  A tibble of smoothed observed variables obtained using the Kalman
-  smoother.
-
-- forecast_z:
-
-  A tibble of forecasted latent state variables. Returned only if
-  `h > 0`.
-
-- forecast_y:
-
-  A tibble of forecasted observed variables. Returned only if `h > 0`.
+  A tibble containing filtered and smoothed state estimates.
 
 - kk_model_mat:
 
@@ -127,13 +115,33 @@ A list with the following components:
 
   A list of state-space model matrices derived from the KK model.
 
+- model:
+
+  The KFAS state-space model object.
+
 - params:
 
-  Estimated model parameters, including covariance terms.
+  Estimated model parameters with standard errors.
 
 - fit:
 
-  The fitted model object from the SUR estimation procedure.
+  The fitted model object from the estimation procedure.
+
+- loglik:
+
+  Log-likelihood value (MLE only).
+
+- aic:
+
+  Akaike Information Criterion (MLE only).
+
+- bic:
+
+  Bayesian Information Criterion (MLE only).
+
+- convergence:
+
+  Convergence status.
 
 - e:
 
@@ -165,7 +173,9 @@ Other revision nowcasting:
 [`plot.jvn_model()`](https://p-wegmueller.github.io/reviser/reference/plot.jvn_model.md),
 [`plot.kk_model()`](https://p-wegmueller.github.io/reviser/reference/plot.kk_model.md),
 [`print.jvn_model()`](https://p-wegmueller.github.io/reviser/reference/print.jvn_model.md),
-[`summary.jvn_model()`](https://p-wegmueller.github.io/reviser/reference/summary.jvn_model.md)
+[`print.kk_model()`](https://p-wegmueller.github.io/reviser/reference/print.kk_model.md),
+[`summary.jvn_model()`](https://p-wegmueller.github.io/reviser/reference/summary.jvn_model.md),
+[`summary.kk_model()`](https://p-wegmueller.github.io/reviser/reference/summary.kk_model.md)
 
 ## Examples
 
@@ -188,6 +198,10 @@ h <- 2 # Forecast horizon
 result <- kk_nowcast(df, e, h = h, model = "Kishor-Koenig")
 
 result$params
-#>           F0         G0_0         G0_1           v0         eps0 
-#>  0.200853533  0.995630065 -0.001694615  1.598322193  0.006664367 
+#>   Parameter     Estimate    Std.Error
+#> 1        F0  0.200853533 0.0735783747
+#> 2      G0_0  0.995630065 0.0048794659
+#> 3      G0_1 -0.001694615 0.0047626028
+#> 4        v0  1.598322193 0.1718526669
+#> 5      eps0  0.006664367 0.0007165572
 ```

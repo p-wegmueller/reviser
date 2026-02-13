@@ -32,6 +32,10 @@ a single wide-format data frame.
 ## See also
 
 Other helpers:
+[`print.tbl_pubdate()`](https://p-wegmueller.github.io/reviser/reference/print.tbl_pubdate.md),
+[`print.tbl_release()`](https://p-wegmueller.github.io/reviser/reference/print.tbl_release.md),
+[`summary.tbl_pubdate()`](https://p-wegmueller.github.io/reviser/reference/summary.tbl_pubdate.md),
+[`summary.tbl_release()`](https://p-wegmueller.github.io/reviser/reference/summary.tbl_release.md),
 [`vintages_long()`](https://p-wegmueller.github.io/reviser/reference/vintages_long.md)
 
 ## Examples
