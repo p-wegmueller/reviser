@@ -55,29 +55,28 @@ gradient is considered close enough to zero to terminate the
 algorithm (See \code{\link[stats:nlm]{stats::nlm()}}). Default is 1e-6.
 \item \strong{steptol}: A positive scalar providing the minimum allowable relative
 step length (See \code{\link[stats:nlm]{stats::nlm()}}). Default is 1e-6.
+\item \strong{transform_se}: T/F whether standard errors should be constrained to be
+positive in optimization.
+\item \strong{method}: String specifying optimization method (default = "L-BFGS-B").
+\item \strong{se_method}: Method for standard error calculation (default = "hessian")
+\item \strong{n_starts}: Number of random starting points for multi-start optimization
 }}
 }
 \value{
 A list with the following components:
 \describe{
-\item{filtered_z}{A tibble of filtered latent state variables based on
-the Kalman filter.}
-\item{filtered_y}{A tibble of filtered observed variables based on the
-Kalman filter.}
-\item{smoothed_z}{A tibble of smoothed latent state variables obtained
-using the Kalman smoother.}
-\item{smoothed_y}{A tibble of smoothed observed variables obtained using
-the Kalman smoother.}
-\item{forecast_z}{A tibble of forecasted latent state variables. Returned
-only if \code{h > 0}.}
-\item{forecast_y}{A tibble of forecasted observed variables. Returned
-only if \code{h > 0}.}
+\item{states}{A tibble containing filtered and smoothed state estimates.}
 \item{kk_model_mat}{A list of KK model matrices, such as transition
 and observation matrices.}
 \item{ss_model_mat}{A list of state-space model matrices derived
 from the KK model.}
-\item{params}{Estimated model parameters, including covariance terms.}
-\item{fit}{The fitted model object from the SUR estimation procedure.}
+\item{model}{The KFAS state-space model object.}
+\item{params}{Estimated model parameters with standard errors.}
+\item{fit}{The fitted model object from the estimation procedure.}
+\item{loglik}{Log-likelihood value (MLE only).}
+\item{aic}{Akaike Information Criterion (MLE only).}
+\item{bic}{Bayesian Information Criterion (MLE only).}
+\item{convergence}{Convergence status.}
 \item{e}{The number of the efficient release (0-indexed).}
 \item{data}{The input data in wide format.}
 }
@@ -127,6 +126,8 @@ Other revision nowcasting:
 \code{\link{plot.jvn_model}()},
 \code{\link{plot.kk_model}()},
 \code{\link{print.jvn_model}()},
-\code{\link{summary.jvn_model}()}
+\code{\link{print.kk_model}()},
+\code{\link{summary.jvn_model}()},
+\code{\link{summary.kk_model}()}
 }
 \concept{revision nowcasting}

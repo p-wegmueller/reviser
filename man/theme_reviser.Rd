@@ -60,15 +60,23 @@ ggplot(mtcars, aes(x = wt, y = mpg, color = factor(cyl))) +
 }
 \seealso{
 Other revision graphs: 
+\code{\link{plot.tbl_pubdate}()},
+\code{\link{plot.tbl_release}()},
 \code{\link{plot_vintages}()}
 
 Other revision graphs: 
+\code{\link{plot.tbl_pubdate}()},
+\code{\link{plot.tbl_release}()},
 \code{\link{plot_vintages}()}
 
 Other revision graphs: 
+\code{\link{plot.tbl_pubdate}()},
+\code{\link{plot.tbl_release}()},
 \code{\link{plot_vintages}()}
 
 Other revision graphs: 
+\code{\link{plot.tbl_pubdate}()},
+\code{\link{plot.tbl_release}()},
 \code{\link{plot_vintages}()}
 }
 \concept{revision graphs}

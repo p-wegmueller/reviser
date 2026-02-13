@@ -27,7 +27,7 @@ detail for the output:
 1: Default, includes information about revision size.
 2: includes correlation statistics of revision.
 3: includes news and noise tests.
-4: includes sign switches, seasonality analysis and Theil’s U.
+4: includes sign switches, seasonality analysis and Theil's U.
 5: Full set of all statistics and tests.}
 
 \item{grouping_var}{A character string specifying the grouping variable in
@@ -176,7 +176,12 @@ results <- get_revision_analysis(
 }
 \seealso{
 Other revision analysis: 
+\code{\link{diagnose}()},
+\code{\link{diagnose.revision_summary}()},
 \code{\link{get_first_efficient_release}()},
-\code{\link{summary.lst_efficient}()}
+\code{\link{print.lst_efficient}()},
+\code{\link{print.revision_summary}()},
+\code{\link{summary.lst_efficient}()},
+\code{\link{summary.revision_summary}()}
 }
 \concept{revision analysis}

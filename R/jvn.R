@@ -74,18 +74,20 @@
 #'
 #' @family revision nowcasting
 #' @export
-jvn_nowcast <- function(df,
-                        e,
-                        ar_order = 1,
-                        h = 0,
-                        include_news = TRUE,
-                        include_noise = TRUE,
-                        include_spillovers = FALSE,
-                        spillover_news = TRUE,
-                        spillover_noise = TRUE,
-                        method = "MLE",
-                        alpha = 0.05,
-                        solver_options = list()) {
+jvn_nowcast <- function(
+  df,
+  e,
+  ar_order = 1,
+  h = 0,
+  include_news = TRUE,
+  include_noise = TRUE,
+  include_spillovers = FALSE,
+  spillover_news = TRUE,
+  spillover_noise = TRUE,
+  method = "MLE",
+  alpha = 0.05,
+  solver_options = list()
+) {
   # Default solver options
   default_solver_options <- list(
     trace = 0,
@@ -143,8 +145,10 @@ jvn_nowcast <- function(df,
   if (is.list(check)) {
     if (length(check) > 1) {
       rlang::abort(paste0(
-        "'df' must contain a single ID, but ", length(check),
-        " IDs were provided: ", paste(names(check), collapse = ", ")
+        "'df' must contain a single ID, but ",
+        length(check),
+        " IDs were provided: ",
+        paste(names(check), collapse = ", ")
       ))
     }
     # Extract single data frame from list
@@ -156,7 +160,9 @@ jvn_nowcast <- function(df,
   if (check == "long") {
     if ("id" %in% colnames(df) && length(unique(df$id)) > 1) {
       rlang::abort(paste0(
-        "'df' contains ", length(unique(df$id)), " different IDs. ",
+        "'df' contains ",
+        length(unique(df$id)),
+        " different IDs. ",
         "Filter to a single ID first."
       ))
     }
@@ -206,8 +212,13 @@ jvn_nowcast <- function(df,
     cat("Estimating JVN model with", model_struct$n_params, "parameters...\n")
     cat("AR order:", ar_order, "\n")
     cat(
-      "News:", include_news, " Noise:", include_noise,
-      " Spillovers:", include_spillovers, "\n\n"
+      "News:",
+      include_news,
+      " Noise:",
+      include_noise,
+      " Spillovers:",
+      include_spillovers,
+      "\n\n"
     )
   }
 
@@ -254,27 +265,36 @@ jvn_nowcast <- function(df,
         sd_indices <- unlist(sd_indices)
         # Keep log(sigma) between log(0.01) and log(10)
         current_init[sd_indices] <- pmax(
-          pmin(current_init[sd_indices], log(100)), log(0.001)
+          pmin(current_init[sd_indices], log(100)),
+          log(0.001)
         )
       }
 
       # For AR coefficients, ensure stationarity
       ar_indices <- model_struct$param_info$ar_coef_idx
       current_init[ar_indices] <- pmax(
-        pmin(current_init[ar_indices], 0.9), -0.9
+        pmin(current_init[ar_indices], 0.9),
+        -0.9
       )
       # For spillover parameters, keep between 0 and 1
       if (!is.null(model_struct$param_info$spill_nu_idx)) {
         current_init[model_struct$param_info$spill_nu_idx] <-
           pmax(
-            pmin(current_init[model_struct$param_info$spill_nu_idx], 0.9), -0.9
+            pmin(current_init[model_struct$param_info$spill_nu_idx], 0.9),
+            -0.9
           )
       }
       if (!is.null(model_struct$param_info$spill_zeta_idx)) {
         current_init[model_struct$param_info$spill_zeta_idx] <-
-          pmax(pmin(current_init[
-            model_struct$param_info$spill_zeta_idx
-          ], 0.9), -0.9)
+          pmax(
+            pmin(
+              current_init[
+                model_struct$param_info$spill_zeta_idx
+              ],
+              0.9
+            ),
+            -0.9
+          )
       }
     }
 
@@ -479,7 +499,7 @@ jvn_nowcast <- function(df,
 
   if (se_method == "hessian") {
     # ===== HESSIAN METHOD =====
-    
+
     # We wrap the whole logic in a list-returning tryCatch
     se_result <- suppressWarnings(tryCatch(
       {
@@ -492,60 +512,76 @@ jvn_nowcast <- function(df,
           transform_se = default_solver_options$transform_se,
           method.args = list(eps = 1e-4, d = 0.01, r = 6)
         )
-        
+
         # Check condition number
         cond_num <- tryCatch(
-          kappa(precise_hessian, exact = FALSE), error = function(e) Inf
-          )
-        
+          kappa(precise_hessian, exact = FALSE),
+          error = function(e) Inf
+        )
+
         if (!is.finite(cond_num) || cond_num > 1e10) {
           msg <- paste0(
-            "Hessian is poorly conditioned", 
+            "Hessian is poorly conditioned",
             if (is.finite(cond_num)) {
-              paste0(" (cond = ", 
-                     format(cond_num, scientific = TRUE, digits = 2), 
-                     ")") } else {
-                       ""},
-            ". SEs may be unreliable.")
-          
+              paste0(
+                " (cond = ",
+                format(cond_num, scientific = TRUE, digits = 2),
+                ")"
+              )
+            } else {
+              ""
+            },
+            ". SEs may be unreliable."
+          )
+
           # Return a list instead of updating external variables
           list(se = rep(NA, length(params_raw)), warning = msg, failed = TRUE)
-          
         } else {
           # Try to invert
-          fisher_info <- tryCatch({
-            solve(precise_hessian)
-          }, error = function(e) {
-            ridge <- 1e-6 * mean(abs(diag(precise_hessian)))
-            if (default_solver_options$trace > 0) {
-              cat("Adding ridge regularization (\u03BB =", 
-                  format(ridge, scientific = TRUE), ")\n")
+          fisher_info <- tryCatch(
+            {
+              solve(precise_hessian)
+            },
+            error = function(e) {
+              ridge <- 1e-6 * mean(abs(diag(precise_hessian)))
+              if (default_solver_options$trace > 0) {
+                cat(
+                  "Adding ridge regularization (\u03BB =",
+                  format(ridge, scientific = TRUE),
+                  ")\n"
+                )
+              }
+              tryCatch(
+                solve(
+                  precise_hessian + ridge * diag(nrow(precise_hessian))
+                ),
+                error = function(e2) NULL
+              )
             }
-            tryCatch(solve(
-              precise_hessian + ridge * diag(nrow(precise_hessian))
-              ), error = function(e2) NULL)
-          })
-          
+          )
+
           if (is.null(fisher_info)) {
             list(
-              se = rep(NA, length(params_raw)), 
-              warning = "Failed to invert Hessian matrix.", 
+              se = rep(NA, length(params_raw)),
+              warning = "Failed to invert Hessian matrix.",
               failed = TRUE
             )
           } else {
             se_calc <- sqrt(diag(fisher_info))
             n_nan <- sum(is.nan(se_calc))
             n_large <- sum(se_calc > 1e3, na.rm = TRUE)
-            
+
             problem_msg <- NULL
             has_failed <- FALSE
-            
+
             if ((n_nan + n_large) > 0) {
-              problem_msg <- paste0((n_nan + n_large), 
-                                    " parameter(s) have problematic SEs")
+              problem_msg <- paste0(
+                (n_nan + n_large),
+                " parameter(s) have problematic SEs"
+              )
               has_failed <- TRUE
             }
-            
+
             se_calc[is.nan(se_calc)] <- NA
             list(se = se_calc, warning = problem_msg, failed = has_failed)
           }
@@ -554,19 +590,19 @@ jvn_nowcast <- function(df,
       error = function(e) {
         # No more <<- operator! We return the list directly from the handler.
         list(
-          se = rep(NA, length(params_raw)), 
-          warning = paste0("Hessian calculation failed: ", e$message), 
+          se = rep(NA, length(params_raw)),
+          warning = paste0("Hessian calculation failed: ", e$message),
           failed = TRUE
         )
       }
     ))
-    
+
     # Extract results back into your local variables
-    se_raw         <- se_result$se
-    se_warning     <- se_result$warning
+    se_raw <- se_result$se
+    se_warning <- se_result$warning
     hessian_failed <- se_result$failed
     se_method_used <- "hessian"
-    
+
     # Issue warning if Hessian was problematic
     if (hessian_failed && !is.null(se_warning)) {
       warning(se_warning, call. = FALSE)
@@ -686,7 +722,8 @@ jvn_nowcast <- function(df,
       lower = filtered_est - stats::qnorm(1 - alpha / 2) * filtered_se,
       upper = filtered_est + stats::qnorm(1 - alpha / 2) * filtered_se,
       filter = "filtered",
-      sample = dplyr::if_else(output_dates %in% forecast_dates,
+      sample = dplyr::if_else(
+        output_dates %in% forecast_dates,
         "out_of_sample",
         "in_sample"
       )
@@ -700,7 +737,8 @@ jvn_nowcast <- function(df,
       lower = smoothed_est - stats::qnorm(1 - alpha / 2) * smoothed_se,
       upper = smoothed_est + stats::qnorm(1 - alpha / 2) * smoothed_se,
       filter = "smoothed",
-      sample = dplyr::if_else(output_dates %in% forecast_dates,
+      sample = dplyr::if_else(
+        output_dates %in% forecast_dates,
         "out_of_sample",
         "in_sample"
       )
@@ -748,8 +786,16 @@ jvn_nowcast <- function(df,
 #'
 #' @keywords internal
 #' @noRd
-jvn_matrices <- function(n_obs, n_vint, ar_order, include_news, include_noise,
-                         include_spillovers, spillover_news, spillover_noise) {
+jvn_matrices <- function(
+  n_obs,
+  n_vint,
+  ar_order,
+  include_news,
+  include_noise,
+  include_spillovers,
+  spillover_news,
+  spillover_noise
+) {
   # State dimensions following paper notation
   # State vector:
   # $\tilde{y}_t, \tilde{y}_{t-1}, \ldots, \tilde{y}_{t-p+1}, \nu_t, \zeta_t$
@@ -814,7 +860,7 @@ jvn_matrices <- function(n_obs, n_vint, ar_order, include_news, include_noise,
     # Placeholders for $\sigma_{\nu}$, filled during update
     R[1, 2:(n_vint + 1)] <- 1
 
-    # News states get: $-U_1 · diag(R_3) \eta_{\nu t}$
+    # News states get: $-U_1 x diag(R_3) \eta_{\nu t}$
     # $U_1$ is upper triangular matrix with 1s on and above diagonal
     # This creates the cumulative news structure
     news_start <- ar_order + 1
@@ -870,23 +916,30 @@ jvn_matrices <- function(n_obs, n_vint, ar_order, include_news, include_noise,
     } else {
       NULL
     },
-    spill_zeta_idx =
-      if (include_noise && include_spillovers && spillover_noise) {
-        start <- ar_order + 2 + news_dim + noise_dim +
-          (if (include_news && include_spillovers && spillover_news) {
-            n_vint
-          } else {
-                  0})
-        start:(start + n_vint - 1)
-      } else {
-        NULL
-      }
+    spill_zeta_idx = if (
+      include_noise && include_spillovers && spillover_noise
+    ) {
+      start <- ar_order +
+        2 +
+        news_dim +
+        noise_dim +
+        (if (include_news && include_spillovers && spillover_news) {
+          n_vint
+        } else {
+          0
+        })
+      start:(start + n_vint - 1)
+    } else {
+      NULL
+    }
   )
 
   # Count total parameters
   n_params <- ar_order + 1 + news_dim + noise_dim
   if (include_spillovers) {
-    if (include_news && spillover_news) n_params <- n_params + n_vint
+    if (include_news && spillover_news) {
+      n_params <- n_params + n_vint
+    }
     if (include_noise && spillover_noise) n_params <- n_params + n_vint
   }
 
@@ -957,7 +1010,8 @@ jvn_update_matrices <- function(model_struct, params) {
   if (info$include_noise) {
     sigma_zeta <- params[info$sigma_zeta_idx]
     noise_start <- info$ar_order +
-      (if (info$include_news) info$n_vint else 0) + 1
+      (if (info$include_news) info$n_vint else 0) +
+      1
     shock_start <- 1 + (if (info$include_news) info$n_vint else 0) + 1
     for (i in 1:info$n_vint) {
       R[noise_start + i - 1, shock_start + i - 1] <- sigma_zeta[i]
@@ -976,7 +1030,8 @@ jvn_update_matrices <- function(model_struct, params) {
   if (info$include_noise && info$include_spillovers && info$spillover_noise) {
     spill_zeta <- params[info$spill_zeta_idx]
     noise_start <- info$ar_order +
-      (if (info$include_news) info$n_vint else 0) + 1
+      (if (info$include_news) info$n_vint else 0) +
+      1
     noise_end <- noise_start + info$n_vint - 1
     diag(Tmat[noise_start:noise_end, noise_start:noise_end]) <- spill_zeta
   }
@@ -1070,8 +1125,7 @@ jvn_init_params <- function(model_struct, data, transform_se = TRUE) {
       stats::ar(
         final_vintage,
         aic = FALSE,
-        order.max =
-          ar_order,
+        order.max = ar_order,
         method = "ols"
       )
     },
@@ -1126,7 +1180,8 @@ jvn_init_params <- function(model_struct, data, transform_se = TRUE) {
     # Force monotonic decrease (later vintages should be less noisy)
     for (v in 2:n_vint) {
       sigma_zeta_init[v] <- min(
-        sigma_zeta_init[v], sigma_zeta_init[v - 1] * 0.85
+        sigma_zeta_init[v],
+        sigma_zeta_init[v - 1] * 0.85
       )
     }
 
@@ -1143,7 +1198,10 @@ jvn_init_params <- function(model_struct, data, transform_se = TRUE) {
         ar1 <- tryCatch(
           {
             stats::ar(
-              revisions, aic = FALSE, order.max = 1, method = "ols"
+              revisions,
+              aic = FALSE,
+              order.max = 1,
+              method = "ols"
             )$ar[1]
           },
           error = function(e) 0.3
@@ -1163,7 +1221,10 @@ jvn_init_params <- function(model_struct, data, transform_se = TRUE) {
         ar1 <- tryCatch(
           {
             stats::ar(
-              residuals, aic = FALSE, order.max = 1, method = "ols"
+              residuals,
+              aic = FALSE,
+              order.max = 1,
+              method = "ols"
             )$ar[1]
           },
           error = function(e) 0.2
@@ -1237,8 +1298,11 @@ jvn_param_table <- function(params, se, param_info) {
   }
 
   # News spillovers
-  if (param_info$include_spillovers && param_info$include_news &&
-        param_info$spillover_news) {
+  if (
+    param_info$include_spillovers &&
+      param_info$include_news &&
+      param_info$spillover_news
+  ) {
     for (i in 1:param_info$n_vint) {
       param_names[idx] <- paste0("T_nu_", i)
       idx <- idx + 1
@@ -1246,8 +1310,11 @@ jvn_param_table <- function(params, se, param_info) {
   }
 
   # Noise spillovers
-  if (param_info$include_spillovers && param_info$include_noise &&
-        param_info$spillover_noise) {
+  if (
+    param_info$include_spillovers &&
+      param_info$include_noise &&
+      param_info$spillover_noise
+  ) {
     for (i in 1:param_info$n_vint) {
       param_names[idx] <- paste0("T_zeta_", i)
       idx <- idx + 1
@@ -1274,15 +1341,15 @@ jvn_param_table <- function(params, se, param_info) {
 #' @return The function returns the input \code{object} invisibly.
 #' @method summary jvn_model
 #' @examples
-#' gdp <- dplyr::filter(
+#' gdp_growth <- dplyr::filter(
 #'   tsbox::ts_pc(
 #'     reviser::gdp
 #'   ), id %in% c("EA"),
 #'   time >= min(pub_date),
 #'   time <= as.Date("2020-01-01")
 #' )
-#' gdp <- tidyr::drop_na(gdp)
-#' df <- get_nth_release(gdp, n = 0:4)
+#' gdp_growth <- tidyr::drop_na(gdp_growth)
+#' df <- get_nth_release(gdp_growth, n = 0:4)
 #'
 #' # Estimate model
 #' result <- jvn_nowcast(
@@ -1299,9 +1366,15 @@ jvn_param_table <- function(params, se, param_info) {
 #' @export
 summary.jvn_model <- function(object, ...) {
   cat("\n=== Jacobs-Van Norden Model ===\n\n")
-  cat("Convergence:", ifelse(
-    object$convergence == 0, "Success", "Failed"
-  ), "\n")
+  cat(
+    "Convergence:",
+    ifelse(
+      object$convergence == 0,
+      "Success",
+      "Failed"
+    ),
+    "\n"
+  )
   cat("Log-likelihood:", round(object$loglik, 2), "\n")
   cat("AIC:", round(object$aic, 2), "\n")
   cat("BIC:", round(object$bic, 2), "\n\n")
@@ -1328,15 +1401,15 @@ summary.jvn_model <- function(object, ...) {
 #' @return The function returns the input \code{x} invisibly.
 #' @method print jvn_model
 #' @examples
-#' gdp <- dplyr::filter(
+#' gdp_growth <- dplyr::filter(
 #'   tsbox::ts_pc(
 #'     reviser::gdp
 #'   ), id %in% c("EA"),
 #'   time >= min(pub_date),
 #'   time <= as.Date("2020-01-01")
 #' )
-#' gdp <- tidyr::drop_na(gdp)
-#' df <- get_nth_release(gdp, n = 0:4)
+#' gdp_growth <- tidyr::drop_na(gdp_growth)
+#' df <- get_nth_release(gdp_growth, n = 0:4)
 #'
 #' # Estimate model
 #' result <- jvn_nowcast(
@@ -1364,15 +1437,15 @@ print.jvn_model <- function(x, ...) {
 #'
 #' @return A ggplot2 object visualizing the specified state estimates.
 #' @examples
-#' gdp <- dplyr::filter(
+#' gdp_growth <- dplyr::filter(
 #'   tsbox::ts_pc(
 #'     reviser::gdp
 #'   ), id %in% c("EA"),
 #'   time >= min(pub_date),
 #'   time <= as.Date("2020-01-01")
 #' )
-#' gdp <- tidyr::drop_na(gdp)
-#' df <- get_nth_release(gdp, n = 0:4)
+#' gdp_growth <- tidyr::drop_na(gdp_growth)
+#' df <- get_nth_release(gdp_growth, n = 0:4)
 #'
 #' # Estimate model
 #' result <- jvn_nowcast(

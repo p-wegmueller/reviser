@@ -9,7 +9,7 @@
 \arguments{
 \item{object}{An output object from the
 \code{get_first_efficient_release} function. The object must be of
-class \code{list_eff_rel}.}
+class \code{lst_efficient}.}
 
 \item{...}{Additional arguments (not used).}
 }
@@ -67,7 +67,12 @@ summary(result)
 }
 \seealso{
 Other revision analysis: 
+\code{\link{diagnose}()},
+\code{\link{diagnose.revision_summary}()},
 \code{\link{get_first_efficient_release}()},
-\code{\link{get_revision_analysis}()}
+\code{\link{get_revision_analysis}()},
+\code{\link{print.lst_efficient}()},
+\code{\link{print.revision_summary}()},
+\code{\link{summary.revision_summary}()}
 }
 \concept{revision analysis}

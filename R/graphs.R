@@ -209,7 +209,8 @@ plot_vintages <- function(
     if (type == "line") {
       p <- p +
         ggplot2::geom_line(
-          ggplot2::aes(x = !!time_col, y = .data$value), data = df
+          ggplot2::aes(x = !!time_col, y = .data$value),
+          data = df
         ) +
         scale_color_reviser()
     } else if (type == "point") {
@@ -270,7 +271,9 @@ plot_vintages <- function(
       p <- p +
         ggplot2::geom_boxplot(
           ggplot2::aes(
-            x = !!time_col, y = .data$value, fill = factor(!!time_col)
+            x = !!time_col,
+            y = .data$value,
+            fill = factor(!!time_col)
           ),
           data = df
         ) +
@@ -284,7 +287,9 @@ plot_vintages <- function(
   # labels and title
   p <- p + ggplot2::ylab(ylab)
   if (!missing("title")) {
-    if (missing("subtitle")) subtitle <- NULL
+    if (missing("subtitle")) {
+      subtitle <- NULL
+    }
     p <- p + ggplot2::ggtitle(label = title, subtitle = subtitle)
   }
 
@@ -303,6 +308,32 @@ plot_vintages <- function(
   p
 }
 
+#' Plot Method for Publication Date Vintages
+#'
+#' @param x An object of class \code{tbl_pubdate}.
+#' @param ... Additional arguments passed to plot_vintages.
+#'
+#' @return A ggplot2 object.
+#' @method plot tbl_pubdate
+#' @family revision graphs
+#' @export
+plot.tbl_pubdate <- function(x, ...) {
+  plot_vintages(x, dim_col = "pub_date", ...)
+}
+
+#' Plot Method for Release Vintages
+#'
+#' @param x An object of class \code{tbl_release}.
+#' @param ... Additional arguments passed to plot_vintages.
+#'
+#' @return A ggplot2 object.
+#' @method plot tbl_release
+#' @family revision graphs
+#' @export
+plot.tbl_release <- function(x, ...) {
+  plot_vintages(x, dim_col = "release", ...)
+}
+
 #' Plot Revision Model Results
 #'
 #' @param x An object of class 'revision_model'
@@ -313,7 +344,6 @@ plot_vintages <- function(
 #' @keywords internal
 #' @noRd
 plot.revision_model <- function(x, state = NULL, type = "filtered", ...) {
-
   # Handle defaults if not provided by the child method
   if (is.null(state)) {
     state <- x$states[x$states$filter == type, ]$state[1]
@@ -331,13 +361,14 @@ plot.revision_model <- function(x, state = NULL, type = "filtered", ...) {
   col_values <- c("in_sample" = pal[1], "out_of_sample" = pal[2])
   line_values <- c("in_sample" = "solid", "out_of_sample" = "solid")
   label_values <- c(
-    "in_sample" = "In-sample", "out_of_sample" = "Out-of-sample"
+    "in_sample" = "In-sample",
+    "out_of_sample" = "Out-of-sample"
   )
 
   # Build Plot
   # Split samples
-  in_sample_data  <- plot_data[plot_data$sample == "in_sample", ]
-  oos_data        <- plot_data[plot_data$sample == "out_of_sample", ]
+  in_sample_data <- plot_data[plot_data$sample == "in_sample", ]
+  oos_data <- plot_data[plot_data$sample == "out_of_sample", ]
 
   p <- ggplot2::ggplot() +
 
@@ -345,21 +376,26 @@ plot.revision_model <- function(x, state = NULL, type = "filtered", ...) {
     ggplot2::geom_ribbon(
       data = in_sample_data,
       ggplot2::aes(
-        x = .data$time, ymin = .data$lower, ymax = .data$upper, fill = sample
+        x = .data$time,
+        ymin = .data$lower,
+        ymax = .data$upper,
+        fill = sample
       ),
       alpha = 0.2
     ) +
     ggplot2::geom_line(
       data = in_sample_data,
       ggplot2::aes(
-        x = .data$time, y = .data$estimate, color = sample, linetype = sample
+        x = .data$time,
+        y = .data$estimate,
+        color = sample,
+        linetype = sample
       ),
       linewidth = 0.8
     )
 
   # ---- Out-of-sample: branch on length ----
   if (nrow(oos_data) == 1) {
-
     p <- p +
       ggplot2::geom_crossbar(
         data = oos_data,
@@ -377,7 +413,10 @@ plot.revision_model <- function(x, state = NULL, type = "filtered", ...) {
       ggplot2::geom_point(
         data = oos_data,
         ggplot2::aes(
-          x = .data$time, y = .data$estimate, color = sample, fill = sample
+          x = .data$time,
+          y = .data$estimate,
+          color = sample,
+          fill = sample
         ),
         size = 2
       )
@@ -386,14 +425,20 @@ plot.revision_model <- function(x, state = NULL, type = "filtered", ...) {
       ggplot2::geom_ribbon(
         data = oos_data,
         ggplot2::aes(
-          x = .data$time, ymin = .data$lower, ymax = .data$upper, fill = sample
+          x = .data$time,
+          ymin = .data$lower,
+          ymax = .data$upper,
+          fill = sample
         ),
         alpha = 0.2
       ) +
       ggplot2::geom_line(
         data = oos_data,
         ggplot2::aes(
-          x = .data$time, y = .data$estimate, color = sample, linetype = sample
+          x = .data$time,
+          y = .data$estimate,
+          color = sample,
+          linetype = sample
         ),
         linewidth = 0.8
       )
@@ -417,7 +462,9 @@ plot.revision_model <- function(x, state = NULL, type = "filtered", ...) {
     ggplot2::labs(
       title = paste(type, "estimate:", state),
       subtitle = "with 95% confidence intervals",
-      color = "Sample", fill = "Sample", linetype = "Sample"
+      color = "Sample",
+      fill = "Sample",
+      linetype = "Sample"
     ) +
     ggplot2::ylab("")
 

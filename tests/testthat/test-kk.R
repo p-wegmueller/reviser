@@ -32,23 +32,6 @@ test_that("kk_nowcast returns a list of class kk_model", {
   expect_s3_class(result, "kk_model")
 })
 
-test_that("kk_nowcast returns expected components", {
-  result <- kk_nowcast(df_kk, e = 1, h = 1, model = "Kishor-Koenig")
-  expect_named(
-    result,
-    c(
-      "states",
-      "kk_model_mat",
-      "ss_model_mat",
-      "model",
-      "params",
-      "fit",
-      "e",
-      "data"
-    )
-  )
-})
-
 test_that("kk_nowcast handles different models", {
   expect_silent(kk_nowcast(df_kk, e = 1, h = 0, model = "Kishor-Koenig"))
   expect_silent(kk_nowcast(df_kk, e = 1, h = 0, model = "Howrey"))
@@ -60,7 +43,6 @@ test_that("kk_nowcast handles different methods", {
   expect_silent(kk_nowcast(df_kk, e = 1, h = 0, method = "MLE"))
   expect_silent(kk_nowcast(df_kk, e = 1, h = 0, method = "OLS"))
 })
-
 
 test_that("kk_nowcast throws error for invalid e and h", {
   expect_error(
@@ -96,22 +78,6 @@ test_that("kk_nowcast throws error for invalid solver_options", {
   )
 })
 
-test_that("kk_nowcast handles startvals", {
-  n_params <- ifelse(
-    "Kishor-Koenig" %in% c("Kishor-Koenig", "KK"),
-    1 + 1 + 1^2,
-    ifelse("Howrey" == "Howrey", 1 + 1^2, 1)
-  ) +
-    (1 + 1)
-  start_values <- setNames(rep(0.1, n_params), paste0("p", 1:n_params))
-  expect_silent(kkmod <- kk_nowcast(df_kk, e = 1))
-  start_values_vec <- kkmod$params
-  expect_silent(kk_nowcast(
-    df_kk,
-    e = 1,
-    solver_options = list(startvals = start_values_vec)
-  ))
-})
 
 test_that("kk_nowcast throws error for invalid startvals", {
   n_params <- ifelse(

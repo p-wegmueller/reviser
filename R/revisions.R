@@ -174,7 +174,8 @@ get_revisions <- function(
         dplyr::mutate(
           value_ref = dplyr::lag(
             .data$value,
-            n = interval, order_by = .data$pub_date
+            n = interval,
+            order_by = .data$pub_date
           )
         ) %>%
         dplyr::mutate(value = .data$value_ref - .data$value) %>%
@@ -216,7 +217,8 @@ get_revisions <- function(
         dplyr::mutate(
           value_ref = dplyr::lag(
             .data$value,
-            n = interval, order_by = .data$pub_date
+            n = interval,
+            order_by = .data$pub_date
           )
         ) %>%
         dplyr::ungroup() %>%
@@ -262,7 +264,7 @@ get_revisions <- function(
 #' @param robust A logical value indicating whether to use robust HAC standard
 #' errors (default is `TRUE`).
 #'
-#' @return A list of class `list_eff_rel` with the following elements:
+#' @return A list of class `lst_efficient` with the following elements:
 #'   - `e`: The index of the first efficient release. (0 indexed)
 #'   - `data`: A long-format data frame containing the vintage data with the
 #'   final release appended.
@@ -556,6 +558,19 @@ get_first_efficient_release <- function(
   return(df_output)
 }
 
+#' Print Method for Efficient Release Results
+#'
+#' @param x An object of class \code{lst_efficient}.
+#' @param ... Additional arguments (not used).
+#'
+#' @return The function returns the input \code{x} invisibly.
+#' @method print lst_efficient
+#' @family revision analysis
+#' @export
+print.lst_efficient <- function(x, ...) {
+  summary.lst_efficient(x, ...)
+}
+
 #' Summary of Efficient Release Models
 #'
 #' Provides a detailed summary of the regression model and hypothesis test for
@@ -564,7 +579,7 @@ get_first_efficient_release <- function(
 #'
 #' @param object An output object from the
 #' `get_first_efficient_release` function. The object must be of
-#' class `list_eff_rel`.
+#' class `lst_efficient`.
 #' @param ... Additional arguments (not used).
 #'
 #' @details
@@ -721,7 +736,7 @@ summary.lst_efficient <- function(object, ...) {
 #'    1: Default, includes information about revision size.
 #'    2: includes correlation statistics of revision.
 #'    3: includes news and noise tests.
-#'    4: includes sign switches, seasonality analysis and Theil’s U.
+#'    4: includes sign switches, seasonality analysis and Theil's U.
 #'    5: Full set of all statistics and tests.
 #' @param grouping_var A character string specifying the grouping variable in
 #' the data frame. Defaults to `"pub_date"` or `"release"` if available.
@@ -953,7 +968,10 @@ get_revision_analysis <- function(
       length(unique(df$id)) > 0
   ) {
     final_release <- dplyr::select(
-      final_release, "time", "final_value", "id"
+      final_release,
+      "time",
+      "final_value",
+      "id"
     )
 
     df <- df %>%
@@ -1000,7 +1018,8 @@ get_revision_analysis <- function(
     any(
       revisions %>%
         dplyr::count(dplyr::across(dplyr::all_of(grouping_vars))) %>%
-        dplyr::pull(.data$n) < 8
+        dplyr::pull(.data$n) <
+        8
     )
   ) {
     rlang::abort(
@@ -1102,6 +1121,604 @@ get_revision_analysis <- function(
   }
 }
 
+#' Print Method for Revision Summary
+#'
+#' @param x An object of class \code{revision_summary}.
+#' @param interpretation Logical. If TRUE, provides interpretation of key
+#' statistics. Default is TRUE.
+#' @param digits Integer. Number of digits to display. Default is 3.
+#' @param ... Additional arguments (not used).
+#'
+#' @return The function returns the input \code{x} invisibly.
+#' @method print revision_summary
+#' @family revision analysis
+#' @export
+print.revision_summary <- function(x, interpretation = TRUE, digits = 3, ...) {
+  cat("\n=== Revision Analysis Summary ===\n\n")
+
+  # Determine grouping variables
+  grouping_vars <- setdiff(
+    colnames(x)[
+      !colnames(x) %in%
+        c(
+          "N",
+          "Frequency",
+          "Bias (mean)",
+          "Bias (p-value)",
+          "Bias (robust p-value)",
+          "Minimum",
+          "Maximum",
+          "10Q",
+          "Median",
+          "90Q",
+          "MAR",
+          "Std. Dev.",
+          "Noise/Signal",
+          "Correlation",
+          "Correlation (p-value)",
+          "Autocorrelation (1st)",
+          "Autocorrelation (1st p-value)",
+          "Autocorrelation up to 1yr (Ljung-Box p-value)",
+          "Theil's U1",
+          "Theil's U2",
+          "Seasonality (Friedman p-value)",
+          "News test Intercept",
+          "News test Intercept (std.err)",
+          "News test Intercept (p-value)",
+          "News test Coefficient",
+          "News test Coefficient (std.err)",
+          "News test Coefficient (p-value)",
+          "News joint test (p-value)",
+          "Noise test Intercept",
+          "Noise test Intercept (std.err)",
+          "Noise test Intercept (p-value)",
+          "Noise test Coefficient",
+          "Noise test Coefficient (std.err)",
+          "Noise test Coefficient (p-value)",
+          "Noise joint test (p-value)",
+          "Fraction of correct sign",
+          "Fraction of correct growth rate change"
+        )
+    ],
+    c()
+  )
+
+  # Print the data
+  x_print <- x
+
+  # Round numeric columns
+  numeric_cols <- sapply(x_print, is.numeric)
+  x_print[numeric_cols] <- lapply(x_print[numeric_cols], round, digits)
+
+  # Remove class for printing
+  class(x_print) <- class(x_print)[class(x_print) != "revision_summary"]
+  print(x_print, ...)
+
+  # Add interpretation if requested
+  if (interpretation && nrow(x) > 0) {
+    cat("\n=== Interpretation ===\n")
+
+    for (i in seq_len(nrow(x))) {
+      row <- x[i, ]
+
+      # Header for group
+      if (length(grouping_vars) > 0) {
+        group_label <- paste(
+          sapply(grouping_vars, function(v) {
+            paste0(v, "=", row[[v]])
+          }),
+          collapse = ", "
+        )
+        cat("\n", group_label, ":\n", sep = "")
+      } else if (nrow(x) > 1) {
+        cat("\nGroup", i, ":\n")
+      } else {
+        cat("\n")
+      }
+
+      # Bias interpretation
+      if ("Bias (robust p-value)" %in% colnames(row)) {
+        bias_p <- row[["Bias (robust p-value)"]]
+        bias_mean <- row[["Bias (mean)"]]
+
+        if (!is.na(bias_p) && !is.na(bias_mean)) {
+          if (bias_p < 0.05) {
+            direction <- if (bias_mean > 0) "upward" else "downward"
+            cat(
+              "  • Significant",
+              direction,
+              "bias detected (p =",
+              round(bias_p, 3),
+              ")\n"
+            )
+          } else {
+            cat(
+              "  • No significant bias detected (p =",
+              round(bias_p, 3),
+              ")\n"
+            )
+          }
+        }
+      }
+
+      # Noise/Signal ratio interpretation
+      if ("Noise/Signal" %in% colnames(row)) {
+        ns_ratio <- row[["Noise/Signal"]]
+        if (!is.na(ns_ratio)) {
+          if (ns_ratio < 0.1) {
+            cat(
+              "  • Very low revision volatility (Noise/Signal =",
+              round(ns_ratio, 3),
+              ")\n"
+            )
+          } else if (ns_ratio < 0.3) {
+            cat(
+              "  • Moderate revision volatility (Noise/Signal =",
+              round(ns_ratio, 3),
+              ")\n"
+            )
+          } else {
+            cat(
+              "  • High revision volatility (Noise/Signal =",
+              round(ns_ratio, 3),
+              ")\n"
+            )
+          }
+        }
+      }
+
+      # Correlation interpretation
+      if ("Correlation (p-value)" %in% colnames(row)) {
+        cor_p <- row[["Correlation (p-value)"]]
+        cor_val <- row[["Correlation"]]
+
+        if (!is.na(cor_p) && !is.na(cor_val)) {
+          if (cor_p < 0.05) {
+            direction <- if (cor_val > 0) "positive" else "negative"
+            cat(
+              "  • Significant",
+              direction,
+              "correlation between revisions and initial values (ρ =",
+              round(cor_val, 3),
+              ", p =",
+              round(cor_p, 3),
+              ")\n"
+            )
+          }
+        }
+      }
+
+      # News/Noise test interpretation
+      if ("News joint test (p-value)" %in% colnames(row)) {
+        news_p <- row[["News joint test (p-value)"]]
+        if (!is.na(news_p)) {
+          if (news_p < 0.05) {
+            cat(
+              "  • Revisions contain NEWS (p =",
+              round(news_p, 3),
+              "): systematic information\n"
+            )
+          } else {
+            cat(
+              "  • Revisions do NOT contain news (p =",
+              round(news_p, 3),
+              ")\n"
+            )
+          }
+        }
+      }
+
+      if ("Noise joint test (p-value)" %in% colnames(row)) {
+        noise_p <- row[["Noise joint test (p-value)"]]
+        if (!is.na(noise_p)) {
+          if (noise_p < 0.05) {
+            cat(
+              "  • Revisions contain NOISE (p =",
+              round(noise_p, 3),
+              "): measurement error\n"
+            )
+          } else {
+            cat(
+              "  • Revisions do NOT contain noise (p =",
+              round(noise_p, 3),
+              ")\n"
+            )
+          }
+        }
+      }
+
+      # Autocorrelation interpretation
+      if ("Autocorrelation (1st p-value)" %in% colnames(row)) {
+        auto_p <- row[["Autocorrelation (1st p-value)"]]
+        auto_val <- row[["Autocorrelation (1st)"]]
+
+        if (!is.na(auto_p) && !is.na(auto_val)) {
+          if (auto_p < 0.05) {
+            cat(
+              "  • Significant autocorrelation in revisions (ρ₁ =",
+              round(auto_val, 3),
+              "): revisions are persistent\n"
+            )
+          }
+        }
+      }
+
+      # Theil's U interpretation
+      if ("Theil's U1" %in% colnames(row)) {
+        u1 <- row[["Theil's U1"]]
+        if (!is.na(u1)) {
+          if (u1 < 0.3) {
+            cat("  • Good forecast accuracy (Theil's U1 =", round(u1, 3), ")\n")
+          } else if (u1 < 0.6) {
+            cat(
+              "  • Moderate forecast accuracy (Theil's U1 =",
+              round(u1, 3),
+              ")\n"
+            )
+          } else {
+            cat("  • Poor forecast accuracy (Theil's U1 =", round(u1, 3), ")\n")
+          }
+        }
+      }
+
+      # Sign correctness interpretation
+      if ("Fraction of correct sign" %in% colnames(row)) {
+        sign_correct <- row[["Fraction of correct sign"]]
+        if (!is.na(sign_correct)) {
+          pct <- round(sign_correct * 100, 1)
+          if (pct > 90) {
+            cat(
+              "  • Excellent sign prediction (",
+              pct,
+              "% correct)\n",
+              sep = ""
+            )
+          } else if (pct > 70) {
+            cat("  • Good sign prediction (", pct, "% correct)\n", sep = "")
+          } else {
+            cat("  • Poor sign prediction (", pct, "% correct)\n", sep = "")
+          }
+        }
+      }
+    }
+  }
+
+  invisible(x)
+}
+
+#' Diagnose Revision Quality
+#'
+#' Provides a quick diagnostic summary of revision quality with color-coded
+#' pass/fail indicators for key metrics.
+#'
+#' @param object An object of class \code{revision_summary}.
+#' @param alpha Significance level for hypothesis tests. Default is 0.05.
+#' @param ... Additional arguments (not used).
+#'
+#' @return A tibble with diagnostic results.
+#' @family revision analysis
+#' @export
+diagnose.revision_summary <- function(object, alpha = 0.05, ...) {
+  cat("\n=== Revision Quality Diagnostics ===\n\n")
+
+  # Determine grouping variables
+  grouping_vars <- setdiff(
+    colnames(object)[
+      !colnames(object) %in%
+        c(
+          "N",
+          "Frequency",
+          "Bias (mean)",
+          "Bias (p-value)",
+          "Bias (robust p-value)",
+          "Minimum",
+          "Maximum",
+          "10Q",
+          "Median",
+          "90Q",
+          "MAR",
+          "Std. Dev.",
+          "Noise/Signal",
+          "Correlation",
+          "Correlation (p-value)",
+          "Autocorrelation (1st)",
+          "Autocorrelation (1st p-value)",
+          "Autocorrelation up to 1yr (Ljung-Box p-value)",
+          "Theil's U1",
+          "Theil's U2",
+          "Seasonality (Friedman p-value)",
+          "News test Intercept",
+          "News test Intercept (std.err)",
+          "News test Intercept (p-value)",
+          "News test Coefficient",
+          "News test Coefficient (std.err)",
+          "News test Coefficient (p-value)",
+          "News joint test (p-value)",
+          "Noise test Intercept",
+          "Noise test Intercept (std.err)",
+          "Noise test Intercept (p-value)",
+          "Noise test Coefficient",
+          "Noise test Coefficient (std.err)",
+          "Noise test Coefficient (p-value)",
+          "Noise joint test (p-value)",
+          "Fraction of correct sign",
+          "Fraction of correct growth rate change"
+        )
+    ],
+    c()
+  )
+
+  results <- list()
+
+  for (i in seq_len(nrow(object))) {
+    row <- object[i, ]
+
+    diagnostics <- tibble::tibble(
+      Metric = character(),
+      Status = character(),
+      Value = character(),
+      Assessment = character()
+    )
+
+    # Group identifier
+    if (length(grouping_vars) > 0) {
+      group_id <- paste(
+        sapply(grouping_vars, function(v) row[[v]]),
+        collapse = "_"
+      )
+    } else {
+      group_id <- paste0("Group_", i)
+    }
+
+    # Test 1: Bias
+    if ("Bias (robust p-value)" %in% colnames(row)) {
+      bias_p <- row[["Bias (robust p-value)"]]
+      bias_mean <- row[["Bias (mean)"]]
+
+      if (!is.na(bias_p)) {
+        status <- if (bias_p >= alpha) "✓ PASS" else "✗ FAIL"
+        value <- paste0("p=", round(bias_p, 3), ", μ=", round(bias_mean, 3))
+        assessment <- if (bias_p >= alpha) {
+          "No significant bias"
+        } else {
+          paste0(
+            "Significant ",
+            if (bias_mean > 0) "upward" else "downward",
+            " bias"
+          )
+        }
+
+        diagnostics <- dplyr::bind_rows(
+          diagnostics,
+          tibble::tibble(
+            Metric = "Unbiasedness",
+            Status = status,
+            Value = value,
+            Assessment = assessment
+          )
+        )
+      }
+    }
+
+    # Test 2: Noise/Signal Ratio
+    if ("Noise/Signal" %in% colnames(row)) {
+      ns <- row[["Noise/Signal"]]
+
+      if (!is.na(ns)) {
+        status <- if (ns < 0.3) {
+          "✓ GOOD"
+        } else if (ns < 0.5) {
+          "~ OK"
+        } else {
+          "✗ HIGH"
+        }
+        value <- round(ns, 3)
+        assessment <- if (ns < 0.3) {
+          "Low revision volatility"
+        } else if (ns < 0.5) {
+          "Moderate revision volatility"
+        } else {
+          "High revision volatility"
+        }
+
+        diagnostics <- dplyr::bind_rows(
+          diagnostics,
+          tibble::tibble(
+            Metric = "Noise/Signal",
+            Status = status,
+            Value = as.character(value),
+            Assessment = assessment
+          )
+        )
+      }
+    }
+
+    # Test 3: News
+    if ("News joint test (p-value)" %in% colnames(row)) {
+      news_p <- row[["News joint test (p-value)"]]
+
+      if (!is.na(news_p)) {
+        status <- if (news_p >= alpha) "✓ PASS" else "✗ FAIL"
+        value <- paste0("p=", round(news_p, 3))
+        assessment <- if (news_p >= alpha) {
+          "No news component"
+        } else {
+          "Contains systematic information"
+        }
+
+        diagnostics <- dplyr::bind_rows(
+          diagnostics,
+          tibble::tibble(
+            Metric = "News Test",
+            Status = status,
+            Value = value,
+            Assessment = assessment
+          )
+        )
+      }
+    }
+
+    # Test 4: Noise
+    if ("Noise joint test (p-value)" %in% colnames(row)) {
+      noise_p <- row[["Noise joint test (p-value)"]]
+
+      if (!is.na(noise_p)) {
+        status <- if (noise_p >= alpha) "✓ PASS" else "✗ FAIL"
+        value <- paste0("p=", round(noise_p, 3))
+        assessment <- if (noise_p >= alpha) {
+          "No noise component"
+        } else {
+          "Contains measurement error"
+        }
+
+        diagnostics <- dplyr::bind_rows(
+          diagnostics,
+          tibble::tibble(
+            Metric = "Noise Test",
+            Status = status,
+            Value = value,
+            Assessment = assessment
+          )
+        )
+      }
+    }
+
+    # Test 5: Forecast Accuracy
+    if ("Theil's U1" %in% colnames(row)) {
+      u1 <- row[["Theil's U1"]]
+
+      if (!is.na(u1)) {
+        status <- if (u1 < 0.3) {
+          "✓ GOOD"
+        } else if (u1 < 0.6) {
+          "~ OK"
+        } else {
+          "✗ POOR"
+        }
+        value <- round(u1, 3)
+        assessment <- if (u1 < 0.3) {
+          "Good forecast accuracy"
+        } else if (u1 < 0.6) {
+          "Moderate forecast accuracy"
+        } else {
+          "Poor forecast accuracy"
+        }
+
+        diagnostics <- dplyr::bind_rows(
+          diagnostics,
+          tibble::tibble(
+            Metric = "Theil's U1",
+            Status = status,
+            Value = as.character(value),
+            Assessment = assessment
+          )
+        )
+      }
+    }
+
+    # Test 6: Sign Prediction
+    if ("Fraction of correct sign" %in% colnames(row)) {
+      sign_pct <- row[["Fraction of correct sign"]] * 100
+
+      if (!is.na(sign_pct)) {
+        status <- if (sign_pct > 90) {
+          "✓ GOOD"
+        } else if (sign_pct > 70) {
+          "~ OK"
+        } else {
+          "✗ POOR"
+        }
+        value <- paste0(round(sign_pct, 1), "%")
+        assessment <- if (sign_pct > 90) {
+          "Excellent sign prediction"
+        } else if (sign_pct > 70) {
+          "Good sign prediction"
+        } else {
+          "Poor sign prediction"
+        }
+
+        diagnostics <- dplyr::bind_rows(
+          diagnostics,
+          tibble::tibble(
+            Metric = "Sign Accuracy",
+            Status = status,
+            Value = value,
+            Assessment = assessment
+          )
+        )
+      }
+    }
+
+    # Print for this group
+    cat(group_id, ":\n")
+    print(diagnostics, row.names = FALSE)
+    cat("\n")
+
+    # Store results
+    diagnostics$Group <- group_id
+    results[[i]] <- diagnostics
+  }
+
+  # Overall summary
+  all_results <- dplyr::bind_rows(results)
+
+  if (nrow(all_results) > 0) {
+    n_pass <- sum(grepl("PASS|GOOD", all_results$Status))
+    n_total <- nrow(all_results)
+    pct_pass <- round(100 * n_pass / n_total, 1)
+
+    cat("=== Overall Assessment ===\n")
+    cat(
+      "Passed:",
+      n_pass,
+      "of",
+      n_total,
+      "checks (",
+      pct_pass,
+      "%)\n",
+      sep = " "
+    )
+
+    if (pct_pass >= 80) {
+      cat("Overall: ✓ GOOD - Revisions are of high quality\n")
+    } else if (pct_pass >= 60) {
+      cat("Overall: ~ MODERATE - Some revision quality issues detected\n")
+    } else {
+      cat("Overall: ✗ POOR - Significant revision quality issues\n")
+    }
+  }
+
+  invisible(all_results)
+}
+
+#' Diagnose Revision Quality
+#'
+#' Generic function to provide diagnostic summaries for revision analysis objects.
+#'
+#' @param object An object for which diagnostics are desired.
+#' @param ... Additional arguments passed to methods.
+#'
+#' @return Method-specific diagnostic output.
+#' @family revision analysis
+#' @export
+diagnose <- function(object, ...) {
+  UseMethod("diagnose")
+}
+#' Summary Method for Revision Summary
+#'
+#' @param object An object of class \code{revision_summary}.
+#' @param interpretation Logical. If TRUE, provides interpretation of key
+#' statistics. Default is TRUE.
+#' @param ... Additional arguments passed to print.
+#'
+#' @return The function returns the input \code{object} invisibly.
+#' @method summary revision_summary
+#' @family revision analysis
+#' @export
+summary.revision_summary <- function(object, interpretation = TRUE, ...) {
+  print.revision_summary(object, interpretation = interpretation, ...)
+}
+
 #' Function to compute statistics and tests for each group
 #' @param data vector
 #' @return A data frame with the computed statistics
@@ -1180,12 +1797,18 @@ compute_revision_stats <- function(data) {
   theils_u1 <- sqrt(mean((data$final_value - data$value)^2)) /
     (sqrt(mean(data$final_value^2)) + sqrt(mean(data$value^2)))
 
-  theils_u2 <- sqrt(sum((data$value[-1] - data$final_value[-1]) /
-    data$final_value[-length(data$final_value)])^2) /
-    sqrt(sum(
-      (data$final_value[-1] - data$final_value[-length(data$final_value)]) /
+  theils_u2 <- sqrt(
+    sum(
+      (data$value[-1] - data$final_value[-1]) /
         data$final_value[-length(data$final_value)]
-    )^2)
+    )^2
+  ) /
+    sqrt(
+      sum(
+        (data$final_value[-1] - data$final_value[-length(data$final_value)]) /
+          data$final_value[-length(data$final_value)]
+      )^2
+    )
 
   # Seasonality test
   if (freq %in% c(4, 12)) {
@@ -1318,12 +1941,14 @@ compute_revision_stats <- function(data) {
   # Computes the fraction of sign changes
   correct_sign <- data %>%
     dplyr::mutate(
-      early_sign = sign(.data$value), late_sign = sign(.data$final_value)
+      early_sign = sign(.data$value),
+      late_sign = sign(.data$final_value)
     ) %>%
     dplyr::summarise(
       fraction_sign_correct = sum(
         (.data$early_sign - .data$late_sign) == 0
-      ) / dplyr::n(),
+      ) /
+        dplyr::n(),
       fraction_sign_wrong = 1 - .data$fraction_sign_correct,
       n = dplyr::n()
     ) %>%
@@ -1845,7 +2470,9 @@ get_fixed_release <- function(df, years, month = NULL, quarter = NULL) {
           1
         ),
         lubridate::make_date(
-          lubridate::year(.data$time) + years, target_month, 1
+          lubridate::year(.data$time) + years,
+          target_month,
+          1
         )
       )
     ) %>%

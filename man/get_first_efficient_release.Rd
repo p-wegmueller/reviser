@@ -38,7 +38,7 @@ even after finding the first efficient release (default is \code{FALSE}).}
 errors (default is \code{TRUE}).}
 }
 \value{
-A list of class \code{list_eff_rel} with the following elements:
+A list of class \code{lst_efficient} with the following elements:
 \itemize{
 \item \code{e}: The index of the first efficient release. (0 indexed)
 \item \code{data}: A long-format data frame containing the vintage data with the
@@ -106,7 +106,12 @@ Money, Credit and Banking, 40(2-3), 319-340, 2008.
 }
 \seealso{
 Other revision analysis: 
+\code{\link{diagnose}()},
+\code{\link{diagnose.revision_summary}()},
 \code{\link{get_revision_analysis}()},
-\code{\link{summary.lst_efficient}()}
+\code{\link{print.lst_efficient}()},
+\code{\link{print.revision_summary}()},
+\code{\link{summary.lst_efficient}()},
+\code{\link{summary.revision_summary}()}
 }
 \concept{revision analysis}

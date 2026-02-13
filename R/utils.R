@@ -412,7 +412,8 @@ vintages_check <- function(df, time_col = "time") {
     if (implicit_missings$total_missing > 0) {
       df <- make_explicit_missing(df, time_col)
       rlang::warn(paste0(
-        prefix, "The 'time' column contains implicit missing values. ",
+        prefix,
+        "The 'time' column contains implicit missing values. ",
         "I created a new 'time' column with explicit NA values. ",
         "Please check your data."
       ))
@@ -420,8 +421,11 @@ vintages_check <- function(df, time_col = "time") {
 
     # Validate date format for "time"
     if (!all(!is.na(as.Date(df$time, format = "%Y-%m-%d")))) {
-      rlang::abort(paste0(prefix, "The 'time' column contains values that 
-                          are not in the '%Y-%m-%d' format."))
+      rlang::abort(paste0(
+        prefix,
+        "The 'time' column contains values that 
+                          are not in the '%Y-%m-%d' format."
+      ))
     }
 
     # Check for long format
@@ -433,8 +437,11 @@ vintages_check <- function(df, time_col = "time") {
     if (long_format) {
       if ("pub_date" %in% colnames(df)) {
         if (!all(!is.na(as.Date(df$pub_date, format = "%Y-%m-%d")))) {
-          rlang::abort(paste0(prefix, "The 'pub_date' column contains values 
-                              that are not in '%Y-%m-%d' format."))
+          rlang::abort(paste0(
+            prefix,
+            "The 'pub_date' column contains values 
+                              that are not in '%Y-%m-%d' format."
+          ))
         }
       }
       return("long")
@@ -449,13 +456,19 @@ vintages_check <- function(df, time_col = "time") {
       ) {
         return("wide")
       } else {
-        rlang::abort(paste0(prefix, "One or more column names in the 'wide 
-                            format' are not labeled correctly."))
+        rlang::abort(paste0(
+          prefix,
+          "One or more column names in the 'wide 
+                            format' are not labeled correctly."
+        ))
       }
     }
 
-    rlang::abort(paste0(prefix, "The data.frame does not conform to either 
-                        'long format' or 'wide format'."))
+    rlang::abort(paste0(
+      prefix,
+      "The data.frame does not conform to either 
+                        'long format' or 'wide format'."
+    ))
   }
 
   # === Main Logic ===
@@ -469,8 +482,10 @@ vintages_check <- function(df, time_col = "time") {
 
     # Check if list has names
     if (is.null(names(df)) || any(names(df) == "")) {
-      rlang::abort("All elements in the list must be named (these names 
-                   serve as IDs).")
+      rlang::abort(
+        "All elements in the list must be named (these names 
+                   serve as IDs)."
+      )
     }
 
     # Check each data frame in the list
@@ -616,8 +631,10 @@ check_implicit_missing <- function(data, time_col, freq = "auto") {
     days_interval <- as.numeric(gsub(" days", "", freq))
     complete_seq <- seq(from = min_date, to = max_date, by = days_interval)
   } else {
-    stop("Unsupported frequency. Use 'day', 'week', 'month', 
-         'quarter', 'year', or 'X days'")
+    stop(
+      "Unsupported frequency. Use 'day', 'week', 'month', 
+         'quarter', 'year', or 'X days'"
+    )
   }
 
   # Find missing dates
@@ -632,7 +649,8 @@ check_implicit_missing <- function(data, time_col, freq = "auto") {
     total_missing = length(missing_dates),
     missing_dates = missing_dates,
     missing_percentage = round(
-      length(missing_dates) / length(complete_seq) * 100, 2
+      length(missing_dates) / length(complete_seq) * 100,
+      2
     )
   )
 
@@ -671,4 +689,211 @@ make_explicit_missing <- function(
     dplyr::arrange(!!rlang::sym(time_col))
 
   return(complete_data)
+}
+
+#' Print Method for Publication Date Vintages
+#'
+#' @param x An object of class \code{tbl_pubdate}.
+#' @param ... Additional arguments passed to print.
+#'
+#' @return The function returns the input \code{x} invisibly.
+#' @method print tbl_pubdate
+#' @family helpers
+#' @export
+print.tbl_pubdate <- function(x, ...) {
+  cat("\n# Vintages data (publication date format)\n")
+  cat("# Time periods:", nrow(x), "\n")
+
+  if ("id" %in% colnames(x)) {
+    cat("# IDs:", length(unique(x$id)), "\n")
+  }
+
+  # Count vintages (columns that are dates)
+  date_cols <- colnames(x)[colnames(x) != "time" & colnames(x) != "id"]
+  n_vintages <- length(date_cols)
+  cat("# Vintages:", n_vintages, "\n\n")
+
+  # Remove class to use default print
+  class(x) <- class(x)[class(x) != "tbl_pubdate"]
+  print(x, ...)
+
+  invisible(x)
+}
+
+#' Print Method for Release Vintages
+#'
+#' @param x An object of class \code{tbl_release}.
+#' @param ... Additional arguments passed to print.
+#'
+#' @return The function returns the input \code{x} invisibly.
+#' @method print tbl_release
+#' @family helpers
+#' @export
+print.tbl_release <- function(x, ...) {
+  cat("\n# Vintages data (release format)\n")
+
+  # Check if long or wide format
+  is_long <- "release" %in% colnames(x) && "value" %in% colnames(x)
+
+  if (is_long) {
+    cat("# Format: long\n")
+    cat("# Time periods:", length(unique(x$time)), "\n")
+    if ("id" %in% colnames(x)) {
+      cat("# IDs:", length(unique(x$id)), "\n")
+    }
+    cat("# Releases:", length(unique(x$release)), "\n\n")
+  } else {
+    cat("# Format: wide\n")
+    cat("# Time periods:", nrow(x), "\n")
+    if ("id" %in% colnames(x)) {
+      cat("# IDs:", length(unique(x$id)), "\n")
+    }
+    # Count releases (columns that match release pattern)
+    release_cols <- colnames(x)[grepl("release|final", colnames(x))]
+    cat("# Releases:", length(release_cols), "\n\n")
+  }
+
+  # Remove class to use default print
+  class(x) <- class(x)[class(x) != "tbl_release"]
+  print(x, ...)
+
+  invisible(x)
+}
+
+#' Summary Method for Publication Date Vintages
+#'
+#' @param object An object of class \code{tbl_pubdate}.
+#' @param ... Additional arguments (not used).
+#'
+#' @return The function returns a summary tibble invisibly.
+#' @method summary tbl_pubdate
+#' @family helpers
+#' @export
+summary.tbl_pubdate <- function(object, ...) {
+  cat("\n=== Vintages Data Summary (Publication Date Format) ===\n\n")
+
+  # Basic info
+  cat("Time periods:", nrow(object), "\n")
+  cat(
+    "Time range:",
+    as.character(min(object$time)),
+    "to",
+    as.character(max(object$time)),
+    "\n"
+  )
+
+  if ("id" %in% colnames(object)) {
+    cat("Number of IDs:", length(unique(object$id)), "\n")
+    cat("IDs:", paste(unique(object$id), collapse = ", "), "\n")
+  }
+
+  # Vintage info
+  date_cols <- colnames(object)[
+    colnames(object) != "time" &
+      colnames(object) != "id"
+  ]
+  cat("\nNumber of vintages:", length(date_cols), "\n")
+  cat("Publication dates:\n")
+  cat("  Earliest:", as.character(min(as.Date(date_cols))), "\n")
+  cat("  Latest:", as.character(max(as.Date(date_cols))), "\n")
+
+  # Missing values
+  n_missing <- sum(is.na(object[, date_cols]))
+  total_cells <- nrow(object) * length(date_cols)
+  pct_missing <- round(100 * n_missing / total_cells, 2)
+  cat(
+    "\nMissing values:",
+    n_missing,
+    "of",
+    total_cells,
+    paste0("(", pct_missing, "%)"),
+    "\n"
+  )
+
+  invisible(object)
+}
+
+#' Summary Method for Release Vintages
+#'
+#' @param object An object of class \code{tbl_release}.
+#' @param ... Additional arguments (not used).
+#'
+#' @return The function returns a summary tibble invisibly.
+#' @method summary tbl_release
+#' @family helpers
+#' @export
+summary.tbl_release <- function(object, ...) {
+  cat("\n=== Vintages Data Summary (Release Format) ===\n\n")
+
+  # Check if long or wide format
+  is_long <- "release" %in% colnames(object) && "value" %in% colnames(object)
+
+  cat("Format:", ifelse(is_long, "long", "wide"), "\n")
+
+  if (is_long) {
+    # Long format summary
+    cat("Time periods:", length(unique(object$time)), "\n")
+    cat(
+      "Time range:",
+      as.character(min(object$time)),
+      "to",
+      as.character(max(object$time)),
+      "\n"
+    )
+
+    if ("id" %in% colnames(object)) {
+      cat("Number of IDs:", length(unique(object$id)), "\n")
+      cat("IDs:", paste(unique(object$id), collapse = ", "), "\n")
+    }
+
+    cat("\nNumber of releases:", length(unique(object$release)), "\n")
+    cat("Releases:", paste(sort(unique(object$release)), collapse = ", "), "\n")
+
+    # Missing values
+    n_missing <- sum(is.na(object$value))
+    total_obs <- nrow(object)
+    pct_missing <- round(100 * n_missing / total_obs, 2)
+    cat(
+      "\nMissing values:",
+      n_missing,
+      "of",
+      total_obs,
+      paste0("(", pct_missing, "%)"),
+      "\n"
+    )
+  } else {
+    # Wide format summary
+    cat("Time periods:", nrow(object), "\n")
+    cat(
+      "Time range:",
+      as.character(min(object$time)),
+      "to",
+      as.character(max(object$time)),
+      "\n"
+    )
+
+    if ("id" %in% colnames(object)) {
+      cat("Number of IDs:", length(unique(object$id)), "\n")
+      cat("IDs:", paste(unique(object$id), collapse = ", "), "\n")
+    }
+
+    release_cols <- colnames(object)[grepl("release|final", colnames(object))]
+    cat("\nNumber of releases:", length(release_cols), "\n")
+    cat("Releases:", paste(sort(release_cols), collapse = ", "), "\n")
+
+    # Missing values
+    n_missing <- sum(is.na(object[, release_cols]))
+    total_cells <- nrow(object) * length(release_cols)
+    pct_missing <- round(100 * n_missing / total_cells, 2)
+    cat(
+      "\nMissing values:",
+      n_missing,
+      "of",
+      total_cells,
+      paste0("(", pct_missing, "%)"),
+      "\n"
+    )
+  }
+
+  invisible(object)
 }

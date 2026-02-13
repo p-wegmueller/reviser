@@ -37,27 +37,26 @@
 #'    algorithm (See [stats::nlm()]). Default is 1e-6.
 #' -  **steptol**: A positive scalar providing the minimum allowable relative
 #' step length (See [stats::nlm()]). Default is 1e-6.
+#' - **transform_se**: T/F whether standard errors should be constrained to be
+#'     positive in optimization.
+#' - **method**: String specifying optimization method (default = "L-BFGS-B").
+#' - **se_method**: Method for standard error calculation (default = "hessian")
+#' - **n_starts**: Number of random starting points for multi-start optimization
 #'
 #' @return A list with the following components:
 #' \describe{
-#'   \item{filtered_z}{A tibble of filtered latent state variables based on
-#'   the Kalman filter.}
-#'   \item{filtered_y}{A tibble of filtered observed variables based on the
-#'   Kalman filter.}
-#'   \item{smoothed_z}{A tibble of smoothed latent state variables obtained
-#'   using the Kalman smoother.}
-#'   \item{smoothed_y}{A tibble of smoothed observed variables obtained using
-#'   the Kalman smoother.}
-#'   \item{forecast_z}{A tibble of forecasted latent state variables. Returned
-#'   only if \code{h > 0}.}
-#'   \item{forecast_y}{A tibble of forecasted observed variables. Returned
-#'   only if \code{h > 0}.}
+#'   \item{states}{A tibble containing filtered and smoothed state estimates.}
 #'   \item{kk_model_mat}{A list of KK model matrices, such as transition
 #'   and observation matrices.}
 #'   \item{ss_model_mat}{A list of state-space model matrices derived
 #'   from the KK model.}
-#'   \item{params}{Estimated model parameters, including covariance terms.}
-#'   \item{fit}{The fitted model object from the SUR estimation procedure.}
+#'   \item{model}{The KFAS state-space model object.}
+#'   \item{params}{Estimated model parameters with standard errors.}
+#'   \item{fit}{The fitted model object from the estimation procedure.}
+#'   \item{loglik}{Log-likelihood value (MLE only).}
+#'   \item{aic}{Akaike Information Criterion (MLE only).}
+#'   \item{bic}{Bayesian Information Criterion (MLE only).}
+#'   \item{convergence}{Convergence status.}
 #'   \item{e}{The number of the efficient release (0-indexed).}
 #'   \item{data}{The input data in wide format.}
 #' }
@@ -126,7 +125,11 @@ kk_nowcast <- function(
     startvals = NULL,
     solvtol = .Machine$double.eps,
     gradtol = 1e-6,
-    steptol = 1e-6
+    steptol = 1e-6,
+    transform_se = TRUE,
+    method = "L-BFGS-B",
+    se_method = "hessian",
+    n_starts = 1
   )
 
   model <- tolower(model)
@@ -231,7 +234,6 @@ kk_nowcast <- function(
     names(start_mat) <- names(kk_mat_sur$params)[1:n_param_mat]
   }
 
-
   # Check data input
   check <- vintages_check(df)
 
@@ -239,8 +241,10 @@ kk_nowcast <- function(
   if (is.list(check)) {
     if (length(check) > 1) {
       rlang::abort(paste0(
-        "'df' must contain a single ID, but ", length(check),
-        " IDs were provided: ", paste(names(check), collapse = ", ")
+        "'df' must contain a single ID, but ",
+        length(check),
+        " IDs were provided: ",
+        paste(names(check), collapse = ", ")
       ))
     }
     # Extract single data frame from list
@@ -252,7 +256,9 @@ kk_nowcast <- function(
   if (check == "long") {
     if ("id" %in% colnames(df) && length(unique(df$id)) > 1) {
       rlang::abort(paste0(
-        "'df' contains ", length(unique(df$id)), " different IDs. ",
+        "'df' contains ",
+        length(unique(df$id)),
+        " different IDs. ",
         "Filter to a single ID first."
       ))
     }
@@ -287,12 +293,25 @@ kk_nowcast <- function(
   ar_order <- 1
   if (default_solver_options$trace > 0) {
     cat(
-      "Estimating", model, "model with",
-      n_param, "parameters...\n"
+      "Estimating",
+      model,
+      "model with",
+      n_param,
+      "parameters...\n"
     )
     cat("Estimation:", method, "\n")
     cat("AR order:", ar_order, "\n")
   }
+
+  # Initialize variables for results
+  params <- NULL
+  fit <- NULL
+  loglik <- NULL
+  aic <- NULL
+  bic <- NULL
+  convergence <- NULL
+  params_raw <- NULL
+  se_raw <- NULL
 
   # Estimation of parameters with SUR or OLS
   if (method == tolower("SUR")) {
@@ -318,6 +337,30 @@ kk_nowcast <- function(
       params = params,
       type = "numeric"
     )$params
+
+    # Extract standard errors from SUR
+    # For nlsystemfit objects, use the coefCov component
+    if (!is.null(fit$se)) {
+      se_raw <- fit$se
+    } else {
+      # Fallback: approximate SEs
+      se_raw <- rep(NA, length(fit$b))
+      rlang::warn(
+        "Could not extract standard errors from SUR estimation",
+        call. = FALSE
+      )
+    }
+
+    # Add variance SEs
+    # For variance parameters from residual covariance matrix,
+    # use asymptotic SE formula: SE(sigma^2) = sigma^2 * sqrt(2/(n-k))
+    # where n = number of observations, k = number of parameters
+    n_obs <- nrow(sur_data)
+    k_params <- length(fit$b)
+    var_se <- parm_cov * sqrt(2 / (n_obs - k_params))
+    se_raw <- c(se_raw, var_se)
+
+    convergence <- fit$convergence
   } else if (method == tolower("OLS")) {
     ols_estim <- kk_ols_estim(
       equations = equations,
@@ -336,42 +379,97 @@ kk_nowcast <- function(
       params = params,
       type = "numeric"
     )$params
-  } else if (method == tolower("MLE")) {
-    # 1. Define the Log-Likelihood Function
-    kk_loglik <- function(p, e, model, Ymat) {
-      # Map vector p back to named parameters
-      names(p) <- names(start_mat_mle)
 
-      # Ensure variance parameters are positive
-      p[grep("v0|eps", names(p))] <- exp(p[grep("v0|eps", names(p))])
-
-      k_mat <- kk_matrices(e = e, model = model, params = p, type = "numeric")
-      ss_mat <- kk_to_ss(k_mat$FF, k_mat$GG, k_mat$V, k_mat$W)
-
-      mod <- KFAS::SSModel(
-        Ymat ~ -1 +
-          SSMcustom(
-            Z = ss_mat$Z,
-            T = ss_mat$Tmat,
-            R = ss_mat$R,
-            Q = ss_mat$Q,
-            a1 = c(rep(0.2, n_states / 2), rep(0, n_states / 2)),
-            P1inf = diag(
-              c(rep(1, n_states / 2), rep(0, n_states / 2)), n_states
-            ),
-            P1 = diag(c(rep(0, n_states / 2), rep(1, n_states / 2)), n_states),
-            index = seq_len(ncol(Ymat))
-          ),
-        H = ss_mat$H
-      )
-
-      # Return negative log-likelihood for minimization
-      ll <- stats::logLik(mod)
-      return(-as.numeric(ll))
+    # Extract standard errors from OLS
+    se_raw <- numeric(length(params))
+    idx <- 1
+    for (i in seq_along(fit)) {
+      if (!is.null(fit[[i]])) {
+        model_se <- summary(fit[[i]])$coefficients[, "Std. Error"]
+        se_raw[idx:(idx + length(model_se) - 1)] <- model_se
+        idx <- idx + length(model_se)
+      }
     }
 
-    # 2. Prepare starting values (log-transform variances for
-    # unconstrained optimization)
+    # Add variance SEs using asymptotic formula
+    # For variance parameters: SE(sigma^2) = sigma^2 * sqrt(2/(n-k))
+    var_idx <- grep("v0|eps", names(params))
+    if (length(var_idx) > 0) {
+      # Use the first OLS model to get n and k (representative)
+      n_obs <- nrow(fit[[1]]$model)
+      k_params <- length(fit[[1]]$coefficients)
+      for (i in var_idx) {
+        se_raw[i] <- params[i] * sqrt(2 / (n_obs - k_params))
+      }
+    }
+
+    convergence <- 0
+  } else if (method == tolower("MLE")) {
+    # 1. Define the Negative Log-Likelihood Function
+    kk_negloglik <- function(p, e, model, Ymat, n_states, transform_se) {
+      # Map vector p back to named parameters
+      param_names <- names(start_mat_mle)
+      names(p) <- param_names
+
+      # Transform variance parameters if needed
+      if (transform_se) {
+        var_idx <- grep("v0|eps", param_names)
+        p[var_idx] <- exp(p[var_idx])
+      }
+
+      # Ensure variance parameters are positive
+      var_idx <- grep("v0|eps", names(p))
+      if (any(p[var_idx] <= 0)) {
+        return(1e10)
+      }
+
+      tryCatch(
+        {
+          k_mat <- kk_matrices(
+            e = e,
+            model = model,
+            params = p,
+            type = "numeric"
+          )
+          ss_mat <- kk_to_ss(k_mat$FF, k_mat$GG, k_mat$V, k_mat$W)
+
+          mod <- KFAS::SSModel(
+            Ymat ~ -1 +
+              SSMcustom(
+                Z = ss_mat$Z,
+                T = ss_mat$Tmat,
+                R = ss_mat$R,
+                Q = ss_mat$Q,
+                a1 = c(rep(0.2, n_states / 2), rep(0, n_states / 2)),
+                P1inf = diag(
+                  c(rep(1, n_states / 2), rep(0, n_states / 2)),
+                  n_states
+                ),
+                P1 = diag(
+                  c(rep(0, n_states / 2), rep(1, n_states / 2)),
+                  n_states
+                ),
+                index = seq_len(ncol(Ymat))
+              ),
+            H = ss_mat$H
+          )
+
+          # Return negative log-likelihood for minimization
+          ll <- stats::logLik(mod, check.model = FALSE)
+
+          if (is.finite(ll)) {
+            return(-as.numeric(ll))
+          } else {
+            return(1e10)
+          }
+        },
+        error = function(e) {
+          return(1e10)
+        }
+      )
+    }
+
+    # 2. Prepare starting values
     if (is.null(default_solver_options$startvals)) {
       # Use OLS estimates as smart starting values if none provided
       ols_init <- kk_ols_estim(equations, sur_data, model)$params
@@ -380,34 +478,375 @@ kk_nowcast <- function(
       start_mat_mle <- default_solver_options$startvals
     }
 
-    # Log-transform variances so optim can work in unconstrained space
-    var_idx <- grep("v0|eps", names(start_mat_mle))
-    start_mat_mle[var_idx] <- log(pmax(start_mat_mle[var_idx], 1e-6))
+    # Log-transform variances if needed
+    if (default_solver_options$transform_se) {
+      var_idx <- grep("v0|eps", names(start_mat_mle))
+      start_mat_mle[var_idx] <- log(pmax(start_mat_mle[var_idx], 1e-6))
+    }
 
-    # 3. Optimize
-    fit_mle <- stats::optim(
-      par = start_mat_mle,
-      fn = kk_loglik,
-      e = e,
-      model = model,
-      Ymat = Ymat,
-      method = "BFGS",
-      control = list(
-        maxit = default_solver_options$maxiter,
-        trace = default_solver_options$trace,
-        factr = 1e7
+    # Check if multi-start is requested
+    n_starts <- if (!is.null(default_solver_options$n_starts)) {
+      max(1, default_solver_options$n_starts)
+    } else {
+      1
+    }
+
+    if (n_starts > 1 && default_solver_options$trace > 0) {
+      cat(
+        "\nUsing multi-start optimization with",
+        n_starts,
+        "starting points\n"
       )
-    )
+      cat("Method:", default_solver_options$method, "\n\n")
+    }
 
-    # 4. Transform back and extract results
-    params <- fit_mle$par
-    params[var_idx] <- exp(params[var_idx])
-    fit <- fit_mle
+    # Storage for multi-start results
+    all_results <- vector("list", n_starts)
+    all_values <- numeric(n_starts)
+
+    # Run optimization from multiple starting points
+    for (start_idx in 1:n_starts) {
+      if (n_starts > 1 && default_solver_options$trace > 0) {
+        cat("=== Starting point", start_idx, "of", n_starts, "===\n")
+      }
+
+      # Generate starting values
+      if (start_idx == 1) {
+        current_init <- start_mat_mle
+      } else {
+        # Perturb around default
+        current_init <- start_mat_mle +
+          stats::rnorm(length(start_mat_mle), 0, 0.5)
+
+        # Ensure perturbations respect constraints
+        if (default_solver_options$transform_se) {
+          var_idx <- grep("v0|eps", names(start_mat_mle))
+          current_init[var_idx] <- pmax(
+            pmin(current_init[var_idx], log(100)),
+            log(0.001)
+          )
+        }
+
+        # For F0 and G parameters, keep reasonable
+        non_var_idx <- grep("F0|G", names(start_mat_mle))
+        current_init[non_var_idx] <- pmax(
+          pmin(current_init[non_var_idx], 0.9),
+          -0.9
+        )
+      }
+
+      # Determine optimization method
+      opt_method <- default_solver_options$method
+
+      if (opt_method == "two-step") {
+        if (default_solver_options$trace > 0) {
+          cat("Step 1: Nelder-Mead (global search)...\n")
+        }
+
+        opt_result_nm <- stats::optim(
+          par = current_init,
+          fn = kk_negloglik,
+          e = e,
+          model = model,
+          Ymat = Ymat,
+          n_states = n_states,
+          transform_se = default_solver_options$transform_se,
+          method = "Nelder-Mead",
+          control = list(
+            trace = max(0, default_solver_options$trace),
+            maxit = 500
+          )
+        )
+
+        if (default_solver_options$trace > 0) {
+          cat("Step 2: BFGS (local refinement)...\n")
+        }
+        current_result <- stats::optim(
+          par = opt_result_nm$par,
+          fn = kk_negloglik,
+          e = e,
+          model = model,
+          Ymat = Ymat,
+          n_states = n_states,
+          transform_se = default_solver_options$transform_se,
+          method = "BFGS",
+          control = list(
+            trace = max(0, default_solver_options$trace),
+            maxit = default_solver_options$maxiter
+          ),
+          hessian = FALSE
+        )
+      } else if (opt_method == "L-BFGS-B") {
+        # Set bounds for parameters
+        n_params_opt <- length(current_init)
+        lower_bounds <- rep(-Inf, n_params_opt)
+        upper_bounds <- rep(Inf, n_params_opt)
+
+        if (default_solver_options$transform_se) {
+          var_idx <- grep("v0|eps", names(start_mat_mle))
+          lower_bounds[var_idx] <- log(0.001)
+          upper_bounds[var_idx] <- log(100)
+        }
+
+        # F0 and G parameters
+        non_var_idx <- grep("F0|G", names(start_mat_mle))
+        lower_bounds[non_var_idx] <- -0.99
+        upper_bounds[non_var_idx] <- 0.99
+
+        current_result <- stats::optim(
+          par = current_init,
+          fn = kk_negloglik,
+          e = e,
+          model = model,
+          Ymat = Ymat,
+          n_states = n_states,
+          transform_se = default_solver_options$transform_se,
+          method = "L-BFGS-B",
+          lower = lower_bounds,
+          upper = upper_bounds,
+          control = list(
+            trace = max(0, default_solver_options$trace),
+            maxit = default_solver_options$maxiter
+          ),
+          hessian = FALSE
+        )
+      } else if (opt_method == "nlminb") {
+        # Set bounds
+        n_params_opt <- length(current_init)
+        lower_bounds <- rep(-Inf, n_params_opt)
+        upper_bounds <- rep(Inf, n_params_opt)
+
+        if (default_solver_options$transform_se) {
+          var_idx <- grep("v0|eps", names(start_mat_mle))
+          lower_bounds[var_idx] <- log(0.001)
+          upper_bounds[var_idx] <- log(100)
+        }
+
+        non_var_idx <- grep("F0|G", names(start_mat_mle))
+        lower_bounds[non_var_idx] <- -0.99
+        upper_bounds[non_var_idx] <- 0.99
+
+        opt_result_nlminb <- stats::nlminb(
+          start = current_init,
+          objective = kk_negloglik,
+          e = e,
+          model = model,
+          Ymat = Ymat,
+          n_states = n_states,
+          transform_se = default_solver_options$transform_se,
+          lower = lower_bounds,
+          upper = upper_bounds,
+          control = list(
+            trace = max(0, default_solver_options$trace),
+            eval.max = default_solver_options$maxiter * 2,
+            iter.max = default_solver_options$maxiter
+          )
+        )
+
+        # Convert nlminb output to optim format
+        current_result <- list(
+          par = opt_result_nlminb$par,
+          value = opt_result_nlminb$objective,
+          convergence = opt_result_nlminb$convergence,
+          message = opt_result_nlminb$message
+        )
+      } else {
+        current_result <- stats::optim(
+          par = current_init,
+          fn = kk_negloglik,
+          e = e,
+          model = model,
+          Ymat = Ymat,
+          n_states = n_states,
+          transform_se = default_solver_options$transform_se,
+          method = opt_method,
+          control = list(
+            trace = max(0, default_solver_options$trace),
+            maxit = default_solver_options$maxiter
+          ),
+          hessian = FALSE
+        )
+      }
+
+      # Store results
+      all_results[[start_idx]] <- current_result
+      all_values[start_idx] <- current_result$value
+
+      if (n_starts > 1 && default_solver_options$trace > 0) {
+        cat("Negative log-likelihood:", round(current_result$value, 4), "\n")
+        cat("Convergence:", current_result$convergence, "\n\n")
+      }
+    }
+
+    # Select best result from all starting points
+    best_idx <- which.min(all_values)
+    opt_result <- all_results[[best_idx]]
+
+    if (n_starts > 1 && default_solver_options$trace > 0) {
+      cat("=== Multi-start Summary ===\n")
+      cat("Best result from starting point", best_idx, "\n")
+      cat("Negative log-likelihoods across starts:\n")
+      for (i in 1:n_starts) {
+        marker <- if (i == best_idx) " <- BEST" else ""
+        cat(sprintf("  Start %d: %.4f%s\n", i, all_values[i], marker))
+      }
+      cat("\n")
+    }
+
+    # Extract results (raw scale from optimizer)
+    params_raw <- opt_result$par
+    loglik <- -opt_result$value
+    convergence <- opt_result$convergence
+    fit <- opt_result
+
+    # ===== STANDARD ERROR CALCULATION =====
+    se_method <- default_solver_options$se_method
+
+    if (se_method == "hessian") {
+      # Calculate high-precision Hessian
+      se_result <- suppressWarnings(tryCatch(
+        {
+          precise_hessian <- numDeriv::hessian(
+            func = kk_negloglik,
+            x = params_raw,
+            e = e,
+            model = model,
+            Ymat = Ymat,
+            n_states = n_states,
+            transform_se = default_solver_options$transform_se,
+            method.args = list(eps = 1e-4, d = 0.01, r = 6)
+          )
+
+          # Check condition number
+          cond_num <- tryCatch(
+            kappa(precise_hessian, exact = FALSE),
+            error = function(e) Inf
+          )
+
+          if (!is.finite(cond_num) || cond_num > 1e10) {
+            msg <- paste0(
+              "Hessian is poorly conditioned",
+              if (is.finite(cond_num)) {
+                paste0(
+                  " (cond = ",
+                  format(cond_num, scientific = TRUE, digits = 2),
+                  ")"
+                )
+              } else {
+                ""
+              },
+              ". SEs may be unreliable."
+            )
+
+            list(se = rep(NA, length(params_raw)), warning = msg, failed = TRUE)
+          } else {
+            # Try to invert
+            fisher_info <- tryCatch(
+              {
+                solve(precise_hessian)
+              },
+              error = function(e) {
+                ridge <- 1e-6 * mean(abs(diag(precise_hessian)))
+                if (default_solver_options$trace > 0) {
+                  cat(
+                    "Adding ridge regularization (\u03BB =",
+                    format(ridge, scientific = TRUE),
+                    ")\n"
+                  )
+                }
+                tryCatch(
+                  solve(
+                    precise_hessian + ridge * diag(nrow(precise_hessian))
+                  ),
+                  error = function(e2) NULL
+                )
+              }
+            )
+
+            if (is.null(fisher_info)) {
+              list(
+                se = rep(NA, length(params_raw)),
+                warning = "Failed to invert Hessian matrix.",
+                failed = TRUE
+              )
+            } else {
+              se_calc <- sqrt(diag(fisher_info))
+              n_nan <- sum(is.nan(se_calc))
+              n_large <- sum(se_calc > 1e3, na.rm = TRUE)
+
+              problem_msg <- NULL
+              has_failed <- FALSE
+
+              if ((n_nan + n_large) > 0) {
+                problem_msg <- paste0(
+                  (n_nan + n_large),
+                  " parameter(s) have problematic SEs"
+                )
+                has_failed <- TRUE
+              }
+
+              se_calc[is.nan(se_calc)] <- NA
+              list(se = se_calc, warning = problem_msg, failed = has_failed)
+            }
+          }
+        },
+        error = function(e) {
+          list(
+            se = rep(NA, length(params_raw)),
+            warning = paste0("Hessian calculation failed: ", e$message),
+            failed = TRUE
+          )
+        }
+      ))
+
+      se_raw <- se_result$se
+      se_warning <- se_result$warning
+      hessian_failed <- se_result$failed
+      se_method_used <- "hessian"
+
+      if (hessian_failed && !is.null(se_warning)) {
+        warning(se_warning, call. = FALSE)
+      }
+    }
+
+    if (default_solver_options$trace > 0) {
+      cat("Standard error method used:", se_method_used, "\n")
+      if (!is.null(se_warning) && default_solver_options$trace > 1) {
+        cat("Warning:", se_warning, "\n")
+      }
+    }
+
+    # Initialize final objects
+    params <- params_raw
+    se <- se_raw
+
+    # Apply transformation and Delta Method
+    if (default_solver_options$transform_se) {
+      var_idx <- grep("v0|eps", names(params_raw))
+
+      for (i in var_idx) {
+        if (!is.na(i)) {
+          # The value on the original scale: exp(log_sigma)
+          params[i] <- exp(params_raw[i])
+
+          # The Delta Method: SE_original = |d/dx exp(x)| * SE_log
+          se[i] <- params[i] * se_raw[i]
+        }
+      }
+    }
 
     # Ensure parameter order is consistent
     params <- kk_matrices(
-      e = e, model = model, params = params, type = "numeric"
+      e = e,
+      model = model,
+      params = params,
+      type = "numeric"
     )$params
+
+    # Calculate information criteria
+    n_obs <- nrow(Ymat) * ncol(Ymat)
+    aic <- -2 * loglik + 2 * n_param
+    bic <- -2 * loglik + log(n_obs) * n_param
   }
 
   # Create model matrices with estimated parameters
@@ -456,16 +895,16 @@ kk_nowcast <- function(
   model_kfas <- KFAS::SSModel(
     Ymat ~
       -1 +
-        SSMcustom(
-          Z = sur_ss_mat$Z,
-          T = sur_ss_mat$Tmat,
-          R = sur_ss_mat$R,
-          Q = sur_ss_mat$Q,
-          a1 = c(rep(0.2, n_states / 2), rep(0, n_states / 2)),
-          P1inf = diag(c(rep(1, n_states / 2), rep(0, n_states / 2)), n_states),
-          P1 = diag(c(rep(0, n_states / 2), rep(1, n_states / 2)), n_states),
-          index = c(seq_len(dim(Ymat)[2]))
-        ),
+      SSMcustom(
+        Z = sur_ss_mat$Z,
+        T = sur_ss_mat$Tmat,
+        R = sur_ss_mat$R,
+        Q = sur_ss_mat$Q,
+        a1 = c(rep(0.2, n_states / 2), rep(0, n_states / 2)),
+        P1inf = diag(c(rep(1, n_states / 2), rep(0, n_states / 2)), n_states),
+        P1 = diag(c(rep(0, n_states / 2), rep(1, n_states / 2)), n_states),
+        index = c(seq_len(dim(Ymat)[2]))
+      ),
     H = sur_ss_mat$H
   )
 
@@ -496,7 +935,8 @@ kk_nowcast <- function(
       lower = filtered_est - stats::qnorm(1 - alpha / 2) * filtered_se,
       upper = filtered_est + stats::qnorm(1 - alpha / 2) * filtered_se,
       filter = "filtered",
-      sample = dplyr::if_else(output_dates %in% forecast_dates,
+      sample = dplyr::if_else(
+        output_dates %in% forecast_dates,
         "out_of_sample",
         "in_sample"
       )
@@ -510,7 +950,8 @@ kk_nowcast <- function(
       lower = smoothed_est - stats::qnorm(1 - alpha / 2) * smoothed_se,
       upper = smoothed_est + stats::qnorm(1 - alpha / 2) * smoothed_se,
       filter = "smoothed",
-      sample = dplyr::if_else(output_dates %in% forecast_dates,
+      sample = dplyr::if_else(
+        output_dates %in% forecast_dates,
         "out_of_sample",
         "in_sample"
       )
@@ -527,6 +968,22 @@ kk_nowcast <- function(
   states_long <- dplyr::as_tibble(states_long) %>%
     dplyr::arrange(.data$filter, .data$state, .data$time)
 
+  # Create parameter table with standard errors
+  if (method == tolower("MLE")) {
+    param_table <- data.frame(
+      Parameter = names(params),
+      Estimate = params,
+      Std.Error = se,
+      row.names = NULL
+    )
+  } else if (method == tolower("SUR") || method == tolower("OLS")) {
+    param_table <- data.frame(
+      Parameter = names(params),
+      Estimate = params,
+      Std.Error = se_raw,
+      row.names = NULL
+    )
+  }
 
   # Remove the parameters from the model matrices
   kk_mat_hat$params <- NULL
@@ -536,8 +993,12 @@ kk_nowcast <- function(
     kk_model_mat = kk_mat_hat,
     ss_model_mat = sur_ss_mat,
     model = model_kfas,
-    params = params,
+    params = param_table,
     fit = fit,
+    loglik = loglik,
+    aic = aic,
+    bic = bic,
+    convergence = convergence,
     e = e,
     data = df
   )
@@ -1215,6 +1676,110 @@ kk_to_ss <- function(FF, GG, V, W, epsilon = 1e-6) {
   }
 
   return(list(Z = Z, Tmat = Tmat, H = H, Q = Q, R = R))
+}
+
+
+#' Summary Method for KK Model
+#'
+#' @description Computes and displays a summary of the results from a
+#' Kishor-Koenig (KK) model fit, including convergence status,
+#' information criteria, and parameter estimates.
+#'
+#' @param object An object of class \code{kk_model}.
+#' @param ... Additional arguments passed to or from other methods.
+#'
+#' @return The function returns the input \code{object} invisibly.
+#' @method summary kk_model
+#' @examples
+#' df <- get_nth_release(
+#'   tsbox::ts_span(
+#'     tsbox::ts_pc(
+#'       dplyr::filter(reviser::gdp, id == "US")
+#'     ),
+#'     start = "1980-01-01"
+#'   ),
+#'   n = 0:1
+#' )
+#' df <- dplyr::select(df, -c("id", "pub_date"))
+#' df <- na.omit(df)
+#'
+#' e <- 1
+#' h <- 2
+#' result <- kk_nowcast(df, e, h = h, model = "Kishor-Koenig", method = "MLE")
+#' summary(result)
+#'
+#' @family revision nowcasting
+#' @export
+summary.kk_model <- function(object, ...) {
+  cat("\n=== Kishor-Koenig Model ===\n\n")
+
+  if (!is.null(object$convergence)) {
+    cat(
+      "Convergence:",
+      ifelse(
+        object$convergence == 0,
+        "Success",
+        "Failed"
+      ),
+      "\n"
+    )
+  }
+
+  if (!is.null(object$loglik)) {
+    cat("Log-likelihood:", round(object$loglik, 2), "\n")
+  }
+
+  if (!is.null(object$aic)) {
+    cat("AIC:", round(object$aic, 2), "\n")
+  }
+
+  if (!is.null(object$bic)) {
+    cat("BIC:", round(object$bic, 2), "\n")
+  }
+
+  cat("\nParameter Estimates:\n")
+  df_print <- object$params
+  df_print$Estimate <- sprintf("%.3f", df_print$Estimate)
+  df_print$Std.Error <- sprintf("%.3f", df_print$Std.Error)
+  print(df_print, row.names = FALSE, quote = FALSE)
+
+  cat("\n")
+  invisible(object)
+}
+
+
+#' Print Method for KK Model
+#'
+#' @description Default print method for \code{kk_model} objects.
+#' Wraps the \code{summary} method for a consistent output.
+#'
+#' @param x An object of class \code{kk_model}.
+#' @param ... Additional arguments passed to \code{summary.kk_model}.
+#'
+#' @return The function returns the input \code{x} invisibly.
+#' @method print kk_model
+#' @examples
+#' df <- get_nth_release(
+#'   tsbox::ts_span(
+#'     tsbox::ts_pc(
+#'       dplyr::filter(reviser::gdp, id == "US")
+#'     ),
+#'     start = "1980-01-01"
+#'   ),
+#'   n = 0:1
+#' )
+#' df <- dplyr::select(df, -c("id", "pub_date"))
+#' df <- na.omit(df)
+#'
+#' e <- 1
+#' h <- 2
+#' result <- kk_nowcast(df, e, h = h, model = "Kishor-Koenig", method = "MLE")
+#' result
+#'
+#' @family revision nowcasting
+#' @export
+print.kk_model <- function(x, ...) {
+  summary.kk_model(x, ...)
 }
 
 
