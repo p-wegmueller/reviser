@@ -8,6 +8,5 @@
 
 library(testthat)
 library(reviser)
-library(dplyr)
 
 test_check("reviser")
