@@ -92,7 +92,7 @@ If no efficient release is found, a warning is issued.
 
 ## References
 
-Aruoba, S. Borağan, "Revisions Are Not Well Behaved", Journal of Money,
+Aruoba, S. Boragan, "Revisions Are Not Well Behaved", Journal of Money,
 Credit and Banking, 40(2-3), 319-340, 2008.
 
 ## See also

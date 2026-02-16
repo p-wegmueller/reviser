@@ -270,15 +270,18 @@ head(results)
 #> 
 #> id=EA, release=release_1:
 #>   • Significant negative correlation between revisions and initial values (ρ = -0.318 , p = 0 )
-#>   • Significant autocorrelation in revisions (ρ₁ = -0.157 ): revisions are persistent
+#>   • Significant autocorrelation in revisions 
+#>               (ρ₁ = -0.157 ): revisions are persistent
 #> 
 #> id=JP, release=release_0:
 #>   • Significant negative correlation between revisions and initial values (ρ = -0.204 , p = 0.006 )
-#>   • Significant autocorrelation in revisions (ρ₁ = -0.278 ): revisions are persistent
+#>   • Significant autocorrelation in revisions 
+#>               (ρ₁ = -0.278 ): revisions are persistent
 #> 
 #> id=JP, release=release_1:
 #>   • Significant negative correlation between revisions and initial values (ρ = -0.241 , p = 0.001 )
-#>   • Significant autocorrelation in revisions (ρ₁ = -0.292 ): revisions are persistent
+#>   • Significant autocorrelation in revisions 
+#>               (ρ₁ = -0.292 ): revisions are persistent
 ```
 
 ### Sign Switches
@@ -651,7 +654,8 @@ head(results)
 #>   • Very low revision volatility (Noise/Signal = 0.045 )
 #>   • Revisions do NOT contain news (p = 0.237 )
 #>   • Revisions do NOT contain noise (p = 0.069 )
-#>   • Significant autocorrelation in revisions (ρ₁ = -0.201 ): revisions are persistent
+#>   • Significant autocorrelation in revisions 
+#>               (ρ₁ = -0.201 ): revisions are persistent
 #>   • Good forecast accuracy (Theil's U1 = 0.022 )
 #>   • Excellent sign prediction (97.2% correct)
 #> 
@@ -669,7 +673,8 @@ head(results)
 #>   • Significant negative correlation between revisions and initial values (ρ = -0.219 , p = 0.003 )
 #>   • Revisions do NOT contain news (p = 0.18 )
 #>   • Revisions do NOT contain noise (p = 0.298 )
-#>   • Significant autocorrelation in revisions (ρ₁ = -0.232 ): revisions are persistent
+#>   • Significant autocorrelation in revisions 
+#>               (ρ₁ = -0.232 ): revisions are persistent
 #>   • Good forecast accuracy (Theil's U1 = 0.023 )
 #>   • Excellent sign prediction (100% correct)
 #> 
@@ -679,7 +684,8 @@ head(results)
 #>   • Significant negative correlation between revisions and initial values (ρ = -0.203 , p = 0.007 )
 #>   • Revisions contain NEWS (p = 0.04 ): systematic information
 #>   • Revisions do NOT contain noise (p = 0.067 )
-#>   • Significant autocorrelation in revisions (ρ₁ = -0.198 ): revisions are persistent
+#>   • Significant autocorrelation in revisions 
+#>               (ρ₁ = -0.198 ): revisions are persistent
 #>   • Good forecast accuracy (Theil's U1 = 0.013 )
 #>   • Excellent sign prediction (100% correct)
 ```
@@ -745,7 +751,8 @@ head(results)
 #>   • Very low revision volatility (Noise/Signal = 0.021 )
 #>   • Revisions do NOT contain news (p = 0.318 )
 #>   • Revisions do NOT contain noise (p = 0.376 )
-#>   • Significant autocorrelation in revisions (ρ₁ = -0.494 ): revisions are persistent
+#>   • Significant autocorrelation in revisions 
+#>               (ρ₁ = -0.494 ): revisions are persistent
 #>   • Good forecast accuracy (Theil's U1 = 0.009 )
 #>   • Excellent sign prediction (100% correct)
 #> 
@@ -754,7 +761,8 @@ head(results)
 #>   • Very low revision volatility (Noise/Signal = 0.032 )
 #>   • Revisions do NOT contain news (p = 0.612 )
 #>   • Revisions do NOT contain noise (p = 0.623 )
-#>   • Significant autocorrelation in revisions (ρ₁ = -0.378 ): revisions are persistent
+#>   • Significant autocorrelation in revisions 
+#>               (ρ₁ = -0.378 ): revisions are persistent
 #>   • Good forecast accuracy (Theil's U1 = 0.011 )
 #>   • Excellent sign prediction (98.9% correct)
 #> 
