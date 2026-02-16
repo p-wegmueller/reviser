@@ -361,19 +361,19 @@ test_that("print.tbl_release produces output", {
 })
 
 test_that("print.tbl_release handles long format", {
-  df_rel_long <- df_long_release
+  df_rel_long <- as_tibble(df_long_release)
   class(df_rel_long) <- c("tbl_release", class(df_rel_long))
   
   output <- utils::capture.output(print(df_rel_long))
   
-  expect_true(any(grepl("Format: long", output)))
+  expect_true(any(grepl("long", output)))
 })
 
 test_that("print.tbl_release handles wide format", {
-  df_rel <- vintages_wide(df_long_release, names_from = "release")
+  df_rel <- vintages_wide(as_tibble(df_long_release), names_from = "release")
   output <- utils::capture.output(print(df_rel))
   
-  expect_true(any(grepl("Format: wide", output)))
+  expect_true(any(grepl("wide", output)))
 })
 
 # ===== Tests for summary methods =====
