@@ -119,11 +119,11 @@ results <- get_revision_analysis(
   degree = 1
 )
 
-head(results)
+results
 #> 
 #> === Revision Analysis Summary ===
 #> 
-#> # A tibble: 6 × 14
+#> # A tibble: 8 × 14
 #>   id    release       N `Bias (mean)` `Bias (p-value)` `Bias (robust p-value)`
 #>   <chr> <chr>     <dbl>         <dbl>            <dbl>                   <dbl>
 #> 1 CHE   release_0   178         0.11             0.007                   0    
@@ -132,6 +132,8 @@ head(results)
 #> 4 EA    release_1   177         0.05             0.004                   0.001
 #> 5 JP    release_0   178         0.01             0.848                   0.795
 #> 6 JP    release_1   177         0.009            0.859                   0.79 
+#> 7 US    release_0   178         0.023            0.3                     0.255
+#> 8 US    release_1   177         0.02             0.347                   0.288
 #> # ℹ 8 more variables: Minimum <dbl>, Maximum <dbl>, `10Q` <dbl>, Median <dbl>,
 #> #   `90Q` <dbl>, MAR <dbl>, `Std. Dev.` <dbl>, `Noise/Signal` <dbl>
 #> 
@@ -160,6 +162,14 @@ head(results)
 #> id=JP, release=release_1:
 #>   • No significant bias detected (p = 0.79 )
 #>   • High revision volatility (Noise/Signal = 0.548 )
+#> 
+#> id=US, release=release_0:
+#>   • No significant bias detected (p = 0.255 )
+#>   • Moderate revision volatility (Noise/Signal = 0.27 )
+#> 
+#> id=US, release=release_1:
+#>   • No significant bias detected (p = 0.288 )
+#>   • Moderate revision volatility (Noise/Signal = 0.257 )
 ```
 
 ### Correlation of Revisions
@@ -610,11 +620,11 @@ results <- get_revision_analysis(
   degree = 5
 )
 
-head(results)
+results
 #> 
 #> === Revision Analysis Summary ===
 #> 
-#> # A tibble: 6 × 39
+#> # A tibble: 8 × 39
 #>   id    pub_date       N Frequency `Bias (mean)` `Bias (p-value)`
 #>   <chr> <date>     <dbl>     <dbl>         <dbl>            <dbl>
 #> 1 CHE   2024-04-01   176         4         0.002            0.478
@@ -623,6 +633,8 @@ head(results)
 #> 4 EA    2024-07-01   177         4         0.002            0.52 
 #> 5 JP    2024-04-01   176         4        -0.003            0.49 
 #> 6 JP    2024-07-01   177         4        -0.003            0.305
+#> 7 US    2024-04-01   176         4         0.008            0.006
+#> 8 US    2024-07-01   177         4         0.007            0.006
 #> # ℹ 33 more variables: `Bias (robust p-value)` <dbl>, Minimum <dbl>,
 #> #   Maximum <dbl>, `10Q` <dbl>, Median <dbl>, `90Q` <dbl>, MAR <dbl>,
 #> #   `Std. Dev.` <dbl>, `Noise/Signal` <dbl>, Correlation <dbl>,
@@ -688,6 +700,26 @@ head(results)
 #>               (ρ₁ = -0.198 ): revisions are persistent
 #>   • Good forecast accuracy (Theil's U1 = 0.013 )
 #>   • Excellent sign prediction (100% correct)
+#> 
+#> id=US, pub_date=2024-04-01:
+#>   • No significant bias detected (p = 0.111 )
+#>   • Very low revision volatility (Noise/Signal = 0.033 )
+#>   • Revisions do NOT contain news (p = 0.12 )
+#>   • Revisions do NOT contain noise (p = 0.058 )
+#>   • Significant autocorrelation in revisions 
+#>               (ρ₁ = 0.544 ): revisions are persistent
+#>   • Good forecast accuracy (Theil's U1 = 0.014 )
+#>   • Excellent sign prediction (99.4% correct)
+#> 
+#> id=US, pub_date=2024-07-01:
+#>   • No significant bias detected (p = 0.12 )
+#>   • Very low revision volatility (Noise/Signal = 0.032 )
+#>   • Revisions do NOT contain news (p = 0.122 )
+#>   • Revisions do NOT contain noise (p = 0.059 )
+#>   • Significant autocorrelation in revisions 
+#>               (ρ₁ = 0.558 ): revisions are persistent
+#>   • Good forecast accuracy (Theil's U1 = 0.014 )
+#>   • Excellent sign prediction (99.4% correct)
 ```
 
 The

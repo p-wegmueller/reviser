@@ -92,6 +92,97 @@ statistics. Default is TRUE.</p></dd>
 <code><a href="summary.lst_efficient.html">summary.lst_efficient()</a></code></p></div>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Example usage with revision analysis results</span></span></span>
+<span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="get_nth_release.html">get_nth_release</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>      <span class="fu">tsbox</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/tsbox/reference/ts_pc.html" class="external-link">ts_pc</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>        <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu">reviser</span><span class="fu">::</span><span class="va"><a href="gdp.html">gdp</a></span>, <span class="va">id</span> <span class="op">==</span> <span class="st">"US"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>      <span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span>,</span></span>
+<span class="r-in"><span>    n <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">3</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="op">-</span><span class="st">"pub_date"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">final_release</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="get_nth_release.html">get_nth_release</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>      <span class="fu">tsbox</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/tsbox/reference/ts_pc.html" class="external-link">ts_pc</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>        <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu">reviser</span><span class="fu">::</span><span class="va"><a href="gdp.html">gdp</a></span>, <span class="va">id</span> <span class="op">==</span> <span class="st">"US"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>      <span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span>,</span></span>
+<span class="r-in"><span>    n <span class="op">=</span> <span class="st">"latest"</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="op">-</span><span class="st">"pub_date"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Get revision analysis results</span></span></span>
+<span class="r-in"><span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_revision_analysis.html">get_revision_analysis</a></span><span class="op">(</span><span class="va">df</span>, <span class="va">final_release</span>, degree <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Summarize revision quality</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> === Revision Analysis Summary ===</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 4 × 39</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   id    release       N Frequency `Bias (mean)` `Bias (p-value)`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> US    release_0   178         4         0.023            0.3  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> US    release_1   177         4         0.02             0.347</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> US    release_2   176         4         0.022            0.311</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> US    release_3   175         4         0.032            0.133</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 33 more variables: `Bias (robust p-value)` &lt;dbl&gt;, Minimum &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   Maximum &lt;dbl&gt;, `10Q` &lt;dbl&gt;, Median &lt;dbl&gt;, `90Q` &lt;dbl&gt;, MAR &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `Std. Dev.` &lt;dbl&gt;, `Noise/Signal` &lt;dbl&gt;, Correlation &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `Correlation (p-value)` &lt;dbl&gt;, `Autocorrelation (1st)` &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `Autocorrelation (1st p-value)` &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `Autocorrelation up to 1yr (Ljung-Box p-value)` &lt;dbl&gt;, `Theil's U1` &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `Theil's U2` &lt;dbl&gt;, `Seasonality (Friedman p-value)` &lt;dbl&gt;, …</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> === Interpretation ===</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> id=US, release=release_0:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   • No significant bias detected (p = 0.255 )</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   • Moderate revision volatility (Noise/Signal = 0.27 )</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   • Significant negative correlation between revisions and initial values (ρ = -0.237 , p = 0.001 )</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   • Revisions contain NEWS (p = 0.002 ): systematic information</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   • Revisions do NOT contain noise (p = 0.372 )</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   • Good forecast accuracy (Theil's U1 = 0.115 )</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   • Excellent sign prediction (94.9% correct)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> id=US, release=release_1:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   • No significant bias detected (p = 0.288 )</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   • Moderate revision volatility (Noise/Signal = 0.257 )</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   • Significant negative correlation between revisions and initial values (ρ = -0.243 , p = 0.001 )</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   • Revisions contain NEWS (p = 0 ): systematic information</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   • Revisions do NOT contain noise (p = 0.447 )</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   • Good forecast accuracy (Theil's U1 = 0.11 )</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   • Excellent sign prediction (96% correct)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> id=US, release=release_2:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   • No significant bias detected (p = 0.238 )</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   • Moderate revision volatility (Noise/Signal = 0.26 )</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   • Significant negative correlation between revisions and initial values (ρ = -0.237 , p = 0.002 )</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   • Revisions contain NEWS (p = 0.001 ): systematic information</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   • Revisions do NOT contain noise (p = 0.342 )</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   • Good forecast accuracy (Theil's U1 = 0.111 )</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   • Excellent sign prediction (95.5% correct)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> id=US, release=release_3:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   • No significant bias detected (p = 0.053 )</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   • Moderate revision volatility (Noise/Signal = 0.252 )</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   • Significant negative correlation between revisions and initial values (ρ = -0.251 , p = 0.001 )</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   • Revisions contain NEWS (p = 0 ): systematic information</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   • Revisions do NOT contain noise (p = 0.103 )</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   • Significant autocorrelation in revisions </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               (ρ₁ = -0.182 ): revisions are persistent</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   • Good forecast accuracy (Theil's U1 = 0.108 )</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   • Excellent sign prediction (95.4% correct)</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

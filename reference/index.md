@@ -89,6 +89,10 @@ Helper functions to convert revisions to a tidy format.
   : Summary Method for Publication Date Vintages
 - [`summary(`*`<tbl_release>`*`)`](https://p-wegmueller.github.io/reviser/reference/summary.tbl_release.md)
   : Summary Method for Release Vintages
+- [`tbl_sum(`*`<tbl_pubdate>`*`)`](https://p-wegmueller.github.io/reviser/reference/tbl_sum.tbl_pubdate.md)
+  : Tibble Summary for Publication Date Vintages
+- [`tbl_sum(`*`<tbl_release>`*`)`](https://p-wegmueller.github.io/reviser/reference/tbl_sum.tbl_release.md)
+  : Tibble Summary for Release Vintages
 - [`vintages_long()`](https://p-wegmueller.github.io/reviser/reference/vintages_long.md)
   : Convert Vintages Data to Long Format
 - [`vintages_wide()`](https://p-wegmueller.github.io/reviser/reference/vintages_wide.md)
