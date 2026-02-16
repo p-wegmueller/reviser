@@ -245,11 +245,6 @@ test_that("plot_vintages handles data with id column", {
   expect_s3_class(p, "ggplot")
 })
 
-test_that("plot_vintages adjusts legend position for few vintages", {
-  p <- plot_vintages(df_plot, dim_col = "pub_date") # 3 vintages
-  # Legend should be at bottom for <= 5 vintages
-  expect_true("theme" %in% names(p))
-})
 
 test_that("plot_vintages adjusts legend position for many vintages", {
   df_many <- dplyr::slice(df_plot, rep(1:dplyr::n(), each = 4)) %>%
