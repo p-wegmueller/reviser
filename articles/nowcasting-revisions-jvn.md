@@ -262,7 +262,7 @@ summary(nowcast)
 #> 
 #> Parameter Estimates:
 #>     Parameter Estimate Std.Error
-#>         rho_1    0.596     0.138
+#>         rho_1    0.596     0.139
 #>       sigma_e    0.001     0.426
 #>    sigma_nu_1    1.023     0.257
 #>    sigma_nu_2    0.001     0.023
