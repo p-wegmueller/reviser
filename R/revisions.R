@@ -348,7 +348,7 @@ get_revisions <- function(
 #' # Access the index of the first efficient release
 #' result$e
 #'
-#' @references Aruoba, S. Borağan, "Revisions Are Not Well Behaved", Journal of
+#' @references Aruoba, S. Boragan, "Revisions Are Not Well Behaved", Journal of
 #' Money, Credit and Banking, 40(2-3), 319-340, 2008.
 #'
 #' @family revision analysis
@@ -1225,7 +1225,7 @@ print.revision_summary <- function(x, interpretation = TRUE, digits = 3, ...) {
           if (bias_p < 0.05) {
             direction <- if (bias_mean > 0) "upward" else "downward"
             cat(
-              "  • Significant",
+              "  \u2022 Significant",
               direction,
               "bias detected (p =",
               round(bias_p, 3),
@@ -1233,7 +1233,7 @@ print.revision_summary <- function(x, interpretation = TRUE, digits = 3, ...) {
             )
           } else {
             cat(
-              "  • No significant bias detected (p =",
+              "  \u2022 No significant bias detected (p =",
               round(bias_p, 3),
               ")\n"
             )
@@ -1247,19 +1247,19 @@ print.revision_summary <- function(x, interpretation = TRUE, digits = 3, ...) {
         if (!is.na(ns_ratio)) {
           if (ns_ratio < 0.1) {
             cat(
-              "  • Very low revision volatility (Noise/Signal =",
+              "  \u2022 Very low revision volatility (Noise/Signal =",
               round(ns_ratio, 3),
               ")\n"
             )
           } else if (ns_ratio < 0.3) {
             cat(
-              "  • Moderate revision volatility (Noise/Signal =",
+              "  \u2022 Moderate revision volatility (Noise/Signal =",
               round(ns_ratio, 3),
               ")\n"
             )
           } else {
             cat(
-              "  • High revision volatility (Noise/Signal =",
+              "  \u2022 High revision volatility (Noise/Signal =",
               round(ns_ratio, 3),
               ")\n"
             )
@@ -1276,9 +1276,9 @@ print.revision_summary <- function(x, interpretation = TRUE, digits = 3, ...) {
           if (cor_p < 0.05) {
             direction <- if (cor_val > 0) "positive" else "negative"
             cat(
-              "  • Significant",
+              "  \u2022 Significant",
               direction,
-              "correlation between revisions and initial values (ρ =",
+              "correlation between revisions and initial values (\u03C1 =",
               round(cor_val, 3),
               ", p =",
               round(cor_p, 3),
@@ -1294,13 +1294,13 @@ print.revision_summary <- function(x, interpretation = TRUE, digits = 3, ...) {
         if (!is.na(news_p)) {
           if (news_p < 0.05) {
             cat(
-              "  • Revisions contain NEWS (p =",
+              "  \u2022 Revisions contain NEWS (p =",
               round(news_p, 3),
               "): systematic information\n"
             )
           } else {
             cat(
-              "  • Revisions do NOT contain news (p =",
+              "  \u2022 Revisions do NOT contain news (p =",
               round(news_p, 3),
               ")\n"
             )
@@ -1313,13 +1313,13 @@ print.revision_summary <- function(x, interpretation = TRUE, digits = 3, ...) {
         if (!is.na(noise_p)) {
           if (noise_p < 0.05) {
             cat(
-              "  • Revisions contain NOISE (p =",
+              "  \u2022 Revisions contain NOISE (p =",
               round(noise_p, 3),
               "): measurement error\n"
             )
           } else {
             cat(
-              "  • Revisions do NOT contain noise (p =",
+              "  \u2022 Revisions do NOT contain noise (p =",
               round(noise_p, 3),
               ")\n"
             )
@@ -1335,8 +1335,8 @@ print.revision_summary <- function(x, interpretation = TRUE, digits = 3, ...) {
         if (!is.na(auto_p) && !is.na(auto_val)) {
           if (auto_p < 0.05) {
             cat(
-              "  • Significant autocorrelation in revisions (ρ₁ =",
-              round(auto_val, 3),
+              "  \u2022 Significant autocorrelation in revisions 
+              (\u03C1\u2081 =",  round(auto_val, 3), 
               "): revisions are persistent\n"
             )
           }
@@ -1348,15 +1348,15 @@ print.revision_summary <- function(x, interpretation = TRUE, digits = 3, ...) {
         u1 <- row[["Theil's U1"]]
         if (!is.na(u1)) {
           if (u1 < 0.3) {
-            cat("  • Good forecast accuracy (Theil's U1 =", round(u1, 3), ")\n")
+            cat("  \u2022 Good forecast accuracy (Theil's U1 =", round(u1, 3), ")\n")
           } else if (u1 < 0.6) {
             cat(
-              "  • Moderate forecast accuracy (Theil's U1 =",
+              "  \u2022 Moderate forecast accuracy (Theil's U1 =",
               round(u1, 3),
               ")\n"
             )
           } else {
-            cat("  • Poor forecast accuracy (Theil's U1 =", round(u1, 3), ")\n")
+            cat("  \u2022 Poor forecast accuracy (Theil's U1 =", round(u1, 3), ")\n")
           }
         }
       }
@@ -1368,15 +1368,15 @@ print.revision_summary <- function(x, interpretation = TRUE, digits = 3, ...) {
           pct <- round(sign_correct * 100, 1)
           if (pct > 90) {
             cat(
-              "  • Excellent sign prediction (",
+              "  \u2022 Excellent sign prediction (",
               pct,
               "% correct)\n",
               sep = ""
             )
           } else if (pct > 70) {
-            cat("  • Good sign prediction (", pct, "% correct)\n", sep = "")
+            cat("  \u2022 Good sign prediction (", pct, "% correct)\n", sep = "")
           } else {
-            cat("  • Poor sign prediction (", pct, "% correct)\n", sep = "")
+            cat("  \u2022 Poor sign prediction (", pct, "% correct)\n", sep = "")
           }
         }
       }
@@ -1476,8 +1476,8 @@ diagnose.revision_summary <- function(object, alpha = 0.05, ...) {
       bias_mean <- row[["Bias (mean)"]]
 
       if (!is.na(bias_p)) {
-        status <- if (bias_p >= alpha) "✓ PASS" else "✗ FAIL"
-        value <- paste0("p=", round(bias_p, 3), ", μ=", round(bias_mean, 3))
+        status <- if (bias_p >= alpha) "\u2713 PASS" else "\u2717 FAIL"
+        value <- paste0("p=", round(bias_p, 3), ", \u03BC=", round(bias_mean, 3))
         assessment <- if (bias_p >= alpha) {
           "No significant bias"
         } else {
@@ -1506,11 +1506,11 @@ diagnose.revision_summary <- function(object, alpha = 0.05, ...) {
 
       if (!is.na(ns)) {
         status <- if (ns < 0.3) {
-          "✓ GOOD"
+          "\u2713 GOOD"
         } else if (ns < 0.5) {
           "~ OK"
         } else {
-          "✗ HIGH"
+          "\u2717 HIGH"
         }
         value <- round(ns, 3)
         assessment <- if (ns < 0.3) {
@@ -1538,7 +1538,7 @@ diagnose.revision_summary <- function(object, alpha = 0.05, ...) {
       news_p <- row[["News joint test (p-value)"]]
 
       if (!is.na(news_p)) {
-        status <- if (news_p >= alpha) "✓ PASS" else "✗ FAIL"
+        status <- if (news_p >= alpha) "\u2713 PASS" else "\u2717 FAIL"
         value <- paste0("p=", round(news_p, 3))
         assessment <- if (news_p >= alpha) {
           "No news component"
@@ -1563,7 +1563,7 @@ diagnose.revision_summary <- function(object, alpha = 0.05, ...) {
       noise_p <- row[["Noise joint test (p-value)"]]
 
       if (!is.na(noise_p)) {
-        status <- if (noise_p >= alpha) "✓ PASS" else "✗ FAIL"
+        status <- if (noise_p >= alpha) "\u2713 PASS" else "\u2717 FAIL"
         value <- paste0("p=", round(noise_p, 3))
         assessment <- if (noise_p >= alpha) {
           "No noise component"
@@ -1589,11 +1589,11 @@ diagnose.revision_summary <- function(object, alpha = 0.05, ...) {
 
       if (!is.na(u1)) {
         status <- if (u1 < 0.3) {
-          "✓ GOOD"
+          "\u2713 GOOD"
         } else if (u1 < 0.6) {
           "~ OK"
         } else {
-          "✗ POOR"
+          "\u2717 POOR"
         }
         value <- round(u1, 3)
         assessment <- if (u1 < 0.3) {
@@ -1622,11 +1622,11 @@ diagnose.revision_summary <- function(object, alpha = 0.05, ...) {
 
       if (!is.na(sign_pct)) {
         status <- if (sign_pct > 90) {
-          "✓ GOOD"
+          "\u2713 GOOD"
         } else if (sign_pct > 70) {
           "~ OK"
         } else {
-          "✗ POOR"
+          "\u2717 POOR"
         }
         value <- paste0(round(sign_pct, 1), "%")
         assessment <- if (sign_pct > 90) {
@@ -1680,11 +1680,11 @@ diagnose.revision_summary <- function(object, alpha = 0.05, ...) {
     )
 
     if (pct_pass >= 80) {
-      cat("Overall: ✓ GOOD - Revisions are of high quality\n")
+      cat("Overall: \u2713 GOOD - Revisions are of high quality\n")
     } else if (pct_pass >= 60) {
       cat("Overall: ~ MODERATE - Some revision quality issues detected\n")
     } else {
-      cat("Overall: ✗ POOR - Significant revision quality issues\n")
+      cat("Overall: \u2717 POOR - Significant revision quality issues\n")
     }
   }
 

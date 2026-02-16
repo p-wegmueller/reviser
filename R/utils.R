@@ -681,7 +681,11 @@ make_explicit_missing <- function(
   )
   names(complete_dates) <- time_col
 
-  data_subset <- data %>% dplyr::select(c(time_col, dplyr::everything()))
+  data_subset <- data %>% 
+    dplyr::select(
+      dplyr::all_of(time_col), 
+      dplyr::everything()
+    )
 
   # Merge to create explicit NAs
   complete_data <- complete_dates %>%
