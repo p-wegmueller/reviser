@@ -1,5 +1,11 @@
 # Test file for kk.R
 # Tests for kk_nowcast and related functions
+#' @srrstats {G5.2} Error and warning behavior tested
+#' @srrstats {G5.2a} Every error message is unique
+#' @srrstats {G5.2b} Tests demonstrate conditions triggering messages
+#' @srrstats {G5.4} Correctness tests against fixed test data
+#' @srrstats {G5.5} Tests run with fixed random seed
+#' @srrstats {G5.6} Parameter recovery tests
 
 # ===== Setup Test Data =====
 

@@ -109,7 +109,7 @@ results <- get_revision_analysis(
   degree = 1
 )
 
-head(results)
+results
 ```
 
 ### Correlation of Revisions  
@@ -332,7 +332,7 @@ results <- get_revision_analysis(
   degree = 5
 )
 
-head(results)
+results
 ```
 
 

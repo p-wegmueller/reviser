@@ -695,72 +695,111 @@ make_explicit_missing <- function(
   return(complete_data)
 }
 
-#' Print Method for Publication Date Vintages
+#' Tibble Summary for Publication Date Vintages
+#'
+#' Provides a custom header for objects of class \code{tbl_pubdate} when printed.
+#' This method is called automatically by pillar when printing tibbles.
 #'
 #' @param x An object of class \code{tbl_pubdate}.
-#' @param ... Additional arguments passed to print.
+#' @param ... Additional arguments (unused).
 #'
-#' @return The function returns the input \code{x} invisibly.
+#' @return A named character vector where names are labels and values are 
+#'   the corresponding information. The vector is used by pillar to format
+#'   the tibble header.
+#' @family helpers
+#' @export
+tbl_sum.tbl_pubdate <- function(x, ...) {
+  # Count vintages (columns that are not time or id)
+  
+  is_long <- vintages_check(x) == "long"
+  
+  # Calculate metadata
+  n_time <- if (is_long) length(unique(x$time)) else nrow(x)
+  n_vintages  <- if (is_long) length(unique(x$pub_date)) else ncol(x) - 1
+  
+  
+  # Build header lines
+  header <- c(
+    "Vintages data (publication date format)" = "",
+    "Time periods" = nrow(x),
+    "Vintages" = n_vintages
+  )
+  
+  # Add ID count if present
+  if ("id" %in% names(x)) {
+    header <- c(header, "IDs" = length(unique(x$id)))
+  }
+  
+  header
+}
+
+#' Print Method for Publication Date Vintages
+#'
+#' Print method for objects of class \code{tbl_pubdate}. This method delegates
+#' to the tibble print method, which will automatically call \code{tbl_sum.tbl_pubdate}
+#' to generate the custom header.
+#'
+#' @param x An object of class \code{tbl_pubdate}.
+#' @param ... Additional arguments passed to the next print method.
+#'
+#' @return The input \code{x} is returned invisibly.
 #' @method print tbl_pubdate
 #' @family helpers
 #' @export
 print.tbl_pubdate <- function(x, ...) {
-  cat("\n# Vintages data (publication date format)\n")
-  cat("# Time periods:", nrow(x), "\n")
-
-  if ("id" %in% colnames(x)) {
-    cat("# IDs:", length(unique(x$id)), "\n")
-  }
-
-  # Count vintages (columns that are dates)
-  date_cols <- colnames(x)[colnames(x) != "time" & colnames(x) != "id"]
-  n_vintages <- length(date_cols)
-  cat("# Vintages:", n_vintages, "\n\n")
-
-  # Remove class to use default print
-  class(x) <- class(x)[class(x) != "tbl_pubdate"]
-  print(x, ...)
-
+  # Delegate to tibble's print method, which will call tbl_sum.tbl_pubdate
+  NextMethod("print")
   invisible(x)
+}
+
+#' Tibble Summary for Release Vintages
+#'
+#' Provides a custom header for objects of class \code{tbl_release} when printed.
+#'
+#' @param x An object of class \code{tbl_release}.
+#' @param ... Additional arguments (unused).
+#'
+#' @return A named character vector where names are labels and values are 
+#'   the corresponding information.
+#' @family helpers
+#' @export
+tbl_sum.tbl_release <- function(x, ...) {
+  # Determine data orientation
+  is_long <- vintages_check(x) == "long"
+  
+  # Calculate metadata
+  n_time <- if (is_long) length(unique(x$time)) else nrow(x)
+  n_rel  <- if (is_long) length(unique(x$release)) else sum(grepl("release|final", names(x)))
+  
+  # Build header
+  header <- c(
+    "Vintages data (release format)" = "",
+    "Format" = if (is_long) "long" else "wide",
+    "Time periods" = n_time,
+    "Releases" = n_rel
+  )
+  
+  # Add ID count if present
+  if ("id" %in% names(x)) {
+    header <- c(header, "IDs" = length(unique(x$id)))
+  }
+  
+  header
 }
 
 #' Print Method for Release Vintages
 #'
-#' @param x An object of class \code{tbl_release}.
-#' @param ... Additional arguments passed to print.
+#' Print method for objects of class \code{tbl_release}.
 #'
-#' @return The function returns the input \code{x} invisibly.
+#' @param x An object of class \code{tbl_release}.
+#' @param ... Additional arguments passed to the next print method.
+#'
+#' @return The input \code{x} is returned invisibly.
 #' @method print tbl_release
 #' @family helpers
 #' @export
 print.tbl_release <- function(x, ...) {
-  cat("\n# Vintages data (release format)\n")
-
-  # Check if long or wide format
-  is_long <- "release" %in% colnames(x) && "value" %in% colnames(x)
-
-  if (is_long) {
-    cat("# Format: long\n")
-    cat("# Time periods:", length(unique(x$time)), "\n")
-    if ("id" %in% colnames(x)) {
-      cat("# IDs:", length(unique(x$id)), "\n")
-    }
-    cat("# Releases:", length(unique(x$release)), "\n\n")
-  } else {
-    cat("# Format: wide\n")
-    cat("# Time periods:", nrow(x), "\n")
-    if ("id" %in% colnames(x)) {
-      cat("# IDs:", length(unique(x$id)), "\n")
-    }
-    # Count releases (columns that match release pattern)
-    release_cols <- colnames(x)[grepl("release|final", colnames(x))]
-    cat("# Releases:", length(release_cols), "\n\n")
-  }
-
-  # Remove class to use default print
-  class(x) <- class(x)[class(x) != "tbl_release"]
-  print(x, ...)
-
+  NextMethod("print")
   invisible(x)
 }
 

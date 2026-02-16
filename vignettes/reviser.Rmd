@@ -91,7 +91,7 @@ To revert to **long format**, use `vintages_long()`. The function expects column
 ```{r}
 # Convert back to long format
 long_ea_short <- vintages_long(wide_ea_short)
-head(long_ea_short)
+long_ea_short
 ```
 
 ## Handling Multiple Series with `id`

@@ -9,19 +9,23 @@
 \arguments{
 \item{x}{An object of class \code{tbl_pubdate}.}
 
-\item{...}{Additional arguments passed to print.}
+\item{...}{Additional arguments passed to the next print method.}
 }
 \value{
-The function returns the input \code{x} invisibly.
+The input \code{x} is returned invisibly.
 }
 \description{
-Print Method for Publication Date Vintages
+Print method for objects of class \code{tbl_pubdate}. This method delegates
+to the tibble print method, which will automatically call \code{tbl_sum.tbl_pubdate}
+to generate the custom header.
 }
 \seealso{
 Other helpers: 
 \code{\link{print.tbl_release}()},
 \code{\link{summary.tbl_pubdate}()},
 \code{\link{summary.tbl_release}()},
+\code{\link{tbl_sum.tbl_pubdate}()},
+\code{\link{tbl_sum.tbl_release}()},
 \code{\link{vintages_long}()},
 \code{\link{vintages_wide}()}
 }

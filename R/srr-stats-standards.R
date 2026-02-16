@@ -24,15 +24,12 @@ NULL
 #' @srrstatsNA {G2.5}
 #' @srrstatsNA {G2.14c}
 #' @srrstatsNA {G2.16}
-#' @srrstatsNA {G3.0}
 #' @srrstatsNA {G4.0}
 #' @srrstatsNA {G5.0}
 #' @srrstatsNA {G5.1}
 #' @srrstatsNA {G5.3}
 #' @srrstatsNA {G5.4b}
 #' @srrstatsNA {G5.4c}
-#' @srrstatsNA {G5.5}
-#' @srrstatsNA {G5.6}
 #' @srrstatsNA {G5.6a}
 #' @srrstatsNA {G5.6b}
 #' @srrstatsNA {G5.7}
@@ -64,11 +61,6 @@ NULL
 #' @srrstatsNA {TS4.5b}
 #' @srrstatsNA {TS4.5c}
 #' @srrstatsNA {TS4.6a}
-#' @srrstatsNA {TS4.6c}
-#' @srrstatsNA {TS4.7c}
 #' @srrstatsNA {TS5.4}
-#' @srrstatsNA {TS5.6}
-#' @srrstatsNA {TS5.7}
-#' @srrstatsNA {TS5.8}
 #' @noRd
 NULL

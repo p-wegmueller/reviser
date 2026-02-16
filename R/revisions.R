@@ -1396,6 +1396,37 @@ print.revision_summary <- function(x, interpretation = TRUE, digits = 3, ...) {
 #' @param ... Additional arguments (not used).
 #'
 #' @return A tibble with diagnostic results.
+#' @examples
+#' # Example usage with revision analysis results
+#' df <- dplyr::select(
+#'   get_nth_release(
+#'     na.omit(
+#'       tsbox::ts_pc(
+#'         dplyr::filter(reviser::gdp, id == "US")
+#'       )
+#'     ),
+#'     n = 0:3
+#'   ),
+#'   -"pub_date"
+#' )
+#'
+#' final_release <- dplyr::select(
+#'   get_nth_release(
+#'     na.omit(
+#'       tsbox::ts_pc(
+#'         dplyr::filter(reviser::gdp, id == "US")
+#'       )
+#'     ),
+#'     n = "latest"
+#'   ),
+#'   -"pub_date"
+#' )
+#'
+#' # Get revision analysis results
+#' results <- get_revision_analysis(df, final_release, degree = 5)
+#' 
+#' # Diagnose revision quality
+#' diagnose(results)
 #' @family revision analysis
 #' @export
 diagnose.revision_summary <- function(object, alpha = 0.05, ...) {
@@ -1651,7 +1682,7 @@ diagnose.revision_summary <- function(object, alpha = 0.05, ...) {
 
     # Print for this group
     cat(group_id, ":\n")
-    print(diagnostics, row.names = FALSE)
+    print(diagnostics)
     cat("\n")
 
     # Store results
@@ -1699,6 +1730,39 @@ diagnose.revision_summary <- function(object, alpha = 0.05, ...) {
 #' @param ... Additional arguments passed to methods.
 #'
 #' @return Method-specific diagnostic output.
+#' 
+#' @examples
+#' # Example usage with revision analysis results
+#' df <- dplyr::select(
+#'   get_nth_release(
+#'     na.omit(
+#'       tsbox::ts_pc(
+#'         dplyr::filter(reviser::gdp, id == "US")
+#'       )
+#'     ),
+#'     n = 0:3
+#'   ),
+#'   -"pub_date"
+#' )
+#'
+#' final_release <- dplyr::select(
+#'   get_nth_release(
+#'     na.omit(
+#'       tsbox::ts_pc(
+#'         dplyr::filter(reviser::gdp, id == "US")
+#'       )
+#'     ),
+#'     n = "latest"
+#'   ),
+#'   -"pub_date"
+#' )
+#'
+#' # Get revision analysis results
+#' results <- get_revision_analysis(df, final_release, degree = 5)
+#' 
+#' # Diagnose revision quality
+#' diagnose(results)
+#' 
 #' @family revision analysis
 #' @export
 diagnose <- function(object, ...) {
@@ -1714,6 +1778,37 @@ diagnose <- function(object, ...) {
 #' @return The function returns the input \code{object} invisibly.
 #' @method summary revision_summary
 #' @family revision analysis
+#' @examples
+#' # Example usage with revision analysis results
+#' df <- dplyr::select(
+#'   get_nth_release(
+#'     na.omit(
+#'       tsbox::ts_pc(
+#'         dplyr::filter(reviser::gdp, id == "US")
+#'       )
+#'     ),
+#'     n = 0:3
+#'   ),
+#'   -"pub_date"
+#' )
+#'
+#' final_release <- dplyr::select(
+#'   get_nth_release(
+#'     na.omit(
+#'       tsbox::ts_pc(
+#'         dplyr::filter(reviser::gdp, id == "US")
+#'       )
+#'     ),
+#'     n = "latest"
+#'   ),
+#'   -"pub_date"
+#' )
+#'
+#' # Get revision analysis results
+#' results <- get_revision_analysis(df, final_release, degree = 5)
+#' 
+#' # Summarize revision quality
+#' summary(results)
 #' @export
 summary.revision_summary <- function(object, interpretation = TRUE, ...) {
   print.revision_summary(object, interpretation = interpretation, ...)

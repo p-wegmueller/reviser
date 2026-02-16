@@ -17,6 +17,7 @@ utils::globalVariables(c(
 #' @importFrom KFAS SSModel SSMcustom
 #' @importFrom magrittr %>%
 #' @importFrom calculus %mx% %diff% %sum% %prod%
+#' @importFrom pillar tbl_sum
 #' @srrstats {G1.4} roxygen2 is used for all documentation.
 #' @srrstats {G1.4a} All internal functions are also documented
 NULL

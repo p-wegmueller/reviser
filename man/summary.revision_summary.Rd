@@ -20,6 +20,38 @@ The function returns the input \code{object} invisibly.
 \description{
 Summary Method for Revision Summary
 }
+\examples{
+# Example usage with revision analysis results
+df <- dplyr::select(
+  get_nth_release(
+    na.omit(
+      tsbox::ts_pc(
+        dplyr::filter(reviser::gdp, id == "US")
+      )
+    ),
+    n = 0:3
+  ),
+  -"pub_date"
+)
+
+final_release <- dplyr::select(
+  get_nth_release(
+    na.omit(
+      tsbox::ts_pc(
+        dplyr::filter(reviser::gdp, id == "US")
+      )
+    ),
+    n = "latest"
+  ),
+  -"pub_date"
+)
+
+# Get revision analysis results
+results <- get_revision_analysis(df, final_release, degree = 5)
+
+# Summarize revision quality
+summary(results)
+}
 \seealso{
 Other revision analysis: 
 \code{\link{diagnose}()},

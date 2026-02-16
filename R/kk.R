@@ -101,6 +101,8 @@
 #' @srrstats {TS4.6} Time Series Software which implements or otherwise
 #' enables forecasting should return either:
 #' @srrstats {TS4.6b} filtered/forecasted point estimates
+#' @srrstats {TS4.6c} Error indication for forecast estimates (confidence intervals)
+#' @srrstats {TS4.7c} Distinguishes model vs forecast values (sample column)
 #' @srrstats {TS4.7} forecast values and models separately returned
 #' @srrstats {TS4.7a} only forecast values returned
 #' @srrstats {TS4.7b} forecast values and models separately returned
@@ -1398,6 +1400,7 @@ kk_ols_estim <- function(equations, data, model = "KK") {
 #'
 #' @srrstats {G2.4b} convert via via `as.numeric()`
 #' @srrstats {G2.4c} convert via via `as.character()`
+#' @srrstats {G3.0} Uses epsilon for numerical stability (epsilon parameter)
 #'
 #' @examples
 #' # Example 1: Kishor-Koenig model with character matrices
@@ -1609,7 +1612,7 @@ kk_matrices <- function(e, model, params = NULL, type = "numeric") {
 #'     \item{\code{Q}}{The state noise covariance matrix.}
 #'     \item{\code{R}}{The control matrix.}
 #'   }
-#'
+#' @srrstats {G3.0} Numerical stability with epsilon parameter
 #' @details The state space model is represented by the following equations:
 #'
 #' **State Equation:**

@@ -46,6 +46,44 @@
 #'   \item{bic}{Bayesian Information Criterion}
 #'   \item{data}{Input data}
 #' }
+#' 
+#' @srrstats {G1.0} Primary reference: Jacobs & Van Norden (2011)
+#' @srrstats {G1.1} First implementation in R of the Jacobs-Van Norden state-space model
+#' @srrstats {G1.3} Statistical terminology clearly defined (news, noise, spillovers)
+#' @srrstats {G2.0} Input assertions on lengths (e, h, ar_order must be single values)
+#' @srrstats {G2.0a} Documents expectations on input lengths in parameter descriptions
+#' @srrstats {G2.1} Input type assertions (checks for list, numeric types)
+#' @srrstats {G2.1a} Documents data type expectations for all inputs
+#' @srrstats {G2.2} Restricts multivariate input to univariate parameters (e, h, ar_order)
+#' @srrstats {G2.3a} Uses match.arg() equivalent for method parameter validation
+#' @srrstats {G2.3b} Documents case-sensitivity requirements
+#' @srrstats {G2.4} Type conversion mechanisms (round() for ar_order)
+#' @srrstats {G2.4a} Explicit conversion to integer via round()
+#' @srrstats {G2.7} Accepts multiple tabular forms (matrix, data.frame, list)
+#' @srrstats {G2.8} Pre-processing routines (vintages_check, vintages_wide)
+#' @srrstats {G2.9} Diagnostic messages for type conversions (suppressWarnings)
+#' @srrstats {G2.10} Consistent column extraction behavior
+#' @srrstats {G2.13} Checks for missing data (complete.cases in init_params)
+#' @srrstats {G2.14} Options for handling missing data (implicit via KFAS)
+#' @srrstats {G2.15} Never assumes non-missingness
+#' @srrstats {G3.0} Numerical stability considerations (epsilon parameter)
+#' @srrstats {G5.2} Error and warning behavior tested
+#' @srrstats {TS1.0} Uses explicit time series class systems
+#' @srrstats {TS1.1} Documents types/classes of input data
+#' @srrstats {TS1.2} Validation routines for input classes (vintages_check)
+#' @srrstats {TS1.3} Pre-processing to validate and transform input (vintages_wide)
+#' @srrstats {TS1.4} Maintains time/date components of input data
+#' @srrstats {TS1.5} Ensures strict ordering of time index
+#' @srrstats {TS1.6} Catches ordering violations in pre-processing
+#' @srrstats {TS1.8} Explicit about monthly time intervals (frequency calculation)
+#' @srrstats {TS2.0} Handles explicit vs implicit missing values
+#' @srrstats {TS2.1} Options for handling missing data
+#' @srrstats {TS4.0b} Returns unique class-defined format (jvn_model)
+#' @srrstats {TS4.2} Explicitly documents return value types/classes
+#' @srrstats {TS4.3} Return values include time scales
+#' @srrstats {TS4.6b} Forecasting returns first- and second-order moments
+#' @srrstats {TS4.6c} Error indication for forecast estimates (confidence intervals)
+#' @srrstats {TS4.7c} Distinguishes model vs forecast values (sample column)
 #'
 #' @references Jacobs, Jan P.A.M. and Van Norden, Simon, "Modeling Data
 #' Revisions: Measurement Error and Dynamics of 'True' Values", Journal of
@@ -783,6 +821,11 @@ jvn_nowcast <- function(
 #'
 #' Constructs the state-space matrices Z, T, R, H, Q according to the
 #' Jacobs & Van Norden (2011) specification.
+#' 
+#' @srrstats {G1.4a} Internal function documented with @noRd tag
+#' @srrstats {G2.0} Input assertions on parameter dimensions
+#' @srrstats {G2.1} Type checking for parameters
+#' @srrstats {G3.0} Numerical stability in matrix construction
 #'
 #' @keywords internal
 #' @noRd
@@ -977,6 +1020,9 @@ jvn_matrices <- function(
 
 
 #' Update Model Matrices with Estimated Parameters
+#' @srrstats {G1.4a} Internal function documented with @noRd tag
+#' @srrstats {G2.1} Parameter type validation
+#' @srrstats {G3.0} Numerical operations with appropriate precision
 #' @keywords internal
 #' @noRd
 jvn_update_matrices <- function(model_struct, params) {
@@ -1043,6 +1089,9 @@ jvn_update_matrices <- function(model_struct, params) {
 
 
 #' Negative Log-Likelihood Function
+#' @srrstats {G1.4a} Internal function documented with @noRd tag
+#' @srrstats {G2.15} Handles missing values appropriately
+#' @srrstats {G3.0} Numerical stability in likelihood calculation
 #' @keywords internal
 #' @noRd
 jvn_negloglik <- function(params, model_struct, data, transform_se = TRUE) {
@@ -1434,6 +1483,13 @@ print.jvn_model <- function(x, ...) {
 #' @param state String. The name of the state to visualize.
 #' @param type String. Type of estimate to plot: "filtered" or "smoothed".
 #' @param ... Additional arguments passed to theme_reviser.
+#' 
+#' @srrstats {TS5.0} Implements default plot methods for class system
+#' @srrstats {TS5.1} Time axis labeling (delegates to base method)
+#' @srrstats {TS5.2} Time on horizontal axis (delegates to base method)
+#' @srrstats {TS5.6} Distributional limits shown (confidence intervals)
+#' @srrstats {TS5.7} Includes model and forecast values in plot
+#' @srrstats {TS5.8} Visual distinction between model and forecast values
 #'
 #' @return A ggplot2 object visualizing the specified state estimates.
 #' @examples

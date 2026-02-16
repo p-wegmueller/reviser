@@ -26,6 +26,7 @@ Imports:
     magrittr,
     dplyr,
     tidyr,
+    pillar,
     ggplot2,
     car,
     sandwich,
