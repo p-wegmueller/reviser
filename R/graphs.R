@@ -317,6 +317,9 @@ plot_vintages <- function(
 #' @srrstats {TS5.0} Implements default plot methods for implemented class system
 #' @srrstats {TS4.2} Explicitly documents the type and class of return values
 #' @method plot tbl_pubdate
+#' @examples
+#' df <- dplyr::filter(reviser::gdp, id == "US")
+#' plot(df)
 #' @family revision graphs
 #' @export
 plot.tbl_pubdate <- function(x, ...) {
@@ -332,6 +335,10 @@ plot.tbl_pubdate <- function(x, ...) {
 #' @srrstats {TS5.0} Implements default plot methods for implemented class system
 #' @srrstats {TS4.2} Explicitly documents the type and class of return values
 #' @method plot tbl_release
+#' @examples
+#' df <- dplyr::filter(reviser::gdp, id == "US")
+#' df <- get_nth_release(df, n = 0:5)
+#' plot(df)
 #' @family revision graphs
 #' @export
 plot.tbl_release <- function(x, ...) {
