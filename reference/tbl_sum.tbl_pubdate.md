@@ -37,3 +37,15 @@ Other helpers:
 [`tbl_sum.tbl_release()`](https://p-wegmueller.github.io/reviser/reference/tbl_sum.tbl_release.md),
 [`vintages_long()`](https://p-wegmueller.github.io/reviser/reference/vintages_long.md),
 [`vintages_wide()`](https://p-wegmueller.github.io/reviser/reference/vintages_wide.md)
+
+## Examples
+
+``` r
+df <- dplyr::filter(reviser::gdp, id == "US")
+wide_data <- vintages_wide(df)
+pillar::tbl_sum(wide_data$US)
+#> Vintages data (publication date format)                            Time periods 
+#>                                      ""                                   "179" 
+#>                                Vintages 
+#>                                    "89" 
+```

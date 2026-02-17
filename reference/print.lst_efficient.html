@@ -87,6 +87,60 @@
 <code><a href="summary.revision_summary.html">summary.revision_summary()</a></code></p></div>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_nth_release.html">get_nth_release</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="fu">tsbox</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/tsbox/reference/ts_pc.html" class="external-link">ts_pc</a></span><span class="op">(</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu">reviser</span><span class="fu">::</span><span class="va"><a href="gdp.html">gdp</a></span>, <span class="va">id</span> <span class="op">==</span> <span class="st">"US"</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  n <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">3</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">final_release</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_nth_release.html">get_nth_release</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="fu">tsbox</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/tsbox/reference/ts_pc.html" class="external-link">ts_pc</a></span><span class="op">(</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu">reviser</span><span class="fu">::</span><span class="va"><a href="gdp.html">gdp</a></span>, <span class="va">id</span> <span class="op">==</span> <span class="st">"US"</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  n <span class="op">=</span> <span class="fl">10</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_first_efficient_release.html">get_first_efficient_release</a></span><span class="op">(</span><span class="va">df</span>, <span class="va">final_release</span>, significance <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Efficient release:  0 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Model summary: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> stats::lm(formula = formula, data = df_wide)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Residuals:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Min       1Q   Median       3Q      Max </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -0.89186 -0.12669  0.02046  0.11475  0.97986 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Coefficients:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             Estimate Std. Error t value Pr(&gt;|t|)    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)  0.00299    0.02223   0.134    0.893    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> release_0    0.97412    0.01692  57.567   &lt;2e-16 ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Residual standard error: 0.2518 on 166 degrees of freedom</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   (10 observations deleted due to missingness)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Multiple R-squared:  0.9523,	Adjusted R-squared:  0.952 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> F-statistic:  3314 on 1 and 166 DF,  p-value: &lt; 2.2e-16</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Test summary: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Linear hypothesis test:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept) = 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> release_0 = 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Model 1: restricted model</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Model 2: final ~ release_0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Note: Coefficient covariance matrix supplied.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Res.Df Df      F Pr(&gt;F)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1    168                 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2    166  2 1.9283 0.1486</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

@@ -87,6 +87,43 @@
 <code><a href="vintages_wide.html">vintages_wide()</a></code></p></div>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu">reviser</span><span class="fu">::</span><span class="va"><a href="gdp.html">gdp</a></span>, <span class="va">id</span> <span class="op">==</span> <span class="st">"US"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Long format</span></span></span>
+<span class="r-in"><span><span class="va">release_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_nth_release.html">get_nth_release</a></span><span class="op">(</span><span class="va">df</span>, n <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">release_data</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> === Vintages Data Summary (Release Format) ===</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Format: long </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Time periods: 179 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Time range: 1980-01-01 to 2024-07-01 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Number of IDs: 1 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> IDs: US </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Number of releases: 4 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Releases: release_0, release_1, release_2, release_3 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Missing values: 0 of 710 (0%) </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Wide format</span></span></span>
+<span class="r-in"><span><span class="va">wide_release</span> <span class="op">&lt;-</span> <span class="fu"><a href="vintages_wide.html">vintages_wide</a></span><span class="op">(</span><span class="va">release_data</span>, names_from <span class="op">=</span> <span class="st">"release"</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Ignoring columns: pub_date</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">wide_release</span><span class="op">$</span><span class="va">US</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> === Vintages Data Summary (Release Format) ===</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Format: wide </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Time periods: 179 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Time range: 1980-01-01 to 2024-07-01 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Number of releases: 4 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Releases: release_0, release_1, release_2, release_3 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Missing values: 6 of 716 (0.84%) </span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

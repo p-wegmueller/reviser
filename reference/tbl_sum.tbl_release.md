@@ -35,3 +35,17 @@ Other helpers:
 [`tbl_sum.tbl_pubdate()`](https://p-wegmueller.github.io/reviser/reference/tbl_sum.tbl_pubdate.md),
 [`vintages_long()`](https://p-wegmueller.github.io/reviser/reference/vintages_long.md),
 [`vintages_wide()`](https://p-wegmueller.github.io/reviser/reference/vintages_wide.md)
+
+## Examples
+
+``` r
+df <- dplyr::filter(reviser::gdp, id == "US")
+release_data <- get_nth_release(df, n = 0:3)
+pillar::tbl_sum(release_data)
+#> Vintages data (release format)                         Format 
+#>                             ""                         "long" 
+#>                   Time periods                       Releases 
+#>                          "179"                            "4" 
+#>                            IDs 
+#>                            "1" 
+```
