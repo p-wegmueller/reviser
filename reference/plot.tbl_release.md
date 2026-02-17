@@ -29,3 +29,11 @@ Other revision graphs:
 [`plot.tbl_pubdate()`](https://p-wegmueller.github.io/reviser/reference/plot.tbl_pubdate.md),
 [`plot_vintages()`](https://p-wegmueller.github.io/reviser/reference/plot_vintages.md),
 [`theme_reviser()`](https://p-wegmueller.github.io/reviser/reference/theme_reviser.md)
+
+## Examples
+
+``` r
+df <- dplyr::filter(reviser::gdp, id == "US")
+df <- get_nth_release(df, n = 0:5)
+plot(df)
+```
