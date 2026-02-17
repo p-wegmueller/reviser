@@ -28,11 +28,15 @@ NULL
 #' @srrstatsNA {G5.0}
 #' @srrstatsNA {G5.1}
 #' @srrstatsNA {G5.3}
+#' @srrstatsNA {G5.4a}
 #' @srrstatsNA {G5.4b}
 #' @srrstatsNA {G5.4c}
 #' @srrstatsNA {G5.6a}
 #' @srrstatsNA {G5.6b}
 #' @srrstatsNA {G5.7}
+#' @srrstatsNA {G5.8a}
+#' @srrstatsNA {G5.8b}
+#' @srrstatsNA {G5.8c}
 #' @srrstatsNA {G5.9}
 #' @srrstatsNA {G5.9b}
 #' @srrstatsNA {G5.10}
