@@ -566,6 +566,19 @@ get_first_efficient_release <- function(
 #' @return The function returns the input \code{x} invisibly.
 #' @method print lst_efficient
 #' @family revision analysis
+#' @examples
+#' df <- get_nth_release(
+#'   tsbox::ts_pc(dplyr::filter(reviser::gdp, id == "US")),
+#'   n = 0:3
+#' )
+#'
+#' final_release <- get_nth_release(
+#'   tsbox::ts_pc(dplyr::filter(reviser::gdp, id == "US")),
+#'   n = 10
+#' )
+#'
+#' result <- get_first_efficient_release(df, final_release, significance = 0.05)
+#' print(result)
 #' @export
 print.lst_efficient <- function(x, ...) {
   summary.lst_efficient(x, ...)
@@ -1132,6 +1145,36 @@ get_revision_analysis <- function(
 #' @return The function returns the input \code{x} invisibly.
 #' @method print revision_summary
 #' @family revision analysis
+#' @examples
+#' df <- dplyr::select(
+#'   get_nth_release(
+#'     na.omit(
+#'       tsbox::ts_pc(
+#'         dplyr::filter(reviser::gdp, id == "US")
+#'       )
+#'     ),
+#'     n = 0:3
+#'   ),
+#'   -"pub_date"
+#' )
+#'
+#' final_release <- dplyr::select(
+#'   get_nth_release(
+#'     na.omit(
+#'       tsbox::ts_pc(
+#'         dplyr::filter(reviser::gdp, id == "US")
+#'       )
+#'     ),
+#'     n = "latest"
+#'   ),
+#'   -"pub_date"
+#' )
+#'
+#' results <- get_revision_analysis(df, final_release, degree = 1)
+#' print(results)
+#'
+#' # Print without interpretation
+#' print(results, interpretation = FALSE)
 #' @export
 print.revision_summary <- function(x, interpretation = TRUE, digits = 3, ...) {
   cat("\n=== Revision Analysis Summary ===\n\n")

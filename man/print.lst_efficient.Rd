@@ -17,6 +17,20 @@ The function returns the input \code{x} invisibly.
 \description{
 Print Method for Efficient Release Results
 }
+\examples{
+df <- get_nth_release(
+  tsbox::ts_pc(dplyr::filter(reviser::gdp, id == "US")),
+  n = 0:3
+)
+
+final_release <- get_nth_release(
+  tsbox::ts_pc(dplyr::filter(reviser::gdp, id == "US")),
+  n = 10
+)
+
+result <- get_first_efficient_release(df, final_release, significance = 0.05)
+print(result)
+}
 \seealso{
 Other revision analysis: 
 \code{\link{diagnose}()},

@@ -22,6 +22,37 @@ The function returns the input \code{x} invisibly.
 \description{
 Print Method for Revision Summary
 }
+\examples{
+df <- dplyr::select(
+  get_nth_release(
+    na.omit(
+      tsbox::ts_pc(
+        dplyr::filter(reviser::gdp, id == "US")
+      )
+    ),
+    n = 0:3
+  ),
+  -"pub_date"
+)
+
+final_release <- dplyr::select(
+  get_nth_release(
+    na.omit(
+      tsbox::ts_pc(
+        dplyr::filter(reviser::gdp, id == "US")
+      )
+    ),
+    n = "latest"
+  ),
+  -"pub_date"
+)
+
+results <- get_revision_analysis(df, final_release, degree = 1)
+print(results)
+
+# Print without interpretation
+print(results, interpretation = FALSE)
+}
 \seealso{
 Other revision analysis: 
 \code{\link{diagnose}()},

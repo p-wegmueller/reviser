@@ -18,6 +18,11 @@ the corresponding information.
 \description{
 Provides a custom header for objects of class \code{tbl_release} when printed.
 }
+\examples{
+df <- dplyr::filter(reviser::gdp, id == "US")
+release_data <- get_nth_release(df, n = 0:3)
+pillar::tbl_sum(release_data)
+}
 \seealso{
 Other helpers: 
 \code{\link{print.tbl_pubdate}()},

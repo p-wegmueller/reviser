@@ -17,6 +17,11 @@ The input \code{x} is returned invisibly.
 \description{
 Print method for objects of class \code{tbl_release}.
 }
+\examples{
+df <- dplyr::filter(reviser::gdp, id == "US")
+release_data <- get_nth_release(df, n = 0:3)
+print(release_data)
+}
 \seealso{
 Other helpers: 
 \code{\link{print.tbl_pubdate}()},

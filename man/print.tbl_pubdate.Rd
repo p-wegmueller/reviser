@@ -19,6 +19,11 @@ Print method for objects of class \code{tbl_pubdate}. This method delegates
 to the tibble print method, which will automatically call \code{tbl_sum.tbl_pubdate}
 to generate the custom header.
 }
+\examples{
+df <- dplyr::filter(reviser::gdp, id == "US")
+wide_data <- vintages_wide(df)
+print(wide_data$US)
+}
 \seealso{
 Other helpers: 
 \code{\link{print.tbl_release}()},

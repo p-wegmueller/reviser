@@ -17,6 +17,11 @@ The function returns a summary tibble invisibly.
 \description{
 Summary Method for Publication Date Vintages
 }
+\examples{
+df <- dplyr::filter(reviser::gdp, id == "US")
+wide_data <- vintages_wide(df)
+summary(wide_data$US)
+}
 \seealso{
 Other helpers: 
 \code{\link{print.tbl_pubdate}()},

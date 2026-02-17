@@ -17,6 +17,16 @@ The function returns a summary tibble invisibly.
 \description{
 Summary Method for Release Vintages
 }
+\examples{
+df <- dplyr::filter(reviser::gdp, id == "US")
+# Long format
+release_data <- get_nth_release(df, n = 0:3)
+summary(release_data)
+
+# Wide format
+wide_release <- vintages_wide(release_data, names_from = "release")
+summary(wide_release$US)
+}
 \seealso{
 Other helpers: 
 \code{\link{print.tbl_pubdate}()},

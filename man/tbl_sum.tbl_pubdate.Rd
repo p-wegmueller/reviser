@@ -20,6 +20,11 @@ the tibble header.
 Provides a custom header for objects of class \code{tbl_pubdate} when printed.
 This method is called automatically by pillar when printing tibbles.
 }
+\examples{
+df <- dplyr::filter(reviser::gdp, id == "US")
+wide_data <- vintages_wide(df)
+pillar::tbl_sum(wide_data$US)
+}
 \seealso{
 Other helpers: 
 \code{\link{print.tbl_pubdate}()},

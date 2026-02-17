@@ -706,6 +706,10 @@ make_explicit_missing <- function(
 #' @return A named character vector where names are labels and values are 
 #'   the corresponding information. The vector is used by pillar to format
 #'   the tibble header.
+#' @examples
+#' df <- dplyr::filter(reviser::gdp, id == "US")
+#' wide_data <- vintages_wide(df)
+#' pillar::tbl_sum(wide_data$US)
 #' @family helpers
 #' @export
 tbl_sum.tbl_pubdate <- function(x, ...) {
@@ -744,10 +748,13 @@ tbl_sum.tbl_pubdate <- function(x, ...) {
 #'
 #' @return The input \code{x} is returned invisibly.
 #' @method print tbl_pubdate
+#' @examples
+#' df <- dplyr::filter(reviser::gdp, id == "US")
+#' wide_data <- vintages_wide(df)
+#' print(wide_data$US)
 #' @family helpers
 #' @export
 print.tbl_pubdate <- function(x, ...) {
-  # Delegate to tibble's print method, which will call tbl_sum.tbl_pubdate
   NextMethod("print")
   invisible(x)
 }
@@ -761,6 +768,10 @@ print.tbl_pubdate <- function(x, ...) {
 #'
 #' @return A named character vector where names are labels and values are 
 #'   the corresponding information.
+#' @examples
+#' df <- dplyr::filter(reviser::gdp, id == "US")
+#' release_data <- get_nth_release(df, n = 0:3)
+#' pillar::tbl_sum(release_data)
 #' @family helpers
 #' @export
 tbl_sum.tbl_release <- function(x, ...) {
@@ -796,6 +807,10 @@ tbl_sum.tbl_release <- function(x, ...) {
 #'
 #' @return The input \code{x} is returned invisibly.
 #' @method print tbl_release
+#' @examples
+#' df <- dplyr::filter(reviser::gdp, id == "US")
+#' release_data <- get_nth_release(df, n = 0:3)
+#' print(release_data)
 #' @family helpers
 #' @export
 print.tbl_release <- function(x, ...) {
@@ -810,6 +825,10 @@ print.tbl_release <- function(x, ...) {
 #'
 #' @return The function returns a summary tibble invisibly.
 #' @method summary tbl_pubdate
+#' @examples
+#' df <- dplyr::filter(reviser::gdp, id == "US")
+#' wide_data <- vintages_wide(df)
+#' summary(wide_data$US)
 #' @family helpers
 #' @export
 summary.tbl_pubdate <- function(object, ...) {
@@ -863,6 +882,15 @@ summary.tbl_pubdate <- function(object, ...) {
 #'
 #' @return The function returns a summary tibble invisibly.
 #' @method summary tbl_release
+#' @examples
+#' df <- dplyr::filter(reviser::gdp, id == "US")
+#' # Long format
+#' release_data <- get_nth_release(df, n = 0:3)
+#' summary(release_data)
+#'
+#' # Wide format
+#' wide_release <- vintages_wide(release_data, names_from = "release")
+#' summary(wide_release$US)
 #' @family helpers
 #' @export
 summary.tbl_release <- function(object, ...) {
