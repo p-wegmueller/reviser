@@ -17,6 +17,11 @@ A ggplot2 object.
 \description{
 Plot Method for Release Vintages
 }
+\examples{
+df <- dplyr::filter(reviser::gdp, id == "US")
+df <- get_nth_release(df, n = 0:5)
+plot(df)
+}
 \seealso{
 Other revision graphs: 
 \code{\link{plot.tbl_pubdate}()},
