@@ -183,7 +183,7 @@ This measures whether revisions are systematically related to the
 initial release $y_{t}^{h}$, which serves as a proxy for available
 information at the time of release:
 
-$$\rho = \frac{\sum\left( y_{t}^{h} - {\bar{y}}^{h} \right)\left( Rr_{t}^{f} - \bar{r} \right)}{\sqrt{\sum\left( y_{t}^{h} - {\bar{y}}^{h} \right)^{2}}\sqrt{\sum\left( r_{t}^{f} - \bar{r} \right)^{2}}}$$
+$$\rho = \frac{\sum\left( y_{t}^{h} - {\bar{y}}^{h} \right)\left( r_{t}^{f} - \bar{r} \right)}{\sqrt{\sum\left( y_{t}^{h} - {\bar{y}}^{h} \right)^{2}}\sqrt{\sum\left( r_{t}^{f} - \bar{r} \right)^{2}}}$$
 
 A significant correlation suggests that initial estimates contain
 information that predicts later revisions. A **t-test**
