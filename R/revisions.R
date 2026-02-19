@@ -512,12 +512,14 @@ get_first_efficient_release <- function(
       formula <- stats::as.formula(paste0("final ~ ", es[i]))
 
       model <- stats::lm(formula, data = df_wide)
-      hac_se <- sandwich::vcovHAC(model)
+      
+      # Conditionally set vcov argument
+      vcov <- if (robust) sandwich::vcovHAC(model) else NULL
 
       test <- car::linearHypothesis(
         model,
         c("(Intercept) = 0", paste0(es[i], " = 1")),
-        vcov = hac_se
+        vcov = vcov
       )
 
       p_value <- test[2, "Pr(>F)"]

@@ -204,6 +204,8 @@ plot_vintages <- function(
   }
 
   p <- ggplot2::ggplot()
+  needs_color_scale <- FALSE
+  needs_fill_scale <- FALSE
 
   if (n == 1L) {
     if (type == "line") {
@@ -211,25 +213,22 @@ plot_vintages <- function(
         ggplot2::geom_line(
           ggplot2::aes(x = !!time_col, y = .data$value),
           data = df
-        ) +
-        scale_color_reviser()
+        )
     } else if (type == "point") {
       p <- p +
         ggplot2::geom_point(
           ggplot2::aes(x = !!time_col, y = .data$value),
           data = df
-        ) +
-        scale_color_reviser()
+        )
     } else if (type == "bar") {
+      needs_fill_scale <- TRUE
       p <- p +
         ggplot2::geom_bar(
           ggplot2::aes(x = !!time_col, y = .data$value),
           data = df,
           position = "identity",
           stat = "identity"
-        ) +
-        scale_color_reviser() +
-        scale_fill_reviser()
+        )
     } else if (type == "boxplot") {
       rlang::abort(
         "'type' boxplot not supported if 'dim_col' contains one unique value."
@@ -239,20 +238,22 @@ plot_vintages <- function(
     }
   } else {
     if (type == "line") {
+      needs_color_scale <- TRUE
       p <- p +
         ggplot2::geom_line(
           ggplot2::aes(x = !!time_col, y = .data$value, color = !!dim_col),
           data = df
-        ) +
-        scale_color_reviser()
+        )
     } else if (type == "point") {
+      needs_color_scale <- TRUE
       p <- p +
         ggplot2::geom_point(
           ggplot2::aes(x = !!time_col, y = .data$value, color = !!dim_col),
           data = df
-        ) +
-        scale_color_reviser()
+        )
     } else if (type == "bar") {
+      needs_color_scale <- TRUE
+      needs_fill_scale <- TRUE
       p <- p +
         ggplot2::geom_bar(
           ggplot2::aes(
@@ -264,9 +265,7 @@ plot_vintages <- function(
           position = "identity",
           stat = "identity",
           data = df
-        ) +
-        scale_color_reviser() +
-        scale_fill_reviser()
+        )
     } else if (type == "boxplot") {
       p <- p +
         ggplot2::geom_boxplot(
@@ -277,11 +276,18 @@ plot_vintages <- function(
           ),
           data = df
         ) +
-        scale_fill_reviser() +
         theme_reviser(legend.position = "none")
     } else {
       rlang::abort("Invalid 'type' argument. Must be either 'line' or 'point'.")
     }
+  }
+
+  if (needs_color_scale) {
+    p <- p + scale_color_reviser()
+  }
+
+  if (needs_fill_scale) {
+    p <- p + scale_fill_reviser()
   }
 
   # labels and title

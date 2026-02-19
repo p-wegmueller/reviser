@@ -400,8 +400,8 @@ vintages_check <- function(df, time_col = "time") {
       }
     )
 
-    # Check for required "time" column
-    if (!"time" %in% colnames(df)) {
+    # Check for required time column
+    if (!time_col %in% colnames(df)) {
       rlang::abort(
         paste0(prefix, "The 'time' column is missing in the data.frame.")
       )
@@ -631,7 +631,7 @@ check_implicit_missing <- function(data, time_col, freq = "auto") {
     days_interval <- as.numeric(gsub(" days", "", freq))
     complete_seq <- seq(from = min_date, to = max_date, by = days_interval)
   } else {
-    stop(
+    rlang::abort(
       "Unsupported frequency. Use 'day', 'week', 'month', 
          'quarter', 'year', or 'X days'"
     )

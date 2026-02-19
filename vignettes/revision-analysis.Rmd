@@ -120,7 +120,7 @@ Understanding how revisions relate to initial releases and past revisions can re
    This measures whether revisions are systematically related to the initial release \( y_t^h \), which serves as a proxy for available information at the time of release:
 
    \[
-   \rho = \frac{\sum (y_t^h - \bar{y}^h) (Rr_t^f - \bar{r})}{\sqrt{\sum (y_t^h - \bar{y}^h)^2}  \sqrt{\sum (r_t^f - \bar{r})^2}}
+   \rho = \frac{\sum (y_t^h - \bar{y}^h) (r_t^f - \bar{r})}{\sqrt{\sum (y_t^h - \bar{y}^h)^2}  \sqrt{\sum (r_t^f - \bar{r})^2}}
    \]
 
    A significant correlation suggests that initial estimates contain information that predicts later revisions. A **t-test** (`"Correlation (p-value)"`) is used to test whether \( \rho \) is significantly different from zero.
