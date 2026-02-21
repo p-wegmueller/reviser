@@ -26,7 +26,7 @@ vintage estimate for the same time period. Rows are time periods.}
 \item{e}{An integer indicating the number of data vintages to include in the
 model. Must be greater than 0.}
 
-\item{ar_order}{Integer specifying AR order for true values (default = 2).}
+\item{ar_order}{Integer specifying AR order for true values (default = 1).}
 
 \item{h}{Integer specifying the forecast horizon (default = 0).}
 
@@ -57,7 +57,7 @@ Maximum likelihood ("MLE") for now.}
 \item startvals: Named vector of starting values (optional)
 \item transform_se: T/F whether standard errors should be constrained to be
 positive in optimization.
-.  - method: String specifying optimization method (default = "L-BFGS-B").
+\item method: String specifying optimization method (default = "L-BFGS-B").
 \item se_method: Method for standard error calculation (default = "hessian")
 \item n_starts: Number of random starting points for multi-start optimization
 }}

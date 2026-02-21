@@ -19,7 +19,7 @@ include the columns:
 \item Positive integer or vector (e.g., 0 for first release, 1 for  second, etc.)
 \item \code{"first"} to extract the first release.
 \item \code{"latest"} to extract the most recent release.
-Default is 1 (the first release).
+Default is 0 (the first release).
 }}
 
 \item{diagonal}{Logical. If \code{TRUE}, the function only returns real

@@ -2252,7 +2252,7 @@ friedman_test <- function(series, frequency = 12) {
 #' - Positive integer or vector (e.g., 0 for first release, 1 for  second, etc.)
 #' - `"first"` to extract the first release.
 #' - `"latest"` to extract the most recent release.
-#' Default is 1 (the first release).
+#' Default is 0 (the first release).
 #' @param diagonal Logical. If `TRUE`, the function only returns real
 #' first releases.
 #'
@@ -2338,22 +2338,21 @@ get_nth_release <- function(df, n = 0, diagonal = FALSE) {
       nth_release <- get_first_release(df)
     }
     if (diagonal) {
-      min_pub_date <- df %>%
-        dplyr::group_by("id") %>%
-        dplyr::summarize(min_pub_date = min(.data$pub_date)) %>%
-        dplyr::pull("min_pub_date", "id") %>%
-        as.Date()
-
-      max_time <- df %>%
-        dplyr::filter(.data$pub_date == min_pub_date) %>%
+      diagonal_thresholds <- df %>%
         dplyr::group_by(.data$id) %>%
-        dplyr::summarize(max_time = max(.data$time)) %>%
-        dplyr::pull("max_time", "id") %>%
-        as.Date()
+        dplyr::summarise(min_pub_date = min(.data$pub_date), .groups = "drop") %>%
+        dplyr::left_join(
+          df %>%
+            dplyr::group_by(.data$id, .data$pub_date) %>%
+            dplyr::summarise(max_time = max(.data$time), .groups = "drop"),
+          by = c("id", "min_pub_date" = "pub_date")
+        ) %>%
+        dplyr::select(.data$id, .data$max_time)
 
-      # Filter using direct vectorized lookup
-      df <- df %>%
-        dplyr::filter(.data$time >= max_time[.data$id])
+      nth_release <- nth_release %>%
+        dplyr::left_join(diagonal_thresholds, by = "id") %>%
+        dplyr::filter(.data$time >= .data$max_time) %>%
+        dplyr::select(-"max_time")
     }
   } else {
     # Ensure data is sorted by pub_date and time
@@ -2380,7 +2379,7 @@ get_nth_release <- function(df, n = 0, diagonal = FALSE) {
     if (diagonal) {
       min_pub_date <- min(df$pub_date)
       max_time <- max(df$time[df$pub_date == min_pub_date])
-      df <- df %>%
+      nth_release <- nth_release %>%
         dplyr::filter(
           .data$time >= max_time
         )
@@ -2508,7 +2507,7 @@ get_latest_release <- function(df) {
       dplyr::arrange(.data$id, .data$pub_date, .data$time)
     df <- df %>%
       dplyr::group_by(.data$id, .data$time) %>%
-      dplyr::mutate("release" = paste0("release_", dplyr::n())) %>%
+      dplyr::mutate("release" = paste0("release_", dplyr::n() - 1)) %>%
       dplyr::filter(.data$pub_date == max(.data$pub_date)) %>%
       dplyr::ungroup()
   } else {
@@ -2517,7 +2516,7 @@ get_latest_release <- function(df) {
       dplyr::arrange(.data$pub_date, .data$time)
     df <- df %>%
       dplyr::group_by(.data$time) %>%
-      dplyr::mutate("release" = paste0("release_", dplyr::n())) %>%
+      dplyr::mutate("release" = paste0("release_", dplyr::n() - 1)) %>%
       dplyr::filter(.data$pub_date == max(.data$pub_date)) %>%
       dplyr::ungroup()
   }
@@ -2538,10 +2537,12 @@ get_latest_release <- function(df) {
 #' time` (observation date).
 #' @param month An optional parameter specifying the target month as a name
 #' ("July") or an integer (7). Cannot be used with `quarter`.
+#' At least one of `month` or `quarter` must be supplied.
 #' @param quarter An optional parameter specifying the target quarter (1-4).
-#' Cannot be used with `month`.
-#' @param years The integer number of unrestricted years after `pub_date` for
-#' which the values should be extracted.
+#' Cannot be used with `month`. At least one of `month` or `quarter` must be
+#' supplied.
+#' @param years A single whole number of years after `pub_date` for which the
+#' values should be extracted.
 #'
 #' @return A filtered data frame containing values matching the
 #' specified criteria.
@@ -2559,26 +2560,45 @@ get_fixed_release <- function(df, years, month = NULL, quarter = NULL) {
     rlang::abort("Specify either a month or a quarter, not both.")
   }
 
-  # Ensure years is numeric and integer or can be converted to integer
-  if (is.numeric(years)) {
-    if (years %% 1 != 0) {
-      rlang::abort("years' must be  a whole number.")
-    }
-    years <- as.integer(years)
+  # Ensure one target period is specified
+  if (is.null(month) && is.null(quarter)) {
+    rlang::abort("Specify one of 'month' or 'quarter'.")
   }
+
+  # Ensure years is a single whole number
+  if (!is.numeric(years) || length(years) != 1 || is.na(years) || years %% 1 != 0) {
+    rlang::abort("'years' must be a single whole number.")
+  }
+  years <- as.integer(years)
 
   # Ensure the month is in numeric format if provided
   if (!is.null(month)) {
     if (is.character(month)) {
+      if (length(month) != 1) {
+        rlang::abort("Invalid 'month'. Must be a single month name or integer.")
+      }
       month <- match(tolower(month), tolower(month.name))
       if (is.na(month)) rlang::abort("Invalid 'month' name")
+    } else if (
+      !is.numeric(month) || length(month) != 1 || is.na(month) ||
+        month %% 1 != 0 || month < 1 || month > 12
+    ) {
+      rlang::abort(
+        "Invalid 'month'. Must be an integer between 1 and 12 or a month name."
+      )
     }
+    month <- as.integer(month)
   }
+
   # Ensure quarter is in numeric format if provided
   if (!is.null(quarter)) {
-    if (!quarter %in% 1:4) {
+    if (
+      !is.numeric(quarter) || length(quarter) != 1 || is.na(quarter) ||
+        quarter %% 1 != 0 || !quarter %in% 1:4
+    ) {
       rlang::abort("Invalid quarter number. Must be between 1 and 4.")
     }
+    quarter <- as.integer(quarter)
   }
 
   check <- vintages_check(df)

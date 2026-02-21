@@ -520,9 +520,12 @@ test_that("kk_matrices validates params length", {
 })
 
 test_that("kk_matrices validates params are named", {
-  # Skip - the function tries to access params by name before validating they are named
-  # This is a design issue in kk_matrices that causes subscript out of bounds error
-  skip("kk_matrices accesses params before validating names")
+  params <- rep(0.2, 5) # Correct length for e = 1 KK model, but unnamed
+
+  expect_error(
+    kk_matrices(e = 1, model = "KK", params = params, type = "numeric"),
+    "All parameters must be named"
+  )
 })
 
 test_that("kk_matrices handles Howrey model correctly", {

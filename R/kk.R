@@ -146,10 +146,10 @@ kk_nowcast <- function(
   if (
     length(setdiff(names(solver_options), names(default_solver_options))) > 0
   ) {
-    rlang::abort(
+    rlang::abort(paste0(
       "Invalid solver options provided. Valid options are: ",
       paste(names(default_solver_options), collapse = ", ")
-    )
+    ))
   }
 
   # Update default options with user-provided options
@@ -1454,8 +1454,11 @@ kk_matrices <- function(e, model, params = NULL, type = "numeric") {
   }
 
   # Check params are named
-  if (!is.null(params) && !all(!is.na(names(params)))) {
-    rlang::abort("All parameters must be named!")
+  if (!is.null(params)) {
+    param_names <- names(params)
+    if (is.null(param_names) || anyNA(param_names) || any(param_names == "")) {
+      rlang::abort("All parameters must be named!")
+    }
   }
 
   # Check params input

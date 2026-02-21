@@ -7,7 +7,7 @@
 #'   vintage estimate for the same time period. Rows are time periods.
 #' @param e An integer indicating the number of data vintages to include in the
 #'  model. Must be greater than 0.
-#' @param ar_order Integer specifying AR order for true values (default = 2).
+#' @param ar_order Integer specifying AR order for true values (default = 1).
 #' @param h Integer specifying the forecast horizon (default = 0).
 #' @param include_news Logical, whether to include news component in
 #'   measurement error (default = TRUE).
@@ -28,7 +28,7 @@
 #'   - startvals: Named vector of starting values (optional)
 #'   - transform_se: T/F whether standard errors should be constrained to be
 #'     positive in optimization.
-#' .  - method: String specifying optimization method (default = "L-BFGS-B").
+#'   - method: String specifying optimization method (default = "L-BFGS-B").
 #'   - se_method: Method for standard error calculation (default = "hessian")
 #'   - n_starts: Number of random starting points for multi-start optimization
 #'
@@ -153,10 +153,10 @@ jvn_nowcast <- function(
   if (
     length(setdiff(names(solver_options), names(default_solver_options))) > 0
   ) {
-    rlang::abort(
+    rlang::abort(paste0(
       "Invalid solver options provided. Valid options are: ",
       paste(names(default_solver_options), collapse = ", ")
-    )
+    ))
   }
 
   # Update default options with user-provided options

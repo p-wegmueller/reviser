@@ -320,6 +320,56 @@ test_that("get_nth_release case insensitivity", {
   expect_equal(nrow(result1), nrow(result2))
 })
 
+test_that("get_nth_release diagonal filters historical rows", {
+  df_diag <- tibble::tibble(
+    time = as.Date(c(
+      "2020-01-01", "2020-02-01", "2020-01-01", "2020-02-01", "2020-03-01"
+    )),
+    pub_date = as.Date(c(
+      "2020-02-01", "2020-02-01", "2020-03-01", "2020-03-01", "2020-03-01"
+    )),
+    value = c(1, 2, 1.1, 2.1, 3.1)
+  )
+
+  result_all <- get_nth_release(df_diag, n = 0, diagonal = FALSE)
+  result_diag <- get_nth_release(df_diag, n = 0, diagonal = TRUE)
+
+  expect_lt(nrow(result_diag), nrow(result_all))
+  expect_true(all(result_diag$time >= as.Date("2020-02-01")))
+})
+
+test_that("get_nth_release diagonal works for multiple IDs", {
+  df_a <- tibble::tibble(
+    id = "A",
+    time = as.Date(c(
+      "2020-01-01", "2020-02-01", "2020-01-01", "2020-02-01", "2020-03-01"
+    )),
+    pub_date = as.Date(c(
+      "2020-02-01", "2020-02-01", "2020-03-01", "2020-03-01", "2020-03-01"
+    )),
+    value = c(1, 2, 1.1, 2.1, 3.1)
+  )
+  df_b <- tibble::tibble(
+    id = "B",
+    time = as.Date(c(
+      "2020-01-01", "2020-01-01", "2020-02-01", "2020-03-01"
+    )),
+    pub_date = as.Date(c(
+      "2020-02-01", "2020-03-01", "2020-03-01", "2020-03-01"
+    )),
+    value = c(5, 5.1, 6.1, 7.1)
+  )
+  df_multi <- dplyr::bind_rows(df_a, df_b)
+
+  result <- get_nth_release(df_multi, n = "first", diagonal = TRUE)
+  counts <- result %>%
+    dplyr::count(id) %>%
+    dplyr::arrange(id)
+
+  expect_equal(counts$n[counts$id == "A"], 2)
+  expect_equal(counts$n[counts$id == "B"], 3)
+})
+
 # ===== Tests for get_first_release =====
 
 test_that("get_first_release returns first release", {
@@ -336,6 +386,7 @@ test_that("get_latest_release returns latest release", {
   
   expect_true(inherits(result, "tbl_pubdate") || inherits(result, "tbl_release"))
   expect_true("release" %in% colnames(result))
+  expect_true(all(result$release == "release_4"))
 })
 
 # ===== Tests for get_fixed_release =====
@@ -362,6 +413,13 @@ test_that("get_fixed_release validates exclusive parameters", {
   expect_error(
     get_fixed_release(df_long_rev, month = 7, quarter = 3, years = 1),
     "Specify either a month or a quarter"
+  )
+})
+
+test_that("get_fixed_release requires month or quarter", {
+  expect_error(
+    get_fixed_release(df_long_rev, years = 1),
+    "Specify one of 'month' or 'quarter'"
   )
 })
 

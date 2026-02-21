@@ -9,14 +9,16 @@ get_fixed_release(df, years, month = NULL, quarter = NULL)
 \arguments{
 \item{df}{A data frame containing columns \code{pub_date} (publication date) and \code{ time} (observation date).}
 
-\item{years}{The integer number of unrestricted years after \code{pub_date} for
-which the values should be extracted.}
+\item{years}{A single whole number of years after \code{pub_date} for which the
+values should be extracted.}
 
 \item{month}{An optional parameter specifying the target month as a name
-("July") or an integer (7). Cannot be used with \code{quarter}.}
+("July") or an integer (7). Cannot be used with \code{quarter}.
+At least one of \code{month} or \code{quarter} must be supplied.}
 
 \item{quarter}{An optional parameter specifying the target quarter (1-4).
-Cannot be used with \code{month}.}
+Cannot be used with \code{month}. At least one of \code{month} or \code{quarter} must be
+supplied.}
 }
 \value{
 A filtered data frame containing values matching the
