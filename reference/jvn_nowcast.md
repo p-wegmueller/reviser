@@ -37,7 +37,7 @@ jvn_nowcast(
 
 - ar_order:
 
-  Integer specifying AR order for true values (default = 2).
+  Integer specifying AR order for true values (default = 1).
 
 - h:
 
@@ -85,8 +85,10 @@ jvn_nowcast(
   - startvals: Named vector of starting values (optional)
 
   - transform_se: T/F whether standard errors should be constrained to
-    be positive in optimization. . - method: String specifying
-    optimization method (default = "L-BFGS-B").
+    be positive in optimization.
+
+  - method: String specifying optimization method (default =
+    "L-BFGS-B").
 
   - se_method: Method for standard error calculation (default =
     "hessian")

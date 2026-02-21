@@ -20,18 +20,20 @@ get_fixed_release(df, years, month = NULL, quarter = NULL)
 
 - years:
 
-  The integer number of unrestricted years after `pub_date` for which
-  the values should be extracted.
+  A single whole number of years after `pub_date` for which the values
+  should be extracted.
 
 - month:
 
   An optional parameter specifying the target month as a name ("July")
-  or an integer (7). Cannot be used with `quarter`.
+  or an integer (7). Cannot be used with `quarter`. At least one of
+  `month` or `quarter` must be supplied.
 
 - quarter:
 
   An optional parameter specifying the target quarter (1-4). Cannot be
-  used with `month`.
+  used with `month`. At least one of `month` or `quarter` must be
+  supplied.
 
 ## Value
 

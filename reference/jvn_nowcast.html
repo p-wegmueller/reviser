@@ -89,7 +89,7 @@ model. Must be greater than 0.</p></dd>
 
 
 <dt id="arg-ar-order">ar_order<a class="anchor" aria-label="anchor" href="#arg-ar-order"></a></dt>
-<dd><p>Integer specifying AR order for true values (default = 2).</p></dd>
+<dd><p>Integer specifying AR order for true values (default = 1).</p></dd>
 
 
 <dt id="arg-h">h<a class="anchor" aria-label="anchor" href="#arg-h"></a></dt>
@@ -135,8 +135,8 @@ Maximum likelihood ("MLE") for now.</p></dd>
 <li><p>maxiter: Maximum iterations (default = 1000)</p></li>
 <li><p>startvals: Named vector of starting values (optional)</p></li>
 <li><p>transform_se: T/F whether standard errors should be constrained to be
-positive in optimization.
-.  - method: String specifying optimization method (default = "L-BFGS-B").</p></li>
+positive in optimization.</p></li>
+<li><p>method: String specifying optimization method (default = "L-BFGS-B").</p></li>
 <li><p>se_method: Method for standard error calculation (default = "hessian")</p></li>
 <li><p>n_starts: Number of random starting points for multi-start optimization</p></li>
 </ul></dd>

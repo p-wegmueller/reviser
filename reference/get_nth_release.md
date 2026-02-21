@@ -30,7 +30,7 @@ get_nth_release(df, n = 0, diagonal = FALSE)
 
   - `"first"` to extract the first release.
 
-  - `"latest"` to extract the most recent release. Default is 1 (the
+  - `"latest"` to extract the most recent release. Default is 0 (the
     first release).
 
 - diagonal:
