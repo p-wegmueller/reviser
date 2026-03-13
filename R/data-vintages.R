@@ -31,7 +31,7 @@
 #' * JP:
 #'   * Japan
 #'   * Sources: Cabinet Office (Japan), OECD
-#'   
+#'
 #'
 #' @srrstats {G1.0} academic literature
 #'

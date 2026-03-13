@@ -31,7 +31,7 @@ The procedure is based on the assumption that there exists an efficient estimate
 **2. The Observation Equation**
 \[y_t = (I - G) F y_{t-1} + G z_t + \epsilon_t\]
 
-where 
+where
 \[ z'_t = \begin{bmatrix} y_{t-e}^e, y_{t-e +1}^e, ...,  y_t^e \end{bmatrix}' \]
 \[ y'_t = \begin{bmatrix} y_{t-e}^e, y_{t-e +1}^{e-1}, ...,  y_t^0 \end{bmatrix}' \]
 \[ \nu'_t = \begin{bmatrix} 0, 0, ...,  \nu_{0,t} \end{bmatrix}' \]
@@ -53,11 +53,11 @@ G = \begin{bmatrix} 1 & 0 & \dots & 0 \\
 \( G \) is a gain matrix capturing the weight placed on new information, \( F \) determines the AR coefficient, and \( \nu_t \) and \( \epsilon_t \) are error vectors. The state-equation and observation-equation error vectors are assumed to be uncorrelated with one another at all leads and lags, and to be serially uncorrelated.
 
 Because \( \nu_t \) and \( \epsilon_t \) are serially uncorrelated, and uncorrelated with one another at all leads and lags, estimation of the model equations is unproblematic apart from the crossequation restrictions on \( F \).
-Therefore, it is recommended to estimate this system using seemingly unrelated regression (SUR). The SUR estimation is based on the [systemfit::nlsystemfit()] function. The parameter space of the KK model increases exponentially with the number of the efficient release. This leads to long computation times and potential convergence issues. As a fast, but potentially biased alternative, the package also allows to estimate the models parameters equation by equation using ordinary least squares (OLS). 
+Therefore, it is recommended to estimate this system using seemingly unrelated regression (SUR). The SUR estimation is based on the [systemfit::nlsystemfit()] function. The parameter space of the KK model increases exponentially with the number of the efficient release. This leads to long computation times and potential convergence issues. As a fast, but potentially biased alternative, the package also allows to estimate the models parameters equation by equation using ordinary least squares (OLS).
 
 
 ### Howrey and Classical Measurement Error Model
-It is easy to see that the KK model nests the classical measurement error model and the @howreyUsePreliminaryData1978 model. 
+It is easy to see that the KK model nests the classical measurement error model and the @howreyUsePreliminaryData1978 model.
 measurement error model treats published data ($y_t$) as a noisy measure of the true economic variable ($z_t$), where $y_t = z_t + \eta_t$. It addresses uncertainty in interpreting recent data by optimally updating forecasts, considering both potential economic shocks and measurement errors. This model is obtained by setting \( G = I \).
 
 As an extension to the classical measurement error mode, @howreyUsePreliminaryData1978 proposed a model that allows the revisions to be autocorrelated. Setting the entries $G_{e-i,0} = 0$ for $i = 1,...,e-1$ and $G_{0,0} = 1$ results in the Howrey model.
@@ -83,8 +83,8 @@ where
 \[ R = I \]
 \[ \eta_t = \begin{bmatrix} \nu_t \\ \epsilon_t - (I-G) \nu_t \end{bmatrix} \]
 \[ \eta_t \sim N(0, Q) \]
- 
-The analyst sees truth and the revisions. Both truth and revisions are included in the state vector. Importantly, when calculating the gain matrix, the model requires that one allow for the possibility that the off-diagonal matrix elements of \( Q \equiv E[\eta_t \eta'_t] \) are nonzero. In particular, our model implies that 
+
+The analyst sees truth and the revisions. Both truth and revisions are included in the state vector. Importantly, when calculating the gain matrix, the model requires that one allow for the possibility that the off-diagonal matrix elements of \( Q \equiv E[\eta_t \eta'_t] \) are nonzero. In particular, our model implies that
  \[ Q = \begin{bmatrix} \nu_t \nu'_t & -\nu_t \nu'_t (I-G)'\\ - (I-G) \nu_t \nu'_t & \varepsilon_t \varepsilon'_t + (I-G) \nu_t \nu'_t (I-G)' \end{bmatrix} \]
 
 
@@ -129,7 +129,7 @@ summary(efficient_release)
 ```
 
 
-We then use the `kk_nowcast()` function to nowcast the Euro Area GDP using the KK model. The function requires a `df` with columns `time`, `value`, `release#` and `final`. The function `get_first_efficient_release()` returns a dataset in this format. 
+We then use the `kk_nowcast()` function to nowcast the Euro Area GDP using the KK model. The function requires a `df` with columns `time`, `value`, `release#` and `final`. The function `get_first_efficient_release()` returns a dataset in this format.
 
 
 ```{r warning = FALSE, message=FALSE}

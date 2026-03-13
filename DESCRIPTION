@@ -5,7 +5,7 @@ Version: 0.1.0.9000
 Authors@R: c(
     person(given = "Marc", family = "Burri", email = "marc.burri91@gmail.com", role = c("aut", "cre", "cph"),
            comment = c(ORCID = "0000-0001-8974-9090")),
-    person(given = "Philipp", family = "Wegmueller", 
+    person(given = "Philipp", family = "Wegmueller",
         email = "philipp.wemueller@seco.admin.ch", role = c("aut", "cph"))
   )
 Description: Provides tools to analyze revision properties in real-time time series data.
@@ -14,7 +14,7 @@ Maintainer: Marc Burri <marc.burri91@gmail.com>
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-Depends: 
+Depends:
     R (>= 2.10)
 RoxygenNote: 7.3.3
 Roxygen: list (markdown = TRUE, roclets = c ("namespace", "rd", "srr::srr_stats_roclet"))
@@ -34,7 +34,7 @@ Imports:
     lubridate,
     KFAS,
     numDeriv
-Suggests: 
+Suggests:
     tsbox,
     testthat (>= 3.0.0),
     knitr,

@@ -17,7 +17,8 @@ the corresponding information. The vector is used by pillar to format
 the tibble header.
 }
 \description{
-Provides a custom header for objects of class \code{tbl_pubdate} when printed.
+Provides a custom header for objects of class \code{tbl_pubdate} when
+printed.
 This method is called automatically by pillar when printing tibbles.
 }
 \examples{

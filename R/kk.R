@@ -101,7 +101,8 @@
 #' @srrstats {TS4.6} Time Series Software which implements or otherwise
 #' enables forecasting should return either:
 #' @srrstats {TS4.6b} filtered/forecasted point estimates
-#' @srrstats {TS4.6c} Error indication for forecast estimates (confidence intervals)
+#' @srrstats {TS4.6c} Error indication for forecast estimates (confidence
+#'   intervals)
 #' @srrstats {TS4.7c} Distinguishes model vs forecast values (sample column)
 #' @srrstats {TS4.7} forecast values and models separately returned
 #' @srrstats {TS4.7a} only forecast values returned
@@ -160,6 +161,11 @@ kk_nowcast <- function(
   }
 
   # Check input e
+  if (!is.numeric(e) || length(e) != 1 || is.na(e) || e %% 1 != 0) {
+    rlang::abort("'e' must be a single whole number greater than 0.")
+  }
+  e <- as.integer(e)
+
   if (e == 0) {
     rlang::abort("The initial release is already efficient, 'e' is equal to 0!")
   }
@@ -267,6 +273,19 @@ kk_nowcast <- function(
     df <- suppressWarnings(vintages_wide(df, names_from = "release"))
     # Handle if vintages_wide returns a list
     if (is.list(df) && !is.data.frame(df)) df <- df[[1]]
+  }
+
+  required_release_cols <- paste0("release_", 0:e)
+  missing_release_cols <- setdiff(required_release_cols, colnames(df))
+  if (length(missing_release_cols) > 0) {
+    rlang::abort(paste0(
+      "'df' must contain release columns ",
+      paste(required_release_cols, collapse = ", "),
+      " for e = ",
+      e,
+      ". Missing: ",
+      paste(missing_release_cols, collapse = ", ")
+    ))
   }
 
   # Define state and observable variable names
@@ -873,7 +892,7 @@ kk_nowcast <- function(
     frequency <- unique((round(as.numeric(diff(df$time)) / 30)))
     if (length(frequency) > 1) {
       rlang::abort(
-        "The time series seems not to be regular, 
+        "The time series seems not to be regular,
         please provide a regular time series!"
       )
     }

@@ -25,7 +25,7 @@ Data revisions can be classified into two main types: ongoing revisions, which i
 
 - **Unbiasedness**: Revisions should not systematically push estimates in one direction. Mathematically, for a revision series \( r_t^f = y_t^f - y_t^h \) where \( h \) denotes the release number \( y_t^f \) represents the final release and \( y_t^h \) represents the series released at time \( h \) (\( h=0 \) is the initial release), unbiasedness requires:
   \[
-  E[r_t^f] = 0 
+  E[r_t^f] = 0
   \]
 
 - **Efficiency**: An efficient release incorporates all available information optimally, ensuring that subsequent revisions are unpredictable. This can be tested using the Mincer-Zarnowitz regression:
@@ -44,7 +44,7 @@ A fundamental assumption in many revision models is that the first release of a 
 \[
 y_t^h = y_t^* + \varepsilon_t^h,
 \]
-where \( y_t^* \) is the true value and \( \varepsilon_t^h \) is an error term that diminishes as \( h \) increases. The properties of \( r_t^h \) determine whether the preliminary release \( h \) is an efficient estimator of \( y_t^* \). If \( r_t^h \) is predictable, the revision process is inefficient, indicating room for improvement in the initial estimates. Vice-versa if \( r_t^h \) is unpredictable, the preliminary release is efficient (i.e \(y_t^h = y_t^e\)). 
+where \( y_t^* \) is the true value and \( \varepsilon_t^h \) is an error term that diminishes as \( h \) increases. The properties of \( r_t^h \) determine whether the preliminary release \( h \) is an efficient estimator of \( y_t^* \). If \( r_t^h \) is predictable, the revision process is inefficient, indicating room for improvement in the initial estimates. Vice-versa if \( r_t^h \) is unpredictable, the preliminary release is efficient (i.e \(y_t^h = y_t^e\)).
 
 
 ### The Challenge of Defining a Final Release
@@ -60,9 +60,9 @@ An iterative approach is proposed to determine the optimal number of revisions, 
    y_t^f = \alpha + \beta y_t^h + \varepsilon_t
    \]
    where the null hypothesis is that \( \alpha = 0 \) and \( \beta = 1 \), indicating that \( y_t^h \) is an efficient estimate of \( y_t^f \).
-   
+
 2. **Determine the Optimal \( e \)**: Increase \( h \) iteratively and test whether the efficiency conditions hold. The smallest \( e \) for which the hypothesis is not rejected is considered the final efficient release.
-   
+
 
 
 ### Importance of an Efficient Release
@@ -80,7 +80,7 @@ An optimal revision process is one that leads to unbiased, efficient, and minima
 
 ### Example: Identifying an Efficient Release in GDP Data with `reviser`
 
-In the following example, we use the `reviser` package to identify the efficient release in quarterly GDP data for Switzerland, the Euro Area, Japan, and the United States. We test the first 20 data releases, and we aim to determine the point at which further revisions become negligible. As the final release, we use the same release for all countries, namely the data released 5 years after the first release. The tests shows that the first efficient release occurs at different points for each country, ranging from the 1st (Japan, US) to the 13th (Switzerland) release. 
+In the following example, we use the `reviser` package to identify the efficient release in quarterly GDP data for Switzerland, the Euro Area, Japan, and the United States. We test the first 20 data releases, and we aim to determine the point at which further revisions become negligible. As the final release, we use the same release for all countries, namely the data released 5 years after the first release. The tests shows that the first efficient release occurs at different points for each country, ranging from the 1st (Japan, US) to the 13th (Switzerland) release.
 
 
 ```{r setup, warning=FALSE, message=FALSE}
@@ -106,7 +106,7 @@ head(res)
 ```
 
 
-Note: The identification of the first efficient release is related to the news hypothesis testing. Hence, the same conclusion could be reached by using the function `get_revision_analysis()` (setting `degree=3`, providing results for news and noise tests) as shown below. An advantage of using the `get_first_efficient_release()` function is that it organizes the data to be subsequently used in `kk_nowcast()` to improve nowcasts of preliminary releases (See vignette [Nowcasting Revisions](nowcasting-revisions.html) for more details). 
+Note: The identification of the first efficient release is related to the news hypothesis testing. Hence, the same conclusion could be reached by using the function `get_revision_analysis()` (setting `degree=3`, providing results for news and noise tests) as shown below. An advantage of using the `get_first_efficient_release()` function is that it organizes the data to be subsequently used in `kk_nowcast()` to improve nowcasts of preliminary releases (See vignette [Nowcasting Revisions](nowcasting-revisions.html) for more details).
 
 
 ```{r, warning=FALSE, message=FALSE}

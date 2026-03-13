@@ -71,17 +71,16 @@ vintages_long <- function(df, names_to = "pub_date", keep_na = FALSE) {
       check <- vintages_check(df[[id]])
       if (check == "long") {
         rlang::warn("The input data is already in long format.")
-        long_df_tmp <- df[[id]] %>%
-          dplyr::mutate(id = .env$id)
+        long_df_tmp <- df[[id]]
       } else {
         long_df_tmp <- df[[id]] %>%
           tidyr::pivot_longer(
             cols = -"time",
             names_to = names_to,
             values_to = "value"
-          ) %>%
-          dplyr::mutate(id = .env$id)
+          )
       }
+      long_df_tmp$id <- id
 
       if (keep_na) {
         return(long_df_tmp)
@@ -425,7 +424,7 @@ vintages_check <- function(df, time_col = "time") {
     if (!all(!is.na(as.Date(df$time, format = "%Y-%m-%d")))) {
       rlang::abort(paste0(
         prefix,
-        "The 'time' column contains values that 
+        "The 'time' column contains values that
                           are not in the '%Y-%m-%d' format."
       ))
     }
@@ -441,7 +440,7 @@ vintages_check <- function(df, time_col = "time") {
         if (!all(!is.na(as.Date(df$pub_date, format = "%Y-%m-%d")))) {
           rlang::abort(paste0(
             prefix,
-            "The 'pub_date' column contains values 
+            "The 'pub_date' column contains values
                               that are not in '%Y-%m-%d' format."
           ))
         }
@@ -460,7 +459,7 @@ vintages_check <- function(df, time_col = "time") {
       } else {
         rlang::abort(paste0(
           prefix,
-          "One or more column names in the 'wide 
+          "One or more column names in the 'wide
                             format' are not labeled correctly."
         ))
       }
@@ -468,7 +467,7 @@ vintages_check <- function(df, time_col = "time") {
 
     rlang::abort(paste0(
       prefix,
-      "The data.frame does not conform to either 
+      "The data.frame does not conform to either
                         'long format' or 'wide format'."
     ))
   }
@@ -485,7 +484,7 @@ vintages_check <- function(df, time_col = "time") {
     # Check if list has names
     if (is.null(names(df)) || any(names(df) == "")) {
       rlang::abort(
-        "All elements in the list must be named (these names 
+        "All elements in the list must be named (these names
                    serve as IDs)."
       )
     }
@@ -634,7 +633,7 @@ check_implicit_missing <- function(data, time_col, freq = "auto") {
     complete_seq <- seq(from = min_date, to = max_date, by = days_interval)
   } else {
     rlang::abort(
-      "Unsupported frequency. Use 'day', 'week', 'month', 
+      "Unsupported frequency. Use 'day', 'week', 'month',
          'quarter', 'year', or 'X days'"
     )
   }
@@ -683,9 +682,9 @@ make_explicit_missing <- function(
   )
   names(complete_dates) <- time_col
 
-  data_subset <- data %>% 
+  data_subset <- data %>%
     dplyr::select(
-      dplyr::all_of(time_col), 
+      dplyr::all_of(time_col),
       dplyr::everything()
     )
 
@@ -699,13 +698,14 @@ make_explicit_missing <- function(
 
 #' Tibble Summary for Publication Date Vintages
 #'
-#' Provides a custom header for objects of class \code{tbl_pubdate} when printed.
+#' Provides a custom header for objects of class \code{tbl_pubdate} when
+#' printed.
 #' This method is called automatically by pillar when printing tibbles.
 #'
 #' @param x An object of class \code{tbl_pubdate}.
 #' @param ... Additional arguments (unused).
 #'
-#' @return A named character vector where names are labels and values are 
+#' @return A named character vector where names are labels and values are
 #'   the corresponding information. The vector is used by pillar to format
 #'   the tibble header.
 #' @examples
@@ -716,33 +716,34 @@ make_explicit_missing <- function(
 #' @export
 tbl_sum.tbl_pubdate <- function(x, ...) {
   # Count vintages (columns that are not time or id)
-  
+
   is_long <- vintages_check(x) == "long"
-  
+
   # Calculate metadata
   n_time <- if (is_long) length(unique(x$time)) else nrow(x)
   n_vintages  <- if (is_long) length(unique(x$pub_date)) else ncol(x) - 1
-  
-  
+
+
   # Build header lines
   header <- c(
     "Vintages data (publication date format)" = "",
     "Time periods" = nrow(x),
     "Vintages" = n_vintages
   )
-  
+
   # Add ID count if present
   if ("id" %in% names(x)) {
     header <- c(header, "IDs" = length(unique(x$id)))
   }
-  
+
   header
 }
 
 #' Print Method for Publication Date Vintages
 #'
 #' Print method for objects of class \code{tbl_pubdate}. This method delegates
-#' to the tibble print method, which will automatically call \code{tbl_sum.tbl_pubdate}
+#' to the tibble print method, which will automatically call
+#' \code{tbl_sum.tbl_pubdate}
 #' to generate the custom header.
 #'
 #' @param x An object of class \code{tbl_pubdate}.
@@ -763,12 +764,13 @@ print.tbl_pubdate <- function(x, ...) {
 
 #' Tibble Summary for Release Vintages
 #'
-#' Provides a custom header for objects of class \code{tbl_release} when printed.
+#' Provides a custom header for objects of class \code{tbl_release} when
+#' printed.
 #'
 #' @param x An object of class \code{tbl_release}.
 #' @param ... Additional arguments (unused).
 #'
-#' @return A named character vector where names are labels and values are 
+#' @return A named character vector where names are labels and values are
 #'   the corresponding information.
 #' @examples
 #' df <- dplyr::filter(reviser::gdp, id == "US")
@@ -779,11 +781,15 @@ print.tbl_pubdate <- function(x, ...) {
 tbl_sum.tbl_release <- function(x, ...) {
   # Determine data orientation
   is_long <- vintages_check(x) == "long"
-  
+
   # Calculate metadata
   n_time <- if (is_long) length(unique(x$time)) else nrow(x)
-  n_rel  <- if (is_long) length(unique(x$release)) else sum(grepl("release|final", names(x)))
-  
+  n_rel <- if (is_long) {
+    length(unique(x$release))
+  } else {
+    sum(grepl("release|final", names(x)))
+  }
+
   # Build header
   header <- c(
     "Vintages data (release format)" = "",
@@ -791,12 +797,12 @@ tbl_sum.tbl_release <- function(x, ...) {
     "Time periods" = n_time,
     "Releases" = n_rel
   )
-  
+
   # Add ID count if present
   if ("id" %in% names(x)) {
     header <- c(header, "IDs" = length(unique(x$id)))
   }
-  
+
   header
 }
 

@@ -24,7 +24,11 @@ for (t in 2:n_obs) {
 
 # Create release data with systematic revisions
 df_wide_kk <- data.frame(
-  time = seq.Date(from = as.Date("2020-01-01"), by = "month", length.out = n_obs)
+  time = seq.Date(
+    from = as.Date("2020-01-01"),
+    by = "month",
+    length.out = n_obs
+  )
 )
 
 # Add releases with decreasing measurement error
@@ -55,7 +59,7 @@ test_that("kk_nowcast returns correct structure with SUR", {
     method = "SUR",
     solver_options = list(trace = 0)
   )
-  
+
   expect_s3_class(result, "kk_model")
   expect_true("states" %in% names(result))
   expect_true("params" %in% names(result))
@@ -75,7 +79,7 @@ test_that("kk_nowcast returns correct structure with OLS", {
     method = "OLS",
     solver_options = list(trace = 0)
   )
-  
+
   expect_s3_class(result, "kk_model")
   expect_true("params" %in% names(result))
   expect_equal(result$convergence, 0)
@@ -90,7 +94,7 @@ test_that("kk_nowcast returns correct structure with MLE", {
     method = "MLE",
     solver_options = list(trace = 0, maxiter = 100)
   )
-  
+
   expect_s3_class(result, "kk_model")
   expect_true(!is.null(result$loglik))
   expect_true(!is.null(result$aic))
@@ -107,7 +111,7 @@ test_that("kk_nowcast handles long format data", {
     method = "OLS",
     solver_options = list(trace = 0)
   )
-  
+
   expect_s3_class(result, "kk_model")
 })
 
@@ -115,6 +119,11 @@ test_that("kk_nowcast validates e parameter", {
   expect_error(
     kk_nowcast(df = df_small, e = 0, model = "KK"),
     "The initial release is already efficient"
+  )
+
+  expect_error(
+    kk_nowcast(df = df_small, e = 3, model = "KK"),
+    "'df' must contain release columns"
   )
 })
 
@@ -158,7 +167,7 @@ test_that("kk_nowcast handles Kishor-Koenig model", {
     method = "OLS",
     solver_options = list(trace = 0)
   )
-  
+
   expect_s3_class(result, "kk_model")
   expect_true(any(grepl("^G", result$params$Parameter)))
 })
@@ -171,7 +180,7 @@ test_that("kk_nowcast handles KK model (short name)", {
     method = "OLS",
     solver_options = list(trace = 0)
   )
-  
+
   expect_s3_class(result, "kk_model")
 })
 
@@ -183,7 +192,7 @@ test_that("kk_nowcast handles Howrey model", {
     method = "OLS",
     solver_options = list(trace = 0)
   )
-  
+
   expect_s3_class(result, "kk_model")
   # Howrey has e^2 G parameters (fewer than KK)
   n_g_params <- sum(grepl("^G", result$params$Parameter))
@@ -198,7 +207,7 @@ test_that("kk_nowcast handles Classical model", {
     method = "OLS",
     solver_options = list(trace = 0)
   )
-  
+
   expect_s3_class(result, "kk_model")
   # Classical has no G parameters
   n_g_params <- sum(grepl("^G", result$params$Parameter))
@@ -212,14 +221,14 @@ test_that("kk_nowcast handles different e values", {
     method = "OLS",
     solver_options = list(trace = 0)
   )
-  
+
   result_e2 <- kk_nowcast(
     df = df_small,
     e = 2,
     method = "OLS",
     solver_options = list(trace = 0)
   )
-  
+
   # e=2 should have more parameters than e=1
   expect_gt(nrow(result_e2$params), nrow(result_e1$params))
 })
@@ -232,7 +241,7 @@ test_that("kk_nowcast produces forecasts when h > 0", {
     method = "OLS",
     solver_options = list(trace = 0)
   )
-  
+
   oos_data <- result$states[result$states$sample == "out_of_sample", ]
   expect_gt(nrow(oos_data), 0)
   expect_equal(length(unique(oos_data$time)), 3)
@@ -246,24 +255,24 @@ test_that("kk_nowcast handles custom starting values with OLS", {
     method = "OLS",
     solver_options = list(trace = 0)
   )
-  
+
   n_params <- nrow(temp_result$params)
   start_vals <- rep(0.3, n_params)
   names(start_vals) <- temp_result$params$Parameter
-  
+
   result <- kk_nowcast(
     df = df_small,
     e = 1,
     method = "OLS",
     solver_options = list(trace = 0, startvals = start_vals)
   )
-  
+
   expect_s3_class(result, "kk_model")
 })
 
 test_that("kk_nowcast validates startvals length", {
   start_vals <- c(F0 = 0.5, G1_1 = 0.3)  # Wrong length
-  
+
   expect_error(
     kk_nowcast(
       df = df_small,
@@ -288,7 +297,7 @@ test_that("kk_nowcast validates startvals are numeric", {
 
 test_that("kk_nowcast validates startvals are named", {
   start_vals <- c(0.5, 0.3, 0.2, 0.1, 0.1)  # Not named
-  
+
   expect_error(
     kk_nowcast(
       df = df_small,
@@ -301,7 +310,7 @@ test_that("kk_nowcast validates startvals are named", {
 
 test_that("kk_nowcast MLE with different optimization methods", {
   methods <- c("L-BFGS-B", "BFGS", "Nelder-Mead", "nlminb")
-  
+
   for (meth in methods) {
     result <- kk_nowcast(
       df = df_small,
@@ -309,7 +318,7 @@ test_that("kk_nowcast MLE with different optimization methods", {
       method = "MLE",
       solver_options = list(trace = 0, method = meth, maxiter = 50)
     )
-    
+
     expect_s3_class(result, "kk_model")
     expect_true(is.finite(result$loglik))
   }
@@ -322,7 +331,7 @@ test_that("kk_nowcast MLE with two-step method", {
     method = "MLE",
     solver_options = list(trace = 0, method = "two-step", maxiter = 50)
   )
-  
+
   expect_s3_class(result, "kk_model")
   expect_true(is.finite(result$loglik))
 })
@@ -334,7 +343,7 @@ test_that("kk_nowcast MLE with multi-start optimization", {
     method = "MLE",
     solver_options = list(trace = 0, n_starts = 2, maxiter = 50)
   )
-  
+
   expect_s3_class(result, "kk_model")
 })
 
@@ -345,14 +354,14 @@ test_that("kk_nowcast MLE with transform_se option", {
     method = "MLE",
     solver_options = list(trace = 0, transform_se = TRUE, maxiter = 50)
   )
-  
+
   result_no_transform <- kk_nowcast(
     df = df_small,
     e = 1,
     method = "MLE",
     solver_options = list(trace = 0, transform_se = FALSE, maxiter = 50)
   )
-  
+
   expect_s3_class(result_transform, "kk_model")
   expect_s3_class(result_no_transform, "kk_model")
 })
@@ -365,9 +374,9 @@ test_that("kk_nowcast states output has correct structure", {
     method = "OLS",
     solver_options = list(trace = 0)
   )
-  
+
   states <- result$states
-  
+
   expect_true("time" %in% colnames(states))
   expect_true("state" %in% colnames(states))
   expect_true("estimate" %in% colnames(states))
@@ -375,7 +384,7 @@ test_that("kk_nowcast states output has correct structure", {
   expect_true("upper" %in% colnames(states))
   expect_true("filter" %in% colnames(states))
   expect_true("sample" %in% colnames(states))
-  
+
   expect_true(all(states$filter %in% c("filtered", "smoothed")))
   expect_true(all(states$sample %in% c("in_sample", "out_of_sample")))
 })
@@ -387,7 +396,7 @@ test_that("kk_nowcast parameter estimates are finite", {
     method = "OLS",
     solver_options = list(trace = 0)
   )
-  
+
   expect_true(all(is.finite(result$params$Estimate)))
 })
 
@@ -397,7 +406,7 @@ test_that("kk_nowcast handles irregular time series error", {
     seq.Date(as.Date("2020-01-01"), by = "month", length.out = 10),
     seq.Date(as.Date("2020-11-01"), by = "quarter", length.out = 10)
   )
-  
+
   expect_error(
     kk_nowcast(
       df = df_irregular,
@@ -418,7 +427,7 @@ test_that("kk_nowcast case insensitivity for model parameter", {
     method = "OLS",
     solver_options = list(trace = 0)
   )
-  
+
   result_upper <- kk_nowcast(
     df = df_small,
     e = 1,
@@ -426,7 +435,7 @@ test_that("kk_nowcast case insensitivity for model parameter", {
     method = "OLS",
     solver_options = list(trace = 0)
   )
-  
+
   expect_equal(nrow(result_lower$params), nrow(result_upper$params))
 })
 
@@ -437,14 +446,14 @@ test_that("kk_nowcast case insensitivity for method parameter", {
     method = "ols",
     solver_options = list(trace = 0)
   )
-  
+
   result_upper <- kk_nowcast(
     df = df_small,
     e = 1,
     method = "OLS",
     solver_options = list(trace = 0)
   )
-  
+
   expect_equal(nrow(result_lower$params), nrow(result_upper$params))
 })
 
@@ -452,13 +461,13 @@ test_that("kk_nowcast case insensitivity for method parameter", {
 
 test_that("kk_matrices creates character matrices", {
   matrices <- kk_matrices(e = 2, model = "KK", type = "character")
-  
+
   expect_true("FF" %in% names(matrices))
   expect_true("GG" %in% names(matrices))
   expect_true("V" %in% names(matrices))
   expect_true("W" %in% names(matrices))
   expect_true("params" %in% names(matrices))
-  
+
   expect_true(is.character(matrices$FF))
   expect_equal(dim(matrices$FF), c(3, 3))  # e+1 x e+1
 })
@@ -475,9 +484,14 @@ test_that("kk_matrices creates numeric matrices with params", {
     v0 = 0.1,
     eps1 = 0.05, eps0 = 0.03
   )
-  
-  matrices <- kk_matrices(e = 2, model = "KK", params = params, type = "numeric")
-  
+
+  matrices <- kk_matrices(
+    e = 2,
+    model = "KK",
+    params = params,
+    type = "numeric"
+  )
+
   expect_true(is.numeric(matrices$FF))
   expect_equal(matrices$FF[3, 3], 0.8)  # F0 in bottom right
 })
@@ -512,7 +526,7 @@ test_that("kk_matrices requires params for numeric type", {
 
 test_that("kk_matrices validates params length", {
   params <- c(F0 = 0.8)  # Too few parameters
-  
+
   expect_error(
     kk_matrices(e = 1, model = "KK", params = params, type = "numeric"),
     "'params' must have length"
@@ -530,7 +544,7 @@ test_that("kk_matrices validates params are named", {
 
 test_that("kk_matrices handles Howrey model correctly", {
   matrices <- kk_matrices(e = 2, model = "Howrey", type = "character")
-  
+
   # Howrey has e*e G parameters
   n_g_params <- sum(grepl("^G", names(matrices$params)))
   expect_equal(n_g_params, 2^2)  # e=2, so 4 G parameters
@@ -538,18 +552,18 @@ test_that("kk_matrices handles Howrey model correctly", {
 
 test_that("kk_matrices handles Classical model correctly", {
   matrices <- kk_matrices(e = 2, model = "Classical", type = "character")
-  
+
   # Classical has no G parameters
   n_g_params <- sum(grepl("^G", names(matrices$params)))
   expect_equal(n_g_params, 0)
-  
+
   # GG should be identity matrix
   expect_true(all(diag(3) == as.numeric(matrices$GG)))
 })
 
 test_that("kk_matrices parameter sorting is consistent", {
   matrices <- kk_matrices(e = 1, model = "KK", type = "character")
-  
+
   param_names <- names(matrices$params)
   # Should start with F0, then G params, then v0, then eps params
   expect_equal(param_names[1], "F0")
@@ -568,10 +582,15 @@ test_that("kk_to_ss converts KK matrices to state-space form", {
     v0 = 0.1,
     eps0 = 0.05
   )
-  
-  matrices <- kk_matrices(e = 1, model = "KK", params = params, type = "numeric")
+
+  matrices <- kk_matrices(
+    e = 1,
+    model = "KK",
+    params = params,
+    type = "numeric"
+  )
   ss_mat <- kk_to_ss(matrices$FF, matrices$GG, matrices$V, matrices$W)
-  
+
   expect_true("Z" %in% names(ss_mat))
   expect_true("Tmat" %in% names(ss_mat))
   expect_true("H" %in% names(ss_mat))
@@ -590,10 +609,15 @@ test_that("kk_to_ss creates correct dimensions", {
     v0 = 0.1,
     eps1 = 0.05, eps0 = 0.03
   )
-  
-  matrices <- kk_matrices(e = 2, model = "KK", params = params, type = "numeric")
+
+  matrices <- kk_matrices(
+    e = 2,
+    model = "KK",
+    params = params,
+    type = "numeric"
+  )
   ss_mat <- kk_to_ss(matrices$FF, matrices$GG, matrices$V, matrices$W)
-  
+
   e <- 2
   expect_equal(dim(ss_mat$Z), c(e + 1, 2 * (e + 1)))
   expect_equal(dim(ss_mat$Tmat), c(2 * (e + 1), 2 * (e + 1)))
@@ -609,9 +633,9 @@ test_that("print.kk_model produces output", {
     method = "OLS",
     solver_options = list(trace = 0)
   )
-  
+
   output <- utils::capture.output(print(result))
-  
+
   expect_gt(length(output), 0)
   expect_true(any(grepl("Kishor-Koenig Model", output)))
   expect_true(any(grepl("Convergence", output)))
@@ -624,7 +648,7 @@ test_that("print.kk_model returns invisibly", {
     method = "OLS",
     solver_options = list(trace = 0)
   )
-  
+
   returned <- print(result)
   expect_identical(returned, result)
 })
@@ -638,9 +662,9 @@ test_that("summary.kk_model produces detailed output", {
     method = "MLE",
     solver_options = list(trace = 0, maxiter = 50)
   )
-  
+
   output <- utils::capture.output(summary(result))
-  
+
   expect_gt(length(output), 0)
   expect_true(any(grepl("Kishor-Koenig Model", output)))
   expect_true(any(grepl("Log-likelihood", output)))
@@ -656,7 +680,7 @@ test_that("summary.kk_model returns invisibly", {
     method = "OLS",
     solver_options = list(trace = 0)
   )
-  
+
   returned <- summary(result)
   expect_identical(returned, result)
 })
@@ -671,7 +695,7 @@ test_that("plot.kk_model returns ggplot object", {
     method = "OLS",
     solver_options = list(trace = 0)
   )
-  
+
   p <- plot(result)
   expect_s3_class(p, "ggplot")
 })
@@ -683,10 +707,10 @@ test_that("plot.kk_model handles different states", {
     method = "OLS",
     solver_options = list(trace = 0)
   )
-  
+
   # Get available states
   states <- unique(result$states$state)
-  
+
   for (state_name in states) {
     p <- plot(result, state = state_name)
     expect_s3_class(p, "ggplot")
@@ -700,10 +724,10 @@ test_that("plot.kk_model handles filtered vs smoothed", {
     method = "OLS",
     solver_options = list(trace = 0)
   )
-  
+
   p_filtered <- plot(result, type = "filtered")
   p_smoothed <- plot(result, type = "smoothed")
-  
+
   expect_s3_class(p_filtered, "ggplot")
   expect_s3_class(p_smoothed, "ggplot")
 })
@@ -720,20 +744,20 @@ test_that("full workflow with all components", {
     alpha = 0.05,
     solver_options = list(trace = 0)
   )
-  
+
   # Test structure
   expect_s3_class(result, "kk_model")
-  
+
   # Test methods work
   output_summary <- utils::capture.output(summary(result))
   expect_gt(length(output_summary), 0)
-  
+
   output_print <- utils::capture.output(print(result))
   expect_gt(length(output_print), 0)
-  
+
   p <- plot(result)
   expect_s3_class(p, "ggplot")
-  
+
   # Test components
   expect_true(result$convergence %in% c(0, 1))
   expect_true("Parameter" %in% colnames(result$params))
@@ -749,7 +773,7 @@ test_that("different models produce different results", {
     method = "OLS",
     solver_options = list(trace = 0)
   )
-  
+
   result_howrey <- kk_nowcast(
     df = df_small,
     e = 1,
@@ -757,7 +781,7 @@ test_that("different models produce different results", {
     method = "OLS",
     solver_options = list(trace = 0)
   )
-  
+
   result_classical <- kk_nowcast(
     df = df_small,
     e = 1,
@@ -765,7 +789,7 @@ test_that("different models produce different results", {
     method = "OLS",
     solver_options = list(trace = 0)
   )
-  
+
   # Different number of parameters
   expect_gt(nrow(result_kk$params), nrow(result_howrey$params))
   expect_gt(nrow(result_howrey$params), nrow(result_classical$params))
@@ -778,14 +802,14 @@ test_that("different methods produce consistent estimates", {
     method = "OLS",
     solver_options = list(trace = 0)
   )
-  
+
   result_sur <- kk_nowcast(
     df = df_small,
     e = 1,
     method = "SUR",
     solver_options = list(trace = 0, maxiter = 100)
   )
-  
+
   # Both should have same parameter names
   expect_equal(
     result_ols$params$Parameter,
@@ -797,28 +821,28 @@ test_that("different methods produce consistent estimates", {
 
 test_that("kk_nowcast handles minimal data", {
   df_minimal <- df_wide_kk[1:12, 1:3]  # 12 obs, 2 releases (e=1)
-  
+
   result <- kk_nowcast(
     df = df_minimal,
     e = 1,
     method = "OLS",
     solver_options = list(trace = 0)
   )
-  
+
   expect_s3_class(result, "kk_model")
 })
 
 test_that("kk_nowcast handles data with NAs at beginning", {
   df_na <- df_small
   df_na[1:3, 2] <- NA
-  
+
   result <- kk_nowcast(
     df = df_na,
     e = 1,
     method = "OLS",
     solver_options = list(trace = 0)
   )
-  
+
   expect_s3_class(result, "kk_model")
 })
 
@@ -835,14 +859,14 @@ test_that("kk_nowcast handles high frequency data", {
     release_0 = rnorm(20, 100, 10),
     release_1 = rnorm(20, 100, 8)
   )
-  
+
   result <- kk_nowcast(
     df = df_quarterly,
     e = 1,
     method = "OLS",
     solver_options = list(trace = 0)
   )
-  
+
   expect_s3_class(result, "kk_model")
 })
 
@@ -853,16 +877,16 @@ test_that("kk_nowcast model matrices have correct properties", {
     method = "OLS",
     solver_options = list(trace = 0)
   )
-  
+
   # Check FF is square
   expect_equal(nrow(result$kk_model_mat$FF), ncol(result$kk_model_mat$FF))
-  
+
   # Check GG is square
   expect_equal(nrow(result$kk_model_mat$GG), ncol(result$kk_model_mat$GG))
-  
+
   # Check V is square
   expect_equal(nrow(result$kk_model_mat$V), ncol(result$kk_model_mat$V))
-  
+
   # Check W is square
   expect_equal(nrow(result$kk_model_mat$W), ncol(result$kk_model_mat$W))
 })
@@ -874,11 +898,11 @@ test_that("kk_nowcast information criteria are calculated correctly for MLE", {
     method = "MLE",
     solver_options = list(trace = 0, maxiter = 50)
   )
-  
+
   expect_true(is.finite(result$aic))
   expect_true(is.finite(result$bic))
   expect_true(is.finite(result$loglik))
-  
+
   # BIC should penalize more than AIC
   expect_gt(result$bic, result$aic)
 })
@@ -891,7 +915,7 @@ test_that("kk_nowcast confidence intervals have correct coverage", {
     method = "OLS",
     solver_options = list(trace = 0)
   )
-  
+
   # Check that lower < estimate < upper
   states <- result$states
   expect_true(all(states$lower <= states$estimate, na.rm = TRUE))

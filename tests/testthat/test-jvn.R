@@ -105,6 +105,11 @@ test_that("jvn_nowcast validates e parameter", {
     jvn_nowcast(df = df_test_wide, e = 0, ar_order = 1),
     "The initial release is already efficient"
   )
+
+  expect_error(
+    jvn_nowcast(df = df_test_wide, e = 5, ar_order = 1),
+    "'df' must contain release columns"
+  )
 })
 
 test_that("jvn_nowcast validates ar_order parameter", {
@@ -112,6 +117,30 @@ test_that("jvn_nowcast validates ar_order parameter", {
     jvn_nowcast(df = df_test_wide, e = 1, ar_order = 0),
     "'ar_order' must be > 0"
   )
+})
+
+test_that("jvn_init_params falls back to finite defaults for short samples", {
+  model_struct <- reviser:::jvn_matrices(
+    n_obs = 3,
+    n_vint = 2,
+    ar_order = 1,
+    include_news = TRUE,
+    include_noise = TRUE,
+    include_spillovers = FALSE,
+    spillover_news = TRUE,
+    spillover_noise = TRUE
+  )
+  y_short <- matrix(
+    c(1, 2, 3, 1.1, 2.1, 3.1),
+    ncol = 2
+  )
+
+  expect_warning(
+    params <- reviser:::jvn_init_params(model_struct, y_short),
+    "Insufficient data for smart initialization"
+  )
+  expect_length(params, model_struct$n_params)
+  expect_true(all(is.finite(params)))
 })
 
 test_that("jvn_nowcast validates h parameter", {

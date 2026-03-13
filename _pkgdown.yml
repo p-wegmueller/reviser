@@ -14,31 +14,31 @@ reference:
       Functions for analyzing revisions of time series.
     contents:
     - has_concept("revision analysis")
-  
+
   - subtitle: Revision utilities
     desc: >
       Utility functions for working with revisions of time series.
     contents:
     - has_concept("revision utilities")
-  
+
   - subtitle: Revision nowcasting
     desc: >
       Functions for nowcasting revisions of time series.
     contents:
     - has_concept("revision nowcasting")
-  
+
   - subtitle: Revision graphs
     desc: >
       Functions for plotting revisions of time series.
     contents:
     - has_concept("revision graphs")
-  
+
   - subtitle: Helpers
     desc: >
       Helper functions to convert revisions to a tidy format.
     contents:
     - has_concept("helpers")
-  
+
   - subtitle: Data
     desc: >
       GDP data used in the package.
@@ -55,11 +55,11 @@ articles:
   - efficient-release
   - nowcasting-revisions-kk
   - nowcasting-revisions-jvn
-  
+
 - title: "Why revisions matter"
   contents:
   - literature-review
-  
+
 authors:
   Marc Burri:
     href: https://marcburri.github.io

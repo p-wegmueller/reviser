@@ -16,7 +16,8 @@ The input \code{x} is returned invisibly.
 }
 \description{
 Print method for objects of class \code{tbl_pubdate}. This method delegates
-to the tibble print method, which will automatically call \code{tbl_sum.tbl_pubdate}
+to the tibble print method, which will automatically call
+\code{tbl_sum.tbl_pubdate}
 to generate the custom header.
 }
 \examples{

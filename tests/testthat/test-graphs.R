@@ -195,7 +195,10 @@ test_that("plot_vintages handles wide format data", {
 })
 
 test_that("plot_vintages warns if dim_col has more than 30 unique values", {
-  df_many_vintages <- dplyr::slice(df_plot, rep(1:dplyr::n(), each = 2)) %>%
+  df_many_vintages <- dplyr::slice(
+    df_plot,
+    rep(seq_len(dplyr::n()), each = 2)
+  ) %>%
     dplyr::mutate(
       pub_date = as.Date(pub_date) + rep(0:35, length.out = dplyr::n())
     )
@@ -207,7 +210,10 @@ test_that("plot_vintages warns if dim_col has more than 30 unique values", {
 })
 
 test_that("plot_vintages limits to 30 vintages when warning", {
-  df_many_vintages <- dplyr::slice(df_plot, rep(1:dplyr::n(), each = 2)) %>%
+  df_many_vintages <- dplyr::slice(
+    df_plot,
+    rep(seq_len(dplyr::n()), each = 2)
+  ) %>%
     dplyr::mutate(
       pub_date = as.Date(pub_date) + rep(0:35, length.out = dplyr::n())
     )
@@ -247,7 +253,10 @@ test_that("plot_vintages handles data with id column", {
 
 
 test_that("plot_vintages adjusts legend position for many vintages", {
-  df_many <- dplyr::slice(df_plot, rep(1:dplyr::n(), each = 4)) %>%
+  df_many <- dplyr::slice(
+    df_plot,
+    rep(seq_len(dplyr::n()), each = 4)
+  ) %>%
     dplyr::mutate(
       pub_date = as.Date(pub_date) + rep(0:9, length.out = dplyr::n())
     )

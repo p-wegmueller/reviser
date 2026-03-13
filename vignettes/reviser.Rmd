@@ -11,7 +11,7 @@ vignette: >
 ---
 
 The `reviser` package provides tools to manipulate and analyze vintages of time series data subject to revisions. This vignette demonstrates how to get started and structure your data according to the package’s conventions.
-  
+
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -169,7 +169,7 @@ To use `plot_vintages()`, provide a data frame containing:
 
   - A `time` column (representing the observation period),
   - A `value` column (containing the reported data),
-  - A column indicating the publication date (`pub_date`) or release number (`release`), which determines the dimension along which the data is visualized. 
+  - A column indicating the publication date (`pub_date`) or release number (`release`), which determines the dimension along which the data is visualized.
 
 For example, to visualize how GDP estimates evolved over time, you can create a line plot comparing different vintages:
 
@@ -186,7 +186,7 @@ gdp_releases <- get_nth_release(gdp_us_short, n = 0:3)
 plot_vintages(gdp_releases, dim_col = "release")
 ```
 
-By default, if `dim_col` (the dimension along which vintages are plotted) contains more than 30 unique values, only the most recent 30 are displayed to maintain readability. 
+By default, if `dim_col` (the dimension along which vintages are plotted) contains more than 30 unique values, only the most recent 30 are displayed to maintain readability.
 
 ```{r}
 # Line plot showing GDP vintages over the publication date dimension
@@ -224,7 +224,7 @@ These functions ensure a consistent visual style tailored for vintage data analy
 
 After defining the final release, we can analyze revisions and releases in multiple ways:
 
-- Calculate revisions: `get_revisions()`. See vignette [Understanding Data Revisions](understanding-revisions.html) for more details.  
-- Analyze the revisions: `get_revision_analysis()`. See vignette [Revision Patterns and Statistics](revision-analysis.html) for more details.  
-- Identify the first efficient release: `get_first_efficient_release()`. See vignette [Efficient Release Identification](efficient-release.html) for more details.  
-- Nowcast future revisions: `kk_nowcast()`. See vignette [Nowcasting Revisions](nowcasting-revisions.html) for more details.  
+- Calculate revisions: `get_revisions()`. See vignette [Understanding Data Revisions](understanding-revisions.html) for more details.
+- Analyze the revisions: `get_revision_analysis()`. See vignette [Revision Patterns and Statistics](revision-analysis.html) for more details.
+- Identify the first efficient release: `get_first_efficient_release()`. See vignette [Efficient Release Identification](efficient-release.html) for more details.
+- Nowcast future revisions: `kk_nowcast()`. See vignette [Nowcasting Revisions](nowcasting-revisions.html) for more details.

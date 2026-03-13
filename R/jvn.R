@@ -46,15 +46,20 @@
 #'   \item{bic}{Bayesian Information Criterion}
 #'   \item{data}{Input data}
 #' }
-#' 
+#'
 #' @srrstats {G1.0} Primary reference: Jacobs & Van Norden (2011)
-#' @srrstats {G1.1} First implementation in R of the Jacobs-Van Norden state-space model
-#' @srrstats {G1.3} Statistical terminology clearly defined (news, noise, spillovers)
-#' @srrstats {G2.0} Input assertions on lengths (e, h, ar_order must be single values)
-#' @srrstats {G2.0a} Documents expectations on input lengths in parameter descriptions
+#' @srrstats {G1.1} First implementation in R of the Jacobs-Van Norden
+#'   state-space model
+#' @srrstats {G1.3} Statistical terminology clearly defined (news, noise,
+#'   spillovers)
+#' @srrstats {G2.0} Input assertions on lengths (e, h, ar_order must be
+#'   single values)
+#' @srrstats {G2.0a} Documents expectations on input lengths in parameter
+#'   descriptions
 #' @srrstats {G2.1} Input type assertions (checks for list, numeric types)
 #' @srrstats {G2.1a} Documents data type expectations for all inputs
-#' @srrstats {G2.2} Restricts multivariate input to univariate parameters (e, h, ar_order)
+#' @srrstats {G2.2} Restricts multivariate input to univariate parameters
+#'   (e, h, ar_order)
 #' @srrstats {G2.3a} Uses match.arg() equivalent for method parameter validation
 #' @srrstats {G2.3b} Documents case-sensitivity requirements
 #' @srrstats {G2.4} Type conversion mechanisms (round() for ar_order)
@@ -71,18 +76,21 @@
 #' @srrstats {TS1.0} Uses explicit time series class systems
 #' @srrstats {TS1.1} Documents types/classes of input data
 #' @srrstats {TS1.2} Validation routines for input classes (vintages_check)
-#' @srrstats {TS1.3} Pre-processing to validate and transform input (vintages_wide)
+#' @srrstats {TS1.3} Pre-processing to validate and transform input
+#'   (vintages_wide)
 #' @srrstats {TS1.4} Maintains time/date components of input data
 #' @srrstats {TS1.5} Ensures strict ordering of time index
 #' @srrstats {TS1.6} Catches ordering violations in pre-processing
-#' @srrstats {TS1.8} Explicit about monthly time intervals (frequency calculation)
+#' @srrstats {TS1.8} Explicit about monthly time intervals (frequency
+#'   calculation)
 #' @srrstats {TS2.0} Handles explicit vs implicit missing values
 #' @srrstats {TS2.1} Options for handling missing data
 #' @srrstats {TS4.0b} Returns unique class-defined format (jvn_model)
 #' @srrstats {TS4.2} Explicitly documents return value types/classes
 #' @srrstats {TS4.3} Return values include time scales
 #' @srrstats {TS4.6b} Forecasting returns first- and second-order moments
-#' @srrstats {TS4.6c} Error indication for forecast estimates (confidence intervals)
+#' @srrstats {TS4.6c} Error indication for forecast estimates (confidence
+#'   intervals)
 #' @srrstats {TS4.7c} Distinguishes model vs forecast values (sample column)
 #'
 #' @references Jacobs, Jan P.A.M. and Van Norden, Simon, "Modeling Data
@@ -167,6 +175,11 @@ jvn_nowcast <- function(
   }
 
   # Check input e
+  if (!is.numeric(e) || length(e) != 1 || is.na(e) || e %% 1 != 0) {
+    rlang::abort("'e' must be a single whole number greater than 0.")
+  }
+  e <- as.integer(e)
+
   if (e == 0) {
     rlang::abort("The initial release is already efficient, 'e' is equal to 0!")
   }
@@ -209,8 +222,22 @@ jvn_nowcast <- function(
     if (is.list(df) && !is.data.frame(df)) df <- df[[1]]
   }
 
+  required_release_cols <- paste0("release_", 0:(e - 1))
+  missing_release_cols <- setdiff(required_release_cols, colnames(df))
+  if (length(missing_release_cols) > 0) {
+    rlang::abort(paste0(
+      "'df' must contain release columns ",
+      paste(required_release_cols, collapse = ", "),
+      " for e = ",
+      e,
+      ". Missing: ",
+      paste(missing_release_cols, collapse = ", ")
+    ))
+  }
+
   # Arrange data
-  df_intern <- df[, 1:(e + 1)]
+  df_intern <- df %>%
+    dplyr::select("time", dplyr::all_of(required_release_cols))
 
   y_mat <- as.matrix(dplyr::select(df_intern, -"time"))
   rownames(y_mat) <- as.character(df$time)
@@ -698,7 +725,7 @@ jvn_nowcast <- function(
     frequency <- unique((round(as.numeric(diff(df$time)) / 30)))
     if (length(frequency) > 1) {
       rlang::abort(
-        "The time series seems not to be regular, 
+        "The time series seems not to be regular,
         please provide a regular time series!"
       )
     }
@@ -821,7 +848,7 @@ jvn_nowcast <- function(
 #'
 #' Constructs the state-space matrices Z, T, R, H, Q according to the
 #' Jacobs & Van Norden (2011) specification.
-#' 
+#'
 #' @srrstats {G1.4a} Internal function documented with @noRd tag
 #' @srrstats {G2.0} Input assertions on parameter dimensions
 #' @srrstats {G2.1} Type checking for parameters
@@ -1149,6 +1176,49 @@ jvn_negloglik <- function(params, model_struct, data, transform_se = TRUE) {
   )
 }
 
+#' Create stable default starting values for the JVN model
+#' @keywords internal
+#' @noRd
+jvn_default_params <- function(model_struct, transform_se = TRUE) {
+  info <- model_struct$param_info
+  params <- numeric(model_struct$n_params)
+
+  if (!is.null(info$ar_coef_idx)) {
+    ar_default <- 0.4 / seq_along(info$ar_coef_idx)
+    params[info$ar_coef_idx] <- ar_default
+  }
+
+  if (!is.null(info$sigma_e_idx)) {
+    params[info$sigma_e_idx] <- 0.2
+  }
+  if (!is.null(info$sigma_nu_idx)) {
+    params[info$sigma_nu_idx] <- 0.15
+  }
+  if (!is.null(info$sigma_zeta_idx)) {
+    params[info$sigma_zeta_idx] <- 0.1
+  }
+  if (!is.null(info$spill_nu_idx)) {
+    params[info$spill_nu_idx] <- 0.3
+  }
+  if (!is.null(info$spill_zeta_idx)) {
+    params[info$spill_zeta_idx] <- 0.2
+  }
+
+  if (transform_se) {
+    if (!is.null(info$sigma_e_idx)) {
+      params[info$sigma_e_idx] <- log(params[info$sigma_e_idx])
+    }
+    if (!is.null(info$sigma_nu_idx)) {
+      params[info$sigma_nu_idx] <- log(params[info$sigma_nu_idx])
+    }
+    if (!is.null(info$sigma_zeta_idx)) {
+      params[info$sigma_zeta_idx] <- log(params[info$sigma_zeta_idx])
+    }
+  }
+
+  params
+}
+
 #' Initialize Parameters with Data-Driven Starting Values
 #' @keywords internal
 #' @noRd
@@ -1163,7 +1233,7 @@ jvn_init_params <- function(model_struct, data, transform_se = TRUE) {
 
   if (nrow(data_clean) < ar_order + 10) {
     warning("Insufficient data for smart initialization. Using default values.")
-    return(jvn_init_params(model_struct, transform_se))
+    return(jvn_default_params(model_struct, transform_se))
   }
 
   # ===== 1. AR COEFFICIENTS AND SHOCK from final vintage =====
@@ -1301,7 +1371,7 @@ jvn_init_params <- function(model_struct, data, transform_se = TRUE) {
   # ===== 6. VALIDATION =====
   if (any(!is.finite(params))) {
     warning("Some starting values are non-finite. Falling back to defaults.")
-    return(jvn_init_params(model_struct, transform_se))
+    return(jvn_default_params(model_struct, transform_se))
   }
 
   # Ensure AR stationarity
@@ -1483,7 +1553,7 @@ print.jvn_model <- function(x, ...) {
 #' @param state String. The name of the state to visualize.
 #' @param type String. Type of estimate to plot: "filtered" or "smoothed".
 #' @param ... Additional arguments passed to theme_reviser.
-#' 
+#'
 #' @srrstats {TS5.0} Implements default plot methods for class system
 #' @srrstats {TS5.1} Time axis labeling (delegates to base method)
 #' @srrstats {TS5.2} Time on horizontal axis (delegates to base method)

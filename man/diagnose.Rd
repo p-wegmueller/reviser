@@ -15,7 +15,8 @@ diagnose(object, ...)
 Method-specific diagnostic output.
 }
 \description{
-Generic function to provide diagnostic summaries for revision analysis objects.
+Generic function to provide diagnostic summaries for revision analysis
+objects.
 }
 \examples{
 # Example usage with revision analysis results

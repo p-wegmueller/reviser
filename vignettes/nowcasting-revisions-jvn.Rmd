@@ -60,20 +60,20 @@ Consider an AR(2) process for the true output growth with three data releases. T
 
 $$
 \begin{bmatrix}
-y_{t}^{t+1} \\ 
-y_{t}^{t+2} \\ 
-y_{t}^{t+3} 
+y_{t}^{t+1} \\
+y_{t}^{t+2} \\
+y_{t}^{t+3}
 \end{bmatrix}
-= 
+=
 \begin{bmatrix}
 1 & 0 & 1 & 0 & 0 & 1 & 0 & 0 \\
 1 & 0 & 0 & 1 & 0 & 0 & 1 & 0 \\
 1 & 0 & 0 & 0 & 1 & 0 & 0 & 1
 \end{bmatrix}
 \begin{bmatrix}
-\tilde{y}_{t} \\ 
-\tilde{y}_{t-1} \\ 
-\nu_{1t} \\ 
+\tilde{y}_{t} \\
+\tilde{y}_{t-1} \\
+\nu_{1t} \\
 \nu_{2t} \\
 \nu_{3t} \\
 \zeta_{1t} \\
@@ -86,20 +86,20 @@ The state vector evolves according to:
 
 $$
 \begin{bmatrix}
-\tilde{y}_{t} \\ 
-\tilde{y}_{t-1} \\ 
-\nu_{1t} \\ 
+\tilde{y}_{t} \\
+\tilde{y}_{t-1} \\
+\nu_{1t} \\
 \nu_{2t} \\
 \nu_{3t} \\
 \zeta_{1t} \\
 \zeta_{2t} \\
 \zeta_{3t}
 \end{bmatrix}
-= 
+=
 \begin{bmatrix}
-\rho_1 & \rho_2 & 0 & 0 & 0 & 0 & 0 & 0 \\ 
-1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\ 
-0 & 0 & \tau_{\nu 1} & 0 & 0 & 0 & 0 & 0 \\ 
+\rho_1 & \rho_2 & 0 & 0 & 0 & 0 & 0 & 0 \\
+1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & \tau_{\nu 1} & 0 & 0 & 0 & 0 & 0 \\
 0 & 0 & 0 & \tau_{\nu 2} & 0 & 0 & 0 & 0 \\
 0 & 0 & 0 & 0 & \tau_{\nu 3} & 0 & 0 & 0 \\
 0 & 0 & 0 & 0 & 0 & \tau_{\zeta 1} & 0 & 0 \\
@@ -107,9 +107,9 @@ $$
 0 & 0 & 0 & 0 & 0 & 0 & 0 & \tau_{\zeta 3}
 \end{bmatrix}
 \begin{bmatrix}
-\tilde{y}_{t-1} \\ 
-\tilde{y}_{t-2} \\ 
-\nu_{1,t-1} \\ 
+\tilde{y}_{t-1} \\
+\tilde{y}_{t-2} \\
+\nu_{1,t-1} \\
 \nu_{2,t-1} \\
 \nu_{3,t-1} \\
 \zeta_{1,t-1} \\
@@ -118,24 +118,24 @@ $$
 \end{bmatrix}
 + \\
 \begin{bmatrix}
-\sigma_{e} & \sigma_{\nu 1} & \sigma_{\nu 2} & \sigma_{\nu 3} & 0 & 0 & 0 \\ 
-0 & 0 & 0 & 0 & 0 & 0 & 0 \\ 
-0 & -\sigma_{\nu 1} & -\sigma_{\nu 2} & -\sigma_{\nu 3} & 0 & 0 & 0 \\ 
-0 & 0 & -\sigma_{\nu 2} & -\sigma_{\nu 3} & 0 & 0 & 0 \\ 
-0 & 0 & 0 & -\sigma_{\nu 3} & 0 & 0 & 0 \\ 
-0 & 0 & 0 & 0 & \sigma_{\zeta 1} & 0 & 0 \\ 
-0 & 0 & 0 & 0 & 0 & \sigma_{\zeta 2} & 0 \\ 
-0 & 0 & 0 & 0 & 0 & 0 & \sigma_{\zeta 3} \\ 
+\sigma_{e} & \sigma_{\nu 1} & \sigma_{\nu 2} & \sigma_{\nu 3} & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & -\sigma_{\nu 1} & -\sigma_{\nu 2} & -\sigma_{\nu 3} & 0 & 0 & 0 \\
+0 & 0 & -\sigma_{\nu 2} & -\sigma_{\nu 3} & 0 & 0 & 0 \\
+0 & 0 & 0 & -\sigma_{\nu 3} & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & \sigma_{\zeta 1} & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & \sigma_{\zeta 2} & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & \sigma_{\zeta 3} \\
 \end{bmatrix}
-\cdot 
+\cdot
 \begin{bmatrix}
-\eta_{et} \\ 
-\eta_{\nu_{1}t} \\ 
-\eta_{\nu_{2}t} \\ 
-\eta_{\nu_{3}t} \\ 
-\eta_{\zeta_{1}t} \\ 
-\eta_{\zeta_{2}t} \\ 
-\eta_{\zeta_{3}t} \\ 
+\eta_{et} \\
+\eta_{\nu_{1}t} \\
+\eta_{\nu_{2}t} \\
+\eta_{\nu_{3}t} \\
+\eta_{\zeta_{1}t} \\
+\eta_{\zeta_{2}t} \\
+\eta_{\zeta_{3}t} \\
 \end{bmatrix}
 $$
 

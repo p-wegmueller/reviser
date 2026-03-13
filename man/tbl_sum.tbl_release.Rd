@@ -16,7 +16,8 @@ A named character vector where names are labels and values are
 the corresponding information.
 }
 \description{
-Provides a custom header for objects of class \code{tbl_release} when printed.
+Provides a custom header for objects of class \code{tbl_release} when
+printed.
 }
 \examples{
 df <- dplyr::filter(reviser::gdp, id == "US")

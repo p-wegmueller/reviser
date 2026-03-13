@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-This vignette introduces the **notation** used in the literature and presents the **revision triangle** as a foundational structure for analyzing revisions. Then, it illustrates how to use the function `get_revisions()` to extract revisions from time series data. Finally, we illustrate with a detailed example how data revisions can be extracted and illustrated. 
+This vignette introduces the **notation** used in the literature and presents the **revision triangle** as a foundational structure for analyzing revisions. Then, it illustrates how to use the function `get_revisions()` to extract revisions from time series data. Finally, we illustrate with a detailed example how data revisions can be extracted and illustrated.
 
 # Introduction: Why do data revisions occur?
 

@@ -320,7 +320,8 @@ plot_vintages <- function(
 #' @param ... Additional arguments passed to plot_vintages.
 #'
 #' @return A ggplot2 object.
-#' @srrstats {TS5.0} Implements default plot methods for implemented class system
+#' @srrstats {TS5.0} Implements default plot methods for implemented
+#'   class system
 #' @srrstats {TS4.2} Explicitly documents the type and class of return values
 #' @method plot tbl_pubdate
 #' @examples
@@ -338,7 +339,8 @@ plot.tbl_pubdate <- function(x, ...) {
 #' @param ... Additional arguments passed to plot_vintages.
 #'
 #' @return A ggplot2 object.
-#' @srrstats {TS5.0} Implements default plot methods for implemented class system
+#' @srrstats {TS5.0} Implements default plot methods for implemented
+#'   class system
 #' @srrstats {TS4.2} Explicitly documents the type and class of return values
 #' @method plot tbl_release
 #' @examples
@@ -359,9 +361,12 @@ plot.tbl_release <- function(x, ...) {
 #' @param ... Additional arguments passed to theme_reviser.
 #' @srrstats {G1.4a} Internal function documented with @noRd tag
 #' @srrstats {TS5.0} Implements plot methods for class system
-#' @srrstats {TS5.7} Includes model (input) values in plot with forecast (output) values (in-sample vs out-of-sample)
-#' @srrstats {TS5.8} Provides clear visual distinction between model and forecast values (different colors/samples)
-#' @srrstats {TS5.6} Indicates distributional limits (confidence intervals) on plot by default
+#' @srrstats {TS5.7} Includes model (input) values in plot with forecast
+#'   (output) values (in-sample vs out-of-sample)
+#' @srrstats {TS5.8} Provides clear visual distinction between model and
+#'   forecast values (different colors/samples)
+#' @srrstats {TS5.6} Indicates distributional limits (confidence
+#'   intervals) on plot by default
 #' @return ggplot object
 #'
 #' @keywords internal

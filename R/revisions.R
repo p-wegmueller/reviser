@@ -512,7 +512,7 @@ get_first_efficient_release <- function(
       formula <- stats::as.formula(paste0("final ~ ", es[i]))
 
       model <- stats::lm(formula, data = df_wide)
-      
+
       # Conditionally set vcov argument
       vcov <- if (robust) sandwich::vcovHAC(model) else NULL
 
@@ -955,7 +955,7 @@ get_revision_analysis <- function(
       is.null(grouping_var)
   ) {
     rlang::warn(
-      "Both 'release' and 'pub_date' columns are present in 'df. 
+      "Both 'release' and 'pub_date' columns are present in 'df.
       The 'release' column will be used for grouping."
     )
     df <- df %>%
@@ -1232,7 +1232,7 @@ print.revision_summary <- function(x, interpretation = TRUE, digits = 3, ...) {
   x_print <- x
 
   # Round numeric columns
-  numeric_cols <- sapply(x_print, is.numeric)
+  numeric_cols <- vapply(x_print, is.numeric, logical(1))
   x_print[numeric_cols] <- lapply(x_print[numeric_cols], round, digits)
 
   # Remove class for printing
@@ -1249,9 +1249,13 @@ print.revision_summary <- function(x, interpretation = TRUE, digits = 3, ...) {
       # Header for group
       if (length(grouping_vars) > 0) {
         group_label <- paste(
-          sapply(grouping_vars, function(v) {
-            paste0(v, "=", row[[v]])
-          }),
+          vapply(
+            grouping_vars,
+            function(v) {
+              paste0(v, "=", row[[v]])
+            },
+            FUN.VALUE = character(1)
+          ),
           collapse = ", "
         )
         cat("\n", group_label, ":\n", sep = "")
@@ -1380,8 +1384,8 @@ print.revision_summary <- function(x, interpretation = TRUE, digits = 3, ...) {
         if (!is.na(auto_p) && !is.na(auto_val)) {
           if (auto_p < 0.05) {
             cat(
-              "  \u2022 Significant autocorrelation in revisions 
-              (\u03C1\u2081 =",  round(auto_val, 3), 
+              "  \u2022 Significant autocorrelation in revisions
+              (\u03C1\u2081 =",  round(auto_val, 3),
               "): revisions are persistent\n"
             )
           }
@@ -1393,7 +1397,11 @@ print.revision_summary <- function(x, interpretation = TRUE, digits = 3, ...) {
         u1 <- row[["Theil's U1"]]
         if (!is.na(u1)) {
           if (u1 < 0.3) {
-            cat("  \u2022 Good forecast accuracy (Theil's U1 =", round(u1, 3), ")\n")
+            cat(
+              "  \u2022 Good forecast accuracy (Theil's U1 =",
+              round(u1, 3),
+              ")\n"
+            )
           } else if (u1 < 0.6) {
             cat(
               "  \u2022 Moderate forecast accuracy (Theil's U1 =",
@@ -1401,7 +1409,11 @@ print.revision_summary <- function(x, interpretation = TRUE, digits = 3, ...) {
               ")\n"
             )
           } else {
-            cat("  \u2022 Poor forecast accuracy (Theil's U1 =", round(u1, 3), ")\n")
+            cat(
+              "  \u2022 Poor forecast accuracy (Theil's U1 =",
+              round(u1, 3),
+              ")\n"
+            )
           }
         }
       }
@@ -1419,9 +1431,19 @@ print.revision_summary <- function(x, interpretation = TRUE, digits = 3, ...) {
               sep = ""
             )
           } else if (pct > 70) {
-            cat("  \u2022 Good sign prediction (", pct, "% correct)\n", sep = "")
+            cat(
+              "  \u2022 Good sign prediction (",
+              pct,
+              "% correct)\n",
+              sep = ""
+            )
           } else {
-            cat("  \u2022 Poor sign prediction (", pct, "% correct)\n", sep = "")
+            cat(
+              "  \u2022 Poor sign prediction (",
+              pct,
+              "% correct)\n",
+              sep = ""
+            )
           }
         }
       }
@@ -1469,7 +1491,7 @@ print.revision_summary <- function(x, interpretation = TRUE, digits = 3, ...) {
 #'
 #' # Get revision analysis results
 #' results <- get_revision_analysis(df, final_release, degree = 5)
-#' 
+#'
 #' # Diagnose revision quality
 #' diagnose(results)
 #' @family revision analysis
@@ -1539,7 +1561,13 @@ diagnose.revision_summary <- function(object, alpha = 0.05, ...) {
     # Group identifier
     if (length(grouping_vars) > 0) {
       group_id <- paste(
-        sapply(grouping_vars, function(v) row[[v]]),
+        vapply(
+          grouping_vars,
+          function(v) {
+            as.character(row[[v]])
+          },
+          FUN.VALUE = character(1)
+        ),
         collapse = "_"
       )
     } else {
@@ -1553,7 +1581,10 @@ diagnose.revision_summary <- function(object, alpha = 0.05, ...) {
 
       if (!is.na(bias_p)) {
         status <- if (bias_p >= alpha) "\u2713 PASS" else "\u2717 FAIL"
-        value <- paste0("p=", round(bias_p, 3), ", \u03BC=", round(bias_mean, 3))
+        value <- paste0(
+          "p=", round(bias_p, 3),
+          ", \u03BC=", round(bias_mean, 3)
+        )
         assessment <- if (bias_p >= alpha) {
           "No significant bias"
         } else {
@@ -1769,13 +1800,14 @@ diagnose.revision_summary <- function(object, alpha = 0.05, ...) {
 
 #' Diagnose Revision Quality
 #'
-#' Generic function to provide diagnostic summaries for revision analysis objects.
+#' Generic function to provide diagnostic summaries for revision analysis
+#' objects.
 #'
 #' @param object An object for which diagnostics are desired.
 #' @param ... Additional arguments passed to methods.
 #'
 #' @return Method-specific diagnostic output.
-#' 
+#'
 #' @examples
 #' # Example usage with revision analysis results
 #' df <- dplyr::select(
@@ -1804,10 +1836,10 @@ diagnose.revision_summary <- function(object, alpha = 0.05, ...) {
 #'
 #' # Get revision analysis results
 #' results <- get_revision_analysis(df, final_release, degree = 5)
-#' 
+#'
 #' # Diagnose revision quality
 #' diagnose(results)
-#' 
+#'
 #' @family revision analysis
 #' @export
 diagnose <- function(object, ...) {
@@ -1851,7 +1883,7 @@ diagnose <- function(object, ...) {
 #'
 #' # Get revision analysis results
 #' results <- get_revision_analysis(df, final_release, degree = 5)
-#' 
+#'
 #' # Summarize revision quality
 #' summary(results)
 #' @export
@@ -2340,7 +2372,10 @@ get_nth_release <- function(df, n = 0, diagonal = FALSE) {
     if (diagonal) {
       diagonal_thresholds <- df %>%
         dplyr::group_by(.data$id) %>%
-        dplyr::summarise(min_pub_date = min(.data$pub_date), .groups = "drop") %>%
+        dplyr::summarise(
+          min_pub_date = min(.data$pub_date),
+          .groups = "drop"
+        ) %>%
         dplyr::left_join(
           df %>%
             dplyr::group_by(.data$id, .data$pub_date) %>%
@@ -2459,7 +2494,10 @@ get_first_release <- function(df, diagonal = FALSE) {
     if ("id" %in% colnames(df)) {
       diagonal_thresholds <- df %>%
         dplyr::group_by(.data$id) %>%
-        dplyr::summarise(min_pub_date = min(.data$pub_date), .groups = "drop") %>%
+        dplyr::summarise(
+          min_pub_date = min(.data$pub_date),
+          .groups = "drop"
+        ) %>%
         dplyr::left_join(
           df %>%
             dplyr::group_by(.data$id, .data$pub_date) %>%
@@ -2584,7 +2622,12 @@ get_fixed_release <- function(df, years, month = NULL, quarter = NULL) {
   }
 
   # Ensure years is a single whole number
-  if (!is.numeric(years) || length(years) != 1 || is.na(years) || years %% 1 != 0) {
+  if (
+    !is.numeric(years) ||
+      length(years) != 1 ||
+      is.na(years) ||
+      years %% 1 != 0
+  ) {
     rlang::abort("'years' must be a single whole number.")
   }
   years <- as.integer(years)
