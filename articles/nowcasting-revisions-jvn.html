@@ -159,20 +159,20 @@ represents the structural shocks.</p>
 releases. The complete model can be written as:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><msubsup><mi>y</mi><mi>t</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msubsup></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msubsup><mi>y</mi><mi>t</mi><mrow><mi>t</mi><mo>+</mo><mn>2</mn></mrow></msubsup></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msubsup><mi>y</mi><mi>t</mi><mrow><mi>t</mi><mo>+</mo><mn>3</mn></mrow></msubsup></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow><mo>=</mo><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><msub><mover><mi>y</mi><mo accent="true">̃</mo></mover><mi>t</mi></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mover><mi>y</mi><mo accent="true">̃</mo></mover><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>ν</mi><mrow><mn>1</mn><mi>t</mi></mrow></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>ν</mi><mrow><mn>2</mn><mi>t</mi></mrow></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>ν</mi><mrow><mn>3</mn><mi>t</mi></mrow></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>ζ</mi><mrow><mn>1</mn><mi>t</mi></mrow></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>ζ</mi><mrow><mn>2</mn><mi>t</mi></mrow></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>ζ</mi><mrow><mn>3</mn><mi>t</mi></mrow></msub></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">
 \begin{bmatrix}
-y_{t}^{t+1} \\ 
-y_{t}^{t+2} \\ 
-y_{t}^{t+3} 
+y_{t}^{t+1} \\
+y_{t}^{t+2} \\
+y_{t}^{t+3}
 \end{bmatrix}
-= 
+=
 \begin{bmatrix}
 1 &amp; 0 &amp; 1 &amp; 0 &amp; 0 &amp; 1 &amp; 0 &amp; 0 \\
 1 &amp; 0 &amp; 0 &amp; 1 &amp; 0 &amp; 0 &amp; 1 &amp; 0 \\
 1 &amp; 0 &amp; 0 &amp; 0 &amp; 1 &amp; 0 &amp; 0 &amp; 1
 \end{bmatrix}
 \begin{bmatrix}
-\tilde{y}_{t} \\ 
-\tilde{y}_{t-1} \\ 
-\nu_{1t} \\ 
+\tilde{y}_{t} \\
+\tilde{y}_{t-1} \\
+\nu_{1t} \\
 \nu_{2t} \\
 \nu_{3t} \\
 \zeta_{1t} \\
@@ -439,7 +439,7 @@ nlminb, and more</li>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Parameter Estimates:</span></span>
 <span><span class="co">#&gt;     Parameter Estimate Std.Error</span></span>
-<span><span class="co">#&gt;         rho_1    0.596     0.138</span></span>
+<span><span class="co">#&gt;         rho_1    0.596     0.139</span></span>
 <span><span class="co">#&gt;       sigma_e    0.001     0.426</span></span>
 <span><span class="co">#&gt;    sigma_nu_1    1.023     0.257</span></span>
 <span><span class="co">#&gt;    sigma_nu_2    0.001     0.023</span></span>

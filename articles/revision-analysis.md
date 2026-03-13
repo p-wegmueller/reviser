@@ -55,7 +55,7 @@ a tendency for initial releases to be systematically over- or
 under-estimated. A **t-test** is conducted to test the null hypothesis
 $H_{0}:\bar{r} = 0$.
 
-- `"Bias (p-value)"` reports the standard t-test p-value.  
+- `"Bias (p-value)"` reports the standard t-test p-value.
 - `"Bias (robust p-value)"` provides a heteroskedasticity-robust
   alternative.
 
@@ -200,9 +200,8 @@ $$\rho_{1} = \frac{\sum\left( r_{t}^{f} - \bar{r} \right)\left( r_{t - 1}^{f} - 
 
 If revisions exhibit strong autocorrelation, it may indicate a
 systematic pattern in the revision process rather than purely random
-adjustments.  
-A **t-test** (`"Autocorrelation (1st p-value)"`) is used to assess
-whether $\rho_{1}$ is significantly different from zero.
+adjustments. A **t-test** (`"Autocorrelation (1st p-value)"`) is used to
+assess whether $\rho_{1}$ is significantly different from zero.
 
 #### 3. **Autocorrelation of Revisions up to 1 year** (`"Autocorrelation up to 1yr (Ljung-Box p-value)"`)
 
@@ -280,17 +279,17 @@ head(results)
 #> 
 #> id=EA, release=release_1:
 #>   • Significant negative correlation between revisions and initial values (ρ = -0.318 , p = 0 )
-#>   • Significant autocorrelation in revisions 
+#>   • Significant autocorrelation in revisions
 #>               (ρ₁ = -0.157 ): revisions are persistent
 #> 
 #> id=JP, release=release_0:
 #>   • Significant negative correlation between revisions and initial values (ρ = -0.204 , p = 0.006 )
-#>   • Significant autocorrelation in revisions 
+#>   • Significant autocorrelation in revisions
 #>               (ρ₁ = -0.278 ): revisions are persistent
 #> 
 #> id=JP, release=release_1:
 #>   • Significant negative correlation between revisions and initial values (ρ = -0.241 , p = 0.001 )
-#>   • Significant autocorrelation in revisions 
+#>   • Significant autocorrelation in revisions
 #>               (ρ₁ = -0.292 ): revisions are persistent
 ```
 
@@ -506,7 +505,7 @@ $$U_{1} = \frac{\sqrt{\frac{1}{n}\sum\limits_{t = 1}^{n}\left( y_{t}^{f} - y_{t}
 The **U1 statistic is bounded between 0 and 1**:
 
 - A value of **0** implies perfect forecasting ($y_{t}^{h} = y_{t}^{f}$
-  for all $t$).  
+  for all $t$).
 - A value **closer to 1** indicates lower accuracy.
 
 However, U1 suffers from **several limitations**, as highlighted by
@@ -527,18 +526,18 @@ $$U_{2} = \frac{\sqrt{\sum\limits_{t = 1}^{n}\left( \frac{y_{t + 1}^{h} - y_{t +
 where:
 
 - The numerator captures the **relative errors** in the preliminary
-  estimates.  
+  estimates.
 - The denominator measures the **magnitude of changes** in the final
   values over time.
 
 Unlike U1, **U2 is not bounded between 0 and 1**. Instead:
 
 - A value of **0** implies perfect accuracy ($y_{t}^{h} = y_{t}^{f}$ for
-  all $t$).  
+  all $t$).
 - **$U_{2} = 1$** means the accuracy of the preliminary estimates is
-  equal to a **naïve forecast**.  
+  equal to a **naïve forecast**.
 - **$U_{2} > 1$** suggests the preliminary estimates are **less
-  accurate** than the naïve approach.  
+  accurate** than the naïve approach.
 - **$U_{2} < 1$** indicates the preliminary estimates are **more
   accurate** than the naïve method.
 
@@ -666,7 +665,7 @@ results
 #>   • Very low revision volatility (Noise/Signal = 0.045 )
 #>   • Revisions do NOT contain news (p = 0.237 )
 #>   • Revisions do NOT contain noise (p = 0.069 )
-#>   • Significant autocorrelation in revisions 
+#>   • Significant autocorrelation in revisions
 #>               (ρ₁ = -0.201 ): revisions are persistent
 #>   • Good forecast accuracy (Theil's U1 = 0.022 )
 #>   • Excellent sign prediction (97.2% correct)
@@ -685,7 +684,7 @@ results
 #>   • Significant negative correlation between revisions and initial values (ρ = -0.219 , p = 0.003 )
 #>   • Revisions do NOT contain news (p = 0.18 )
 #>   • Revisions do NOT contain noise (p = 0.298 )
-#>   • Significant autocorrelation in revisions 
+#>   • Significant autocorrelation in revisions
 #>               (ρ₁ = -0.232 ): revisions are persistent
 #>   • Good forecast accuracy (Theil's U1 = 0.023 )
 #>   • Excellent sign prediction (100% correct)
@@ -696,7 +695,7 @@ results
 #>   • Significant negative correlation between revisions and initial values (ρ = -0.203 , p = 0.007 )
 #>   • Revisions contain NEWS (p = 0.04 ): systematic information
 #>   • Revisions do NOT contain noise (p = 0.067 )
-#>   • Significant autocorrelation in revisions 
+#>   • Significant autocorrelation in revisions
 #>               (ρ₁ = -0.198 ): revisions are persistent
 #>   • Good forecast accuracy (Theil's U1 = 0.013 )
 #>   • Excellent sign prediction (100% correct)
@@ -706,7 +705,7 @@ results
 #>   • Very low revision volatility (Noise/Signal = 0.033 )
 #>   • Revisions do NOT contain news (p = 0.12 )
 #>   • Revisions do NOT contain noise (p = 0.058 )
-#>   • Significant autocorrelation in revisions 
+#>   • Significant autocorrelation in revisions
 #>               (ρ₁ = 0.544 ): revisions are persistent
 #>   • Good forecast accuracy (Theil's U1 = 0.014 )
 #>   • Excellent sign prediction (99.4% correct)
@@ -716,7 +715,7 @@ results
 #>   • Very low revision volatility (Noise/Signal = 0.032 )
 #>   • Revisions do NOT contain news (p = 0.122 )
 #>   • Revisions do NOT contain noise (p = 0.059 )
-#>   • Significant autocorrelation in revisions 
+#>   • Significant autocorrelation in revisions
 #>               (ρ₁ = 0.558 ): revisions are persistent
 #>   • Good forecast accuracy (Theil's U1 = 0.014 )
 #>   • Excellent sign prediction (99.4% correct)
@@ -783,7 +782,7 @@ head(results)
 #>   • Very low revision volatility (Noise/Signal = 0.021 )
 #>   • Revisions do NOT contain news (p = 0.318 )
 #>   • Revisions do NOT contain noise (p = 0.376 )
-#>   • Significant autocorrelation in revisions 
+#>   • Significant autocorrelation in revisions
 #>               (ρ₁ = -0.494 ): revisions are persistent
 #>   • Good forecast accuracy (Theil's U1 = 0.009 )
 #>   • Excellent sign prediction (100% correct)
@@ -793,7 +792,7 @@ head(results)
 #>   • Very low revision volatility (Noise/Signal = 0.032 )
 #>   • Revisions do NOT contain news (p = 0.612 )
 #>   • Revisions do NOT contain noise (p = 0.623 )
-#>   • Significant autocorrelation in revisions 
+#>   • Significant autocorrelation in revisions
 #>               (ρ₁ = -0.378 ): revisions are persistent
 #>   • Good forecast accuracy (Theil's U1 = 0.011 )
 #>   • Excellent sign prediction (98.9% correct)

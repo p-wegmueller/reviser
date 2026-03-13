@@ -125,7 +125,7 @@ summary(results)
 #>   • Significant negative correlation between revisions and initial values (ρ = -0.251 , p = 0.001 )
 #>   • Revisions contain NEWS (p = 0 ): systematic information
 #>   • Revisions do NOT contain noise (p = 0.103 )
-#>   • Significant autocorrelation in revisions 
+#>   • Significant autocorrelation in revisions
 #>               (ρ₁ = -0.182 ): revisions are persistent
 #>   • Good forecast accuracy (Theil's U1 = 0.108 )
 #>   • Excellent sign prediction (95.4% correct)

@@ -130,9 +130,9 @@ Revision paths for Euro Area GDP (Sources: BEA, Eurostat)
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://p-wegmueller.github.io/reviser/">reviser</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">gdp</span> <span class="op">&lt;-</span> <span class="va">gdp</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span><span class="va">gdp</span> <span class="op">&lt;-</span> <span class="va">gdp</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">id</span> <span class="op">==</span> <span class="st">"US"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu">tsbox</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/tsbox/reference/ts_pc.html" class="external-link">ts_pc</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu">tsbox</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/tsbox/reference/ts_pc.html" class="external-link">ts_pc</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu">tsbox</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/tsbox/reference/ts_span.html" class="external-link">ts_span</a></span><span class="op">(</span>start <span class="op">=</span> <span class="st">"1980-01-01"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">gdp_wide</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/vintages_wide.html">vintages_wide</a></span><span class="op">(</span><span class="va">gdp</span><span class="op">)</span></span>
@@ -140,7 +140,7 @@ Revision paths for Euro Area GDP (Sources: BEA, Eurostat)
 <span><span class="va">gdp_long</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/vintages_long.html">vintages_long</a></span><span class="op">(</span><span class="va">gdp_wide</span>, keep_na <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="reference/plot_vintages.html">plot_vintages</a></span><span class="op">(</span></span>
-<span>  <span class="va">gdp_long</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="va">gdp_long</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span></span>
 <span>    <span class="va">pub_date</span> <span class="op">&gt;=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2009-01-01"</span><span class="op">)</span> <span class="op">&amp;</span> <span class="va">pub_date</span> <span class="op">&lt;</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2010-01-01"</span><span class="op">)</span>,</span>
 <span>    <span class="va">time</span> <span class="op">&lt;</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2010-01-01"</span><span class="op">)</span> <span class="op">&amp;</span> <span class="va">time</span> <span class="op">&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2008-01-01"</span><span class="op">)</span></span>
@@ -150,7 +150,7 @@ Revision paths for Euro Area GDP (Sources: BEA, Eurostat)
 <span>  subtitle <span class="op">=</span> <span class="st">"qoq growth rates"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-3-1.png" width="100%"></p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span>  </span>
+<code class="sourceCode R"><span></span>
 <span><span class="va">final_release</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_nth_release.html">get_nth_release</a></span><span class="op">(</span><span class="va">gdp_long</span>, n <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_nth_release.html">get_nth_release</a></span><span class="op">(</span><span class="va">gdp_long</span>, n <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">6</span><span class="op">)</span></span>
@@ -173,44 +173,44 @@ Revision paths for Euro Area GDP (Sources: BEA, Eurostat)
 <code class="sourceCode R"><span></span>
 <span><span class="va">efficient_release</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_first_efficient_release.html">get_first_efficient_release</a></span><span class="op">(</span><span class="va">df</span>, <span class="va">final_release</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">efficient_release</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Efficient release:  0 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Model summary: </span></span>
-<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Efficient release:  0</span></span>
+<span><span class="co">#&gt;</span></span>
+<span><span class="co">#&gt; Model summary:</span></span>
+<span><span class="co">#&gt;</span></span>
 <span><span class="co">#&gt; Call:</span></span>
 <span><span class="co">#&gt; stats::lm(formula = formula, data = df_wide)</span></span>
-<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;</span></span>
 <span><span class="co">#&gt; Residuals:</span></span>
-<span><span class="co">#&gt;      Min       1Q   Median       3Q      Max </span></span>
-<span><span class="co">#&gt; -0.89186 -0.12669  0.02046  0.11475  0.97986 </span></span>
-<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;      Min       1Q   Median       3Q      Max</span></span>
+<span><span class="co">#&gt; -0.89186 -0.12669  0.02046  0.11475  0.97986</span></span>
+<span><span class="co">#&gt;</span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
-<span><span class="co">#&gt;             Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
-<span><span class="co">#&gt; (Intercept)  0.00299    0.02223   0.134    0.893    </span></span>
+<span><span class="co">#&gt;             Estimate Std. Error t value Pr(&gt;|t|)</span></span>
+<span><span class="co">#&gt; (Intercept)  0.00299    0.02223   0.134    0.893</span></span>
 <span><span class="co">#&gt; release_0    0.97412    0.01692  57.567   &lt;2e-16 ***</span></span>
 <span><span class="co">#&gt; ---</span></span>
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
-<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;</span></span>
 <span><span class="co">#&gt; Residual standard error: 0.2518 on 166 degrees of freedom</span></span>
 <span><span class="co">#&gt;   (10 observations deleted due to missingness)</span></span>
-<span><span class="co">#&gt; Multiple R-squared:  0.9523, Adjusted R-squared:  0.952 </span></span>
+<span><span class="co">#&gt; Multiple R-squared:  0.9523, Adjusted R-squared:  0.952</span></span>
 <span><span class="co">#&gt; F-statistic:  3314 on 1 and 166 DF,  p-value: &lt; 2.2e-16</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Test summary: </span></span>
+<span><span class="co">#&gt;</span></span>
+<span><span class="co">#&gt;</span></span>
+<span><span class="co">#&gt; Test summary:</span></span>
 <span><span class="co">#&gt; Linear hypothesis test</span></span>
-<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;</span></span>
 <span><span class="co">#&gt; Hypothesis:</span></span>
 <span><span class="co">#&gt; (Intercept) = 0</span></span>
 <span><span class="co">#&gt; release_0 = 1</span></span>
-<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;</span></span>
 <span><span class="co">#&gt; Model 1: restricted model</span></span>
 <span><span class="co">#&gt; Model 2: final ~ release_0</span></span>
-<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;</span></span>
 <span><span class="co">#&gt; Note: Coefficient covariance matrix supplied.</span></span>
-<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;</span></span>
 <span><span class="co">#&gt;   Res.Df Df      F Pr(&gt;F)</span></span>
-<span><span class="co">#&gt; 1    168                 </span></span>
+<span><span class="co">#&gt; 1    168</span></span>
 <span><span class="co">#&gt; 2    166  2 1.9283 0.1486</span></span></code></pre></div>
 </div>
 <div class="section level2">

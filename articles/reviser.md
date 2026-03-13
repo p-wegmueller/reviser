@@ -446,17 +446,17 @@ in multiple ways:
   [`get_revisions()`](https://p-wegmueller.github.io/reviser/reference/get_revisions.md).
   See vignette [Understanding Data
   Revisions](https://p-wegmueller.github.io/reviser/articles/understanding-revisions.md)
-  for more details.  
+  for more details.
 - Analyze the revisions:
   [`get_revision_analysis()`](https://p-wegmueller.github.io/reviser/reference/get_revision_analysis.md).
   See vignette [Revision Patterns and
   Statistics](https://p-wegmueller.github.io/reviser/articles/revision-analysis.md)
-  for more details.  
+  for more details.
 - Identify the first efficient release:
   [`get_first_efficient_release()`](https://p-wegmueller.github.io/reviser/reference/get_first_efficient_release.md).
   See vignette [Efficient Release
   Identification](https://p-wegmueller.github.io/reviser/articles/efficient-release.md)
-  for more details.  
+  for more details.
 - Nowcast future revisions:
   [`kk_nowcast()`](https://p-wegmueller.github.io/reviser/reference/kk_nowcast.md).
   See vignette [Nowcasting
