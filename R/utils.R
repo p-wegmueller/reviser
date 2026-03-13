@@ -71,15 +71,17 @@ vintages_long <- function(df, names_to = "pub_date", keep_na = FALSE) {
       check <- vintages_check(df[[id]])
       if (check == "long") {
         rlang::warn("The input data is already in long format.")
-        return(df[[id]])
+        long_df_tmp <- df[[id]] %>%
+          dplyr::mutate(id = .env$id)
+      } else {
+        long_df_tmp <- df[[id]] %>%
+          tidyr::pivot_longer(
+            cols = -"time",
+            names_to = names_to,
+            values_to = "value"
+          ) %>%
+          dplyr::mutate(id = .env$id)
       }
-      long_df_tmp <- df[[id]] %>%
-        tidyr::pivot_longer(
-          cols = -"time",
-          names_to = names_to,
-          values_to = "value"
-        ) %>%
-        dplyr::mutate(id = id)
 
       if (keep_na) {
         return(long_df_tmp)

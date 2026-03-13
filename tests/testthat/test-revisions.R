@@ -379,6 +379,21 @@ test_that("get_first_release returns first release", {
   expect_true(all(result$release == "release_0"))
 })
 
+test_that("get_first_release diagonal keeps the real first-release diagonal", {
+  df_single_wide <- data.frame(
+    time = as.Date(c("2020-01-01", "2020-02-01", "2020-03-01")),
+    `2020-03-01` = c(1, 2, 3),
+    check.names = FALSE
+  )
+
+  result <- get_first_release(vintages_long(df_single_wide), diagonal = TRUE)
+
+  expect_equal(nrow(result), 1)
+  expect_equal(result$time, as.Date("2020-03-01"))
+  expect_equal(result$pub_date, as.Date("2020-03-01"))
+  expect_true(all(result$release == "release_0"))
+})
+
 # ===== Tests for get_latest_release =====
 
 test_that("get_latest_release returns latest release", {

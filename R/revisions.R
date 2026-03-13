@@ -2347,7 +2347,7 @@ get_nth_release <- function(df, n = 0, diagonal = FALSE) {
             dplyr::summarise(max_time = max(.data$time), .groups = "drop"),
           by = c("id", "min_pub_date" = "pub_date")
         ) %>%
-        dplyr::select(.data$id, .data$max_time)
+        dplyr::select("id", "max_time")
 
       nth_release <- nth_release %>%
         dplyr::left_join(diagonal_thresholds, by = "id") %>%
@@ -2456,10 +2456,28 @@ get_first_release <- function(df, diagonal = FALSE) {
   }
 
   if (diagonal) {
-    df <- df %>%
-      dplyr::filter(
-        !dplyr::lead(.data$pub_date) == (.data$pub_date)
-      )
+    if ("id" %in% colnames(df)) {
+      diagonal_thresholds <- df %>%
+        dplyr::group_by(.data$id) %>%
+        dplyr::summarise(min_pub_date = min(.data$pub_date), .groups = "drop") %>%
+        dplyr::left_join(
+          df %>%
+            dplyr::group_by(.data$id, .data$pub_date) %>%
+            dplyr::summarise(max_time = max(.data$time), .groups = "drop"),
+          by = c("id", "min_pub_date" = "pub_date")
+        ) %>%
+        dplyr::select("id", "max_time")
+
+      df <- df %>%
+        dplyr::left_join(diagonal_thresholds, by = "id") %>%
+        dplyr::filter(.data$time >= .data$max_time) %>%
+        dplyr::select(-"max_time")
+    } else {
+      min_pub_date <- min(df$pub_date)
+      max_time <- max(df$time[df$pub_date == min_pub_date])
+      df <- df %>%
+        dplyr::filter(.data$time >= max_time)
+    }
   }
 
   # Add the class only if it is not already present

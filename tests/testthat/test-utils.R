@@ -96,6 +96,19 @@ test_that("vintages_long handles list input", {
   expect_equal(nrow(result), 48)  # 12 * 2 vintages * 2 ids
 })
 
+test_that("vintages_long keeps ids for long-format list input", {
+  long_list <- list(US = df_long, EA = df_long)
+
+  expect_warning(
+    result <- vintages_long(long_list, names_to = "pub_date"),
+    "already in long format"
+  )
+
+  expect_true("id" %in% colnames(result))
+  expect_equal(sort(unique(result$id)), c("EA", "US"))
+  expect_equal(unname(as.integer(table(result$id))), c(nrow(df_long), nrow(df_long)))
+})
+
 test_that("vintages_long validates names_to parameter", {
   expect_error(
     vintages_long(df_wide, names_to = "invalid"),
